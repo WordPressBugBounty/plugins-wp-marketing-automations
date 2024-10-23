@@ -27,6 +27,10 @@ class BWFAN_Api_Get_WC_Coupons extends BWFAN_API_Base {
 	}
 
 	public function process_api_call() {
+		// check if woocommerce is active
+		if ( ! bwfan_is_woocommerce_active() ) {
+			return $this->error_response( __( 'WooCommerce is not active', 'wp-marketing-automations' ), null, 400 );
+		}
 		$search           = ! empty( $this->get_sanitized_arg( 'search', 'text_field' ) ) ? $this->get_sanitized_arg( 'search', 'text_field' ) : '';
 		$exclude_autonami = ! empty( $this->get_sanitized_arg( 'exclude_autonami', 'bool' ) ) ? $this->get_sanitized_arg( 'exclude_autonami', 'bool' ) : true;
 		$coupons          = $this->get_all_coupons( $search, $exclude_autonami );

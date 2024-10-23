@@ -141,7 +141,11 @@ class BWFAN_Delay_Controller extends BWFAN_Base_Step_Controller {
 		if ( $this->is_contact_timezone && ! empty( $this->contact_id ) ) {
 			$contact = new WooFunnels_Contact( '', '', '', absint( $this->contact_id ) );
 			if ( absint( $contact->get_id() ) > 0 && ! empty( $contact->get_timezone() ) ) {
-				$timezone = new DateTimeZone( $contact->get_timezone() );
+				try {
+					$timezone = new DateTimeZone( $contact->get_timezone() );
+				} catch ( Exception $e ) {
+					BWFAN_Common::log_test_data( 'Contact timezone error for contact #' . $contact->get_id() . '. Timezone . ' . $contact->get_timezone() . '. Error: ' . $e->getMessage(), 'delay-time', true );
+				}
 			}
 			$datetime = new DateTime( date( 'Y-m-d H:i:s', $current_timestamp ), $timezone );
 		}

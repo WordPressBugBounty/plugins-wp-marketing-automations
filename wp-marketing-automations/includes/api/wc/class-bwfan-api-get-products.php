@@ -43,6 +43,11 @@ class BWFAN_Api_Get_Products extends BWFAN_API_Base {
 	}
 
 	public function process_api_call() {
+		// check if woocommerce is active
+		if ( ! bwfan_is_woocommerce_active() ) {
+			return $this->error_response( __( 'WooCommerce is not active', 'wp-marketing-automations' ), null, 400 );
+		}
+
 		/** if isset search param then get the tag by name **/
 		$search       = $this->get_sanitized_arg( 'search', 'text_field' );
 		$type         = $this->get_sanitized_arg( 'type', 'text_field' );
@@ -95,7 +100,6 @@ class BWFAN_Api_Get_Products extends BWFAN_API_Base {
 
 		$result              = $this->get_data( $type, $limit, $page );
 		$products            = $result['products'];
-		$this->response_code = 200;
 		$this->total_count   = $result['total'];
 
 		$this->response_code = 200;
@@ -407,6 +411,8 @@ class BWFAN_Api_Get_Products extends BWFAN_API_Base {
 		if ( ! empty( $this->sortby ) ) {
 			$data = $this->get_sort_arg( $data );
 		}
+
+		$data['post_status'] = 'publish';
 
 		$wp_query    = new WP_Query( $data );
 		$product_ids = $wp_query->get_posts();

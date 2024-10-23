@@ -345,8 +345,7 @@ class BWFAN_Automation_Controller {
 	 * @return void
 	 */
 	public function process_current_step() {
-
-		if ( $this->e_time > time() ) {
+		if ( $this->e_time > time() + 5 ) {
 			return;
 		}
 

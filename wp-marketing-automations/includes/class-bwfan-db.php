@@ -176,6 +176,9 @@ class BWFAN_DB {
 		/** Updated block editor default values */
 		update_option( 'bwf_global_block_editor_setting', BWFAN_Common::get_block_editor_default_setting() );
 
+		/** set default settings for email notification */
+		BWFAN_Notification_Email::set_bwfan_settings();
+
 		/** Log if any mysql errors */
 		if ( ! empty( $db_errors ) ) {
 			BWFAN_Common::log_test_data( array_merge( [ __FUNCTION__ ], $db_errors ), 'db-creation-errors' );
@@ -267,6 +270,7 @@ class BWFAN_DB {
 			'3.0.1.1'  => '3_0_1_1',
 			'3.0.4'    => '3_0_4',
 			'3.0.5'    => '3_0_5',
+			'3.2.0'    => '3_2_0',
 		);
 		$db_version = get_option( 'bwfan_db', '2.0' );
 
@@ -1067,6 +1071,21 @@ class BWFAN_DB {
 		if ( ! empty( $db_errors ) ) {
 			BWFAN_Common::log_test_data( array_merge( [ __FUNCTION__ ], $db_errors ), 'db-creation-errors' );
 		}
+
+		/** Updating version key */
+		update_option( 'bwfan_db', $version_key, true );
+	}
+
+	/**
+	 * Set notification email default settings
+	 *
+	 * @param $version_key
+	 *
+	 * @return void
+	 */
+	public function db_update_3_2_0( $version_key ) {
+		/** set default settings for email notification */
+		BWFAN_Notification_Email::set_bwfan_settings();
 
 		/** Updating version key */
 		update_option( 'bwfan_db', $version_key, true );

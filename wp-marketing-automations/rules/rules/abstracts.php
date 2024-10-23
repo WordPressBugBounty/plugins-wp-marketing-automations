@@ -590,29 +590,30 @@ class BWFAN_Rule_Custom_Field extends BWFAN_Rule_Base {
 
 		$type = $rule_data['rule'];
 		$data = $rule_data['data'];
-
-		if ( ! is_array( $data ) && empty( $data ) ) {
+		if ( ! is_array( $data ) || empty( $data ) ) {
 			return $this->return_is_match( false, $rule_data );
 		}
+		$key         = $data[0] ?? '';
+		$saved_value = strtolower( trim( $data[1] ?? '' ) );
+		$value       = strtolower( trim( $this->get_possible_value( $key, $automation_data ) ) );
 
-		$key         = isset( $data[0] ) ? $data[0] : '';
-		$saved_value = isset( $data[1] ) ? $data[1] : '';
-		$value       = $this->get_possible_value( $key, $automation_data );
-
+		if ( empty( $value ) && ! in_array( $type, [ 'is_blank', 'is_not_blank' ] ) ) {
+			return $this->return_is_match( false, $rule_data );
+		}
 		$result = false;
 		switch ( $type ) {
 			case 'is':
-				$result = ( strtolower( $value ) === strtolower( $saved_value ) );
+				$result = ( $value === $saved_value );
 				break;
 			case 'isnot':
 			case 'is_not':
-				$result = ( strtolower( $value ) !== strtolower( $saved_value ) );
+				$result = ( $value !== $saved_value );
 				break;
 			case '>':
-				$result = ( strtolower( $value ) >= strtolower( $saved_value ) );
+				$result = ( $value >= $saved_value );
 				break;
 			case '<':
-				$result = ( strtolower( $value ) <= strtolower( $saved_value ) );
+				$result = ( $value <= $saved_value );
 				break;
 			case 'contains':
 				$result = strpos( $value, $saved_value ) !== false;
@@ -621,17 +622,10 @@ class BWFAN_Rule_Custom_Field extends BWFAN_Rule_Base {
 				$result = strpos( $value, $saved_value ) === false;
 				break;
 			case 'starts_with':
-				$length = strlen( $saved_value );
-				$result = substr( $value, 0, $length ) === $saved_value;
+				$result = strpos( $value, $saved_value ) === 0;
 				break;
 			case 'ends_with':
-				$length = strlen( $saved_value );
-
-				if ( 0 === $length ) {
-					$result = true;
-				} else {
-					$result = substr( $value, - $length ) === $saved_value;
-				}
+				$result = substr( $value, - strlen( $saved_value ) ) === $saved_value;
 				break;
 			case 'is_blank':
 				$result = empty( $value );
@@ -643,6 +637,7 @@ class BWFAN_Rule_Custom_Field extends BWFAN_Rule_Base {
 
 		return $this->return_is_match( $result, $rule_data );
 	}
+
 
 	public function is_match( $rule_data ) {
 		$type  = $rule_data['operator'];

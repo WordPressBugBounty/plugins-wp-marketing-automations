@@ -468,6 +468,7 @@ class BWFAN_Automation_V2 {
 						case 'wait':
 						case 'conditional':
 							if ( isset( $data['data'] ) && isset( $data['data']['sidebarData'] ) ) {
+								$data['data']['sidebarData']   = BWFAN_Common::modify_step_admin_data( 'conditional', $data['data']['sidebarData'] );
 								$step['data']['sidebarValues'] = $data['data']['sidebarData'];
 							}
 							break;
@@ -492,7 +493,8 @@ class BWFAN_Automation_V2 {
 								$step['data']['benchmark'] = $data['action']['benchmark'];
 								$benchmark                 = BWFAN_Core()->sources->get_event( $data['action']['benchmark'] );
 								if ( ! is_null( $benchmark ) && method_exists( $benchmark, 'get_desc_text' ) && isset( $data['data'] ) && isset( $data['data']['sidebarData'] ) ) {
-									$step['data']['desc_text'] = $benchmark->get_desc_text( $data['data']['sidebarData'] );
+									$data['data']['sidebarData'] = BWFAN_Common::modify_step_admin_data( 'benchmark', $data['data']['sidebarData'] );
+									$step['data']['desc_text']   = $benchmark->get_desc_text( $data['data']['sidebarData'] );
 								}
 							}
 							if ( isset( $data['action'] ) && ! empty( $data['action'] ) && isset( $data['action']['source'] ) ) {

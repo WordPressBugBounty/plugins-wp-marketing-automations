@@ -33,6 +33,14 @@ if ( ! bwfan_is_autonami_pro_active() || version_compare( BWFAN_PRO_VERSION, '2.
 				return $this->parse_shortcode_output( $this->get_dummy_preview(), $attr );
 			}
 
+			/** If needed contact email not wc order email */
+			if ( isset( $get_data['contact_id'] ) && defined( 'BWFAN_GET_CONTACT_EMAIL' ) && true === BWFAN_GET_CONTACT_EMAIL ) {
+				$email = $this->get_email( $get_data['contact_id'] );
+				if ( ! empty( $email ) ) {
+					return $this->parse_shortcode_output( $email, $attr );
+				}
+			}
+
 			/** If email */
 			if ( isset( $get_data['email'] ) && ! empty( $get_data['email'] ) ) {
 				return $this->parse_shortcode_output( $get_data['email'], $attr );

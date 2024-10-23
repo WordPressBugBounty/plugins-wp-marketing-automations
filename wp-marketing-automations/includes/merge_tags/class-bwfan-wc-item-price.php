@@ -46,21 +46,10 @@ class BWFAN_WC_Item_Price extends BWFAN_Cart_Display {
 		}
 
 		$this->item_type = 'price';
-		$result          = $this->get_item_details();
-
-		if ( ! empty( $result ) ) {
-			$item_id = BWFAN_Merge_Tag_Loader::get_data( 'wc_single_item_id' );
-			/** If item id is empty */
-			if ( empty( $item_id ) ) {
-				return $this->parse_shortcode_output( $result, $attr );
-			}
-			$item = new WC_Order_Item_Product( $item_id );
-			if ( empty( $item->get_id() ) ) {
-				return $this->parse_shortcode_output( $result, $attr );
-			}
-
-			$formatting = BWFAN_Common::get_formatting_for_wc_price( $attr, $item->get_order() );
-			$result     = BWFAN_Common::get_formatted_price_wc( $result, $formatting['raw'], $formatting['currency'] );
+		try {
+			$result = $this->get_item_details( $attr );
+		} catch ( Exception $e ) {
+			return $this->parse_shortcode_output( '', $attr );
 		}
 
 		return $this->parse_shortcode_output( $result, $attr );

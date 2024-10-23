@@ -50,6 +50,7 @@ class BWFAN_Subscribe_Link_Handler {
 				$url = BWFAN_Common::bwfan_correct_protocol_url( $link );
 				$url = BWFAN_Common::append_extra_url_arguments( $url );
 				if ( false !== wp_http_validate_url( $url ) ) {
+					BWFAN_Email_Conversations::validate_link( $url );
 					wp_redirect( $url );
 					exit;
 				}
@@ -73,7 +74,8 @@ class BWFAN_Subscribe_Link_Handler {
 			$url = BWFAN_Common::bwfan_correct_protocol_url( $link );
 			$url = BWFAN_Common::append_extra_url_arguments( $url );
 			if ( false !== wp_http_validate_url( $url ) ) {
-				wp_redirect( $url );
+				BWFAN_Email_Conversations::validate_link( $url );
+				wp_redirect( urldecode( $url ) );
 				exit;
 			}
 		}

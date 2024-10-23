@@ -35,6 +35,7 @@ class BWFAN_WC_Admin_Order_Note extends BWFAN_Merge_Tag {
 		if ( empty( $current_order_note ) ) {
 			return $this->parse_shortcode_output( '', $attr );
 		}
+		$current_order_note = apply_filters( 'bwfan_current_order_note', $current_order_note, $attr );
 
 		return $this->parse_shortcode_output( $current_order_note, $attr );
 	}

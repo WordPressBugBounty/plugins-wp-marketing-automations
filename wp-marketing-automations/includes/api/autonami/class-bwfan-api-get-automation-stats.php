@@ -68,7 +68,7 @@ class BWFAN_API_Get_Automation_stats extends BWFAN_API_Base {
 						'paused'   => ( false !== $paused_index && isset( $paused_automation[ $paused_index ]['count'] ) ) ? $paused_automation[ $paused_index ]['count'] : 0,
 					];
 				}
-
+				BWFAN_Common::validate_scheduled_recurring_actions();
 				set_transient( $cached_key, $data, $exp );
 			}
 

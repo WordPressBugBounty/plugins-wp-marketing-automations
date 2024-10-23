@@ -1,4 +1,5 @@
 <?php
+
 #[AllowDynamicProperties]
 class BWFAN_Cart_Display extends BWFAN_Merge_Tag {
 
@@ -114,8 +115,13 @@ class BWFAN_Cart_Display extends BWFAN_Merge_Tag {
 		if ( empty( $item_id ) ) {
 			return '';
 		}
-		$item = new WC_Order_Item_Product( $item_id );
-		if ( empty( $item->get_id() ) ) {
+		try {
+			$item = new WC_Order_Item_Product( $item_id );
+		} catch ( Exception $e ) {
+			return '';
+		}
+
+		if ( ! $item instanceof WC_Order_Item_Product || empty( $item->get_id() ) ) {
 			return '';
 		}
 
@@ -129,6 +135,8 @@ class BWFAN_Cart_Display extends BWFAN_Merge_Tag {
 				break;
 			case 'price':
 				$return_value = $item->get_total();
+				$formatting   = BWFAN_Common::get_formatting_for_wc_price( $parameters, $item->get_order() );
+				$return_value = BWFAN_Common::get_formatted_price_wc( $return_value, $formatting['raw'], $formatting['currency'] );
 				break;
 			case 'quantity':
 				$return_value = $item->get_quantity();

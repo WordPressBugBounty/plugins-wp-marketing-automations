@@ -35,7 +35,11 @@ class BWFAN_API_Save_Settings extends BWFAN_API_Base {
 			return $this->error_response( [], __( 'Settings Data is missing.', 'wp-marketing-automations' ) );
 		}
 
+		$old_value = get_option( 'bwfan_global_settings' );
+
 		update_option( 'bwfan_global_settings', $settings, true );
+
+		do_action( 'bwfan_after_save_global_settings', $old_value, $settings );
 
 		$this->response_code = 200;
 

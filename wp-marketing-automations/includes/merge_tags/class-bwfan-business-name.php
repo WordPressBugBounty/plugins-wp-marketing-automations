@@ -33,8 +33,9 @@ class BWFAN_Business_Name extends BWFAN_Merge_Tag {
 			return '';
 		}
 		$business_name = $global_settings['bwfan_setting_business_name'];
+		$business_name = empty( $business_name ) ? get_bloginfo( 'name' ) : $business_name;
 
-		return $this->parse_shortcode_output( $business_name, $attr );
+		return $this->parse_shortcode_output( trim( $business_name ), $attr );
 	}
 
 }

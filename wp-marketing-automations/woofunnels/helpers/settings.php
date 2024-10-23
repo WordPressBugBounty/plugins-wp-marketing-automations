@@ -1,14 +1,5 @@
 <?php
-/**
- * States
- *
- * Returns an array of country states. This deprecates and replaces the /states/ directory found in older versions.
- * States should be defined in English and translated native through localisation files.
- * Country codes and states (or province) names should follow the Unicode CLDR recommendation (http://cldr.unicode.org/translation/country-names).
- * Countries defined with empty arrays have no states.
- *
- *
- */
+
 
 defined( 'ABSPATH' ) || exit;
 
@@ -22,14 +13,14 @@ return apply_filters( 'bwf_settings_config', array(
 			array(
 				'key'           => 'default_selected_builder',
 				'type'          => 'select',
-				'label'         =>  __( 'Default Page Builder', 'woofunnels' ),
+				'label'         => __( 'Default Page Builder', 'woofunnels' ),
 				'hint'          => '',
-				'values'        => [
-					[ 'id' => 'elementor', 'name' => __( 'Elementor', 'woofunnels' ) ],
-					[ 'id' => 'divi', 'name' => __( 'Divi', 'woofunnels' ) ],
-					[ 'id' => 'customizer', 'name' => __( 'Customizer', 'woofunnels' ) ],
-					[ 'id' => 'wp_editor', 'name' => __( 'Other', 'woofunnels' ) ],
-				],
+				'values'        => function_exists( 'wffn_rest_funnels' ) && method_exists( wffn_rest_funnels(), 'get_all_builders' ) ? array_map( function ( $id, $name ) {
+					return [
+						'id'   => $id,
+						'name' => __( $name, 'woofunnels' )
+					];
+				}, array_keys( wffn_rest_funnels()->get_all_builders()['funnel'] ), wffn_rest_funnels()->get_all_builders()['funnel'] ) : [],
 				'selectOptions' => [
 					'hideNoneSelectedText' => true,
 				],
@@ -40,7 +31,7 @@ return apply_filters( 'bwf_settings_config', array(
 				'type'  => 'html',
 				'label' => __( 'Set Funnel as Homepage', 'woofunnels' ),
 				'hint'  => '',
-				'html' => __( 'Select the Funnel page you want to set as the Homepage.  <a href="' . admin_url( 'options-reading.php' ) . '">Go to Wordpress Settings</a>', 'woofunnels' ),
+				'html'  => __( 'Select the Funnel page you want to set as the Homepage.  <a href="' . admin_url( 'options-reading.php' ) . '">Go to Wordpress Settings</a>', 'woofunnels' ),
 			),
 		) ),
 		'priority' => 1,
@@ -353,7 +344,7 @@ return apply_filters( 'bwf_settings_config', array(
 			array(
 				'key'          => 'pixel_variable_as_simple',
 				'type'         => 'checkbox',
-				'label'        => __( 'Treat variable products like simple products', 'woofunnels' ),
+				'label'        => __( 'Enable this to send parent product ID for variable products', 'woofunnels' ),
 				'hint'         => __( 'Turn this option ON when your Product Catalog doesn\'t include the variants for variable products.', 'woofunnels' ),
 				'styleClasses' => [ 'wfacp_checkbox_wrap', 'bwf_vue_checkbox_label' ],
 				'toggler'      => array(
@@ -616,7 +607,7 @@ return apply_filters( 'bwf_settings_config', array(
 			array(
 				'key'          => 'google_ua_variable_as_simple',
 				'type'         => 'checkbox',
-				'label'        => __( 'Treat variable products like simple products', 'woofunnels' ),
+				'label'        => __( 'Enable this to send parent product ID for variable products', 'woofunnels' ),
 				'hint'         => __( 'Turn this option ON when your Product Catalog doesn\'t include the variants for variable products.', 'woofunnels' ),
 				'styleClasses' => [ 'wfacp_checkbox_wrap', 'wfacp_setting_track_and_events_end', 'bwf_remove_lft_pad', 'bwf_clear_rgt_width', 'rem_hint_pad' ],
 			),
@@ -848,7 +839,7 @@ return apply_filters( 'bwf_settings_config', array(
 			array(
 				'key'          => 'google_ads_variable_as_simple',
 				'type'         => 'checkbox',
-				'label'        => __( 'Treat variable products like simple products', 'woofunnels' ),
+				'label'        => __( 'Enable this to send parent product ID for variable products', 'woofunnels' ),
 				'hint'         => __( 'Turn this option ON when your Product Catalog doesn\'t include the variants for variable products.', 'woofunnels' ),
 				'styleClasses' => [ 'wfacp_checkbox_wrap', 'wfacp_setting_track_and_events_end', 'bwf_remove_lft_pad', 'bwf_clear_rgt_width', 'rem_hint_pad' ],
 			),
@@ -1077,7 +1068,7 @@ return apply_filters( 'bwf_settings_config', array(
 			array(
 				'key'          => 'pint_variable_as_simple',
 				'type'         => 'checkbox',
-				'label'        => __( 'Treat variable products like simple products', 'woofunnels' ),
+				'label'        => __( 'Enable this to send parent product ID for variable products', 'woofunnels' ),
 				'hint'         => __( 'Turn this option ON when your Product Catalog doesn\'t include the variants for variable products.', 'woofunnels' ),
 				'styleClasses' => [ 'wfacp_checkbox_wrap', 'wfacp_setting_track_and_events_end', 'bwf_remove_lft_pad', 'bwf_clear_rgt_width', 'rem_hint_pad' ],
 			),
@@ -1274,6 +1265,19 @@ return apply_filters( 'bwf_settings_config', array(
 					),
 				),
 			),
+			array(
+				'type'         => 'label',
+				'key'          => 'label_section_head_ga',
+				'label'        => __( 'Advanced', 'woofunnels' ),
+				'styleClasses' => [ 'wfacp_setting_track_and_events_start', 'bwf_wrap_custom_html_tracking_general' ],
+			),
+			array(
+				'key'          => 'tiktok_variable_as_simple',
+				'type'         => 'checkbox',
+				'label'        => __( 'Enable this to send parent product ID for variable products', 'woofunnels' ),
+				'hint'         => __( 'Turn this option ON when your Product Catalog doesn\'t include the variants for variable products.', 'woofunnels' ),
+				'styleClasses' => [ 'wfacp_checkbox_wrap', 'wfacp_setting_track_and_events_end', 'bwf_remove_lft_pad', 'bwf_clear_rgt_width', 'rem_hint_pad' ],
+			),
 		),
 		'priority' => 30,
 	),
@@ -1388,6 +1392,19 @@ return apply_filters( 'bwf_settings_config', array(
 					),
 				),
 			),
+			array(
+				'type'         => 'label',
+				'key'          => 'label_section_head_ga',
+				'label'        => __( 'Advanced', 'woofunnels' ),
+				'styleClasses' => [ 'wfacp_setting_track_and_events_start', 'bwf_wrap_custom_html_tracking_general' ],
+			),
+			array(
+				'key'          => 'snapchat_variable_as_simple',
+				'type'         => 'checkbox',
+				'label'        => __( 'Enable this to send parent product ID for variable products', 'woofunnels' ),
+				'hint'         => __( 'Turn this option ON when your Product Catalog doesn\'t include the variants for variable products.', 'woofunnels' ),
+				'styleClasses' => [ 'wfacp_checkbox_wrap', 'wfacp_setting_track_and_events_end', 'bwf_remove_lft_pad', 'bwf_clear_rgt_width', 'rem_hint_pad' ],
+			),
 		),
 		'priority' => 30,
 	),
@@ -1413,6 +1430,50 @@ return apply_filters( 'bwf_settings_config', array(
 		),
 		'priority' => 5,
 	),
+	'funnelkit_advanced'    => array(
+		'title'    => __( 'Theme CSS and JavaScript', 'funnel-builder' ),
+		'heading'  => __( 'Enabling this setting will apply theme CSS and JavaScript for FunnelKit canvas and FunnelKit Boxed made template', 'funnel-builder' ),
+		'slug'     => 'allow_theme_css',
+		'fields'   => array(
+			array(
+				'type'             => 'checklist',
+				'key'              => 'allow_theme_css',
+				'label'            => __( 'Enable theme CSS and JavaScript', 'funnel-builder' ),
+				'value'            => [],
+				'options'          => array(
+					array(
+						'value' => 'wfacp_checkout',
+						'label' => __( 'Checkout', 'funnel-builder' )
+					),
+					array(
+						'value' => 'wffn_landing',
+						'label' => __( 'Sales', 'funnel-builder' )
+					),
+					array(
+						'value' => 'wfocu_offer',
+						'label' => __( 'One Click Upsell Offer', 'funnel-builder' ),
+						'isPro' => true
+					),
+					array(
+						'value' => 'wffn_ty',
+						'label' => __( 'Thank you', 'funnel-builder' )
+					),
+
+					array(
+						'value' => 'wffn_optin',
+						'label' => __( 'Optin', 'funnel-builder' )
+					),
+					array(
+						'value' => 'wffn_oty',
+						'label' => __( 'Optin Confirmation', 'funnel-builder' )
+					),
+				),
+				'select_all'       => true,
+				'select_all_label' => __( 'Select All Steps', 'funnel-builder' ),
+				'orientation'      => 'horizontal'
+			)
+		),
+		'priority' => 25,
+	)
 
 ) );
-

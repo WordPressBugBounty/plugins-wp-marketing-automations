@@ -45,7 +45,11 @@ class BWFAN_WC_Item_Meta extends BWFAN_Cart_Display {
 		}
 
 		$this->item_type = 'item_meta';
-		$result          = $this->get_item_details( $attr );
+		try {
+			$result = $this->get_item_details( $attr );
+		} catch ( Exception $e ) {
+			return $this->parse_shortcode_output( 0, $attr );
+		}
 
 		return $this->parse_shortcode_output( $result, $attr );
 	}

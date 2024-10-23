@@ -223,7 +223,7 @@ class BWFAN_API_Get_Automation_Contact_Trail extends BWFAN_API_Base {
 			case BWFAN_Automation_Controller::$TYPE_ACTION :
 				$action      = isset( $data['action'] ) ? json_decode( $data['action'], true ) : [];
 				$action_slug = isset( $action['action'] ) ? $action['action'] : '';
-				$res_msg     = ( empty( $res_msg ) && isset( $response['error_msg'] ) ) ? $response['error_msg'] : $res_msg;
+				$res_msg     = ( empty( $res_msg ) && isset( $response['error_msg'] ) ) ? $this->get_trail_message($response['error_msg']) : $res_msg;
 
 				/** check for action slug */
 				if ( empty( $action_slug ) ) {

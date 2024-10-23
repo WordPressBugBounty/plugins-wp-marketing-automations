@@ -2,9 +2,9 @@
 Contributors: xlplugins, amans2k
 Tags: cart abandonment, follow up emails, email marketing, email customizer, crm, woocommerce, newsletter, marketing automation
 Requires at least: 5.0
-Tested up to: 6.6.1
+Tested up to: 6.7.0
 Requires PHP: 7.0
-Stable tag: 3.2.2
+Stable tag: 3.3.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -415,6 +415,36 @@ FunnelKit Automations is 100% self-hosted and fully GDPR compliant.
 
 
 == Change log ==
+
+= 3.3.0 (Oct 22, 2024) =
+* Compatible upto WordPress 6.7.0
+* Compatible upto WooCommerce 9.4.0
+* Security: SQL injection improvement. (#3465)
+* Added: Optimize engagement tracking table. A new tool optimized the email dynamic merge tag values by removing them. (#3402)
+* Added: Verify base tables. A new tool was added that checks all the required tables and their columns. (#3170)
+* Added: Automation merge tag: Order items and Cart items: Two new template types added. Product names & Product names with quantity for line-separated type. (#3428)
+* Added: Weekly admin notifications and advanced analytics over emails were added.
+* Added: Admin app: Copy cart URL. A new feature was added to the cart listing page. (#2807)
+* Added: Pro: Admin app: Contact export flow optimized. Allow cancelling export. Exports listing showing. (#3406)
+* Improved: Sometimes, contact was entered twice in the automation, and extra handling was added. (#3472, #3507)
+* Improved: Admin app: Admin notices added for better UX. (#3296)
+* Improved: Automation delay step improvement when the timezone is not correct. (#3410)
+* Improved: Admin app: Inline error messages in settings for better UX. (#3095)
+* Improved: Some static translations were made dynamic. (#3419)
+* Improved: Automation action: Send email: Static email address attribution corrected. (#3441)
+* Improved: The contacts fetching query was optimized to speed up the fetching of contacts. (#3471)
+* Improved: Admin app: Delete item API sometimes not deleting the respective row, fixed. (#3431)
+* Improved: Admin app: Tooltip component css fixes. (#3458)
+* Improved: Automation merge tag: Contact subscribe link. Other arguments are not functional; they are fixed. (#3461)
+* Fixed: Automation merge tag: Contact password reset link extra handling added in case key is absent. (#3422)
+* Fixed: Automation merge tag: Order item-related merge tags throw exceptions that break the execution flow. Fixed. (#3435)
+* Fixed: Contact: Update the last modified date time differently to avoid data mixing. (#3137)
+* Fixed: The unsubscribe link merge tag wasn't working with thrive architect fixed. (#3474)
+* Fixed: The contact status was not updated if checkout consent was disabled. (#3446)
+* Fixed: Automation step: Error message sometimes returns multilayer array. The code improved to fetch the error message. (#3271)
+* Fixed: Legacy automation: The fetch tags API wasn't working, so it's fixed. (#3498)
+* Fixed: Pro: New email editor-related API, WooCommerce handling added. (#3426)
+* Fixed: Pro: Email styles: Content position field settings are not visible, fixed. (#3448)
 
 = 3.2.2 (Sep 5, 2024) =
 * Fixed: Issue with unique columns during table creation. (#3407)

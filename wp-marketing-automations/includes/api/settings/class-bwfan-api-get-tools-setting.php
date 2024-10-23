@@ -24,20 +24,27 @@ class BWFAN_API_Get_Tools_Setting extends BWFAN_API_Base {
 	}
 
 	public function process_api_call() {
-		global $wpdb;
+		$tool_settings = [
+			[
+				"title"          => __( "Optimize Engagement Tracking Meta table", "wp-marketing-automations" ),
+				"description"    => __( "Once this tool is run the personalisation merge tags will not be available on single contact profile. There will be no changes to open/click tracking data.", "wp-marketing-automations" ),
+				"task"           => "delete_engagement_tracking_meta",
+				"task_text"      => __( "Optimize", "wp-marketing-automations" ),
+				"processingText" => __( "We are optimizing the engagement tracking meta table", "wp-marketing-automations" ),
+			]
+		];
 
-		$tool_settings   = [];
 		$tool_settings[] = [
-			"title"          => __( "Optimize Engagement Tracking Meta table", "wp-marketing-automations" ),
-			"description"    => __( "Once this tool is run the personalisation merge tags will not be available on single contact profile. There will be no changes to open/click tracking data.", "wp-marketing-automations" ),
-			"task"           => "delete_engagement_tracking_meta",
-			"task_text"      => __( "Optimize", "wp-marketing-automations" ),
-			"processingText" => __( "We are optimizing the engagement tracking meta table", "wp-marketing-automations" ),
+			"title"          => __( "Verify Base Tables", "wp-marketing-automations" ),
+			"description"    => __( "This will verify FunnelKit Automations all the base tables which are required for smooth functioning.", "wp-marketing-automations" ),
+			"task"           => "bwfan_validate_db_tables",
+			"task_text"      => __( "Verify", "wp-marketing-automations" ),
+			"processingText" => __( "Validate required Table in Data base", "wp-marketing-automations" ),
 		];
 
 		if ( bwfan_is_woocommerce_active() ) {
 			$tool_settings[] = array(
-				"title"          => __( "Re-index Cart and Orders conversions for multi-currency setups" ),
+				"title"          => __( "Re-index Cart and Orders conversions for multi-currency setups", "wp-marketing-automations" ),
 				"description"    => __( "This will reindex cart and conversion table for order price.", "wp-marketing-automations" ),
 				"task"           => "re_index_cart_orders_conversion",
 				"task_text"      => __( "Re-index", "wp-marketing-automations" ),

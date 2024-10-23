@@ -101,8 +101,12 @@ function wffnDefaultEvent(result) {
     if (result.hasOwnProperty('fkreferrer') && result.fkreferrer !== '') {
         result.referrer = result.fkreferrer;
         delete result.fkreferrer;
-    }else {
-        result.referrer = document.referrer.indexOf(window.location.hostname) === -1 ? document.referrer : '';
+    } else {
+        const WffnfkRef = document.referrer;
+        const getDomain = url => new URL(url).hostname;
+
+        result.referrer = (WffnfkRef && !wffnUtm.excludeDomain.some(domain => getDomain(WffnfkRef).endsWith(domain)) && !WffnfkRef.includes(window.location.hostname)) ? WffnfkRef : '';
+
     }
 
     result.fl_url = (typeof window.location.pathname !== "undefined") ? window.location.pathname : '/';
@@ -201,7 +205,7 @@ function wffnManageCookies() {
                     if ('undefined' !== typeof wffnCookieManage && '' === wffnCookieManage.getCookie('wffn_' + wffnUtm_terms[k])) {
                         wffnCookieManage.setCookie('wffn_' + wffnUtm_terms[k], queryVars[wffnUtm_terms[k]], 2);
                     }
-                } else{
+                } else {
                     wffnCookieManage.setCookie('wffn_' + wffnUtm_terms[k], queryVars[wffnUtm_terms[k]], 2);
                 }
             }

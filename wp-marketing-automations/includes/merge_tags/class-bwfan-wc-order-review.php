@@ -107,7 +107,7 @@ class BWFAN_WC_Order_Review extends Merge_Tag_Abstract_Product_Display {
 		$this->template = 'review-rows';
 
 		$file_path = BWFAN_PLUGIN_DIR . '/templates/' . $this->template . '.php';
-
+		$file_path = apply_filters( 'bwfan_order_review_template_path', $file_path, $products, $attr );
 		ob_start();
 		include $file_path;
 		$response = ob_get_clean();

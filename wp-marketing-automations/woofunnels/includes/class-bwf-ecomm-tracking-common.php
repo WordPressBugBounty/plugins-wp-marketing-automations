@@ -39,7 +39,6 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 
 
 			add_action( 'bwf_conversion_tracking_index_completed', array( $this, 'update_conversion_table' ), 10, 2 );
-
 		}
 
 		/**
@@ -77,7 +76,9 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				'utc_offset'         => esc_attr( $this->get_timezone_offset() ),
 				'site_url'           => esc_url( site_url() ),
 				'genericParamEvents' => wp_json_encode( $this->get_generic_event_params() ),
-				'cookieKeys'         => [ "flt", "timezone", "is_mobile", "browser", "fbclid", "gclid", "referrer", "fl_url" ]
+				'cookieKeys'         => [ "flt", "timezone", "is_mobile", "browser", "fbclid", "gclid", "referrer", "fl_url" ],
+				'excludeDomain'         => ['paypal.com', 'klarna.com', 'quickpay.net']
+
 			] );
 
 			wp_enqueue_script( 'wfco-utm-tracking', plugin_dir_url( WooFunnel_Loader::$ultimate_path ) . 'woofunnels/assets/js/utm-tracker' . $min . '.js', array(), WooFunnel_Loader::$version, array(
@@ -101,7 +102,6 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 			}
 
 			return array(
-				'domain'     => substr( get_home_url( null, '', 'http' ), 7 ),
 				'user_roles' => $user_roles,
 				'plugin'     => 'Funnel Builder',
 			);
@@ -152,6 +152,9 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 
 			}
 
+			if ( function_exists( 'wffn_update_currency_switcher_data' ) ) {
+				wffn_update_currency_switcher_data();
+			}
 
 		}
 
@@ -193,6 +196,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 						`contact_id` bigint(20) unsigned NOT NULL default 0,
 						`funnel_id` bigint(20) unsigned NOT NULL default 0,
 						`step_id` bigint(20) unsigned NOT NULL default 0,
+						`source_id` bigint(20) unsigned NOT NULL default 0 COMMENT 'save checkout revenue source',
 						`automation_id` bigint(20) unsigned NOT NULL default 0,
 						`source` bigint(20) unsigned NOT NULL default 0,
 						`type` tinyint(2) unsigned COMMENT '1- optin 2- wc_order 3- edd_order',
@@ -229,14 +233,17 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 						KEY `step_id` (`step_id`),
 						KEY `funnel_id` (`funnel_id`),
 						KEY `contact_id` (`contact_id`),
+						KEY `source_id` (`source_id`),
 						KEY `utm_source` (utm_source($max_index_length)),
 						KEY `utm_medium` (utm_medium($max_index_length)),
 						KEY `utm_campaign` (utm_campaign($max_index_length)),    
 						KEY `utm_term` (utm_term($max_index_length)),
+						KEY `utm_content` (utm_content($max_index_length)),
 						KEY `utm_source_last` (utm_source_last($max_index_length)),
 						KEY `utm_medium_last` (utm_medium_last($max_index_length)),
 						KEY `utm_campaign_last` (utm_campaign_last($max_index_length)),    
 						KEY `utm_term_last` (utm_term_last($max_index_length)),
+						KEY `utm_content_last` (utm_content_last($max_index_length)),
 						KEY `bump_accepted` (`bump_accepted`),
 						KEY `bump_rejected` (`bump_rejected`),
 						KEY `offer_accepted` (`offer_accepted`),    
@@ -245,7 +252,8 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 						KEY `source` (`source`),
 						KEY `first_landing_url` (`first_landing_url`),
 						KEY `referrer` (`referrer`),
-						KEY `referrer_last` (`referrer_last`)			
+						KEY `referrer_last` (`referrer_last`),
+						KEY `timestamp` (`timestamp`)			
 						) {table_collate};";
 		}
 
@@ -305,7 +313,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 		/**
 		 * @param $offer_id
 		 * @param $package
-		 * @param $parent_order
+		 * @param WC_Order $parent_order
 		 * @param $new_order
 		 *
 		 *  insert tracking data in newly created upsell order
@@ -313,20 +321,72 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 		 * @return void
 		 */
 		public function insert_tracking_data_in_upsell_order( $offer_id, $package, $parent_order, $new_order ) {
+			// Handle case if primary order already processed
+			if ( in_array( $parent_order->get_status(), wc_get_is_paid_statuses(), true ) ) {
+				global $wpdb;
+				$get_data = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}{$this->conv_table} WHERE type = %d AND source = %d", 2, $parent_order->get_id() ), ARRAY_A );
+
+				if ( $get_data ) {
+
+					$get_data['offer_total']    = ! empty( $get_data['offer_total'] ) ? floatval( $get_data['offer_total'] ) + floatval( $this->get_price_value_for_db( $package['total'], $parent_order->get_currency() ) ?? 0 ) : ( $this->get_price_value_for_db( $package['total'], $parent_order->get_currency() ) ?? 0 );
+					$accepted_offer             = json_decode( $get_data['offer_accepted'] ?? '[]', true );
+					$accepted_offer[]           = (string) $offer_id;
+					$get_data['offer_accepted'] = wp_json_encode( $accepted_offer );
+
+					if ( ! empty( $new_order ) && is_object( $new_order ) ) {
+						unset( $get_data['id'] );
+						$upsell_id = get_post_meta( $offer_id, '_funnel_id', true );
+						$funnel_id = get_post_meta( $upsell_id, '_bwf_in_funnel', true );
+
+						$get_data['funnel_id']      = $funnel_id;
+						$get_data['step_id']        = 0;
+						$get_data['value']          = ! empty( $package['total'] ) ? $this->get_price_value_for_db( $package['total'], $parent_order->get_currency() ) : 0;
+						$get_data['source']         = $new_order->get_id();
+						$get_data['checkout_total'] = 0;
+						$get_data['bump_total']     = 0;
+						$get_data['bump_accepted']  = '';
+						$get_data['bump_rejected']  = '';
+						$get_data['offer_total']    = ! empty( $package['total'] ) ? $this->get_price_value_for_db( $package['total'], $parent_order->get_currency() ) : 0;
+						$get_data['offer_accepted'] = wp_json_encode( array( ( string ) $offer_id ) );
+						$get_data['offer_rejected'] = '';
+						$get_data['timestamp'] =  current_time( 'mysql' );
+						$this->insert_tracking_data( $get_data );
+					} else {
+
+						/**
+						 * Case of exception where its a case of batching but primary order already normalised when upsell accepts
+						 */
+						$get_data['value'] = $this->get_price_value_for_db( $parent_order->get_total(), $parent_order->get_currency() );
+						/**
+						 * Copy data form parent row and modify and insert offer data
+						 */
+						$wpdb->update( "{$wpdb->prefix}{$this->conv_table}", $get_data, [ 'type' => 2, 'source' => $parent_order->get_id() ] );
+					}
+
+					return;
+				}
+			}
+
 			if ( empty( $new_order ) || ! is_object( $new_order ) ) {
 				return;
 			}
 
 			$tracking_data = BWF_WC_Compatibility::get_order_meta( $parent_order, '_wffn_tracking_data' );
 
-			if ( empty ( $tracking_data ) || ! is_array( $tracking_data ) ) {
+			/**
+			 * 1. Handle case when upsell parent order not have tracking meta
+			 * 2. And second case upsell parent order not have any record in conversion table
+			 * In both case upsell create new row in conversion table
+			 */
+			if ( in_array( $parent_order->get_status(), wc_get_is_paid_statuses(), true ) && empty( $tracking_data ) ) {
+				$tracking_data = $this->get_common_tracking_data();
+			}
+
+			if ( empty( $tracking_data ) || ! is_array( $tracking_data ) ) {
 				return;
 			}
 
-			$order   = $new_order;
-			$step_id = BWF_WC_Compatibility::get_order_meta( $parent_order, '_wfacp_post_id' );
-
-			$date_created = $order->get_date_created();
+			$date_created = $new_order->get_date_created();
 			if ( ! empty( $date_created ) ) {
 				$timezone = new DateTimeZone( wp_timezone_string() );
 				$date_created->setTimezone( $timezone );
@@ -340,23 +400,26 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				return;
 			}
 
+			$source_id = class_exists( 'WFFN_Core' ) ? WFFN_Core()->data->get( 'source_id', 0 ) : 0;
+
 			$args = [
-				'contact_id'     => ! ( empty( $parent_order->get_meta( '_woofunnel_cid' ) ) ) ? $parent_order->get_meta( '_woofunnel_cid' ) : 0,
+				'contact_id'     => ! empty( $parent_order->get_meta( '_woofunnel_cid' ) ) ? $parent_order->get_meta( '_woofunnel_cid' ) : 0,
 				'type'           => 2,
-				'value'          => $order->get_total(),
-				'step_id'        => $step_id,
-				'funnel_id'      => ! ( empty( $funnel_id ) ) ? $funnel_id : 0,
+				'value'          => ! empty( $package['total'] ) ? $this->get_price_value_for_db( $package['total'], $parent_order->get_currency() ) : 0,
+				'step_id'        => 0,
+				'funnel_id'      => $funnel_id,
 				'automation_id'  => 0,
-				'source'         => $order->get_id(),
-				'country'        => $order->get_billing_country(),
+				'source'         => $new_order->get_id(),
+				'country'        => $new_order->get_billing_country(),
 				'timestamp'      => empty( $date_created ) ? current_time( 'mysql' ) : $date_created,
 				'checkout_total' => 0,
 				'bump_total'     => 0,
-				'offer_total'    => isset( $package['total'] ) ? $package['total'] : 0,
+				'offer_total'    => ! empty( $package['total'] ) ? $this->get_price_value_for_db( $package['total'], $parent_order->get_currency() ) : 0,
 				'bump_accepted'  => '',
 				'bump_rejected'  => '',
 				'offer_accepted' => wp_json_encode( array( ( string ) $offer_id ) ),
 				'offer_rejected' => '',
+				'source_id'      => $source_id,
 			];
 
 			$tracking_data = array_merge( $tracking_data, $args );
@@ -365,11 +428,12 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				$new_order->update_meta_data( '_wffn_tracking_data', $tracking_data );
 				$new_order->update_meta_data( '_wffn_need_normalize', 'yes' );
 				$new_order->update_meta_data( '_wfocu_offer_id', $offer_id );
-				$order->save_meta_data();
+				$new_order->save_meta_data();
 
 				return;
 			}
-			/** Insert data */
+
+			// Insert data
 			$this->insert_tracking_data( $tracking_data );
 		}
 
@@ -516,6 +580,13 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 
 		}
 
+		/**
+		 * @param WC_Order $order
+		 * @param $tracking_data
+		 *
+		 * @return void
+		 * @throws DateInvalidTimeZoneException
+		 */
 		public function insert_tracking_order( $order, $tracking_data ) {//phpcs:ignore WordPressVIPMinimum.Hooks.AlwaysReturnInFilter.MissingReturnStatement
 			/**
 			 * prepare checkout data for insert
@@ -555,7 +626,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 			$args = [
 				'contact_id'     => ! ( empty( $cid ) ) ? $cid : 0,
 				'type'           => 2,
-				'value'          => $order->get_total(),
+				'value'          => $this->get_price_value_for_db( $order->get_total(), $order->get_currency() ),
 				'step_id'        => ! ( empty( $step_id ) ) ? $step_id : 0,
 				'funnel_id'      => ! ( empty( $funnel_id ) ) ? $funnel_id : 0,
 				'automation_id'  => 0,
@@ -624,6 +695,12 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				$click_id = $get_data['wffn_gclid'];
 			}
 
+			/**
+			 * Insert step landing and optin source id for checkout revenue
+			 * Source id insert only for create order row on optin submit is always insert 0
+			 */
+			$source_id = class_exists( 'WFFN_Core' ) ? WFFN_Core()->data->get( 'source_id', 0 ) : 0;
+
 			$args = [
 				'utm_source'        => isset( $get_data['wffn_utm_source'] ) ? $this->string_length( bwf_clean( $get_data['wffn_utm_source'] ) ) : '',
 				'utm_medium'        => isset( $get_data['wffn_utm_medium'] ) ? $this->string_length( bwf_clean( $get_data['wffn_utm_medium'] ) ) : '',
@@ -637,6 +714,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				'click_id'          => $click_id,
 				'referrer'          => isset( $get_data['wffn_referrer'] ) ? $this->filter_referrer( $get_data['wffn_referrer'] ) : '',
 				'journey'           => '',
+				'source_id'         => $source_id,
 			];
 
 			if ( true === $is_optin ) {
@@ -806,7 +884,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 
 			if ( is_array( $offer_data ) && count( $offer_data ) > 0 ) {
 				foreach ( $offer_data as $o_item ) {
-					if ( 4 == absint( $o_item['action_type_id'] ) ) {
+					if ( 4 === absint( $o_item['action_type_id'] ) ) {
 						$offer_total      = floatval( $offer_total ) + floatval( $o_item['total'] );
 						$offer_accepted[] = ( string ) $o_item['object_id'];
 						/**
@@ -833,7 +911,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				$offer_accepted = [];
 			}
 
-			$args['offer_total']    = $offer_total;
+			$args['offer_total']    = $this->get_price_value_for_db( $offer_total, $order->get_currency() );
 			$args['offer_accepted'] = ! empty( $offer_accepted ) ? wp_json_encode( $offer_accepted ) : '';
 			$args['offer_rejected'] = ! empty( $offer_rejected ) ? wp_json_encode( $offer_rejected ) : '';
 
@@ -1143,6 +1221,11 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 
 		public function conversion_table_name() {
 			return $this->conv_table;
+
+		}
+
+		public function get_price_value_for_db( $total, $currency ) {
+			return class_exists( 'BWF_Plugin_Compatibilities' ) ? round( BWF_Plugin_Compatibilities::get_fixed_currency_price_reverse( $total, $currency ), 2 ) : $total;
 
 		}
 

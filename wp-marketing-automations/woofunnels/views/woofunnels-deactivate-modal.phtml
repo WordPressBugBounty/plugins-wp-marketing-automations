@@ -49,7 +49,6 @@ foreach ( $reasons as $reason ) {
         position: absolute;
         left: 50%;
         margin-left: -298px;
-        padding-bottom: 30px;
         top: -100%;
         z-index: 100001;
         width: 596px
@@ -106,17 +105,19 @@ foreach ( $reasons as $reason ) {
     }
 
     .woofunnels-modal.active .woofunnels-modal-dialog {
-        top: 10%
+        top: 10%;
+        background: #fff;
     }
 
     .woofunnels-modal .woofunnels-modal-body, .woofunnels-modal .woofunnels-modal-footer {
         border: 0;
         background: #fefefe;
-        padding: 20px
+        padding: 25px
     }
 
     .woofunnels-modal .woofunnels-modal-body {
-        border-bottom: 0
+        border-bottom: 0;
+        padding: 0px 23px;
     }
 
     .woofunnels-modal .woofunnels-modal-body h2 {
@@ -144,6 +145,10 @@ foreach ( $reasons as $reason ) {
 
     .woofunnels-modal .woofunnels-modal-footer > .button:first-child {
         margin: 0
+    }
+
+    .woofunnels-modal .woofunnels-modal-footer .button-deactivate {
+        float: left;
     }
 
     .woofunnels-modal .woofunnels-modal-panel:not(.active) {
@@ -181,7 +186,7 @@ foreach ( $reasons as $reason ) {
 		foreach($VARS['reasons'] as $plugin_key => $plugin_reasons) {
 		$threshold = apply_filters( 'woofunnels_uninstall_reason_threshold_' . $plugin_key, 2 );
 		?>
-        WooFunnelsDefaultReason['<?php echo $plugin_key; ?>'] = '<?php echo apply_filters( 'woofunnels_default_reason_' . $plugin_key, '' ); ?>';
+        WooFunnelsDefaultReason['<?php echo $plugin_key; ?>'] = '';
 		<?php
 		if ( $plugin_key === "default" ) {
 			continue;
@@ -225,13 +230,18 @@ foreach ( $reasons as $reason ) {
             modalHtml =
                 '<div class="woofunnels-modal<?php echo ( $confirmation_message === "" ) ? ' no-confirmation-message' : ''; ?>">'
                 + ' <div class="woofunnels-modal-dialog">'
+                + '<div class="woofunnels-modal-header" style="position: relative;display: block;height: 70px;background: #fff;border-bottom: #eeeeee solid 1px;">'
+                + '<div style="padding: 25px 15px;"><svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 233.1 147.2" style="enable-background:new 0 0 233.1 147.2;height: 32px;width: 33px;float: left;/* background: black; *//* fill: bisque; */" xml:space="preserve">'
+                + '<polygon class="st0" points="232,3.8 150.4,143.1 117.9,143.1 198.9,3.8 " style="fill: #1daafc;"></polygon>'
+                + '<polygon class="st0" points="167.4,3.8 86.8,143.1 5.2,3.8 102.8,3.8 88.2,32.4 86.3,32.4 54.7,32.4 86.3,88.2 134.4,3.8 "></polygon>'
+                + '</svg><span style="float: left; font-size: 19px; font-weight: 600; margin-top: 5px; margin-left: 8px;">Quick Feedback</span></div></div>'
                 + '     <div class="woofunnels-modal-body">'
                 + '         <div class="woofunnels-modal-panel" data-panel-id="confirm"><p><?php echo $confirmation_message; ?></p></div>'
                 + '         <div class="woofunnels-modal-panel active" data-panel-id="reasons"><h3><strong><?php printf( WooFunnels_deactivate::load_str( 'deactivation-share-reason' ) ); ?>:</strong></h3><ul id="reasons-list">' + reasonsHtml + '</ul></div>'
                 + '     </div>'
                 + '     <div class="woofunnels-modal-footer">'
-                + '         <a href="#" class="button button-secondary button-deactivate"></a>'
-                + '         <a href="#" class="button button-primary button-close"><?php printf( WooFunnels_deactivate::load_str( 'deactivation-modal-button-cancel' ) ); ?></a>'
+                + '         <a href="#" class="button button-primary button-deactivate"><?php printf( WooFunnels_deactivate::load_str( 'deactivation-modal-button-submit' ) ); ?></a>'
+                + '         <a href="#" class="button button-secondary"><?php printf( __( 'Skip & Deactivate', 'funnel-builder' ) ); ?></a>'
                 + '     </div>'
                 + ' </div>'
                 + '</div>',
@@ -275,40 +285,34 @@ foreach ( $reasons as $reason ) {
                 var _parent = $(this).parents('.woofunnels-modal:first');
                 var _this = $(this);
 
-                if (_this.hasClass('allow-deactivate')) {
-                    var $radio = $('input[type="radio"]:checked');
+
+                var $radio = $('input[type="radio"]:checked');
 
 
-                    var $selected_reason = $radio.parents('li:first'),
-                        $input = $selected_reason.find('textarea, input[type="text"]');
+                var $selected_reason = $radio.parents('li:first'),
+                    $input = $selected_reason.find('textarea, input[type="text"]');
 
 
-                    $.ajax({
-                        url: ajaxurl,
-                        method: 'POST',
-                        data: {
-                            'action': 'woofunnels_submit_uninstall_reason',
-                            'reason_id': (0 !== $radio.length) ? $radio.val() : '',
-                            'reason_info': (0 !== $input.length) ? $input.val().trim() : '',
-                            'plugin_basename': currentPluginName,
-                            'licenses': WooFunnelsallLicenses,
-                            '_nonce': bwf_secure.nonce
-                        },
-                        beforeSend: function () {
-                            _parent.find('.button').addClass('disabled');
-                            _parent.find('.button-secondary').text('Processing...');
-                        },
-                        complete: function () {
-                            // Do not show the dialog box, deactivate the plugin.
-                            window.location.href = $deactivateLinks[currentPluginName];
-                        }
-                    });
-                } else if (_this.hasClass('button-deactivate')) {
-                    // Change the Deactivate button's text and show the reasons panel.
-                    _parent.find('.button-deactivate').addClass('allow-deactivate');
+                $.ajax({
+                    url: ajaxurl,
+                    method: 'POST',
+                    data: {
+                        'action': 'woofunnels_submit_uninstall_reason',
+                        'reason_id': (0 !== $radio.length) ? $radio.val() : '',
+                        'reason_info': (0 !== $input.length) ? $input.val().trim() : '',
+                        'plugin_basename': currentPluginName,
+                        'licenses': WooFunnelsallLicenses,
+                        '_nonce': bwf_secure.nonce
+                    },
+                    beforeSend: function () {
+                        _parent.find('.button').addClass('disabled');
+                    },
+                    complete: function () {
+                        // Do not show the dialog box, deactivate the plugin.
+                        window.location.href = $deactivateLinks[currentPluginName];
+                    }
+                });
 
-                    showPanel('reasons');
-                }
             });
 
             $modal.on('click', 'input[type="radio"]', function () {
@@ -318,7 +322,6 @@ foreach ( $reasons as $reason ) {
                 _parent_ul.children("li.li-active").removeClass("li-active");
 
                 $modal.find('.reason-input').remove();
-                $modal.find('.button-deactivate').text('<?php printf( WooFunnels_deactivate::load_str( 'deactivation-modal-button-submit' ) ); ?>');
 
                 if (_parent.hasClass('has_html')) {
                     _parent.addClass('li-active');
@@ -390,18 +393,15 @@ foreach ( $reasons as $reason ) {
             // Remove all input fields ( textfield, textarea ).
             $modal.find('.reason-input').remove();
 
-            var $deactivateButton = $modal.find('.button-deactivate');
             $modal.find(".reason-hide").hide();
             /*
              * If the modal dialog has no confirmation message, that is, it has only one panel, then ensure
              * that clicking the deactivate button will actually deactivate the plugin.
              */
             if ($modal.hasClass('no-confirmation-message')) {
-                $deactivateButton.addClass('allow-deactivate');
 
                 showPanel('reasons');
             } else {
-                $deactivateButton.removeClass('allow-deactivate');
 
                 showPanel('confirm');
             }
@@ -411,19 +411,8 @@ foreach ( $reasons as $reason ) {
             $modal.find('.woofunnels-modal-panel').removeClass('active ');
             $modal.find('[data-panel-id="' + panelType + '"]').addClass('active');
 
-            updateButtonLabels();
         }
 
-        function updateButtonLabels() {
-            var $deactivateButton = $modal.find('.button-deactivate');
-
-            // Reset the deactivate button's text.
-            if ('confirm' === getCurrentPanel()) {
-                $deactivateButton.text('<?php printf( WooFunnels_deactivate::load_str( 'deactivation-modal-button-confirm' ) ); ?>');
-            } else {
-                $deactivateButton.text('<?php printf( WooFunnels_deactivate::load_str( 'deactivation-modal-button-deactivate' ) ); ?>');
-            }
-        }
 
         function getCurrentPanel() {
             return $modal.find('.woofunnels-modal-panel.active').attr('data-panel-id');

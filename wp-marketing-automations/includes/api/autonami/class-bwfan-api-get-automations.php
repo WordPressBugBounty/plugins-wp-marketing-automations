@@ -62,6 +62,18 @@ class BWFAN_API_Get_Automations extends BWFAN_API_Base {
 		if ( ! is_array( $get_automations ) || ! isset( $get_automations['automations'] ) || ! is_array( $get_automations['automations'] ) ) {
 			return $this->error_response( __( 'Unable to fetch automations', 'wp-marketing-automations' ), null, 500 );
 		}
+		/** Check if worker call is late */
+		$last_run = bwf_options_get( 'fk_core_worker_let' );
+		if ( '' !== $last_run && ( time() - $last_run > 300 ) ) {
+			/** Worker is running late */
+			$get_automations['worker_delayed'] = time() - $last_run;
+		}
+
+		/** Check basic worker last run time and status code check */
+		$resp = BWFAN_Common::validate_core_worker();
+		if ( isset( $resp['response_code'] ) ) {
+			$get_automations['response_code'] = $resp['response_code'];
+		}
 
 		$this->total_count = isset( $get_automations['total_records'] ) ? absint( $get_automations['total_records'] ) : 0;
 		$this->count_data  = BWFAN_Common::get_automation_data_count( $version );

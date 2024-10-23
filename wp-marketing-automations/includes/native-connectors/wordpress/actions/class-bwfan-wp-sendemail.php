@@ -598,7 +598,15 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 				$this->data['body'] = BWFAN_Common::bwfan_correct_protocol_url( $this->data['body'] );
 				$this->data['body'] = $this->append_to_email_body( $this->data['body'], $this->data['preheading'] );
 				$this->set_log( 'before_email: ' . $email );
-				$res = wp_mail( $email, $subject, $this->data['body'], $headers );
+				try {
+					$res = wp_mail( $email, $subject, $this->data['body'], $headers );
+				} catch ( Error $e ) {
+					BWFAN_Common::log_test_data( 'wp_email throwing error ' . $e->getMessage() . ' for email: ' . $email, 'send_email_error', true );
+					continue;
+				} catch ( Exception $e ) {
+					BWFAN_Common::log_test_data( 'wp_email throwing exception ' . $e->getMessage() . ' for email: ' . $email, 'send_email_exception', true );
+					continue;
+				}
 				$this->set_log( 'after_email: ' . $email );
 				$this->data['body']                           = $body; // Set the original body to use correct body in email.
 				$conversations[ $email ]['res']               = $res;
@@ -621,7 +629,15 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 				$autonami_integrations  = BWFAN_Core()->integration->get_integrations();
 				$selected_email_service = $global_settings['bwfan_email_service'];
 				$this->set_log( 'before_email: ' . $email );
-				$res = isset( $autonami_integrations[ $selected_email_service ] ) ? $autonami_integrations[ $selected_email_service ]->send_email( $email, $subject, $this->data['body'], $headers ) : wp_mail( $email, $subject, $this->data['body'], $headers );
+				try {
+					$res = isset( $autonami_integrations[ $selected_email_service ] ) ? $autonami_integrations[ $selected_email_service ]->send_email( $email, $subject, $this->data['body'], $headers ) : wp_mail( $email, $subject, $this->data['body'], $headers );
+				} catch ( Error $e ) {
+					BWFAN_Common::log_test_data( 'wp_email throwing error ' . $e->getMessage() . ' for email: ' . $email, 'send_email_error', true );
+					continue;
+				} catch ( Exception $e ) {
+					BWFAN_Common::log_test_data( 'wp_email throwing exception ' . $e->getMessage() . ' for email: ' . $email, 'send_email_exception', true );
+					continue;
+				}
 				$this->set_log( 'after_email: ' . $email );
 				$this->data['body']                           = $body; // Set the original body to use correct body in email.
 				$this->data['body']                           = $this->append_to_email_body( $this->data['body'], $this->data['preheading'] );

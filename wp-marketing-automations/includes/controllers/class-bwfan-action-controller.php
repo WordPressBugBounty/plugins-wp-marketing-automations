@@ -95,6 +95,8 @@ class BWFAN_Action_Controller extends BWFAN_Base_Step_Controller {
 			$result = $this->process( $processed_data );
 		} catch ( Error $e ) {
 			return $this->action_failed( $e->getMessage() );
+		} catch ( Exception $e ) {
+			return $this->action_failed( $e->getMessage() );
 		}
 
 		if ( ! is_array( $result ) || ( isset( $result['status'] ) && BWFAN_Action::$RESPONSE_FAILED === $result['status'] ) ) {
@@ -186,11 +188,17 @@ class BWFAN_Action_Controller extends BWFAN_Base_Step_Controller {
 				return __( 'Call class not found!', 'wp-marketing-automations' );
 			}
 			$call_class->set_data( $processed_data );
-			$result = $call_class->process();
-			$result = $this->integration->handle_response( $result, $this->connector, $this->call );
-			$result = $this->action_ins->handle_response_v2( $result );
+			try {
+				$result = $call_class->process();
+			} catch ( Error $e ) {
+				return $e;
+			} catch ( Exception $e ) {
+				return $e;
+			}
 
-			return $result;
+			$result = $this->integration->handle_response( $result, $this->connector, $this->call );
+
+			return $this->action_ins->handle_response_v2( $result );
 		}
 
 		/** Direct action execution */

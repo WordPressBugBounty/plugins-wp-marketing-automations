@@ -2222,8 +2222,7 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 		}
 
 		public function save_last_modified() {
-			$this->contact->set_last_modified( current_time( 'mysql', 1 ) );
-			$this->contact->save();
+			BWFCRM_Model_Contact::save_last_modified( $this->get_id() );
 		}
 
 		public function get_field_by_slug( $slug ) {
@@ -2434,8 +2433,8 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 				return false;
 			}
 
-			$this->contact->set_status( 1 );
 			$this->contact->set_last_modified( current_time( 'mysql', 1 ) );
+			$this->contact->set_status( 1 );
 			$this->save();
 
 			return true;
@@ -2606,10 +2605,8 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 				return false;
 			}
 
+			$this->contact->set_last_modified( current_time( 'mysql', 1 ) );
 			$this->contact->save();
-
-			/** Update last modified */
-			$this->save_last_modified();
 
 			/** Fire Tags added */
 			if ( ! empty( $this->assigned_tags ) ) {

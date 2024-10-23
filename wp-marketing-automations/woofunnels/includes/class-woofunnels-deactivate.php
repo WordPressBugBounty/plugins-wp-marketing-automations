@@ -30,11 +30,11 @@ class WooFunnels_Deactivate {
 
 		self::$deactivation_str = array(
 			'deactivation-share-reason'                => __( 'If you have a moment, please let us know why you are deactivating', 'woofunnels' ),
-			'reason-no-longer-needed'                  => __( 'I no longer need the plugin', 'woofunnels' ),
-			'reason-found-a-better-plugin'             => __( 'I found a better plugin', 'woofunnels' ),
+			'reason-no-longer-needed'                  => __( 'No longer need the plugin', 'woofunnels' ),
+			'reason-found-a-better-plugin'             => __( 'I found an alternate plugin', 'woofunnels' ),
 			'reason-needed-for-a-short-period'         => __( 'I only needed the plugin for a short period', 'woofunnels' ),
-			'placeholder-plugin-name'                  => __( 'What\'s the plugin\'s name?', 'woofunnels' ),
-			'reason-broke-my-site'                     => __( 'The plugin broke my site', 'woofunnels' ),
+			'placeholder-plugin-name'                  => __( 'Please share which plugin', 'woofunnels' ),
+			'reason-broke-my-site'                     => __( 'Encountered a fatal error', 'woofunnels' ),
 			'reason-suddenly-stopped-working'          => __( 'The plugin suddenly stopped working', 'woofunnels' ),
 			'reason-other'                             => _x( 'Other', 'the text of the "other" reason for deactivating the plugin that is shown in the modal box.', 'woofunnels' ),
 			'deactivation-modal-button-submit'         => __( 'Submit & Deactivate', 'woofunnels' ),
@@ -46,7 +46,7 @@ class WooFunnels_Deactivate {
 			'placeholder-comfortable-price'            => __( 'What price would you feel comfortable paying?', 'woofunnels' ),
 			'reason-couldnt-make-it-work'              => __( "I couldn't understand how to make it work", 'woofunnels' ),
 			'reason-great-but-need-specific-feature'   => __( "The plugin is great, but I need specific feature that you don't support", 'woofunnels' ),
-			'reason-not-working'                       => __( 'The plugin is not working', 'woofunnels' ),
+			'reason-not-working'                       => __( 'Couldn\'t get the plugin to work', 'woofunnels' ),
 			'reason-not-what-i-was-looking-for'        => __( "It's not what I was looking for", 'woofunnels' ),
 			'reason-didnt-work-as-expected'            => __( "The plugin didn't work as expected", 'woofunnels' ),
 			'placeholder-feature'                      => __( 'What feature?', 'woofunnels' ),
@@ -55,6 +55,8 @@ class WooFunnels_Deactivate {
 			'placeholder-what-did-you-expect'          => __( 'What did you expect?', 'woofunnels' ),
 			'reason-didnt-work'                        => __( "The plugin didn't work", 'woofunnels' ),
 			'reason-dont-like-to-share-my-information' => __( "I don't like to share my information with you", 'woofunnels' ),
+			'conflicts-other-plugins'                  => __( "Conflicts with other plugins", 'woofunnels' ),
+			'temporary-deactivation'                   => __( "It's a temporary deactivation", 'woofunnels' ),
 		);
 	}
 
@@ -73,6 +75,7 @@ class WooFunnels_Deactivate {
 				'slug'    => '',
 				'reasons' => self::deactivate_options(),
 			);
+
 			include_once dirname( dirname( __FILE__ ) ) . '/views/woofunnels-deactivate-modal.phtml';
 		}
 	}
@@ -83,54 +86,56 @@ class WooFunnels_Deactivate {
 	 * @since 1.0.0
 	 */
 	public static function deactivate_options() {
-		$reason_found_better_plugin = array(
-			'id'                => 2,
-			'text'              => self::load_str( 'reason-found-a-better-plugin' ),
-			'input_type'        => 'textfield',
-			'input_placeholder' => self::load_str( 'placeholder-plugin-name' ),
-		);
 
-		$reason_other = array(
-			'id'                => 7,
-			'text'              => self::load_str( 'reason-other' ),
-			'input_type'        => 'textfield',
-			'input_placeholder' => '',
-		);
-
-		$long_term_user_reasons = array(
+		$reasons            = array( 'default' => [] );
+		$reasons['default'] = array(
 			array(
 				'id'                => 1,
+				'text'              => self::load_str( 'reason-not-working' ),
+				'input_type'        => '',
+				'input_placeholder' => self::load_str( 'placeholder-plugin-name' ),
+			),
+			array(
+				'id'                => 2,
+				'text'              => self::load_str( 'reason-found-a-better-plugin' ),
+				'input_type'        => 'textfield',
+				'input_placeholder' => self::load_str( 'placeholder-plugin-name' )
+			),
+			array(
+				'id'                => 3,
 				'text'              => self::load_str( 'reason-no-longer-needed' ),
 				'input_type'        => '',
 				'input_placeholder' => '',
 			),
-			$reason_found_better_plugin,
-			array(
-				'id'                => 3,
-				'text'              => self::load_str( 'reason-needed-for-a-short-period' ),
-				'input_type'        => '',
-				'input_placeholder' => '',
-			),
+
 			array(
 				'id'                => 4,
-				'text'              => self::load_str( 'reason-broke-my-site' ),
+				'text'              => self::load_str( 'temporary-deactivation' ),
 				'input_type'        => '',
 				'input_placeholder' => '',
 			),
 			array(
 				'id'                => 5,
-				'text'              => self::load_str( 'reason-suddenly-stopped-working' ),
+				'text'              => self::load_str( 'conflicts-other-plugins' ),
+				'input_type'        => 'textfield',
+				'input_placeholder' => self::load_str( 'placeholder-plugin-name' )
+			),
+			array(
+				'id'                => 6,
+				'text'              => self::load_str( 'reason-broke-my-site' ),
 				'input_type'        => '',
 				'input_placeholder' => '',
 			),
+			array(
+				'id'                => 7,
+				'text'              => self::load_str( 'reason-other' ),
+				'input_type'        => 'textfield',
+				'input_placeholder' => __( 'Please share the reason', 'woofunnels' ),
+			)
 		);
 
-		$uninstall_reasons['default'] = $long_term_user_reasons;
 
-		$uninstall_reasons = apply_filters( 'woofunnels_uninstall_reasons', $uninstall_reasons );
-		array_push( $uninstall_reasons['default'], $reason_other );
-
-		return $uninstall_reasons;
+		return $reasons;
 	}
 
 	/**
@@ -151,11 +156,15 @@ class WooFunnels_Deactivate {
 	 */
 	public static function _submit_uninstall_reason_action() {
 		check_admin_referer( 'bwf_secure_key', '_nonce' );
+
+		if ( ! current_user_can( 'install_plugins' ) ) {
+			wp_send_json_error();
+		}
 		if ( ! isset( $_POST['reason_id'] ) ) {
 			exit;
 		}
 
-		$reason_info = isset( $_REQUEST['reason_info'] ) ? trim( stripslashes( bwf_clean( $_REQUEST['reason_info'] ) ) ) : '';
+		$reason_info = isset( $_POST['reason_info'] ) ? sanitize_textarea_field( stripslashes( bwf_clean( $_POST['reason_info'] ) ) ) : '';
 
 		$reason = array(
 			'id'   => sanitize_text_field( $_POST['reason_id'] ),
@@ -178,24 +187,62 @@ class WooFunnels_Deactivate {
 			$plugin_basename . '(' . $version . ')' => $reason,
 		);
 
-		$license_info       = isset( $_REQUEST['licenses'] ) ? bwf_clean( json_decode( stripslashes( bwf_clean( $_REQUEST['licenses'] ) ) ) ) : '';
-		$licenses_info_pass = array();
 
-		if ( $license_info && is_object( $license_info ) ) {
+		WooFunnels_API::post_deactivation_data( $deactivations );
+		wp_send_json_success();
 
-			if ( property_exists( $license_info, sha1( $plugin_basename ) ) ) {
-				$basename           = sha1( $plugin_basename );
-				$licenses_info_pass = $license_info->$basename;
-			} elseif ( property_exists( $license_info, ( $plugin_basename ) ) ) {
-				$basename           = $plugin_basename;
-				$licenses_info_pass = $license_info->$basename;
+	}
+
+	public static function get_recent_fatal_error_logs( $limit = 2 ) {
+		try {
+			// Get the WordPress uploads directory information
+			$upload_dir          = wp_upload_dir();
+			$log_directory       = trailingslashit( $upload_dir['basedir'] ) . 'wc-logs/';
+			$log_url_base        = trailingslashit( $upload_dir['baseurl'] ) . 'wc-logs/';
+			$fatal_error_pattern = '/^fatal-errors-.*\.log$/';
+			$log_files           = [];
+
+			// Check if the directory exists
+			if ( ! is_dir( $log_directory ) ) {
+				return [];
 			}
-		}
 
-		WooFunnels_API::post_deactivation_data( $deactivations, $licenses_info_pass );
-		// Print '1' for successful operation.
-		echo 1;
-		exit;
+			// Scan the directory for files
+			$files = scandir( $log_directory );
+			if ( $files === false ) {
+				throw new Exception( "Failed to scan directory: $log_directory" );
+			}
+
+			foreach ( $files as $file ) {
+				if ( preg_match( $fatal_error_pattern, $file ) ) {
+					$full_path = $log_directory . $file;
+					$mtime     = filemtime( $full_path );
+					if ( $mtime === false ) {
+						throw new Exception( "Failed to get modification time for file: $full_path" );
+					}
+					$log_files[ $file ] = $mtime;
+				}
+			}
+
+			// Sort files by modification time, newest first
+			arsort( $log_files );
+
+			// Get the full URLs of the most recent log files
+			$recent_log_urls = [];
+			$count           = 0;
+			foreach ( $log_files as $file => $mtime ) {
+				if ( $count >= $limit ) {
+					break;
+				}
+				$recent_log_urls[] = $log_url_base . $file;
+				$count ++;
+			}
+
+			return $recent_log_urls;
+		} catch ( Exception|Error $e ) {
+			// Log the exception or error
+			return [];
+		}
 	}
 
 }

@@ -77,12 +77,16 @@ class BWFAN_Contact_Password_Setup_Link extends BWFAN_Merge_Tag {
 	protected function get_reset_link( $user_id, $user = false ) {
 		if ( empty( $user ) ) {
 			$user = new WP_User( $user_id );
-			if ( ! $user instanceof WP_User ) {
+			if ( ! $user instanceof WP_User || ! wp_is_password_reset_allowed_for_user( $user ) ) {
 				return '';
 			}
 		}
 
 		$key = get_password_reset_key( $user );
+
+		if ( is_wp_error( $key ) ) {
+			return '';
+		}
 
 		return add_query_arg( array(
 			'action' => 'rp',

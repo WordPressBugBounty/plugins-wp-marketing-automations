@@ -69,7 +69,7 @@ class BWFAN_Contact_Subscribe_Link extends BWFAN_Merge_Tag {
 		}
 
 		if ( ! empty( $redirect_url ) && false !== wp_http_validate_url( $redirect_url ) ) {
-			$args['bwfan-link'] = $redirect_url;
+			$args['bwfan-link'] = urlencode( $redirect_url );
 		}
 
 		return add_query_arg( $args, esc_url_raw( home_url( '/' ) ) );

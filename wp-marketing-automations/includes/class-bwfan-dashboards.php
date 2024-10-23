@@ -257,7 +257,7 @@ class BWFAN_Dashboards {
 		}
 
 		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
-			$where = " AND" . $date_col . " >= '" . $start_date . "' AND `" . $date_col . "` <= '" . $end_date . "' ";
+			$where = " AND " . $date_col . " >= '" . $start_date . "' AND `" . $date_col . "` <= '" . $end_date . "' ";
 		}
 		$arr = [];
 
@@ -301,7 +301,7 @@ class BWFAN_Dashboards {
 		}
 
 		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
-			$where = " AND" . $date_col . " >= '" . $start_date . "' AND `" . $date_col . "` <= '" . $end_date . "' ";
+			$where = " AND " . $date_col . " >= '" . $start_date . "' AND `" . $date_col . "` <= '" . $end_date . "' ";
 		}
 
 		$base_query = "SELECT  sum( open ) as email_open" . $interval_query . "  FROM `" . $table . "` WHERE 1 = 1 " . $where . " and c_status = 2 " . $group_by . " ORDER BY " . $order_by . " ASC";
@@ -335,7 +335,7 @@ class BWFAN_Dashboards {
 		}
 
 		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
-			$where = " AND" . $date_col . " >= '" . $start_date . "' AND `" . $date_col . "` <= '" . $end_date . "' ";
+			$where = " AND " . $date_col . " >= '" . $start_date . "' AND `" . $date_col . "` <= '" . $end_date . "' ";
 		}
 
 		$base_query = "SELECT  sum( click ) as email_click" . $interval_query . "  FROM `" . $table . "` WHERE 1 = 1 " . $where . " and c_status = 2 " . $group_by . " ORDER BY " . $order_by . " ASC";
@@ -360,7 +360,6 @@ class BWFAN_Dashboards {
 		$group_by       = '';
 		$order_by       = ' c.ID';
 		$where          = '';
-		$post_table     = $wpdb->prefix . 'posts';
 		if ( 'interval' === $is_interval ) {
 			$get_interval   = self::get_interval_format_query( $interval, $date_col );
 			$interval_query = $get_interval['interval_query'];
@@ -370,10 +369,10 @@ class BWFAN_Dashboards {
 		}
 
 		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
-			$where = " AND" . $date_col . " >= '" . $start_date . "' AND `" . $date_col . "` <= '" . $end_date . "' ";
+			$where = " AND " . $date_col . " >= '" . $start_date . "' AND " . $date_col . " <= '" . $end_date . "' ";
 		}
 
-		$base_query = "SELECT  count( c.id ) as total_orders, sum( c.wctotal ) as total_revenue " . $interval_query . "  FROM  $table as c JOIN $post_table as p on c.wcid=p.ID   WHERE 1 = 1 " . $where . " and c.wcid != 0 " . $group_by . " ORDER BY " . $order_by . " ASC";
+		$base_query = "SELECT  count( c.id ) as total_orders, sum( c.wctotal ) as total_revenue " . $interval_query . "  FROM  $table as c WHERE 1 = 1 " . $where . " and c.wcid != 0 " . $group_by . " ORDER BY " . $order_by . " ASC";
 
 		return $wpdb->get_results( $base_query, ARRAY_A );
 	}

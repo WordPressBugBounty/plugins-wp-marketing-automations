@@ -1303,6 +1303,11 @@ abstract class BWFAN_Event {
 			return false;
 		}
 
+		$run_immediately = apply_filters( 'bwfan_run_v2_automation_immediately', true, $automation_id, $data );
+		if ( true === $run_immediately ) {
+			$data['e_time'] = $data['e_time'] + 5;
+		}
+
 		BWFAN_Model_Automation_Contact::insert( $data );
 		$p_key = BWFAN_Model_Automation_Contact::insert_id();
 
@@ -1311,7 +1316,7 @@ abstract class BWFAN_Event {
 		$this->update_automation_contact_field( $contact_id, $automation_id );
 
 		/** Check if automation needs to run immediately */
-		if ( true === apply_filters( 'bwfan_run_v2_automation_immediately', true, $automation_id, $data ) ) {
+		if ( true === $run_immediately ) {
 			$ins = BWFAN_Automation_V2_Contact::get_instance();
 			$ins->bwfan_ac_execute_action( $p_key );
 		}
@@ -1430,7 +1435,7 @@ abstract class BWFAN_Event {
 	}
 
 	protected function is_force_asyc() {
-		return $this->force_async;
+		return apply_filters( 'bwfan_force_async', $this->force_async );
 	}
 
 	/**

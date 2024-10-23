@@ -169,7 +169,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			}
 
 			/** Columns needed and JOINS */
-			$wp_wc_columns = $should_send_wc ? 'DISTINCT c.*, wc.aov, wc.id as customer_id, wc.l_order_date,wc.f_order_date,wc.total_order_count, wc.total_order_value, wc.purchased_products, wc.purchased_products_cats, wc.purchased_products_tags, wc.used_coupons' : 'DISTINCT c.*';
+			$wp_wc_columns = $should_send_wc ? ' c.*, wc.aov, wc.id as customer_id, wc.l_order_date,wc.f_order_date,wc.total_order_count, wc.total_order_value, wc.purchased_products, wc.purchased_products_cats, wc.purchased_products_tags, wc.used_coupons' : ' c.*';
 			$join_wc_query = ( isset( $filters['wc'] ) || $should_send_wc ) ? "LEFT JOIN $customer_table as wc ON c.id = wc.cid" : '';
 			$join_cf_query = '';
 
@@ -197,7 +197,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			/** Checking column preferences  */
 			if ( true !== $column_preference ) {
 				/** Columns needed and JOINS */
-				$wp_wc_columns = $should_send_wc ? 'DISTINCT c.*, wc.aov, wc.id as customer_id, wc.l_order_date, wc.f_order_date, wc.total_order_count, wc.total_order_value, wc.purchased_products, wc.purchased_products_cats, wc.purchased_products_tags, wc.used_coupons' : 'DISTINCT c.*';
+				$wp_wc_columns = $should_send_wc ? ' c.*, wc.aov, wc.id as customer_id, wc.l_order_date, wc.f_order_date, wc.total_order_count, wc.total_order_value, wc.purchased_products, wc.purchased_products_cats, wc.purchased_products_tags, wc.used_coupons' : ' c.*';
 				$join_wc_query = ( isset( $filters['wc'] ) || $should_send_wc ) ? "LEFT JOIN $customer_table as wc ON c.id = wc.cid" : '';
 				$join_cf_query = '';
 				if ( $should_send_cf || isset( $filters['cm'] ) ) {
@@ -1360,7 +1360,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			}
 			$format = get_option( 'date_format', 'Y-m-d' );
 
-			return date( $format, strtotime( $date ) );
+			return wp_date( $format, strtotime( $date ) );
 		}
 
 		/**
@@ -1585,6 +1585,19 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 
 				return $filter;
 			}, $filter_query );
+		}
+
+		/**
+		 * save last modified
+		 *
+		 * @param $cid
+		 *
+		 * @return bool|int|mysqli_result|null
+		 */
+		public static function save_last_modified( $cid ) {
+			global $wpdb;
+
+			return $wpdb->update( "{$wpdb->prefix}bwf_contact", [ 'last_modified' => current_time( 'mysql', 1 ) ], [ 'id' => $cid ] );
 		}
 	}
 }

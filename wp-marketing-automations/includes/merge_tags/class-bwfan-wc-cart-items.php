@@ -167,9 +167,13 @@ class BWFAN_WC_Cart_Items extends Merge_Tag_Abstract_Product_Display {
 				'value' => 'list',
 				'label' => __( 'Product List  (Comma Separated)', 'wp-marketing-automations' ),
 			],
+			[
+				'value' => 'line',
+				'label' => __( 'Product List  (Line Separated)', 'wp-marketing-automations' ),
+			],
 		];
 
-		$option_type = [
+		$option_type      = [
 			[
 				'value' => 'comma-separated',
 				'label' => __( 'Product Names', 'wp-marketing-automations' ),
@@ -194,6 +198,16 @@ class BWFAN_WC_Cart_Items extends Merge_Tag_Abstract_Product_Display {
 				'value' => 'comma-separated-product-ids',
 				'label' => __( 'Product IDs - Comma Separated  ', 'wp-marketing-automations' ),
 			]
+		];
+		$option_type_line = [
+			[
+				'value' => 'separated-product-name',
+				'label' => __( 'Line Separated (Product Names)  ', 'wp-marketing-automations' ),
+			],
+			[
+				'value' => 'separated-product-name-with-quantity',
+				'label' => __( 'Line Separated (Product Names with Quantity)', 'wp-marketing-automations' ),
+			],
 		];
 
 		return [
@@ -226,6 +240,25 @@ class BWFAN_WC_Cart_Items extends Merge_Tag_Abstract_Product_Display {
 					'relation' => 'AND',
 				],
 			],
+			[
+				'id'          => 'type_line',
+				'type'        => 'select',
+				'options'     => $option_type_line,
+				'label'       => __( 'Select Line Type', 'wp-marketing-automations' ),
+				"class"       => 'bwfan-input-wrapper',
+				"placeholder" => '',
+				"required"    => false,
+				"description" => "",
+				"toggler"     => [
+					'fields'   => [
+						[
+							'id'    => 'template',
+							'value' => 'line'
+						]
+					],
+					'relation' => 'AND',
+				],
+			],
 		];
 	}
 
@@ -236,8 +269,9 @@ class BWFAN_WC_Cart_Items extends Merge_Tag_Abstract_Product_Display {
 	 */
 	public function get_default_values() {
 		return [
-			'template' => '',
-			'type'     => 'comma-separated'
+			'template'  => '',
+			'type'      => 'comma-separated',
+			'type_line' => 'separated-product-name'
 		];
 	}
 }

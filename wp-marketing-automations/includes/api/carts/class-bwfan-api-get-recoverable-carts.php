@@ -84,6 +84,7 @@ class BWFAN_API_Get_Recoverable_Carts extends BWFAN_API_Base {
 				'order_id'      => $this->get_order_id( $item ),
 				'user_id'       => ! empty( $item->user_id ) ? $item->user_id : 0,
 				'checkout_data' => ! is_null( $item->checkout_data ) ? $item->checkout_data : '',
+				'recovery_link' => $this->get_recovery_link( $item ),
 			];
 		}
 
@@ -91,6 +92,17 @@ class BWFAN_API_Get_Recoverable_Carts extends BWFAN_API_Base {
 		$this->count_data = [];
 
 		return $this->success_response( $result, __( 'Recoverable carts found', 'wp-marketing-automations' ) );
+	}
+
+	public function get_recovery_link( $item ) {
+		$checkout_data = json_decode( $item->checkout_data, true );
+		if ( empty( $checkout_data ) || ! is_array( $checkout_data ) || empty( $item->token ) ) {
+			return '';
+		}
+		$lang          = isset( $checkout_data['lang'] ) ? $checkout_data['lang'] : '';
+		$cart_url      = BWFAN_Common::wc_get_cart_recovery_url( $item->token, '', $lang, $checkout_data );
+
+		return $cart_url;
 	}
 
 	public function get_phone( $item ) {

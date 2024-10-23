@@ -1016,6 +1016,10 @@ class BWFAN_Admin {
 		if ( ! BWFAN_Common::bwf_has_action_scheduled( 'bwfan_run_event_queue' ) ) {
 			bwf_schedule_recurring_action( time(), MINUTE_IN_SECONDS, 'bwfan_run_event_queue' );
 		}
+
+		if ( ! BWFAN_Common::bwf_has_action_scheduled( 'bwfan_run_midnight_cron' ) ) {
+			bwf_schedule_recurring_action( time(), MINUTE_IN_SECONDS, 'bwfan_run_midnight_cron' );
+		}
 	}
 
 	public function schedule_abandoned_cart_cron() {

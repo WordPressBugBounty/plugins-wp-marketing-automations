@@ -34,10 +34,27 @@ class BWFAN_API_Get_Dashboard_Data extends BWFAN_API_Base {
 	 * @return array
 	 */
 	public function prepare_item_for_response() {
+		$force    = filter_input( INPUT_GET, 'force' );
+		$force    = ( 'false' === $force ) ? false : true;
+		$new_data = [];
+
+		/** Check if worker call is late */
+		$last_run = bwf_options_get( 'fk_core_worker_let' );
+		if ( '' !== $last_run && ( time() - $last_run > 300 ) ) {
+			/** Worker is running late */
+			$new_data['worker_delayed'] = time() - $last_run;
+		}
+
+		/** Check basic worker last run time and status code check */
+		$resp = BWFAN_Common::validate_core_worker( $force );
+		if ( isset( $resp['response_code'] ) ) {
+			$new_data['response_code'] = $resp['response_code'];
+		}
+
+		/** Dashboard call */
 		$lite_key = 'bwfan_dashboard_report_lite';
 		$pro_key  = 'bwfan_dashboard_report_pro';
 		$exp      = BWFAN_Common::get_admin_analytics_cache_lifespan();
-		$force    = filter_input( INPUT_GET, 'force' );
 
 		if ( 'false' === $force ) {
 			/** Check for cached data */
@@ -45,13 +62,13 @@ class BWFAN_API_Get_Dashboard_Data extends BWFAN_API_Base {
 				/** Lite version active */
 				$data = get_transient( $lite_key );
 				if ( ! empty( $data ) ) {
-					return $data;
+					return array_merge( $data, $new_data );
 				}
 			} else {
 				/** Pro version active */
 				$data = get_transient( $pro_key );
 				if ( ! empty( $data ) ) {
-					return $data;
+					return array_merge( $data, $new_data );
 				}
 			}
 		}
@@ -106,6 +123,7 @@ class BWFAN_API_Get_Dashboard_Data extends BWFAN_API_Base {
 		$data = [
 			'carts' => $carts,
 		];
+		$data = array_merge( $data, $new_data );
 
 		$additional_info = [
 			'grab_totals' => true,
@@ -140,6 +158,7 @@ class BWFAN_API_Get_Dashboard_Data extends BWFAN_API_Base {
 				'recent_activities' => $recent_activities,
 			] );
 			set_transient( $lite_key, $data, $exp );
+			BWFAN_Common::validate_scheduled_recurring_actions();
 
 			return $data;
 		}
@@ -170,6 +189,7 @@ class BWFAN_API_Get_Dashboard_Data extends BWFAN_API_Base {
 			'recent_activities' => $recent_activities,
 		] );
 		set_transient( $pro_key, $data, $exp );
+		BWFAN_Common::validate_scheduled_recurring_actions();
 
 		return $data;
 	}

@@ -147,13 +147,21 @@ abstract class Merge_Tag_Abstract_Product_Display extends BWFAN_Merge_Tag {
 			$this->template = $this->template . '-' . $type;
 		}
 
+		/** Handle line-separated output */
+		if ( 'line' === $this->template ) {
+			$type_line = isset( $attr['type_line'] ) && ! empty( $attr['type_line'] ) ? $attr['type_line'] : 'separated-product-name';
+			$items     = $cart ? $cart : $products;
+			$is_cart   = $cart ? true : false;
+
+			return self::get_formatted_items_in_line( $items, $type_line, $products_quantity, $is_cart, $attr );
+		}
+
 		if ( isset( $data['currency'] ) && ! empty( $data['currency'] ) ) {
 			remove_all_filters( 'woocommerce_currency_symbol' );
 		}
 
 		$file_path = BWFAN_PLUGIN_DIR . '/templates/' . $this->template . '.php';
 		$file_path = apply_filters( 'bwfan_cart_items_template_path', $file_path, $cart, $data, $attr );
-
 		if ( ! file_exists( $file_path ) ) {
 			return '';
 		}
@@ -163,6 +171,43 @@ abstract class Merge_Tag_Abstract_Product_Display extends BWFAN_Merge_Tag {
 		$response = ob_get_clean();
 
 		return apply_filters( 'bwfan_alter_email_body', $response, $products, $this->template, $products_quantity );
+	}
+
+	/**
+	 * Format items into lines with quantity and names.
+	 *
+	 * @param $items
+	 * @param $type_line
+	 * @param $products_quantity
+	 * @param $is_cart
+	 * @param $attr
+	 *
+	 * @return array|string
+	 */
+	public static function get_formatted_items_in_line( $items, $type_line, $products_quantity, $is_cart, $attr ) {
+		if ( $is_cart && isset( $items['cart_items'] ) ) {
+			$items = $items['cart_items'];
+		}
+		if ( empty( $items ) || ! is_array( $items ) ) {
+			return [];
+		}
+		$result = [];
+
+		foreach ( $items as $item ) {
+			$product = $is_cart ? ( $item['data'] ?? null ) : $item;
+			if ( empty( $product ) || ! $product instanceof WC_Product ) {
+				continue;
+			}
+
+			$product_quantity  = $products_quantity[ $product->get_id() ] ?? 1;
+			$bwfan_separator   = apply_filters( 'bwfan_line_separator_symbol', '-', $product, $attr );
+			$formatted_product = apply_filters( 'bwfan_line_separator_formate', $product->get_name() . " X " . $product_quantity, 'X', $product->get_name(), $product_quantity, $attr );
+			$result[]          = $type_line !== 'separated-product-name' ? "$bwfan_separator $formatted_product" : "$bwfan_separator " . $product->get_name();
+		}
+
+		$bwfan_line_separator = apply_filters( 'bwfan_line_separator', "\n\r", $product, $attr );
+
+		return implode( $bwfan_line_separator, $result );
 	}
 
 	public function prepare_products( $product_ids, $orderby = 'date', $order = 'DESC', $limit = 8 ) {

@@ -192,7 +192,7 @@ final class BWFAN_WC_New_Order extends BWFAN_Event {
 		/** For v1 */
 		if ( count( $this->automations_arr ) > 0 ) {
 			$order->update_meta_data( '_bwfan_' . $this->get_slug(), count( $this->automations_arr ) );
-			$order->save();
+			$order->save_meta_data();
 		}
 	}
 

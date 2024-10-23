@@ -28,6 +28,10 @@ class BWFAN_Api_Get_Automation_Dynamic_Coupons extends BWFAN_API_Base {
 	}
 
 	public function process_api_call() {
+		// check if woocommerce is active
+		if ( ! bwfan_is_woocommerce_active() ) {
+			return $this->error_response( __( 'WooCommerce is not active', 'wp-marketing-automations' ), null, 400 );
+		}
 		$automation_id = ! empty( $this->get_sanitized_arg( 'id', 'text_field' ) ) ? $this->get_sanitized_arg( 'id', 'text_field' ) : '';
 		$coupons       = [];
 		if ( ! empty( $automation_id ) ) {

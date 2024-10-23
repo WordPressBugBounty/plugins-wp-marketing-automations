@@ -158,7 +158,7 @@ final class BWFAN_WC_Product_Purchased extends BWFAN_Event {
 		}
 
 		$order->update_meta_data( '_bwfan_' . $this->get_slug(), count( $this->automations_arr ) );
-		$order->save();
+		$order->save_meta_data();
 	}
 
 	/**

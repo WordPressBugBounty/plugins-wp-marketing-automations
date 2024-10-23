@@ -39,16 +39,16 @@ class BWFAN_API_Status_Autonami_Worker extends BWFAN_API_Base {
 			$time                = isset( $body['time'] ) ? strtotime( $body['time'] ) : time();
 			if ( ! empty( $timing ) ) {
 				if ( $time > $timing ) {
-					return $this->success_response( array( 'time' => $time, 'cached' => false ), 'Not Cached' );
+					return $this->success_response( array( 'time' => $time, 'cached' => false ), __(  'Not Cached', 'wp-marketing-automations' ) );
 				} else {
-					return $this->success_response( array( 'time' => $time, 'cached' => true ), 'Cached' );
+					return $this->success_response( array( 'time' => $time, 'cached' => true ), __( 'Cached', 'wp-marketing-automations' ) );
 				}
 			}
 
-			return $this->success_response( array( 'time' => $time, 'cached' => false ), "Working" );
+			return $this->success_response( array( 'time' => $time, 'cached' => false ), __( 'Working', 'wp-marketing-automations' ) );
 		}
 
-		$message             = 'Not working';
+		$message             = __( 'Not working', 'wp-marketing-automations' );
 		$this->response_code = 404;
 
 		return $this->error_response( $message );

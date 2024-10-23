@@ -1304,7 +1304,7 @@ class BWFAN_Rule_Order_Item_Type extends BWFAN_Rule_Base {
 		$result = [];
 		if ( $order_type && ! is_wp_error( $order_type ) ) {
 			foreach ( $order_type as $type ) {
-                $name = $type->name;
+				$name = $type->name;
 				if ( 'grouped' === $name ) {
 					continue;
 				}
@@ -1489,29 +1489,54 @@ class BWFAN_Rule_Product_Item_Custom_Field extends BWFAN_Rule_Custom_Field {
 class BWFAN_Rule_Product_Item_SKU extends BWFAN_Rule_Base {
 
 	public function __construct() {
+		$this->v2 = true;
 		parent::__construct( 'product_item_sku' );
 	}
 
-	public function is_match( $rule_data ) {
-		$order     = BWFAN_Core()->rules->getRulesData( 'wc_order' );
-		$cart_item = BWFAN_Core()->rules->getRulesData( 'wc_items' );
-
-		if ( empty( $cart_item ) ) {
-			return false;
+	public function get_product_skus( $automation_data = [] ) {
+		$all_skus = [];
+		if ( ! empty( $automation_data['global'] ) && is_array( $automation_data['global'] ) ) {
+			$cart_item = BWFAN_Rules::get_order_item_object( $automation_data );
+			$order     = BWFAN_Rules::get_order_object( $automation_data );
+		} else {
+			$order     = BWFAN_Core()->rules->getRulesData( 'wc_order' );
+			$cart_item = BWFAN_Core()->rules->getRulesData( 'wc_items' );
+		}
+		if ( ! empty( $cart_item ) ) {
+			return $this->get_item_skus( $order, $cart_item );
+		}
+		foreach ( $order->get_items() as $item ) {
+			$all_skus = array_merge( $all_skus, $this->get_item_skus( $order, $item ) );
 		}
 
-		if ( ! $cart_item instanceof WC_Order_Item ) {
-			return false;
+		return $all_skus;
+	}
+
+	public function get_item_skus( $order, $item ) {
+		$skus = [];
+
+		$product = BWFAN_WooCommerce_Compatibility::get_product_from_item( $order, $item );
+
+		if ( $product instanceof WC_Product ) {
+			$product_sku = $product->get_sku();
+			if ( ! empty( $product_sku ) ) {
+				$skus[] = $product_sku;
+			}
 		}
 
-		$product = BWFAN_WooCommerce_Compatibility::get_product_from_item( $order, $cart_item );
-		if ( ! $product instanceof WC_Product ) {
-			return false;
+		return $skus;
+	}
+
+	public function is_match_v2( $automation_data, $rule_data ) {
+		$all_skus = $this->get_product_skus( $automation_data );
+
+		foreach ( $all_skus as $product_sku ) {
+			if ( BWFAN_Common::validate_string( trim( $product_sku ), $rule_data['rule'], trim( $rule_data['data'] ) ) ) {
+				return $this->return_is_match( true, $rule_data );
+			}
 		}
 
-		$product_sku = $product->get_sku();
-
-		return $this->return_is_match( BWFAN_Common::validate_string( $product_sku, $rule_data['operator'], $rule_data['condition'] ), $rule_data );
+		return $this->return_is_match( false, $rule_data );
 	}
 
 
@@ -2398,6 +2423,7 @@ class BWFAN_Rule_Order_Status_Change extends BWFAN_Rule_Base {
 				$result[ $status_key ] = $status_name;
 			}
 		}
+
 		return $result;
 	}
 

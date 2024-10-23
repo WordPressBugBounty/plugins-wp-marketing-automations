@@ -373,7 +373,7 @@ class BWFAN_API_SendMessage extends BWFAN_API_Base {
 		$provider = isset( $provider[1] ) ? $provider[1] : '';
 		$provider = ! empty( $provider ) ? BWFAN_Core()->integration->get_integration( $provider ) : '';
 		if ( ! $provider instanceof BWFAN_Integration || ! method_exists( $provider, 'send_message' ) ) {
-			return new WP_Error( 'connector_not_found', __( 'Connector Integration not found', 'wp-marketing-automations-pro' ) );
+			return new WP_Error( 'connector_not_found', __( 'Connector Integration not found', 'wp-marketing-automations' ) );
 		}
 
 		return $provider->send_message( $args );

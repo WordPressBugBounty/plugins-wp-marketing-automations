@@ -187,3 +187,32 @@ if ( ! function_exists( 'bwf_return_true' ) ) {
 		return true;
 	}
 }
+
+if ( ! function_exists( 'bwf_generate_random_bytes' ) ) {
+	/**
+	 * Generate random bytes for the given count
+	 *
+	 * @param $count
+	 *
+	 * @return string
+	 */
+	function bwf_generate_random_bytes( $count ) {
+		$output = '';
+		$state  = microtime();
+		if ( function_exists( 'getmypid' ) ) {
+			$state .= getmypid();
+		}
+		if ( strlen( $output ) < $count ) {
+			$output = '';
+			for ( $i = 0; $i < $count; $i += 16 ) {
+				$state = md5( microtime() . $state );
+
+				$output .= md5( $state, true );
+
+			}
+			$output = substr( $output, 0, $count );
+		}
+
+		return $output;
+	}
+}

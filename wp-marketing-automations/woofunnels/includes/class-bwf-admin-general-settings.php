@@ -250,6 +250,7 @@ if ( ! class_exists( 'BWF_Admin_General_Settings' ) ) {
 				'snapchat_initiate_checkout_event'  => '',
 				'snapchat_add_payment_info_event'   => '',
 				'is_snapchat_purchase_event'        => array(),
+				'snapchat_variable_as_simple'       => '',
 				'is_fb_add_to_cart_global'          => '',
 				'is_ga_add_to_cart_global'          => '',
 				'is_gad_add_to_cart_global'         => '',
@@ -259,6 +260,7 @@ if ( ! class_exists( 'BWF_Admin_General_Settings' ) ) {
 				'is_tiktok_page_view_op'            => array(),
 				'is_tiktok_pageview_event'          => array(),
 				'tiktok_is_page_view'               => '',
+				'tiktok_variable_as_simple'         => '',
 				'is_tiktok_add_to_cart_global'      => '',
 				'is_pint_add_to_cart_global'        => '',
 				'is_pint_page_visit_global'         => '',
@@ -267,6 +269,7 @@ if ( ! class_exists( 'BWF_Admin_General_Settings' ) ) {
 				'is_ga_add_to_cart_bump'            => '',
 				'is_ga_custom_bump'                 => '',
 				'custom_aud_opt_conf'               => [],
+				'allow_theme_css'                   => array( 'wfacp_checkout' ),
 
 			) );
 		}

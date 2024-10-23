@@ -227,6 +227,9 @@ abstract class BWFCRM_Base_React_Page {
 		] );
 		$this->page_data['wizard_status']      = get_option( '_bwfan_onboarding_completed', false ) || get_option( '_wffn_onboarding_completed', false );
 		$this->page_data['user_email']         = get_user_by( 'id', get_current_user_id() )->user_email;
+
+		$this->page_data['bwfan_table_validation_error'] = BWFAN_Table_Validation_Controller::get_table_validate_option();
+
 		do_action( 'bwfan_admin_view_localize_data', $this );
 	}
 

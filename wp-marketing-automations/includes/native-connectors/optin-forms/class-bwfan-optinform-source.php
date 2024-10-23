@@ -16,7 +16,7 @@ if ( ! bwfan_is_autonami_pro_active() && ! class_exists( 'BWFAN_OptinForm_Source
 		/**
 		 * Ensures only one instance of the class is loaded or can be loaded.
 		 *
-		 * @return BWFAN_CalderaForm_Source|null
+		 * @return BWFAN_OptinForm_Source|null
 		 */
 		public static function get_instance() {
 			if ( null === self::$instance ) {

@@ -47,7 +47,11 @@ class BWFAN_WC_Item_Data extends BWFAN_Cart_Display {
 		}
 
 		$this->item_type = 'item_data';
-		$value           = $this->get_item_details( $attr );
+		try {
+			$value = $this->get_item_details( $attr );
+		} catch ( Exception $e ) {
+			return $this->parse_shortcode_output( '', $attr );
+		}
 		/** if value is date then checking format in attribute */
 		$value = $this->get_date_value( $value, $attr );
 

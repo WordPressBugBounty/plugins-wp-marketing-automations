@@ -59,7 +59,7 @@ class BWFAN_Rules_Loader extends BWFAN_Rules {
 				'title' => __( 'Product', 'wp-marketing-automations' ),
 			),
 			'wc_order'            => array(
-				'title' => __( 'Order', 'wp-marketing-automations' ),
+				'title' => __( 'Current Woo Order', 'wp-marketing-automations' ),
 			),
 			'wc_order_items_data' => array(
 				'title' => __( 'Order Item Data', 'wp-marketing-automations' ),
