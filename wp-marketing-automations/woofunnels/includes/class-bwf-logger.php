@@ -28,7 +28,7 @@ class BWF_Logger {
 		}
 		$plugin_short_name = $folder_prefix . '-logs';
 		$transient_key     = $file_name . '-' . gmdate( 'Y-m-d' );
-		$transient_key     = $transient_key . '-' . hash_hmac( 'md5', $transient_key, AUTH_SALT );
+		$transient_key     = $transient_key . '-' . hash_hmac( 'md5', $transient_key, defined( 'AUTH_SALT' ) && AUTH_SALT ? AUTH_SALT : 'funnelkit-logs' );
 		$transient_value   = gmdate( 'c', time() ) . ' - ' . $message . "\n";
 
 		$file_api = $this->is_writable( $plugin_short_name, $transient_key );
