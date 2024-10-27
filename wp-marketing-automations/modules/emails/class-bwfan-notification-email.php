@@ -517,7 +517,7 @@ class BWFAN_Notification_Email {
 			return;
 		}
 
-		$bwfan_settings = array(
+		$new_settings = array(
 			'bwfan_enable_notification'  => true,
 			'bwf_notification_frequency' => array( 'weekly', 'monthly' ),
 			'bwfan_notification_time'    => array(
@@ -527,6 +527,8 @@ class BWFAN_Notification_Email {
 			),
 			'bwfan_external_user'        => array(),
 		);
+
+		$bwfan_settings = array_merge( $bwfan_settings, $new_settings );
 
 		$users         = get_users( array( 'role' => 'administrator' ) );
 		$user_selector = array();

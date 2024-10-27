@@ -4,7 +4,7 @@ Tags: cart abandonment, follow up emails, email marketing, email customizer, crm
 Requires at least: 5.0
 Tested up to: 6.7.0
 Requires PHP: 7.0
-Stable tag: 3.3.1
+Stable tag: 3.3.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -415,6 +415,11 @@ FunnelKit Automations is 100% self-hosted and fully GDPR compliant.
 
 
 == Change log ==
+
+= 3.3.2 (Oct 27, 2024) =
+* Fixed: Evaluating 'missing URLs' for Mailto and Tel  in Email Audit tool allowed. (#3515)
+* Fixed: Issue with settings not saved properly since last update. (#3519)
+* Fixed: Pro: Admin app: SMS broadcast screen issue fixed. (#3514)
 
 = 3.3.1 (Oct 23, 2024) =
 * Fixed: PHP Error of undefined constant "AUTH_SALT" in a few cases with wp-config.php file modified.

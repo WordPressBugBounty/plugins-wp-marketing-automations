@@ -9778,11 +9778,12 @@ class BWFAN_Common {
 		if ( empty( self::$unsubscribe_page_link ) ) {
 			$global_settings = self::get_global_settings();
 			if ( ! isset( $global_settings['bwfan_unsubscribe_page'] ) || empty( $global_settings['bwfan_unsubscribe_page'] ) ) {
-				return '';
-			}
-			$page = absint( $global_settings['bwfan_unsubscribe_page'] );
+				self::$unsubscribe_page_link = esc_url_raw( home_url() );
+			} else {
+				$page = absint( $global_settings['bwfan_unsubscribe_page'] );
 
-			self::$unsubscribe_page_link = get_permalink( $page );
+				self::$unsubscribe_page_link = get_permalink( $page );
+			}
 		}
 
 		if ( empty( $data ) || ! is_array( $data ) ) {

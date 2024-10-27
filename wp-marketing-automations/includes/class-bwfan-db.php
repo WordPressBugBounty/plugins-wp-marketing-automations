@@ -271,6 +271,7 @@ class BWFAN_DB {
 			'3.0.4'    => '3_0_4',
 			'3.0.5'    => '3_0_5',
 			'3.2.0'    => '3_2_0',
+			'3.2.1'    => '3_2_1',
 		);
 		$db_version = get_option( 'bwfan_db', '2.0' );
 
@@ -1084,11 +1085,330 @@ class BWFAN_DB {
 	 * @return void
 	 */
 	public function db_update_3_2_0( $version_key ) {
+		if ( is_array( $this->method_run ) && in_array( '1.0.0', $this->method_run, true ) ) {
+			update_option( 'bwfan_db', $version_key, true );
+			$this->method_run[] = $version_key;
+
+			return;
+		}
+
 		/** set default settings for email notification */
 		BWFAN_Notification_Email::set_bwfan_settings();
 
 		/** Updating version key */
 		update_option( 'bwfan_db', $version_key, true );
+	}
+
+	public function db_update_3_2_1( $version_key ) {
+		if ( is_array( $this->method_run ) && in_array( '1.0.0', $this->method_run, true ) ) {
+			update_option( 'bwfan_db', $version_key, true );
+			$this->method_run[] = $version_key;
+
+			return;
+		}
+
+		/** Check for merge tags */
+		$this->recheck_merge_tags();
+
+		/** Check cart */
+		$this->check_cart();
+
+		/** Check bounce */
+		$this->check_bounce();
+
+		/** Updating version key */
+		update_option( 'bwfan_db', $version_key, true );
+	}
+
+	protected function recheck_merge_tags() {
+		global $wpdb;
+
+		try {
+			$settings = BWFAN_Common::get_global_settings();
+
+			/** Fetch some merge tag values from the engagements meta table */
+			$query = $wpdb->prepare( "SELECT `ID` FROM `{table_name}` WHERE `created_at` < %s AND `c_status` = %d ORDER BY `created_at` DESC LIMIT 0,1;", '2024-10-22 00:00:01', 2 );
+			$id    = BWFAN_Model_Engagement_Tracking::get_var( $query );
+			if ( empty( $id ) ) {
+				return;
+			}
+			$query = $wpdb->prepare( "SELECT `meta_value` FROM `{table_name}` WHERE `eid` < %d AND `meta_key` LIKE 'merge_tags' AND `meta_value` LIKE '%{{business_name}}%' LIMIT 0,100;", $id );
+			$rows  = BWFAN_Model_Engagement_Trackingmeta::get_results( $query );
+			if ( empty( $rows ) || ! is_array( $rows ) || 0 === count( $rows ) ) {
+				return;
+			}
+			$business_name    = '';
+			$business_address = '';
+			$unsubscribe_url  = '';
+
+			$rows = array_column( $rows, 'meta_value' );
+			foreach ( $rows as $row ) {
+				$row = json_decode( $row, true );
+				if ( empty( $business_name ) && isset( $row['{{business_name}}'] ) && ! empty( $row['{{business_name}}'] ) ) {
+					$business_name = $row['{{business_name}}'];
+				}
+				if ( empty( $business_address ) && isset( $row['{{business_address}}'] ) && ! empty( $row['{{business_address}}'] ) ) {
+					$business_address = $row['{{business_address}}'];
+				}
+				if ( empty( $unsubscribe_url ) && isset( $row['{{unsubscribe_link}}'] ) && ! empty( $row['{{unsubscribe_link}}'] ) ) {
+					$unsubscribe_url = strpos( $row['{{unsubscribe_link}}'], '?bwfan-action=unsubscribe' ) !== false ? $row['{{unsubscribe_link}}'] : '';
+					if ( ! empty( $unsubscribe_url ) ) {
+						$unsubscribe_url = $this->get_the_unsubscribe_page_id( $unsubscribe_url );
+					}
+				}
+
+				if ( ! empty( $business_name ) && ! empty( $business_address ) && ! empty( $unsubscribe_url ) ) {
+					break;
+				}
+			}
+
+			if ( ! empty( $business_name ) ) {
+				$settings['bwfan_setting_business_name'] = $business_name;
+			}
+			if ( ! empty( $business_address ) ) {
+				$settings['bwfan_setting_business_address'] = $business_address;
+			}
+			if ( ! empty( $unsubscribe_url ) ) {
+				$settings['bwfan_unsubscribe_page'] = $unsubscribe_url;
+			}
+
+			update_option( 'bwfan_global_settings', $settings );
+		} catch ( Exception $e ) {
+			return;
+		} catch ( Error $e ) {
+			return;
+		}
+	}
+
+	protected function check_cart() {
+		if ( ! bwfan_is_woocommerce_active() ) {
+			return;
+		}
+
+		$settings = BWFAN_Common::get_global_settings();
+		if ( ! empty( $settings['bwfan_ab_enable'] ) ) {
+			return;
+		}
+		global $wpdb;
+
+		try {
+			$query = $wpdb->prepare( "SELECT `ID` FROM `{table_name}` WHERE `created_time` > %s LIMIT 0,1;", '2024-10-01 00:00:01' );
+			$found = BWFAN_Model_Abandonedcarts::get_var( $query );
+			if ( empty( $found ) ) {
+				return;
+			}
+			$settings['bwfan_ab_enable'] = true;
+			update_option( 'bwfan_global_settings', $settings );
+		} catch ( Exception $e ) {
+			return;
+		} catch ( Error $e ) {
+			return;
+		}
+	}
+
+	protected function check_bounce() {
+		$settings = BWFAN_Common::get_global_settings();
+		if ( ! empty( $settings['bwfan_enable_bounce_handling'] ) ) {
+			return;
+		}
+
+		/** offload ses */
+		if ( class_exists( 'DeliciousBrains\WP_Offload_SES\WP_Offload_SES' ) ) {
+			$settings['bwfan_enable_bounce_handling'] = true;
+			$settings['bwfan_bounce_select']          = 'amazon ses';
+			update_option( 'bwfan_global_settings', $settings );
+
+			return;
+		}
+
+		/** elastic email */
+		if ( class_exists( 'eemail' ) ) {
+			$settings['bwfan_enable_bounce_handling'] = true;
+			$settings['bwfan_bounce_select']          = 'elastic email';
+			update_option( 'bwfan_global_settings', $settings );
+
+			return;
+		}
+
+		/** postmark */
+		if ( class_exists( 'Postmark_Mail' ) ) {
+			$settings['bwfan_enable_bounce_handling'] = true;
+			$settings['bwfan_bounce_select']          = 'postmark';
+			update_option( 'bwfan_global_settings', $settings );
+
+			return;
+		}
+
+		/** wp mail smtp */
+		if ( defined( 'WPMS_PLUGIN_VER' ) ) {
+			$option = get_option( 'wp_mail_smtp', false );
+			if ( $option && isset( $option['mail'] ) && isset( $option['mail']['mailer'] ) ) {
+				$settings['bwfan_enable_bounce_handling'] = true;
+				switch ( $option['mail']['mailer'] ) {
+					case 'postmark':
+						$settings['bwfan_bounce_select'] = 'postmark';
+						break;
+					case 'amazonses':
+						$settings['bwfan_bounce_select'] = 'amazon ses';
+						break;
+					case 'sendinblue':
+						$settings['bwfan_bounce_select'] = 'brevo (formerly sendinblue)';
+						break;
+					case 'sparkpost':
+						$settings['bwfan_bounce_select'] = 'sparkpost';
+						break;
+					case 'mailgun':
+						$settings['bwfan_bounce_select'] = 'mailgun';
+						break;
+					case 'sendgrid':
+						$settings['bwfan_bounce_select'] = 'sendgrid';
+						break;
+				}
+				update_option( 'bwfan_global_settings', $settings );
+
+				return;
+			}
+		}
+
+		/** easy wp smtp */
+		if ( class_exists( 'EasyWPSMTP' ) ) {
+			$option = get_option( 'easy_wp_smtp', false );
+			if ( $option && isset( $option['mail'] ) && isset( $option['mail']['mailer'] ) ) {
+				$settings['bwfan_enable_bounce_handling'] = true;
+				switch ( $option['mail']['mailer'] ) {
+					case 'postmark':
+						$settings['bwfan_bounce_select'] = 'postmark';
+						break;
+					case 'amazonses':
+						$settings['bwfan_bounce_select'] = 'amazon ses';
+						break;
+					case 'sendinblue':
+						$settings['bwfan_bounce_select'] = 'brevo (formerly sendinblue)';
+						break;
+					case 'sparkpost':
+						$settings['bwfan_bounce_select'] = 'sparkpost';
+						break;
+					case 'mailgun':
+						$settings['bwfan_bounce_select'] = 'mailgun';
+						break;
+					case 'sendgrid':
+						$settings['bwfan_bounce_select'] = 'sendgrid';
+						break;
+				}
+				update_option( 'bwfan_global_settings', $settings );
+
+				return;
+			}
+		}
+
+		/** fluent smtp */
+		if ( defined( 'FLUENTMAIL_PLUGIN_FILE' ) ) {
+			$settings = get_option( 'fluentmail-settings', false );
+			if ( ! empty( $settings ) && isset( $settings['misc'] ) && isset( $settings['misc']['default_connection'] ) && isset( $settings['connections'] ) ) {
+				$default_connection = $settings['misc']['default_connection'];
+				if ( isset( $settings['connections'][ $default_connection ] ) && isset( $settings['connections'][ $default_connection ]['provider'] ) ) {
+					$settings['bwfan_enable_bounce_handling'] = true;
+					switch ( $settings['connections'][ $default_connection ]['provider'] ) {
+						case 'postmark':
+							$settings['bwfan_bounce_select'] = 'postmark';
+							break;
+						case 'amazonses':
+							$settings['bwfan_bounce_select'] = 'amazon ses';
+							break;
+						case 'sendinblue':
+							$settings['bwfan_bounce_select'] = 'brevo (formerly sendinblue)';
+							break;
+						case 'sparkpost':
+							$settings['bwfan_bounce_select'] = 'sparkpost';
+							break;
+						case 'mailgun':
+							$settings['bwfan_bounce_select'] = 'mailgun';
+							break;
+						case 'sendgrid':
+							$settings['bwfan_bounce_select'] = 'sendgrid';
+							break;
+						case 'elasticmail':
+							$settings['bwfan_bounce_select'] = 'elastic email';
+							break;
+						case 'pepipost':
+							$settings['bwfan_bounce_select'] = 'pepipost';
+							break;
+					}
+					update_option( 'bwfan_global_settings', $settings );
+
+					return;
+				}
+			}
+		}
+
+		/** post smtp */
+		if ( class_exists( 'Postman' ) ) {
+			$settings = get_option( 'postman_options', false );
+			if ( ! empty( $settings ) && isset( $settings['transport_type'] ) ) {
+				$settings['bwfan_enable_bounce_handling'] = true;
+				switch ( $settings['transport_type'] ) {
+					case 'postmark_api':
+						$settings['bwfan_bounce_select'] = 'postmark';
+						break;
+					case 'aws_ses_api':
+						$settings['bwfan_bounce_select'] = 'amazon ses';
+						break;
+					case 'sendinblue_api':
+						$settings['bwfan_bounce_select'] = 'brevo (formerly sendinblue)';
+						break;
+					case 'sparkpost_api':
+						$settings['bwfan_bounce_select'] = 'sparkpost';
+						break;
+					case 'mailgun_api':
+						$settings['bwfan_bounce_select'] = 'mailgun';
+						break;
+					case 'sendgrid_api':
+						$settings['bwfan_bounce_select'] = 'sendgrid';
+						break;
+					case 'elasticemail_api':
+						$settings['bwfan_bounce_select'] = 'elastic email';
+						break;
+					case 'mailjet_api':
+						$settings['bwfan_bounce_select'] = 'mailjet';
+						break;
+				}
+				update_option( 'bwfan_global_settings', $settings );
+
+				return;
+			}
+		}
+	}
+
+	/**
+	 * Helper method
+	 *
+	 * @param $url
+	 *
+	 * @return int|string
+	 */
+	protected function get_the_unsubscribe_page_id( $url = '' ) {
+		if ( empty( $url ) ) {
+			return '';
+		}
+
+		/** Parse the URL to get just the path component */
+		$path = parse_url( $url, PHP_URL_PATH );
+
+		/** Remove leading and trailing slashes */
+		$slug = trim( $path, '/' );
+
+		/** If the slug has multiple segments, get the last one */
+		$path_segments = explode( '/', $slug );
+		$final_slug    = end( $path_segments );
+
+		/** Get the page using the slug */
+		$page = get_posts( [
+			'name'           => $final_slug,
+			'post_type'      => 'page',
+			'posts_per_page' => 1
+		] );
+
+		return ! empty( $page ) ? strval( $page[0]->ID ) : 0;
 	}
 }
 

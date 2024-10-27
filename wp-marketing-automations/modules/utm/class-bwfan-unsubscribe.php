@@ -16,9 +16,12 @@ class BWFAN_unsubscribe {
 	protected $crm_contact = '';
 	protected $one_click = 0;
 
+	protected $unsubscribe_page = false;
+
 	public function __construct() {
 		add_action( 'bwfan_db_1_0_tables_created', array( $this, 'create_unsubscribe_sample_page' ) );
 		add_action( 'wp', array( $this, 'unsubscribe_page_non_crawlable' ) );
+		add_action( 'wp', array( $this, 'unsubscribe_static_page' ), 100 );
 
 		/** Shortcodes for unsubscribe */
 		add_shortcode( 'bwfan_unsubscribe_button', array( $this, 'bwfan_unsubscribe_button' ) );
@@ -91,6 +94,8 @@ class BWFAN_unsubscribe {
 			return;
 		}
 
+		$this->unsubscribe_page = true;
+
 		$one_click = filter_input( INPUT_GET, 'List-Unsubscribe' );
 		if ( 'One-Click' === $one_click ) {
 			$this->one_click = 1;
@@ -105,6 +110,67 @@ class BWFAN_unsubscribe {
 			}
 			echo "<script>window.bwfan_unsubscribe_preference = 'one_click';</script>";
 		} );
+	}
+
+	/**
+	 * Backward handling in case contact uid present and not an unsubscribe page
+	 *
+	 * @return void
+	 */
+	public function unsubscribe_static_page() {
+		if ( true === $this->unsubscribe_page ) {
+			return;
+		}
+
+		/** Not an unsubscribe page */
+
+		$uid = filter_input( INPUT_GET, 'uid' );
+		if ( empty( $uid ) ) {
+			return;
+		}
+
+		$action = filter_input( INPUT_GET, 'bwfan-action' );
+		if ( in_array( $action, [ 'subscribe', 'view_in_browser', 'incentive' ], true ) ) {
+			return;
+		}
+		$link_hash = filter_input( INPUT_GET, 'bwfan-link-trigger' );
+		if ( ! empty( $link_hash ) ) {
+			return;
+		}
+		$feed_id = filter_input( INPUT_GET, 'form_feed_id' );
+		if ( ! empty( $feed_id ) ) {
+			return;
+		}
+
+		$track_action = filter_input( INPUT_GET, 'bwfan-track-action' );
+		if ( 'unsubscribe' === $action || is_null( $track_action ) ) {
+			$this->set_data();
+			$this->display_unsubscribe_page();
+
+			return;
+		}
+	}
+
+	/**
+	 * Display static unsubscribe page
+	 *
+	 * @return void
+	 */
+	protected function display_unsubscribe_page() {
+		if ( empty( $this->recipient ) ) {
+			return;
+		}
+
+		/** Mark contact unsubscribed */
+		$this->mark_unsubscribe( false );
+
+		$settings = BWFAN_Common::get_global_settings();
+
+		echo sprintf( "<h2>%s</h2>", __( 'Successfully Unsubscribed', 'wp-marketing-automations' ) );
+		if ( isset( $settings['bwfan_unsubscribe_data_success'] ) && ! empty( $settings['bwfan_unsubscribe_data_success'] ) ) {
+			echo sprintf( "<p>%s</p>", $settings['bwfan_unsubscribe_data_success'] );
+		}
+		exit;
 	}
 
 	public function bwfan_unsubscribe_button( $attrs ) {
@@ -706,9 +772,11 @@ class BWFAN_unsubscribe {
 	/**
 	 * Mark contact unsubscribe
 	 *
+	 * @param $return
+	 *
 	 * @return void
 	 */
-	protected function mark_unsubscribe() {
+	protected function mark_unsubscribe( $return = true ) {
 		global $wpdb;
 
 		$automation_id = filter_input( INPUT_POST, 'automation_id', FILTER_SANITIZE_NUMBER_INT );
@@ -772,7 +840,9 @@ class BWFAN_unsubscribe {
 		/** hook when any contact unsubscribed  */
 		do_action( 'bwfcrm_after_contact_unsubscribed', array( $insert_data ) );
 
-		$this->return_message( 2 );
+		if ( true === $return ) {
+			$this->return_message( 2 );
+		}
 	}
 
 	/**

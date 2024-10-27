@@ -662,6 +662,22 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 			$link = self::validate_link( $link );
 
 			if ( false === wp_http_validate_url( $link ) ) {
+				/** check if uid is available in the link */
+				if ( strpos( $link, 'uid' ) !== false ) {
+					/** Redirect to home */
+					$home_url = esc_url_raw( home_url( '/?' ) );
+					$link     = str_replace( 'http://?', $home_url, $link );
+					$link     = str_replace( 'https://?', $home_url, $link );
+					if ( false !== wp_http_validate_url( $link ) ) {
+						$home_url = add_query_arg( $_GET, home_url( '/' ) );
+						$home_url = add_query_arg( array(
+							'bwfan-link' => urlencode( $link )
+						), $home_url );
+						BWFAN_Common::wp_redirect( $home_url );
+						exit;
+					}
+				}
+
 				$this->track_click_skip();
 				BWFAN_Common::wp_redirect( $link );
 				exit;
