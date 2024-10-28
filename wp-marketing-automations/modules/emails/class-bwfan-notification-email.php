@@ -116,7 +116,7 @@ class BWFAN_Notification_Email {
 				}
 
 				$timestamp = $this->create_timestamp_from_array( $notification_time );
-				bwf_schedule_recurring_action( $timestamp, DAY_IN_SECONDS, 'bwfan_run_notifications' );
+				bwf_schedule_single_action( $timestamp, 'bwfan_run_notifications' );
 			}
 
 			return;
@@ -513,7 +513,7 @@ class BWFAN_Notification_Email {
 	 */
 	public static function set_bwfan_settings() {
 		$bwfan_settings = BWFAN_Common::get_global_settings();
-		if ( isset( $bwfan_settings['bwfan_enable_notification'] ) ) {
+		if ( isset( $bwfan_settings['bwfan_enable_notification'] ) && ! empty( $bwfan_settings['bwfan_enable_notification'] ) ) {
 			return;
 		}
 
@@ -541,6 +541,17 @@ class BWFAN_Notification_Email {
 		}
 
 		$bwfan_settings['bwf_notification_user_selector'] = $user_selector;
+
+		/** Set scheduler */
+		$old_settings = array(
+			'bwfan_notification_time' => array(
+				'hours'   => '09',
+				'minutes' => '00',
+				'ampm'    => 'am',
+			),
+		);
+		self::$instance->set_scheduler( $old_settings, $new_settings );
+
 		update_option( 'bwfan_global_settings', $bwfan_settings );
 	}
 }

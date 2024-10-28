@@ -270,8 +270,8 @@ class BWFAN_DB {
 			'3.0.1.1'  => '3_0_1_1',
 			'3.0.4'    => '3_0_4',
 			'3.0.5'    => '3_0_5',
-			'3.2.0'    => '3_2_0',
 			'3.2.1'    => '3_2_1',
+			'3.2.2'    => '3_2_2',
 		);
 		$db_version = get_option( 'bwfan_db', '2.0' );
 
@@ -1084,7 +1084,7 @@ class BWFAN_DB {
 	 *
 	 * @return void
 	 */
-	public function db_update_3_2_0( $version_key ) {
+	public function db_update_3_2_2( $version_key ) {
 		if ( is_array( $this->method_run ) && in_array( '1.0.0', $this->method_run, true ) ) {
 			update_option( 'bwfan_db', $version_key, true );
 			$this->method_run[] = $version_key;

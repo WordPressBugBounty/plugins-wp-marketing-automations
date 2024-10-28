@@ -230,6 +230,8 @@ class BWFAN_Common {
 		add_action( 'bwfan_conversions_index', [ __CLASS__, 'bwfan_conversions_index' ] );
 
 		add_action( 'bwfan_run_midnight_cron', array( 'BWFAN_Table_Validation_Controller', 'get_table_validate_option' ) );
+
+		add_action( 'bwfan_run_midnight_cron', [ __CLASS__, 'schedule_notification' ] );
 	}
 
 	public static function display_marketing_optin_checkbox() {
@@ -11041,6 +11043,25 @@ class BWFAN_Common {
 			}
 
 		} while ( ( time() - $start_time ) < 20 );
+	}
 
+	/**
+	 * Schedule email notification daily
+	 *
+	 * @return void
+	 */
+	public static function schedule_notification() {
+		$settings = BWFAN_Common::get_global_settings();
+		if ( empty( $settings['bwfan_enable_notification'] ) ) {
+			return;
+		}
+
+		$ins = BWFAN_Notification_Email::get_instance();
+
+		$old_settings = $settings;
+
+		$old_settings['bwfan_notification_time']['ampm'] = ( 'am' === $settings['bwfan_notification_time']['ampm'] ) ? 'pm' : 'am';
+
+		$ins->set_scheduler( $old_settings, $settings );
 	}
 }

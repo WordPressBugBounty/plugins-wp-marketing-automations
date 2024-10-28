@@ -4,7 +4,7 @@ Tags: cart abandonment, follow up emails, email marketing, email customizer, crm
 Requires at least: 5.0
 Tested up to: 6.7.0
 Requires PHP: 7.0
-Stable tag: 3.3.2
+Stable tag: 3.3.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -415,6 +415,11 @@ FunnelKit Automations is 100% self-hosted and fully GDPR compliant.
 
 
 == Change log ==
+
+= 3.3.3 (Oct 28, 2024) =
+* Fixed: Contact: Added handling to show the Funnels tab when Funnel Builder is active and WooCommerce is inactive. (#3513)
+* Fixed: Action Scheduler library: One warning is fixed when WooCommerce is inactive. (#3518)
+* Fixed: The FunnelKit Automation Pro minimum required version was corrected. (#3523)
 
 = 3.3.2 (Oct 27, 2024) =
 * Fixed: Evaluating 'missing URLs' for Mailto and Tel  in Email Audit tool allowed. (#3515)
