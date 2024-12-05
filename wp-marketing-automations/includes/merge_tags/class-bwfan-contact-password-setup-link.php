@@ -36,7 +36,8 @@ class BWFAN_Contact_Password_Setup_Link extends BWFAN_Merge_Tag {
 
 		$user_id = isset( $get_data['user_id'] ) ? $get_data['user_id'] : '';
 		if ( ! empty( $user_id ) ) {
-			$link = $this->get_reset_link( $user_id );
+			$key  = isset( $get_data['user_reset_key'] ) ? $get_data['user_reset_key'] : '';
+			$link = $this->get_reset_link( $user_id, false, $key );
 			if ( ! empty( $link ) ) {
 				return $this->parse_shortcode_output( $link, $attr );
 			}
@@ -63,7 +64,7 @@ class BWFAN_Contact_Password_Setup_Link extends BWFAN_Merge_Tag {
 			}
 		}
 
-		return $this->parse_shortcode_output( '', $attr );
+		return $this->parse_shortcode_output( home_url(), $attr );
 	}
 
 	/**
@@ -74,7 +75,7 @@ class BWFAN_Contact_Password_Setup_Link extends BWFAN_Merge_Tag {
 	 *
 	 * @return string
 	 */
-	protected function get_reset_link( $user_id, $user = false ) {
+	protected function get_reset_link( $user_id, $user = false, $key = '' ) {
 		if ( empty( $user ) ) {
 			$user = new WP_User( $user_id );
 			if ( ! $user instanceof WP_User || ! wp_is_password_reset_allowed_for_user( $user ) ) {
@@ -82,10 +83,12 @@ class BWFAN_Contact_Password_Setup_Link extends BWFAN_Merge_Tag {
 			}
 		}
 
-		$key = get_password_reset_key( $user );
+		if ( empty( $key ) ) {
+			$key = get_password_reset_key( $user );
 
-		if ( is_wp_error( $key ) ) {
-			return '';
+			if ( is_wp_error( $key ) ) {
+				return '';
+			}
 		}
 
 		return add_query_arg( array(
@@ -101,7 +104,7 @@ class BWFAN_Contact_Password_Setup_Link extends BWFAN_Merge_Tag {
 	 * @return string
 	 */
 	public function get_dummy_preview() {
-		return '';
+		return home_url();
 	}
 }
 

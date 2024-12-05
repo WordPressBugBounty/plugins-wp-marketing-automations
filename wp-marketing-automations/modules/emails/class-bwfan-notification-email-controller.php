@@ -57,19 +57,27 @@ class BWFAN_Notification_Email_Controller {
 		$total_revenue    = ! isset( $get_total_orders[0]['total_revenue'] ) ? 0 : $get_total_orders[0]['total_revenue'];
 		$total_revenue    = floatval( $total_revenue );
 
+		$theme = array(
+			'date'        => $date_range,
+			'title'       => __( 'Performance Report', 'wp-marketing-automations' ),
+			'subtitle'    => $highlight_subtitle,
+			'button_text' => $highlight_button_text,
+			'button_url'  => $highlight_button_url,
+			'theme'       => 'light',
+		);
+		$time  = strtotime( gmdate( 'c' ) );
+		if ( false === bwfan_is_autonami_pro_active() && $time >= 1732510800 && $time < 1733547600 ) {
+			$theme['theme']    = 'dark';
+			$theme['subtitle'] = __( '💰 Black Friday is HERE - Subscribe Now for Upto 55% Off 💰', 'wp-marketing-automations' );
+		}
+
 		$email_sections = array(
 			array(
 				'type' => 'email_header',
 			),
 			array(
 				'type' => 'highlight',
-				'data' => array(
-					'date'        => $date_range,
-					'title'       => __( 'Performance Report', 'wp-marketing-automations' ),
-					'subtitle'    => $highlight_subtitle,
-					'button_text' => $highlight_button_text,
-					'button_url'  => $highlight_button_url,
-				),
+				'data' => $theme,
 			),
 			array(
 				'type'     => 'dynamic',

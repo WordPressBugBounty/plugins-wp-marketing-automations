@@ -160,7 +160,7 @@ if ( ! function_exists( 'bwf_create_update_contact_object' ) ) {
 		}
 
 		$order_country = $order->get_billing_country();
-		if ( ! empty( $order_country ) ) {
+		if ( ! empty( $order_country ) && 2 === strlen( $order_country ) ) {
 			$order_country = ( false === $force && ! empty( $bwf_contact->get_country() ) ) ? '' : $order_country;
 			$bwf_contact->set_country( $order_country );
 		}

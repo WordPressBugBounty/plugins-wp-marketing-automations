@@ -84,6 +84,10 @@ abstract class BWFAN_Source {
 		return $this->nice_name;
 	}
 
+	public function get_priority() {
+		return $this->priority;
+	}
+
 	/**
 	 * to avoid unserialize of the current class
 	 */

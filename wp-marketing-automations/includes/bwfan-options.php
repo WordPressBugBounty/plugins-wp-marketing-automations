@@ -5,32 +5,32 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! function_exists( 'bwf_options_get' ) ) {
+
 	/**
 	 * Get value of any column based on column key
 	 *
 	 * @param $key
-	 * @param $column - default value column
+	 * @param $column
+	 * @param $default
 	 *
 	 * @return mixed|string|null
 	 */
-	function bwf_options_get( $key = '', $column = 'value' ) {
+	function bwf_options_get( $key = '', $column = '', $default = null ) {
 		global $wpdb;
 
 		if ( empty( $key ) ) {
 			return '';
 		}
-
-		$query = "SELECT `{$column}` FROM {$wpdb->prefix}bwf_options WHERE `key` = %s";
+		$column = empty( $column ) ? 'value' : $column;
+		$query  = "SELECT `{$column}` FROM {$wpdb->prefix}bwf_options WHERE `key` = %s";
 
 		$value = $wpdb->get_var( $wpdb->prepare( $query, $key ) );
-		if ( empty( $value ) ) {
-			return '';
+		if ( is_null( $value ) ) {
+			return ! is_null( $default ) ? $default : '';
 		}
 
 		if ( bwf_is_json( $value ) ) {
-			$value = json_decode( $value, true );
-
-			return $value;
+			return json_decode( $value, true );
 		}
 
 		return maybe_unserialize( $value );

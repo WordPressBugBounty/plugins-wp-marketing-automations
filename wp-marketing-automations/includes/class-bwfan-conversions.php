@@ -57,6 +57,12 @@ if ( ! class_exists( 'BWFAN_Conversions' ) && BWFAN_Common::is_pro_3_0() ) {
 				return;
 			}
 
+			/** Should skip order conversions */
+			$skip = apply_filters( 'bwfan_skip_order_conversions', false, $order_id, $order, $bwf_contact );
+			if ( true === $skip ) {
+				return;
+			}
+
 			$contact_id = $bwf_contact->get_id();
 			if ( empty( $contact_id ) ) {
 				return;

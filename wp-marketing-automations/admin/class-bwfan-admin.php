@@ -1540,7 +1540,8 @@ class BWFAN_Admin {
 
 		$status      = $contact->get_marketing_status();
 		$joined_date = $contact->contact->get_creation_date();
-		$joined_date = gmdate( get_option( 'date_format' ), strtotime( $joined_date ) );
+		$format      = BWFAN_Common::bwfan_get_date_format();
+		$joined_date = gmdate( $format, strtotime( $joined_date ) );
 		?>
         <style type="text/css">
             .bwf-order-edit-wrap {

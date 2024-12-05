@@ -66,13 +66,16 @@ class BWFAN_Table_Validation_Controller {
 	 */
 	public static function bwfan_validate_db_tables( $tables ) {
 		global $wpdb;
-
+		$db_name = ! empty( $wpdb->dbname ) ? $wpdb->dbname : ( defined( 'DB_NAME' ) ? DB_NAME : '' );
+		if ( empty( $db_name ) ) {
+			return array( 'error' => __( "Unable to find the Database name", "wp-marketing-automations" ) );
+		}
 		$table_names = array_map( function ( $table ) use ( $wpdb ) {
 			return $wpdb->prefix . $table;
 		}, $tables );
 
 		$placeholders    = implode( ',', array_fill( 0, count( $table_names ), '%s' ) );
-		$query           = $wpdb->prepare( "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = %s AND TABLE_NAME IN ($placeholders)", array_merge( [ $wpdb->dbname ], $table_names ) );
+		$query           = $wpdb->prepare( "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = %s AND TABLE_NAME IN ($placeholders)", array_merge( [ $db_name ], $table_names ) );
 		$existing_tables = $wpdb->get_col( $query );
 
 		$missing_tables = array_diff( $table_names, $existing_tables );
@@ -140,6 +143,9 @@ class BWFAN_Table_Validation_Controller {
 	public static function check_missing_tables() {
 
 		$missing_tables = self::bwfan_validate_db_tables( self::$tables );
+		if ( isset( $missing_tables['error'] ) ) {
+			return $missing_tables;
+		}
 
 		if ( BWFAN_Common::is_automation_v1_active() ) {
 			$v1_tables      = self::bwfan_validate_db_tables( self::$v1_tables );
@@ -184,7 +190,6 @@ class BWFAN_Table_Validation_Controller {
 	}
 
 	public static function get_collation() {
-
 		global $wpdb;
 		$collate = '';
 		if ( $wpdb->has_cap( 'collation' ) ) {

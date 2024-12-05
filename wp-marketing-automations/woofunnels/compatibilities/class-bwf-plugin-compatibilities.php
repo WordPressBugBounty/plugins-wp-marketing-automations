@@ -45,20 +45,31 @@ class BWF_Plugin_Compatibilities {
 	}
 
 	public static function get_fixed_currency_price_reverse( $price, $from = null, $to = null ) {
-		if ( empty( self::$plugin_compatibilities ) ) {
-			BWF_Plugin_Compatibilities::load_all_compatibilities();
-		}
-		if ( empty( self::$plugin_compatibilities ) ) {
-			return $price;
-		}
 
-		foreach ( self::$plugin_compatibilities as $plugins_class ) {
-			if ( method_exists( $plugins_class, 'is_enable' ) && $plugins_class->is_enable() && is_callable( array( $plugins_class, 'get_fixed_currency_price_reverse' ) ) ) {
-				return call_user_func( array( $plugins_class, 'get_fixed_currency_price_reverse' ), $price, $from, $to );
+		try {
+			if ( empty( self::$plugin_compatibilities ) ) {
+				BWF_Plugin_Compatibilities::load_all_compatibilities();
 			}
+			if ( empty( self::$plugin_compatibilities ) ) {
+				return $price;
+			}
+
+			foreach ( self::$plugin_compatibilities as $plugins_class ) {
+				if ( method_exists( $plugins_class, 'is_enable' ) && $plugins_class->is_enable() && is_callable( array( $plugins_class, 'get_fixed_currency_price_reverse' ) ) ) {
+					return call_user_func( array( $plugins_class, 'get_fixed_currency_price_reverse' ), $price, $from, $to );
+				}
+			}
+
+
+		} catch ( Exception|Error $e ) {
+
+			BWF_Logger::get_instance()->log( 'Error while getting reversed price through compatibility files: ' . $e->getMessage(), 'bwf-compatibilities', 'buildwoofunnels', true );
+
+
 		}
 
 		return $price;
+
 	}
 
 	/**
@@ -79,6 +90,7 @@ class BWF_Plugin_Compatibilities {
 		foreach ( self::$plugin_compatibilities as $plugins_class ) {
 			if ( method_exists( $plugins_class, 'is_enable' ) && $plugins_class->is_enable() && is_callable( array( $plugins_class, 'get_currency_symbol' ) ) ) {
 				return call_user_func( array( $plugins_class, 'get_currency_symbol' ), $currency );
+
 			}
 		}
 

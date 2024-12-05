@@ -40,7 +40,7 @@ class BWFAN_API_Get_Dashboard_Data extends BWFAN_API_Base {
 
 		/** Check if worker call is late */
 		$last_run = bwf_options_get( 'fk_core_worker_let' );
-		if ( '' !== $last_run && ( time() - $last_run > 300 ) ) {
+		if ( '' !== $last_run && ( ( time() - $last_run ) > BWFAN_Common::get_worker_delay_timestamp() ) ) {
 			/** Worker is running late */
 			$new_data['worker_delayed'] = time() - $last_run;
 		}

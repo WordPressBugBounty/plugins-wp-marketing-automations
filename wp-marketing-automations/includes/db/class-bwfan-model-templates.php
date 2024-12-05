@@ -244,8 +244,9 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 		 *
 		 * @return array|mixed
 		 */
-		public static function bwfan_get_template( $id ) {
-			$query = 'SELECT * FROM {table_name} WHERE type = 1 AND canned = 1 AND ID=' . $id;
+		public static function bwfan_get_template( $id, $canned = 1 ) {
+			global $wpdb;
+			$query = $wpdb->prepare( 'SELECT * FROM {table_name} WHERE type = 1 AND canned = %d AND ID=%d', $canned, $id );
 
 			$result = self::get_results( $query );
 
@@ -320,21 +321,25 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 		 * Get templates by ids
 		 *
 		 * @param $tids
+		 * @param array $columns
 		 *
 		 * @return array
 		 */
-		public static function get_templates_by_ids( $tids ) {
+		public static function get_templates_by_ids( $tids, $columns = [] ) {
 			global $wpdb;
 
 			if ( empty( $tids ) ) {
 				return [];
 			}
 
+			if ( empty( $columns ) ) {
+				$columns = [ 'ID', 'subject', 'template', 'type' ];
+			}
+
 			$placeholders = array_fill( 0, count( $tids ), '%d' );
 			$placeholders = implode( ', ', $placeholders );
-			$query        = "SELECT `ID`,`subject`, `template`, `type` FROM {$wpdb->prefix}bwfan_templates WHERE `ID` IN( $placeholders )";
-
-			$result = $wpdb->get_results( $wpdb->prepare( $query, $tids ), ARRAY_A );
+			$query        = "SELECT " . implode( ', ', $columns ) . " FROM {$wpdb->prefix}bwfan_templates WHERE `ID` IN( $placeholders )";
+			$result       = $wpdb->get_results( $wpdb->prepare( $query, $tids ), ARRAY_A );
 
 			$data = [];
 			foreach ( $result as $template ) {

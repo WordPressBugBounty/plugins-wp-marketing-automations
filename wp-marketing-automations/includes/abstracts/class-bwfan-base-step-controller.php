@@ -1,4 +1,5 @@
 <?php
+
 #[AllowDynamicProperties]
 abstract class BWFAN_Base_Step_Controller {
 	public $automation_data = array();

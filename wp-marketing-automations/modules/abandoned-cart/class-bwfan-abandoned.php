@@ -20,6 +20,8 @@ class BWFAN_Abandoned_Cart {
 	protected $coupon_data = array();
 	protected $fees = array();
 	protected $restored_cart_details = array();
+	protected $user_id = 0;
+	protected $added_to_cart = null;
 
 	public function __construct() {
 		if ( ! class_exists( 'WooCommerce' ) ) {
@@ -89,6 +91,8 @@ class BWFAN_Abandoned_Cart {
 
 		/** Remove cart item key from session */
 		add_action( 'woocommerce_remove_cart_item', [ $this, 'remove_session' ], 99 );
+
+		add_action( 'shutdown', [ $this, 'add_to_cart' ] );
 	}
 
 	public function disable_geolocation_recovery() {
@@ -435,9 +439,9 @@ class BWFAN_Abandoned_Cart {
 		do_action( 'bwfan_ab_handle_checkout_data_externally', $checkout_data );
 
 		if ( is_array( $checkout_data ) ) {
-			$page_id = isset( $checkout_data['current_page_id'] ) ? $checkout_data['current_page_id'] : 0;
+			$page_id = isset( $checkout_data['current_page_id'] ) ? intval( $checkout_data['current_page_id'] ) : 0;
 			do_action( 'bwfanac_checkout_data', $page_id, $checkout_data, $this->restored_cart_details );
-			if ( intval( $checkout_data['current_page_id'] ) > 0 ) {
+			if ( $page_id > 0 ) {
 				$url = get_permalink( $page_id );
 			}
 		}
@@ -538,8 +542,21 @@ class BWFAN_Abandoned_Cart {
 			}
 
 			$item_data = apply_filters( 'bwfan_abandoned_modify_cart_item_data', $item_data );
+			try {
+				$hash = WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $variation_data, $item_data );
+			} catch ( Error $e ) {
+				BWFAN_Common::log_test_data( array(
+					'Error'          => $e->getMessage(),
+					'Product ID'     => $product_id,
+					'Quantity'       => $quantity,
+					'Variation ID'   => $variation_id,
+					'Variation Data' => $variation_data,
+					'Item Data'      => $item_data
+				), 'cart-restore-error', true );
+				continue;
 
-			$hash = WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $variation_data, $item_data );
+			}
+
 			if ( isset( $item_data['_wfacp_product_key'] ) ) {
 				$this->aero_product_data[ $item_data['_wfacp_product_key'] ] = $hash;
 			}
@@ -786,9 +803,13 @@ class BWFAN_Abandoned_Cart {
 	}
 
 	public function woocommerce_add_to_cart( $cart_item_key ) {
-		$user    = wp_get_current_user();
-		$user_id = ( isset( $user->ID ) ? (int) $user->ID : 0 );
-		if ( empty( $user_id ) || is_null( WC()->cart ) || WC()->cart->is_empty() ) {
+		$user_id = WC()->session->get( 'bwfan_user_validated' );
+		if ( is_null( $user_id ) ) {
+			$user_id = $this->validate_user( $cart_item_key );
+			WC()->session->set( 'bwfan_user_validated', $user_id );
+		}
+
+		if ( empty( $user_id ) ) {
 			return;
 		}
 
@@ -810,58 +831,8 @@ class BWFAN_Abandoned_Cart {
 		$session_data[ $cart_item_key ] = $item_price;
 		WC()->session->set( 'bwfan_add_to_cart', $session_data );
 
-		$global_settings = BWFAN_Common::get_global_settings();
-		if ( 0 === absint( $global_settings['bwfan_ab_track_on_add_to_cart'] ) ) {
-			return;
-		}
-
-		if ( 0 !== absint( $global_settings['bwfan_ab_exclude_users_cart_tracking'] ) ) {
-			/** Check excluded emails or user roles */
-			if ( isset( $global_settings['bwfan_ab_exclude_emails'] ) && ! empty( $global_settings['bwfan_ab_exclude_emails'] ) ) {
-				$global_settings['bwfan_ab_exclude_emails'] = str_replace( ' ', '', $global_settings['bwfan_ab_exclude_emails'] );
-				$exclude_emails                             = [];
-				if ( strpos( $global_settings['bwfan_ab_exclude_emails'], ',' ) ) {
-					$exclude_emails = explode( ',', $global_settings['bwfan_ab_exclude_emails'] );
-				}
-
-				if ( empty( $exclude_emails ) ) {
-					$exclude_emails = preg_split( '/$\R?^/m', $global_settings['bwfan_ab_exclude_emails'] );
-				}
-
-				if ( in_array( $user->user_email, $exclude_emails, true ) ) {
-					return;
-				}
-			}
-			if ( isset( $global_settings['bwfan_ab_exclude_roles'] ) && ! empty( $global_settings['bwfan_ab_exclude_roles'] ) ) {
-				$exclude_roles = array_intersect( (array) $user->roles, $global_settings['bwfan_ab_exclude_roles'] );
-
-				if ( ! empty( $exclude_roles ) ) {
-					return;
-				}
-			}
-		}
-
-		$coupon_data = [];
-		foreach ( WC()->cart->get_applied_coupons() as $coupon_code ) {
-			$coupon_data[ $coupon_code ] = [
-				'discount_incl_tax' => WC()->cart->get_coupon_discount_amount( $coupon_code, false ),
-				'discount_excl_tax' => WC()->cart->get_coupon_discount_amount( $coupon_code ),
-				'discount_tax'      => WC()->cart->get_coupon_discount_tax_amount( $coupon_code ),
-			];
-		}
-
-		$url = rest_url( '/autonami/v1/wc-add-to-cart' );
-
-		$body_data = array(
-			'id'            => $user_id,
-			'coupon_data'   => maybe_serialize( $coupon_data ),
-			'items'         => maybe_serialize( WC()->cart->get_cart() ),
-			'fees'          => maybe_serialize( WC()->cart->get_fees() ),
-			'unique_key'    => get_option( 'bwfan_u_key', false ),
-			'bwfan_visitor' => BWFAN_Common::get_cookie( 'bwfan_visitor' )
-		);
-		$args      = bwf_get_remote_rest_args( $body_data );
-		wp_remote_post( $url, $args );
+		$this->user_id       = empty( $this->user_id ) ? $user_id : $this->user_id;
+		$this->added_to_cart = true;
 	}
 
 	public function unset_session_key() {
@@ -1638,6 +1609,85 @@ class BWFAN_Abandoned_Cart {
 		}
 
 		BWF_Model_Contact_Fields::update( [ $field_id => json_encode( $token_value ) ], [ 'cid' => $contact_id ] );
+	}
+
+	/**
+	 * check settings and user logged in and
+	 *
+	 * @param $cart_item_key
+	 *
+	 * @return false|int
+	 */
+	public function validate_user( $cart_item_key ) {
+		$user          = wp_get_current_user();
+		$this->user_id = ( $user instanceof WP_User ) ? $user->ID : 0;
+		if ( empty( $this->user_id ) || is_null( WC()->cart ) || WC()->cart->is_empty() ) {
+			return false;
+		}
+
+		$global_settings = BWFAN_Common::get_global_settings();
+		if ( 0 === absint( $global_settings['bwfan_ab_track_on_add_to_cart'] ) ) {
+			return false;
+		}
+
+		if ( 0 !== absint( $global_settings['bwfan_ab_exclude_users_cart_tracking'] ) ) {
+			/** Check excluded emails or user roles */
+			if ( isset( $global_settings['bwfan_ab_exclude_emails'] ) && ! empty( $global_settings['bwfan_ab_exclude_emails'] ) ) {
+				$global_settings['bwfan_ab_exclude_emails'] = str_replace( ' ', '', $global_settings['bwfan_ab_exclude_emails'] );
+				$exclude_emails                             = [];
+				if ( strpos( $global_settings['bwfan_ab_exclude_emails'], ',' ) ) {
+					$exclude_emails = explode( ',', $global_settings['bwfan_ab_exclude_emails'] );
+				}
+
+				if ( empty( $exclude_emails ) ) {
+					$exclude_emails = preg_split( '/$\R?^/m', $global_settings['bwfan_ab_exclude_emails'] );
+				}
+
+				if ( in_array( $user->user_email, $exclude_emails, true ) ) {
+					return false;
+				}
+			}
+			if ( isset( $global_settings['bwfan_ab_exclude_roles'] ) && ! empty( $global_settings['bwfan_ab_exclude_roles'] ) ) {
+				$exclude_roles = array_intersect( (array) $user->roles, $global_settings['bwfan_ab_exclude_roles'] );
+
+				if ( ! empty( $exclude_roles ) ) {
+					return false;
+				}
+			}
+		}
+
+		return $this->user_id;
+	}
+
+	/**
+	 * @return void
+	 */
+	public function add_to_cart() {
+		if ( is_null( $this->added_to_cart ) ) {
+			return;
+		}
+
+		$coupon_data = [];
+		foreach ( WC()->cart->get_applied_coupons() as $coupon_code ) {
+			$coupon_data[ $coupon_code ] = [
+				'discount_incl_tax' => WC()->cart->get_coupon_discount_amount( $coupon_code, false ),
+				'discount_excl_tax' => WC()->cart->get_coupon_discount_amount( $coupon_code ),
+				'discount_tax'      => WC()->cart->get_coupon_discount_tax_amount( $coupon_code ),
+			];
+		}
+
+		$url = rest_url( '/autonami/v1/wc-add-to-cart' );
+
+		$body_data = array(
+			'id'            => $this->user_id,
+			'coupon_data'   => maybe_serialize( $coupon_data ),
+			'items'         => maybe_serialize( WC()->cart->get_cart() ),
+			'fees'          => maybe_serialize( WC()->cart->get_fees() ),
+			'unique_key'    => get_option( 'bwfan_u_key', false ),
+			'bwfan_visitor' => BWFAN_Common::get_cookie( 'bwfan_visitor' )
+		);
+		$args      = bwf_get_remote_rest_args( $body_data );
+		wp_remote_post( $url, $args );
 	}
 }
 

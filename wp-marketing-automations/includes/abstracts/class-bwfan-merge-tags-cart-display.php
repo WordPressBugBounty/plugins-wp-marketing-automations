@@ -7,12 +7,10 @@ class BWFAN_Cart_Display extends BWFAN_Merge_Tag {
 	public $cart_number = null;
 
 	public function get_currency_option() {
-		$currencies = array(
+		return array(
 			'symbol' => __( 'Currency Symbol', 'wp-marketing-automations' ),
 			'code'   => __( '3 Letter Currency code', 'wp-marketing-automations' ),
 		);
-
-		return $currencies;
 	}
 
 	/**

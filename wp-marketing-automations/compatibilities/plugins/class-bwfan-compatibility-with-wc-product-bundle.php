@@ -16,10 +16,9 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_WC_Product_Bundle' ) ) {
 		 */
 		public function bwfan_modify_abandoned_cart_items( $cart ) {
 			foreach ( $cart as $cart_item_key => $item ) {
-				if ( ! wc_pb_maybe_is_bundled_cart_item( $item ) ) {
+				if ( ! function_exists( 'wc_pb_maybe_is_bundled_cart_item' ) || ! wc_pb_maybe_is_bundled_cart_item( $item ) ) {
 					continue;
 				}
-
 				$bundled_item_id = $item['bundled_item_id'];
 				if ( empty( $bundled_item_id ) ) {
 					continue;

@@ -31,7 +31,7 @@ class BWFAN_Connectors {
 
 	public function get_connectors() {
 		if ( empty( $this->_connectors ) ) {
-			$connector_screens = WFCO_Admin::get_available_connectors();
+			$connector_screens = self::get_available_connectors();
 			$this->_connectors = $connector_screens['autonami'];
 		}
 
@@ -64,20 +64,45 @@ class BWFAN_Connectors {
 			if ( ! is_null( $connector ) ) {
 				$meta = method_exists( $connector, 'get_meta_data' ) ? $connector->get_meta_data() : $meta;
 			}
+
+			$priority = is_null( $connector ) && property_exists( $connector_screen, 'priority' ) ? $connector_screen->priority : 0;
+			if ( empty( $priority ) ) {
+				$priority = ! is_null( $connector ) && method_exists( $connector, 'get_priority' ) ? $connector->get_priority() : 100;
+			}
+
+			$logo = property_exists( $connector_screen, 'logo' ) ? $connector_screen->logo : '';
+			if ( empty( $logo ) ) {
+				$logo = $connector_screen->get_logo();
+			} else {
+				/** Check if valid url */
+				$logo = filter_var( $logo, FILTER_VALIDATE_URL ) ? $logo : BWFAN_PLUGIN_URL . '/includes/connectors-logo/' . $logo . '.png';
+			}
+
+			$required = is_null( $connector ) && property_exists( $connector_screen, 'required_plugins' ) ? $connector_screen->required_plugins : [];
+			if ( empty( $required ) ) {
+				$required = ! is_null( $connector ) && method_exists( $connector, 'get_required_plugins' ) ? $connector->get_required_plugins() : [];
+			}
+
+			$new = is_null( $connector ) && property_exists( $connector_screen, 'new' ) ? $connector_screen->new : 0;
+			if ( empty( $new ) ) {
+				$new = ( ! is_null( $connector ) && isset( $connector->is_new ) ) ? $connector->is_new : 0;
+			}
+
 			$final_connector = array(
-				'name'           => $connector_screen->get_name(),
-				'logo'           => $connector_screen->get_logo(),
-				'description'    => $connector_screen->get_desc(),
-				'is_syncable'    => $connector_screen->is_activated() && $connector instanceof BWF_CO && $connector->is_syncable(),
-				'is_connected'   => $is_connected,
-				'fields_schema'  => $fields_schema,
-				'fields_values'  => $fields_values,
-				'connector_id'   => $connector_id,
-				'meta'           => $meta,
-				'ispro'          => $is_pro,
-				'direct_connect' => ! is_null( $connector ) && isset( $connector->direct_connect ) ? $connector->direct_connect : false,
-				'new'            => ! is_null( $connector ) && isset( $connector->is_new ) ? $connector->is_new : 0,
-				'priority'       => ! is_null( $connector ) && method_exists( $connector, 'get_priority' ) ? $connector->get_priority() : 100,
+				'name'             => $connector_screen->get_name(),
+				'logo'             => $logo,
+				'description'      => $connector_screen->get_desc(),
+				'is_syncable'      => $connector_screen->is_activated() && $connector instanceof BWF_CO && $connector->is_syncable(),
+				'is_connected'     => $is_connected,
+				'fields_schema'    => $fields_schema,
+				'fields_values'    => $fields_values,
+				'connector_id'     => $connector_id,
+				'meta'             => $meta,
+				'ispro'            => $is_pro,
+				'direct_connect'   => ! is_null( $connector ) && isset( $connector->direct_connect ) ? $connector->direct_connect : false,
+				'new'              => $new,
+				'priority'         => $priority,
+				'required_plugins' => $required,
 			);
 
 			/** For Wizard Connectors */
@@ -106,6 +131,10 @@ class BWFAN_Connectors {
 	}
 
 	public function is_connected( $slug ) {
+		if ( ! class_exists( 'WFCO_Load_Connectors' ) ) {
+			return false;
+		}
+
 		$connector = WFCO_Load_Connectors::get_connector( $slug );
 		if ( is_null( $connector ) ) {
 			/** Try loading connectors files */
@@ -132,6 +161,43 @@ class BWFAN_Connectors {
 		$meta = method_exists( $connector, 'get_meta_data' ) ? $connector->get_meta_data() : array();
 
 		return isset( $meta['connect_type'] ) && 'wizard' === $meta['connect_type'];
+	}
+
+	public static function get_available_connectors( $type = '' ) {
+		ob_start();
+		include BWFAN_PLUGIN_DIR . '/includes/connectors.json'; //phpcs:ignore WordPressVIPMinimum.Files.IncludingNonPHPFile.IncludingNonPHPFile
+		$connectors_json = ob_get_clean();
+		$response_data   = json_decode( $connectors_json, true );
+		$response_data   = apply_filters( 'wfco_connectors_loaded', $response_data );
+		if ( '' !== $type ) {
+			return $response_data[ $type ] ?? [];
+		}
+
+		return self::load_connector_screens( $response_data, $type );
+	}
+
+	private static function load_connector_screens( $response_data, $type = '' ) {
+		foreach ( $response_data as $slug => $data ) {
+			$connectors = $data['connectors'];
+			foreach ( $connectors as $c_slug => $connector ) {
+				$connector['type'] = $slug;
+				if ( isset( $data['source'] ) && ! empty( $data['source'] ) ) {
+					$connector['source'] = $data['source'];
+				}
+				if ( isset( $data['file'] ) && ! empty( $data['file'] ) ) {
+					$connector['file'] = $data['file'];
+				}
+				if ( isset( $data['support'] ) && ! empty( $data['support'] ) ) {
+					$connector['support'] = $data['support'];
+				}
+				if ( isset( $data['connector_class'] ) && ! empty( $data['connector_class'] ) ) {
+					$connector['connector_class'] = $data['connector_class'];
+				}
+				WFCO_Connector_Screen_Factory::create( $c_slug, $connector );
+			}
+		}
+
+		return WFCO_Connector_Screen_Factory::getAll( $type );
 	}
 }
 

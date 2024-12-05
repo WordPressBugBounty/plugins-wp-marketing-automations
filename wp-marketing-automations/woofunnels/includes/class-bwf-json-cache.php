@@ -273,45 +273,52 @@ if ( ! class_exists( 'BWF_JSON_Cache' ) ) {
 		 *
 		 * @return array|mixed
 		 */
-		public static function maybe_clear_fb_endpoints( $endpoints, $plugin_slug = '' ) {
-
+		public static function maybe_clear_fb_endpoints( $endpoints, $plugin_slug = 'litespeed' ) {
 			if ( ! class_exists( 'WFFN_Core' ) ) {
 				return $endpoints;
 			}
 
-			if ( ! is_array( $endpoints ) ) {
-				$endpoints = [];
-			}
+			$endpoints = ( ! is_array( $endpoints ) ) ? [] : $endpoints;
+
+			$db_options = get_option( 'bwf_gen_config', [] );
+			$cl_slug    = is_array( $db_options ) && isset( $db_options['checkout_page_base'] ) ? $db_options['checkout_page_base'] : '';
+			$of_slug    = is_array( $db_options ) && isset( $db_options['wfocu_page_base'] ) ? $db_options['wfocu_page_base'] : '';
 
 			if ( 'api-auth' === $plugin_slug ) {
 				$endpoints[] = "/funnelkit-app/";
 
+				if ( ! empty( $cl_slug ) ) {
+					$endpoints[] = '/' . $cl_slug . '/';
+				}
+				if ( ! empty( $of_slug ) ) {
+					$endpoints[] = '/' . $of_slug . '/';
+				}
+
 				return $endpoints;
 			}
 
-			$endpoints[] = "^/wp-json/funnelkit-app/";
-
-			$db_options = get_option( 'bwf_gen_config', [] );
-
-			if ( is_array( $db_options ) ) {
-				$cl_slug = isset( $db_options['checkout_page_base'] ) ? $db_options['checkout_page_base'] : '';
-				$of_slug = isset( $db_options['wfocu_page_base'] ) ? $db_options['wfocu_page_base'] : '';
-
-				if ( 'wp_rocket' === $plugin_slug ) {
-					if ( ! empty( $cl_slug ) ) {
-						$endpoints[] = '/' . $cl_slug . '/(.*)';
-					}
-					if ( ! empty( $of_slug ) ) {
-						$endpoints[] = '/' . $of_slug . '/(.*)';
-					}
-				} else {
-					if ( ! empty( $cl_slug ) ) {
-						$endpoints[] = '/' . $cl_slug . '/';
-					}
-					if ( ! empty( $of_slug ) ) {
-						$endpoints[] = '/' . $of_slug . '/';
-					}
+			if ( 'litespeed' === $plugin_slug ) {
+				$endpoints[] = "^/wp-json/funnelkit-app/";
+				if ( ! empty( $cl_slug ) ) {
+					$endpoints[] = '^/' . $cl_slug . '/';
 				}
+				if ( ! empty( $of_slug ) ) {
+					$endpoints[] = '^/' . $of_slug . '/';
+				}
+
+				return $endpoints;
+			}
+
+			if ( 'wp_rocket' === $plugin_slug ) {
+				$endpoints[] = "^/wp-json/funnelkit-app/(.*)";
+				if ( ! empty( $cl_slug ) ) {
+					$endpoints[] = '^/' . $cl_slug . '/(.*)';
+				}
+				if ( ! empty( $of_slug ) ) {
+					$endpoints[] = '^/' . $of_slug . '/(.*)';
+				}
+
+				return $endpoints;
 			}
 
 			return $endpoints;

@@ -1,4 +1,5 @@
 <?php
+
 #[AllowDynamicProperties]
 abstract class BWFAN_Merge_Tag {
 
@@ -400,7 +401,7 @@ abstract class BWFAN_Merge_Tag {
 		if ( false === $this->validate_date( $date_value ) ) {
 			return $date_value;
 		}
-		$date_format = get_option( 'date_format' ); // e.g. "F j, Y"
+		$date_format = BWFAN_Common::bwfan_get_date_format();
 		$date_value  = date( $date_format, strtotime( $date_value ) );
 
 		return $date_value;

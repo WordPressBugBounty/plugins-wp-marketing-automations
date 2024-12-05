@@ -497,6 +497,14 @@ class BWFAN_Load_Integrations {
 				],
 				'priority'   => 35,
 			],
+			'stripe'     => [
+				'group_slug' => 'stripe',
+				'label'      => __( 'Stripe', 'wp-marketing-automations' ),
+				'subgroup'   => [
+					'stripe',
+				],
+				'priority'   => 45,
+			],
 			'woofunnels' => [
 				'group_slug' => 'woofunnels',
 				'label'      => __( 'Funnel Builder', 'wp-marketing-automations' ),
@@ -666,7 +674,7 @@ class BWFAN_Load_Integrations {
 				],
 			],
 			'convertkit'     => [
-				__( 'Convertkit', 'wp-marketing-automations' ) => [
+				__( 'Kit ( Formerly ConvertKit )', 'wp-marketing-automations' ) => [
 					'ck_add_tags',
 					'ck_rmv_tags',
 					'ck_add_to_sequence',

@@ -93,18 +93,18 @@ class BWFAN_Delay_Controller extends BWFAN_Base_Step_Controller {
 			return $current_timestamp;
 		}
 
-		$delay_time = isset( $this->data['time_delay']['time'] ) && ! empty( $this->data['time_delay']['time'] ) ? $this->data['time_delay']['time'] : 0;
+		$delay_time                 = isset( $this->data['time_delay']['time'] ) && ! empty( $this->data['time_delay']['time'] ) ? $this->data['time_delay']['time'] : 0;
+		$current_modified_real_time = $current_timestamp;
 
 		/** timestamp modified to local time */
 		$current_timestamp = $current_timestamp - $diff;
 
 		/** Get time according to contact's timezone */
 		$datetime = $this->get_contact_time( $current_timestamp, $delay_time );
-
 		/** No days delay found */
 		if ( empty( $this->data['week_delay'] ) ) {
 			/** If older time */
-			if ( $datetime->getTimestamp() - current_time( 'timestamp', 1 ) < 0 ) {
+			if ( $datetime->getTimestamp() - $current_modified_real_time < 0 ) {
 				return $datetime->getTimestamp() + DAY_IN_SECONDS;
 			}
 
@@ -118,7 +118,7 @@ class BWFAN_Delay_Controller extends BWFAN_Base_Step_Controller {
 				$current_day = ( intval( $datetime->format( "N" ) ) === 7 ) ? 1 : ( intval( $datetime->format( "N" ) ) + 1 );
 				if ( in_array( $current_day, $this->data['week_delay'] ) ) {
 					/** If future time then return else +1 day */
-					if ( current_time( 'timestamp', 1 ) < $datetime->getTimestamp() ) {
+					if ( $current_modified_real_time < $datetime->getTimestamp() ) {
 						return $datetime->getTimestamp();
 					}
 				}

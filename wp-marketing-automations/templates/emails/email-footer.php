@@ -69,7 +69,7 @@ $settings_text = '<u style="text-decoration: underline;"><a rel="noreferrer noop
 																							<span
                                                                                                 style="mso-line-height-alt: 130%; font-size: 12px;"
                                                                                                 class="has-font-size">
-                                                                                                <?php echo sprintf( __( 'This performance report email was sent from you site %s for period %s.', 'wp-marketing-automations' ), $business_details, $date ); ?>
+                                                                                                <?php echo sprintf( __( 'This performance report email was sent from your site %s for period %s.', 'wp-marketing-automations' ), $business_details, $date ); ?>
 																							</span>
 																						</span>
                                                     <br/>

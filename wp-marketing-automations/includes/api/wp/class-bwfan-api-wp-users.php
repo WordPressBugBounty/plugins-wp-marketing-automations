@@ -26,9 +26,9 @@ class BWFAN_Api_Get_WP_User extends BWFAN_API_Base {
 	}
 
 	public function process_api_call() {
-		$search  = isset( $this->args['search'] ) ? $this->get_sanitized_arg( 'search', 'text_field' ) : '';
-		$limit   = isset( $this->args['limit'] ) ? $this->get_sanitized_arg( 'limit', 'text_field' ) : 10;
-		$data = $this->get_users( $search, $limit );
+		$search = isset( $this->args['search'] ) ? $this->get_sanitized_arg( 'search', 'text_field' ) : '';
+		$limit  = isset( $this->args['limit'] ) ? $this->get_sanitized_arg( 'limit', 'text_field' ) : 10;
+		$data   = $this->get_users( $search, $limit );
 
 		$this->response_code = 200;
 
@@ -42,25 +42,28 @@ class BWFAN_Api_Get_WP_User extends BWFAN_API_Base {
 	 */
 	public function get_users( $search, $limit = 10 ) {
 		$user_data = get_users( array(
-			'number'      => $limit,
-			'orderby'     => 'name',
-			'order'       => 'asc',
-			'search'      => '*' . esc_attr( $search ) . '*',
-			'fields'      => [
-				'display_name', 'user_nicename', 'user_email', 'ID'
+			'number'  => $limit,
+			'orderby' => 'name',
+			'order'   => 'asc',
+			'search'  => '*' . esc_attr( $search ) . '*',
+			'fields'  => [
+				'display_name',
+				'user_nicename',
+				'user_email',
+				'ID'
 			]
 		) );
 
-		if( empty( $user_data ) ) {
+		if ( empty( $user_data ) ) {
 			return [];
 		}
 		$data = [];
 		foreach ( $user_data as $user ) {
 			$data[] = [
 				'display_name' => $user->user_nicename,
-				'name' => $user->display_name,
-				'email' => $user->user_email,
-				'id' => $user->id
+				'name'         => $user->display_name,
+				'email'        => $user->user_email,
+				'id'           => $user->id
 			];
 		}
 

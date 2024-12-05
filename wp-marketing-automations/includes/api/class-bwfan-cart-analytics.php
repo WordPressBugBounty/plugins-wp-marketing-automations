@@ -27,7 +27,7 @@ class BWFAN_Cart_Analytics {
 	public static function get_captured_cart( $start_date = '', $end_date = '', $interval = '', $is_interval = '' ) {
 		global $wpdb;
 		$table          = $wpdb->prefix . 'bwfan_abandonedcarts';
-		$date_col       = "last_modified";
+		$date_col       = "created_time";
 		$interval_query = '';
 		$group_by       = '';
 		$order_by       = ' ID ';
@@ -41,12 +41,12 @@ class BWFAN_Cart_Analytics {
 		}
 		$start_date_query = '';
 		if ( ! empty( $start_date ) ) {
-			$start_date_query = " AND `" . $date_col . "` >= '" . $start_date . "' ";
+			$start_date_query = " AND `" . $date_col . "` >= '" . $start_date . " 00:00:00' ";
 		}
 
 		$end_date_query = '';
 		if ( ! empty( $end_date ) ) {
-			$end_date_query = " AND `" . $date_col . "` <= '" . $end_date . "' ";
+			$end_date_query = " AND `" . $date_col . "` <= '" . $end_date . " 23:59:59' ";
 		}
 
 		$base_query = "SELECT SUM(total_base) as `sum`, COUNT(ID) as `count` " . $interval_query . " FROM `" . $table . "` WHERE `status` != 2  $start_date_query $end_date_query $group_by ORDER BY $order_by ASC";
@@ -121,7 +121,7 @@ class BWFAN_Cart_Analytics {
 		}
 		$where = '';
 		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
-			$where = "AND p.post_date >= '{$start_date}' AND p.post_date <='{$end_date}'";
+			$where = "AND p.post_date >= '{$start_date} 00:00:00' AND p.post_date <='{$end_date} 23:59:59'";
 		}
 		$where .= " AND m2.meta_value > 0";
 
@@ -144,6 +144,12 @@ class BWFAN_Cart_Analytics {
 			$group_by       = "GROUP BY " . $interval_group;
 			$order_by       = ' time_interval ';
 		}
+
+		$start_date = $start_date . ' 00:00:00';
+		$start_date = BWFAN_Common::get_utc_date_from_store_date( $start_date );
+
+		$end_date = $end_date . ' 23:59:59';
+		$end_date = BWFAN_Common::get_utc_date_from_store_date( $end_date );
 
 		$where = "AND p.date_created_gmt >= '{$start_date}' AND p.date_created_gmt <='{$end_date}'";
 		$where .= " AND m2.meta_value > 0";

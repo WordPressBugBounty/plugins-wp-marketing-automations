@@ -248,7 +248,7 @@ abstract class BWFAN_Recipes {
 				$name = __( 'Drip', 'wp-marketing-automations' );
 				break;
 			case 'ck':
-				$name = __( 'Convertkit', 'wp-marketing-automations' );
+				$name = __( 'Kit ( Formerly ConvertKit )', 'wp-marketing-automations' );
 				break;
 			case 'mailchimp':
 				$name = __( 'Mailchimp', 'wp-marketing-automations' );

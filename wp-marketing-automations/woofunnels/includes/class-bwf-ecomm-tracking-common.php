@@ -829,7 +829,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 			 * @todo we will update code showing for funnel meta box currently not have exact mata for check order create by funnel
 			 * so we run query in conversion table and check order created by funnel
 			 */ global $wpdb;
-			$query    = $wpdb->prepare( "SELECT * from " . $wpdb->prefix . $this->conv_table . " WHERE source = %d", $order_id );
+			$query    = $wpdb->prepare( "SELECT * from " . $wpdb->prefix . $this->conv_table . " WHERE type = %s AND source = %d", 2, $order_id );
 			$get_data = $wpdb->get_row( $query, ARRAY_A );//phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 			if ( empty( $get_data ) ) {
 				return;

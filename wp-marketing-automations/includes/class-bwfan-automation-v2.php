@@ -183,6 +183,13 @@ class BWFAN_Automation_V2 {
 			$eventList['subgroup_priority'] = array_merge( $dynamic_events['subgroup_priority'], $eventList['subgroup_priority'] );
 		}
 
+		$eventList['subgroup_desc'] = BWFAN_Core()->sources->get_event_subgroup_description();
+
+		if ( ! empty( $eventList['group'] ) ) {
+			usort( $eventList['group'], function ( $a, $b ) {
+				return $a['priority'] <=> $b['priority'];
+			} );
+		}
 
 		return $eventList;
 	}

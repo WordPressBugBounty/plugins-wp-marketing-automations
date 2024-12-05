@@ -3,6 +3,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
+
 #[AllowDynamicProperties]
 class BWFAN_Load_Custom_Search {
 
@@ -25,7 +26,7 @@ class BWFAN_Load_Custom_Search {
 
 		return self::$ins;
 	}
-	
+
 	/**
 	 * Register the integration when the integration file is included
 	 *
@@ -37,7 +38,7 @@ class BWFAN_Load_Custom_Search {
 
 			$slug                         = $temp_integration->get_slug();
 			self::$custom_search[ $slug ] = $temp_integration;
-			
+
 		}
 	}
 

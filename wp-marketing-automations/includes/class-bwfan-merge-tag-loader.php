@@ -2,6 +2,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
+
 #[AllowDynamicProperties]
 class BWFAN_Merge_Tag_Loader {
 	public static $included_merge_tags = array();
@@ -225,14 +226,26 @@ class BWFAN_Merge_Tag_Loader {
 	 *
 	 * @return array
 	 */
-	public function get_localize_tags_with_group( $form_tags = false ) {
+	public function get_localize_tags_with_group( $form_tags = false, $extra_group = [] ) {
 		$group_localize_tags = self::$localize_tags_with_group;
+
 		foreach ( $group_localize_tags as $key => $value ) {
 			foreach ( $value as $k => $v ) {
 				if ( false === $form_tags && in_array( $k, $this->_form_merge_tags ) ) {
 					unset( $group_localize_tags[ $key ][ $k ] );
 				}
 			}
+		}
+
+		if ( empty( $extra_group ) ) {
+			return $group_localize_tags;
+		}
+
+		foreach ( $extra_group as $group_key ) {
+			if ( ! isset( self::$included_merge_tags[ $group_key ] ) ) {
+				continue;
+			}
+			$group_localize_tags[ self::$merge_tag_group[ $group_key ] ] = self::$included_merge_tags[ $group_key ];
 		}
 
 		return $group_localize_tags;

@@ -82,6 +82,7 @@ class BWFAN_Load_Sources {
 				'group_slug' => $group_slug,
 				'label'      => $source->get_group_name(),
 				'subgroup'   => [ $slug ],
+				'priority'   => $source->get_priority(),
 			];
 		} elseif ( isset( self::$dynamic_register_events['group'][ $group_slug ] ) && ! in_array( $slug, self::$dynamic_register_events['group'][ $group_slug ]['subgroup'] ) ) {
 			self::$dynamic_register_events['group'][ $group_slug ]['subgroup'][] = $slug;
@@ -771,6 +772,15 @@ class BWFAN_Load_Sources {
 			'Twilio'               => 10,
 			'WishList Member'      => 10,
 		] );
+	}
+
+	/**
+	 * Returns event subgroup description
+	 *
+	 * @return array
+	 */
+	public function get_event_subgroup_description() {
+		return apply_filters( 'bwfan_event_subgroup_description', [] );
 	}
 
 	public function get_dynamic_event_data() {

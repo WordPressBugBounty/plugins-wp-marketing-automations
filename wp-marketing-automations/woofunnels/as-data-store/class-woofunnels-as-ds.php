@@ -277,7 +277,7 @@ final class WooFunnels_AS_DS {
 		}
 
 		/** Logs */
-		if ( defined( 'BWF_CHECK_CRON_SCHEDULE' ) && true === BWF_CHECK_CRON_SCHEDULE ) {
+		if ( ( defined( 'BWF_CHECK_CRON_SCHEDULE' ) && true === BWF_CHECK_CRON_SCHEDULE ) || true === apply_filters( 'bwf_check_cron_schedule_logging', false ) ) {
 			add_filter( 'bwf_logs_allowed', '__return_true', PHP_INT_MAX );
 			$logger_obj = BWF_Logger::get_instance();
 			$logger_obj->log( $resp['time'], 'cron-check', 'autonami' );

@@ -100,7 +100,8 @@ class WooFunnels_License_check {
 			$domain = pll_home_url( $default_language );
 		}
 
-		return $domain;
+		// Remove trailing slash if it exists
+		return rtrim( $domain, '/' );
 	}
 
 	public function pass_instance() {

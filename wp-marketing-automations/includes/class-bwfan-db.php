@@ -176,8 +176,15 @@ class BWFAN_DB {
 		/** Updated block editor default values */
 		update_option( 'bwf_global_block_editor_setting', BWFAN_Common::get_block_editor_default_setting() );
 
-		/** set default settings for email notification */
+		/** Set default settings for email notification */
 		BWFAN_Notification_Email::set_bwfan_settings();
+
+		/** Need to set default value of sent to today */
+		$executed_last = array(
+			'weekly'  => date( 'c' ),
+			'monthly' => date( 'c' ),
+		);
+		update_option( 'bwfan_email_notification_updated', $executed_last, false );
 
 		/** Log if any mysql errors */
 		if ( ! empty( $db_errors ) ) {

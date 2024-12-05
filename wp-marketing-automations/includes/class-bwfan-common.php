@@ -112,8 +112,8 @@ class BWFAN_Common {
 	public static $stop_async_call = null;
 
 	public static function init() {
-		self::$date_format           = get_option( 'date_format' );
-		self::$time_format           = get_option( 'time_format' );
+		self::$date_format           = self::bwfan_get_date_format();
+		self::$time_format           = self::bwfan_get_time_format();
 		self::$admin_email           = get_option( 'admin_email' );
 		self::$select2ajax_functions = array( 'get_subscription_product', 'get_membership_plans', 'get_coupon' );
 
@@ -3480,6 +3480,9 @@ class BWFAN_Common {
 			return;
 		}
 
+		/** Check duplicate carts */
+		BWFAN_AB_Cart_Abandoned::maybe_clean();
+
 		/** Maybe run */
 		if ( false === BWFAN_Model_Abandonedcarts::maybe_run( $global_settings['bwfan_ab_init_wait_time'] ) ) {
 			return;
@@ -4416,6 +4419,8 @@ class BWFAN_Common {
 	 * @param $search
 	 * @param $version
 	 * @param $ids
+	 * @param $limit
+	 * @param $offset
 	 *
 	 * @return array|object|stdClass[]|null
 	 */
@@ -4455,7 +4460,7 @@ class BWFAN_Common {
 			$query = $wpdb->prepare( $query, $offset, $limit );
 		}
 
-		return ! empty( $query ) ? $wpdb->get_results( $query, ARRAY_A ) : [];;
+		return ! empty( $query ) ? $wpdb->get_results( $query, ARRAY_A ) : [];
 	}
 
 	/**
@@ -4553,7 +4558,7 @@ class BWFAN_Common {
 	}
 
 	public static function get_date_format() {
-		return get_option( 'date_format', '' ) . ' ' . get_option( 'time_format', '' );
+		return self::bwfan_get_date_format() . ' ' . self::bwfan_get_time_format();
 	}
 
 	/** run global tools
@@ -4703,9 +4708,14 @@ class BWFAN_Common {
 				break;
 			case 'bwfan_validate_db_tables':
 				$missing_tables = BWFAN_Table_Validation_Controller::check_missing_tables();
+				if ( isset( $missing_tables['error'] ) ) {
+					$result['msg'] = $missing_tables['error'];
+					break;
+				}
 
 				if ( empty( $missing_tables ) ) {
 					$result['msg'] = __( 'All required tables are present in the database.', 'wp-marketing-automations' );
+					bwf_options_update( 'bwfan_table_validation_error', 0 );
 					break;
 				}
 
@@ -6866,7 +6876,7 @@ class BWFAN_Common {
 				'wp_adv'         => __( 'WordPress Advanced', 'wp-marketing-automations' ),
 				'zapier'         => __( 'Zapier', 'wp-marketing-automations' ),
 				'activecampaign' => __( 'ActiveCampaign', 'wp-marketing-automations' ),
-				'convertkit'     => __( 'ConvertKit', 'wp-marketing-automations' ),
+				'convertkit'     => __( 'Kit ( Formerly ConvertKit )', 'wp-marketing-automations' ),
 				'drip'           => __( 'Drip', 'wp-marketing-automations' ),
 				'slack'          => __( 'Slack', 'wp-marketing-automations' ),
 				'twilio'         => __( 'Twilio', 'wp-marketing-automations' ),
@@ -7476,7 +7486,9 @@ class BWFAN_Common {
 				) );
 			}
 
-			$subject = self::decode_merge_tags( $args['subject'], $is_crm );
+			$subject = ! empty( $args['subject'] ) ? $args['subject'] : __( 'FunnelKit Automations - Test email subject', 'wp-marketing-automations' );
+
+			$subject = self::decode_merge_tags( $subject, $is_crm );
 
 			/** Get send email object */
 			$send_email_ins = BWFAN_Core()->integration->get_action( 'wp_sendemail' );
@@ -9011,6 +9023,9 @@ class BWFAN_Common {
 		}
 
 		foreach ( $rules as $or_key => $or_rule ) {
+			if ( ! is_array( $or_rule ) ) {
+				continue;
+			}
 			/** OR block */
 			foreach ( $or_rule as $and_key => $rule ) {
 				/** AND block */
@@ -9198,9 +9213,13 @@ class BWFAN_Common {
 	public static function get_store_time( $hours = 0, $mins = 0, $sec = 0 ) {
 		$timezone = new DateTimeZone( wp_timezone_string() );
 		$date     = new DateTime();
-		$date->modify( '+1 days' );
+
 		$date->setTimezone( $timezone );
 		$date->setTime( $hours, $mins, $sec );
+
+		if ( current_time( 'timestamp', 1 ) > $date->getTimestamp() ) {
+			$date->modify( '+1 days' );
+		}
 
 		return $date->getTimestamp();
 	}
@@ -9961,12 +9980,12 @@ class BWFAN_Common {
 				'font'              => [
 					'desktop' => [
 						'family' => 'arial,helvetica,sans-serif',
-						'size'   => 16,
+						'size'   => 14,
 					],
 				],
 				'fontH1'            => [
 					'desktop' => [
-						'size' => 40,
+						'size' => 36,
 					],
 				],
 				'fontH2'            => [
@@ -10072,7 +10091,7 @@ class BWFAN_Common {
 			$new_settings             = array_merge( $default['setting'], $saved_setting['setting'] );
 			$saved_setting['setting'] = $new_settings;
 		}
-		self::$block_editor_settings = $saved_setting;
+		self::$block_editor_settings = ! empty( $saved_setting ) ? $saved_setting : $default;
 
 		return self::$block_editor_settings;
 	}
@@ -10411,7 +10430,7 @@ class BWFAN_Common {
 	 * @return void
 	 */
 	public static function bwfan_before_send_mail( $type = 'block' ) {
-		if ( bwfan_is_autonami_pro_active() && version_compare( BWFAN_PRO_VERSION, '2.9.0', '>=' ) && in_array( $type, [ 5, 'block', '5' ] ) ) {
+		if ( bwfan_is_autonami_pro_active() && version_compare( BWFAN_PRO_VERSION, '2.9.0', '>=' ) && in_array( $type, [ 5, 'block', '5', 7, '7' ] ) ) {
 			include_once BWFAN_PRO_PLUGIN_DIR . '/crm/includes/class-bwfcrm-block-editor.php';
 		}
 	}
@@ -11063,5 +11082,39 @@ class BWFAN_Common {
 		$old_settings['bwfan_notification_time']['ampm'] = ( 'am' === $settings['bwfan_notification_time']['ampm'] ) ? 'pm' : 'am';
 
 		$ins->set_scheduler( $old_settings, $settings );
+	}
+
+	public static function bwfan_get_date_format() {
+		return ! empty( get_option( 'date_format' ) ) ? get_option( 'date_format' ) : 'Y-m-d';
+	}
+
+	public static function bwfan_get_time_format() {
+		return ! empty( get_option( 'time_format' ) ) ? get_option( 'time_format' ) : 'g:i a';
+	}
+
+	public static function get_worker_delay_timestamp() {
+		return ( 60 * apply_filters( 'bwfan_worker_notification_status_delay_var_in_min', 5 ) );
+	}
+
+	/**
+	 * Get the UTC date time value from store date time value
+	 *
+	 * @param $store_date
+	 * @param $format
+	 *
+	 * @return string
+	 */
+	public static function get_utc_date_from_store_date( $store_date, $format = 'Y-m-d H:i:s' ) {
+		if ( empty( $store_date ) ) {
+			return '';
+		}
+
+		try {
+			$utc_date = get_gmt_from_date( $store_date, $format );
+
+			return $utc_date ?: '';
+		} catch ( Exception|Error $e ) {
+			return '';
+		}
 	}
 }

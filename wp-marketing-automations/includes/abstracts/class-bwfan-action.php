@@ -1,4 +1,5 @@
 <?php
+
 #[AllowDynamicProperties]
 abstract class BWFAN_Action {
 

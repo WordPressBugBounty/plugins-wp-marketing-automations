@@ -198,7 +198,7 @@ final class BWFAN_WC_Product_Purchased extends BWFAN_Event {
 		$data_to_send['global']['order_id']          = $this->order_id;
 		$data_to_send['global']['wc_single_item_id'] = $this->single_item_id;
 
-		$this->order                     = $this->order instanceof WC_Order ? $this->order : wc_get_order( $this->order_id );
+		$this->order                     = wc_get_order( $this->order_id );
 		$data_to_send['global']['email'] = BWFAN_Common::get_email_from_order( $this->order_id, $this->order );
 		$data_to_send['global']['phone'] = BWFAN_Common::get_phone_from_order( $this->order_id, $this->order );
 		$user_id                         = BWFAN_Common::get_wp_user_id_from_order( $this->order_id, $this->order );

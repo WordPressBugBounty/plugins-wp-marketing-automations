@@ -168,28 +168,6 @@ final class BWFAN_Header {
 				'name' => __( 'Broadcasts', 'wp-marketing-automations' ),
 				'link' => admin_url( 'admin.php?page=autonami&path=/broadcasts/email' ),
 			),
-//			'campaigns'  => array(
-//				'name'         => __( 'Campaigns', 'wp-marketing-automations' ),
-//				'isExpandable' => true,
-//				'items'        => array(
-//					'automations-v2' => array(
-//						'name' => "Automations <span>Next Gen</span>",
-//						'link' => admin_url( 'admin.php?page=autonami&path=/automations' ),
-//					),
-//					'automations-v1' => array(
-//						'name' => 'Automations',
-//						'link' => admin_url( 'admin.php?page=autonami&path=/automations-v1' ),
-//					),
-//					'broadcasts'     => array(
-//						'name' => __( 'Broadcasts', 'wp-marketing-automations' ),
-//						'link' => admin_url( 'admin.php?page=autonami&path=/broadcasts/email' ),
-//					),
-//					'templates'      => array(
-//						'name' => __( 'Templates', 'wp-marketing-automations' ),
-//						'link' => admin_url( 'admin.php?page=autonami&path=/templates' ),
-//					),
-//				),
-//			),
 			'templates'      => array(
 				'name' => __( 'Emails', 'wp-marketing-automations' ),
 				'link' => admin_url( 'admin.php?page=autonami&path=/templates' ),
@@ -516,7 +494,7 @@ final class BWFAN_Header {
 	}
 
 	public static function level_2_navigation_templates() {
-		return array(
+		$template_menu = array(
 			'templates'    => array(
 				'name' => __( 'Templates', 'wp-marketing-automations' ),
 				'link' => admin_url( 'admin.php?page=autonami&path=/templates' ),
@@ -524,8 +502,20 @@ final class BWFAN_Header {
 			'global-style' => array(
 				'name' => __( 'Global Styles', 'wp-marketing-automations' ),
 				'link' => admin_url( 'admin.php?page=autonami&path=/global-style' ),
-			),
+			)
 		);
+		if ( bwfan_is_woocommerce_active() ) {
+			$template_menu['transactional'] = array(
+				'name' => __( 'Transactional Emails', 'wp-marketing-automations' ),
+				'link' => admin_url( 'admin.php?page=autonami&path=/transactional-emails' ),
+			);
+		}
+		$template_menu['history'] = array(
+			'name' => __( 'History', 'wp-marketing-automations' ),
+			'link' => admin_url( 'admin.php?page=autonami&path=/history' ),
+		);
+
+		return $template_menu;
 	}
 
 	public static function level_2_navigation_links_triggers() {

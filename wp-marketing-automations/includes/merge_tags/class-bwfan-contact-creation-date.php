@@ -32,7 +32,8 @@ class BWFAN_Contact_Creation_Date extends BWFAN_Merge_Tag {
 	 */
 	public function parse_shortcode( $attr ) {
 		$parameters           = [];
-		$parameters['format'] = isset( $attr['format'] ) ? $attr['format'] : get_option( 'date_format' );
+		$format               = BWFAN_Common::bwfan_get_date_format();
+		$parameters['format'] = isset( $attr['format'] ) ? $attr['format'] : $format;
 
 		if ( isset( $attr['modify'] ) ) {
 			$parameters['modify'] = $attr['modify'];

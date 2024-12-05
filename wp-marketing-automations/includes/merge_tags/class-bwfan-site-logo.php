@@ -41,4 +41,4 @@ class BWFAN_Site_Logo extends BWFAN_Merge_Tag {
 /**
  * Register this merge tag to a group.
  */
-BWFAN_Merge_Tag_Loader::register( 'bwfan_default', 'BWFAN_Site_Logo', null, __('General' ,'wp-marketing-automations' ) );
+BWFAN_Merge_Tag_Loader::register( 'bwfan_default', 'BWFAN_Site_Logo', null, __( 'General', 'wp-marketing-automations' ) );

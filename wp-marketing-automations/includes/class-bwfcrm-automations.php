@@ -119,7 +119,8 @@ if ( ! class_exists( 'BWFCRM_Automations' ) && BWFAN_Common::is_pro_3_0() ) {
 				$event_instance = BWFAN_Core()->sources->get_event( $event_slug );
 
 				$task_details = isset( $task['meta']['integration_data']['global'] ) ? $task['meta']['integration_data']['global'] : array();
-				$message      = ( isset( $task['meta']['task_message'] ) ) ? BWFAN_Common::get_parsed_time( get_option( 'date_format' ), maybe_unserialize( $task['meta']['task_message'] ) ) : array();
+				$format       = BWFAN_Common::bwfan_get_date_format();
+				$message      = ( isset( $task['meta']['task_message'] ) ) ? BWFAN_Common::get_parsed_time( $format, maybe_unserialize( $task['meta']['task_message'] ) ) : array();
 
 				$automation_url = add_query_arg( array(
 					'page'    => 'autonami',
@@ -137,7 +138,7 @@ if ( ! class_exists( 'BWFCRM_Automations' ) && BWFAN_Common::is_pro_3_0() ) {
 					'automation_event'        => ! is_null( $event_instance ) ? $event_instance->get_name() : __( 'Data unavailable. Contact Support.', 'wp-marketing-automations' ),
 					'task_integration'        => esc_html__( 'Not Found', 'wp-marketing-automations' ),
 					'task_integration_action' => esc_html__( 'Not Found', 'wp-marketing-automations' ),
-					'task_date'               => BWFAN_Common::get_human_readable_time( $task['date'], get_date_from_gmt( date( 'Y-m-d H:i:s', $task['date'] ), get_option( 'date_format' ) ) ),
+					'task_date'               => BWFAN_Common::get_human_readable_time( $task['date'], get_date_from_gmt( date( 'Y-m-d H:i:s', $task['date'] ), BWFAN_Common::bwfan_get_date_format() ) ),
 					'status'                  => $status,
 					'gif'                     => $gif,
 					'task_message'            => $message,
@@ -617,7 +618,7 @@ if ( ! class_exists( 'BWFCRM_Automations' ) && BWFAN_Common::is_pro_3_0() ) {
 					'v' => empty( $open_count ) ? '-' : $open_count . ' (' . $open_rate . '%)',
 				],
 				[
-					'l' => __('Clicked', 'wp-marketing-automations' ),
+					'l' => __( 'Clicked', 'wp-marketing-automations' ),
 					'v' => empty( $click_count ) ? '-' : $click_count . ' (' . $click_rate . '%)',
 				],
 				[

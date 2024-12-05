@@ -415,7 +415,7 @@ class BWFAN_Recipe_Dependency {
 
 		$is_connected = BWFAN_Core()->connectors->is_connected( 'bwfco_convertkit' );
 		if ( empty( $is_connected ) ) {
-			$this->err_msg = __( 'ConvertKit connector is not integrated.', 'wp-marketing-automations' );
+			$this->err_msg = __( 'Kit ( Formerly ConvertKit ) connector is not integrated.', 'wp-marketing-automations' );
 
 			return false;
 		}

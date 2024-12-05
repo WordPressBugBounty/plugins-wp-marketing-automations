@@ -32,8 +32,8 @@ abstract class BWFCRM_Base_React_Page {
 		$this->page_data['is_connector_active'] = false;
 		$this->page_data['is_funnel_active']    = false;
 		$this->page_data['disable_wp_importer'] = apply_filters( 'bwfcrm_disable_wp_importer', false );
-		$this->page_data['date_format']         = get_option( 'date_format' );
-		$this->page_data['time_format']         = get_option( 'time_format' );
+		$this->page_data['date_format']         = BWFAN_Common::bwfan_get_date_format();
+		$this->page_data['time_format']         = BWFAN_Common::bwfan_get_time_format();
 		$this->page_data['activation_date']     = get_option( 'bwfan_ver_1_0' );
 		$this->page_data['timezone']            = get_option( 'timezone_string' );
 		$this->page_data['admin_img_path']      = esc_url( plugin_dir_url( BWFAN_PLUGIN_FILE ) . 'admin/assets/img/' );
@@ -227,7 +227,8 @@ abstract class BWFCRM_Base_React_Page {
 		] );
 		$this->page_data['wizard_status']      = get_option( '_bwfan_onboarding_completed', false ) || get_option( '_wffn_onboarding_completed', false );
 		$this->page_data['user_email']         = get_user_by( 'id', get_current_user_id() )->user_email;
-
+		$this->page_data['siteLang']           = BWFAN_Common::get_site_current_language();
+		$this->page_data['multiLangSetting']   = method_exists( 'BWFAN_PRO_Common', 'get_language_settings' ) ? BWFAN_PRO_Common::get_language_settings(): [];
 		$this->page_data['bwfan_table_validation_error'] = BWFAN_Table_Validation_Controller::get_table_validate_option();
 
 		do_action( 'bwfan_admin_view_localize_data', $this );

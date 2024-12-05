@@ -199,6 +199,7 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 			'user_id'           => empty( $user_id ) ? null : $user_id,
 			'lang_enabled'      => $lang_enabled,
 			'selected_language' => ( $lang_enabled && isset( $step_data['language'] ) ) ? $step_data['language'] : '',
+			'contact_id'        => $automation_data['global']['contact_id'] ?? $automation_data['global']['cid'] ?? 0,
 		);
 
 		$data_to_set['body'] = stripslashes( $data_to_set['body'] );
@@ -698,9 +699,8 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 		$pre_header = '<div class="preheader" style="display:none;font-size:1px;color:#ffffff;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">' . $pre_header . '</div>';
 
 		/** it will add the space after the pre-header to not show the email body content */
-		if ( apply_filters( 'bwfan_email_enable_pre_header_preview_only', false ) === true ) {
-			$pre_header .= '<div style="display: none; max-height: 0; overflow: hidden;">' . str_repeat( '&#847;&zwnj;&nbsp;', apply_filters( 'bwfan_email_pre_header_space', 50 ) ) // Adding 50 instances to create enough hidden space
-			               . '</div>';
+		if ( ! empty( $pre_header ) ) {
+			$pre_header .= '<div style="display: none; max-height: 0; overflow: hidden;">' . str_repeat( '&#847;&zwnj;&nbsp;', apply_filters( 'bwfan_email_pre_header_space', 70 ) ) . '</div>'; // Adding 70 instances to create enough hidden space
 		}
 
 		$appended_body = $pre_header . ' ' . $body;

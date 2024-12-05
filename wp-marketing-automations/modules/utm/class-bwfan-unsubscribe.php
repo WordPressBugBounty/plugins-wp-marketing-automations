@@ -39,6 +39,13 @@ class BWFAN_unsubscribe {
 		/** Front ajax call */
 		add_action( 'wp_ajax_bwfan_unsubscribe_user', array( $this, 'bwfan_unsubscribe_user' ) );
 		add_action( 'wp_ajax_nopriv_bwfan_unsubscribe_user', array( $this, 'bwfan_unsubscribe_user' ) );
+
+		/** Check if page built using elementor, delete the cache for the page */
+		if ( defined( 'ELEMENTOR_VERSION' ) && version_compare( ELEMENTOR_VERSION, '3.23.0', '>=' ) ) {
+			if ( ! ( ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) || ! is_admin() ) {
+				add_action( 'wp', array( $this, 'delete_elementor_cache' ) );
+			}
+		}
 	}
 
 	public static function get_instance() {
@@ -1017,6 +1024,32 @@ class BWFAN_unsubscribe {
 		}
 	}
 
+	/**
+	 * Delete elementor cache
+	 *
+	 * @return void
+	 */
+	public function delete_elementor_cache() {
+		if ( ! class_exists( 'Elementor\Core\Base\Document' ) || ! method_exists( 'Elementor\Core\Base\Document', 'is_built_with_elementor' ) ) {
+			return;
+		}
+		$setting = BWFAN_Common::get_global_settings();
+
+		$unsubscribe_page_id = isset( $setting['bwfan_unsubscribe_page'] ) ? $setting['bwfan_unsubscribe_page'] : 0;
+		if ( empty( $unsubscribe_page_id ) || ( intval( $unsubscribe_page_id ) !== intval( get_the_ID() ) ) ) {
+			return;
+		}
+
+		/**
+		 * Check if it's a page built using elementor, delete the cache for the page
+		 */
+		$document = Elementor\Plugin::$instance->documents->get( $unsubscribe_page_id );
+		if ( empty( $document ) || empty( $document->is_built_with_elementor() ) ) {
+			return;
+		}
+
+		delete_post_meta( get_the_ID(), delete_post_meta_by_key( Elementor\Core\Base\Document::CACHE_META_KEY ) );
+	}
 }
 
 BWFAN_unsubscribe::get_instance();

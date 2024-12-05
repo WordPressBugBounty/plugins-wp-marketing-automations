@@ -1035,42 +1035,64 @@ class WooFunnels_DB_Updater {
 	 *
 	 */
 	public function maybe_clean_indexing() {
-		if ( 1 === did_action( 'admin_head' ) && current_user_can( 'manage_options' ) && 'yes' === filter_input( INPUT_GET, 'bwf_index_clean', FILTER_UNSAFE_RAW ) ) {
-			global $wpdb;
-
-			$tables = array(
-				'bwf_wc_customers',
-			);
-
-			foreach ( $tables as &$table ) {
-				$bwf_table = $wpdb->prefix . $table;
-				$wpdb->query( "DROP TABLE IF EXISTS $bwf_table" );  //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			}
-
-			delete_option( '_bwf_db_version' );
-			delete_option( '_bwf_db_upgrade' );
-			delete_option( '_bwf_order_threshold' );
-			delete_option( '_bwf_offset' );
-			delete_option( '_bwf_last_offsets' );
-			delete_option( '_bwf_contacts_threshold' );
-			delete_option( '_bwf_contacts_offset' );
-			delete_option( '_bwf_contacts_last_offsets' );
-			delete_option( '_bwf_db_table_list' );
-
-			$table = $wpdb->prefix . 'postmeta';
-			$wpdb->delete( $table, array( 'meta_key' => '_woofunnel_cid' ) );  //phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-			$wpdb->delete( $table, array( 'meta_key' => '_woofunnel_custid' ) );  //phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-			if ( BWF_WC_Compatibility::is_hpos_enabled() ) {
-				$table = $wpdb->prefix . 'wc_orders_meta';
-
-				$wpdb->delete( $table, array( 'meta_key' => '_woofunnel_cid' ) );  //phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-				$wpdb->delete( $table, array( 'meta_key' => '_woofunnel_custid' ) );  //phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-
-			}
-			$this->updater->kill_process_safe();
-			BWF_Logger::get_instance()->log( 'Indexing was cleaned manually.', 'woofunnels_indexing' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
+		if ( 1 === did_action( 'admin_head' ) && current_user_can( 'manage_options' ) && 'yes' === filter_input( INPUT_GET, 'bwf_index_clean', FILTER_UNSAFE_RAW ) ) { //phpcs:ignore
+			$this->reset_indexing_data();
 		}
 		$this->bwf_maybe_restart_indexing();
+	}
+
+	/**
+	 * reset and clean index data for restart index
+	 * @return void
+	 */
+	public function reset_indexing_data() {
+		global $wpdb;
+
+		$tables = array(
+			'bwf_wc_customers',
+		);
+
+		foreach ( $tables as &$table ) {
+			$bwf_table = $wpdb->prefix . $table;
+			$wpdb->query( "DROP TABLE IF EXISTS $bwf_table" );  //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		}
+
+        /**
+         * Remove bwf_wc_customers table from table list for attempt to recreate table
+         */
+        $current_table_list = get_option( '_bwf_db_table_list' );
+
+        if ( is_array( $current_table_list ) && isset( $current_table_list['tables'] ) && count( $current_table_list['tables'] ) > 0 ) {
+            $table_list = array_unique( $current_table_list['tables'] );
+            foreach ( $table_list as $key ) {
+                if ( 'bwf_wc_customers' === $key ) {
+                    unset( $table_list[ $key ] );
+	                $current_table_list['tables'] = array_values( $table_list );
+                    update_option( '_bwf_db_table_list', $current_table_list, true );
+                    break;
+                }
+            }
+        }
+		delete_option( '_bwf_db_upgrade' );
+		delete_option( '_bwf_order_threshold' );
+		delete_option( '_bwf_offset' );
+		delete_option( '_bwf_last_offsets' );
+		delete_option( '_bwf_contacts_threshold' );
+		delete_option( '_bwf_contacts_offset' );
+		delete_option( '_bwf_contacts_last_offsets' );
+
+		$table = $wpdb->prefix . 'postmeta';
+		$wpdb->delete( $table, array( 'meta_key' => '_woofunnel_cid' ) );  //phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+		$wpdb->delete( $table, array( 'meta_key' => '_woofunnel_custid' ) );  //phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+		if ( BWF_WC_Compatibility::is_hpos_enabled() ) {
+			$table = $wpdb->prefix . 'wc_orders_meta';
+
+			$wpdb->delete( $table, array( 'meta_key' => '_woofunnel_cid' ) );  //phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+			$wpdb->delete( $table, array( 'meta_key' => '_woofunnel_custid' ) );  //phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+
+		}
+		$this->updater->kill_process_safe();
+		BWF_Logger::get_instance()->log( 'Indexing was cleaned manually.', 'woofunnels_indexing' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 	}
 
 	/**

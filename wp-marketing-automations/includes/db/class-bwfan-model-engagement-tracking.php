@@ -513,5 +513,183 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 
 			return $wpdb->get_results( $wpdb->prepare( $query, $args ), ARRAY_A );
 		}
+
+		/**
+		 * Get email activity by filters
+		 *
+		 * @param array $filter_list
+		 * @param string $search
+		 * @param array $filters
+		 * @param int $offset
+		 * @param int $limit Limit
+		 *
+		 * @return array
+		 *
+		 */
+		public static function get_engagements_activity( $filter_list, $search = '', $filters = [], $offset = 0, $limit = 10 ) {
+			global $wpdb;
+			$table        = self::_table();
+			$query        = "SELECT `ID`,`cid`,`created_at`,`type`,`send_to`,`open`,`click`,`oid`,`author_id`,`tid`,`c_status`,`mode` FROM {$table} WHERE 1=1";
+			$count        = "SELECT COUNT(`ID`) AS total_count FROM {$table} WHERE 1=1";
+			$con_data     = [];
+			$filter_query = '';
+
+			if ( ! empty( $search ) ) {
+				$filter_query .= $wpdb->prepare( " AND send_to LIKE %s", "%" . esc_sql( $search ) . "%" );
+			}
+
+			//filter data if there is any filtered value pass
+			foreach ( $filters as $filter ) {
+				switch ( $filter['filter'] ) {
+					case 'source':
+						if ( ! empty( $filter['data'] ) ) {
+							$oid = array_column( $filter['data'], 'id' );
+						}
+						switch ( $filter['rule'] ) {
+							case 1:
+								if ( ! empty( $oid ) ) {
+									$filter_query .= " AND oid IN (" . implode( ', ', $oid ) . ") AND type = 1";
+								}
+								break;
+
+							case 2:
+								if ( ! empty( $oid ) ) {
+									$filter_query .= " AND oid IN (" . implode( ', ', $oid ) . ") AND type = 2";
+								}
+								break;
+						}
+						break;
+					case 'status':
+						$status = ! empty( $filter['data'] ) ? $filter['data'] : '';
+						if ( ! empty( $status ) ) {
+							$filter_query .= " AND c_status = '{$status}'";
+						}
+						break;
+
+					case 'period':
+						$start_date = ! empty( $filter['data']['after'] ) ? $filter['data']['after'] : '';
+						$end_date   = ! empty( $filter['data']['before'] ) ? $filter['data']['before'] : '';
+						if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
+							$filter_query .= " AND (created_at >= '{$start_date}' AND created_at <= '{$end_date}')";
+						}
+						break;
+				}
+			}
+
+			$query   .= $filter_query;
+			$query   .= " ORDER BY ID DESC LIMIT {$limit} OFFSET {$offset}";
+			$results = $wpdb->get_results( $query, ARRAY_A );
+
+			if ( empty( $results ) ) {
+				return array(
+					'data'  => [],
+					'total' => 0
+				);
+			}
+
+			// Get contact details
+			$cids = array_unique( array_column( $results, 'cid' ) );
+
+			$con_query    = $wpdb->prepare( "SELECT ID, f_name, email, l_name FROM {$wpdb->prefix}bwf_contact WHERE ID IN (" . implode( ',', array_map( 'absint', $cids ) ) . ")" );
+			$contact_data = $wpdb->get_results( $con_query, ARRAY_A );
+
+			// Map contact details by ID
+			$contact_map = [];
+			foreach ( $contact_data as $contact ) {
+				$contact_map[ $contact['ID'] ] = $contact;
+			}
+
+			// Get subjects in one query
+			$tids              = [];
+			$message_track_ids = [];
+			foreach ( $results as $result ) {
+				if ( empty( $result['tid'] ) ) {
+					$message_track_ids[] = $result['ID'];
+					continue;
+				}
+				$tids[] = $result['tid'];
+			}
+
+			$template      = $wpdb->prepare( "SELECT ct.ID, ct.subject FROM {$wpdb->prefix}bwfan_templates AS ct WHERE ct.ID IN (" . implode( ',', array_map( 'absint', $tids ) ) . ")" );
+			$template_data = $wpdb->get_results( $template, ARRAY_A );
+
+			// Map subjects by ID
+			$template_map = [];
+			foreach ( $template_data as $template ) {
+				$template_map[ $template['ID'] ] = $template['subject'];
+			}
+
+			$message_data = [];
+			if ( ! empty( $message_track_ids ) ) {
+				$m_data = BWFAN_Model_Message::get_message_by_track_id( $message_track_ids );
+				foreach ( $m_data as $data ) {
+					$message_data[ $data['track_id'] ] = $data['subject'];
+				}
+			}
+
+			$con_class = new BWFAN_Email_Conversations();
+
+			foreach ( $results as $key => $val ) {
+				$con_data[ $key ]['ID']   = $val['ID'];
+				$con_data[ $key ]['mode'] = $val['mode'];
+				$con_data[ $key ]['type'] = $val['type'];
+
+				// Retrieve contact details from map
+				$contact = $contact_map[ $val['cid'] ] ?? array();
+
+				$con_data[ $key ]['contact'] = [];
+				if ( ! empty( $contact ) ) {
+					$con_data[ $key ]['contact'] = array(
+						'id'     => $contact['ID'],
+						'f_name' => $contact['f_name'],
+						'l_name' => $contact['l_name'],
+						'email'  => $contact['email'],
+						'link'   => add_query_arg( array( 'page' => 'autonami', 'path' => '/contact/' . $contact['ID'] . '/profile' ), admin_url( 'admin.php' ) ),
+					);
+				}
+
+				// Get source data
+				$source = $con_class->get_source( [
+					'oid'       => $val['oid'],
+					'type'      => $val['type'],
+					'author_id' => $val['author_id']
+				] );
+
+				if ( ! empty( $source ) ) {
+					$con_data[ $key ]['source'] = $source;
+				}
+
+				// Set sent status and sent date
+				$con_data[ $key ]['c_status'] = $val['c_status'];
+				$con_data[ $key ]['sent_on']  = $val['created_at'];
+				$con_data[ $key ]['open']     = $val['open'];
+				$con_data[ $key ]['click']    = $val['click'];
+				$con_data[ $key ]['send_to']  = $val['send_to'];
+
+				// Retrieve subject from map
+				$subject                     = ! empty( $val['tid'] ) ? $template_map[ $val['tid'] ] : '';
+				$subject                     = empty( $subject ) && isset( $message_data[ $val['ID'] ] ) ? $message_data[ $val['ID'] ] : $subject;
+				$con_data[ $key ]['subject'] = ! empty( $subject ) ? $subject : __( 'No Subject', 'wp-marketing-automations' );
+			}
+
+			return [
+				'data'  => $con_data,
+				'total' => $wpdb->get_var( $count . $filter_query )
+			];
+
+		}
+
+		public static function get_engagements_by_tid( $tid, $only_count = false ) {
+			global $wpdb;
+			$table = self::_table();
+			if ( $only_count ) {
+				$query = "SELECT COUNT(ID) as count FROM {$table} WHERE tid = $tid";
+			} else {
+				$query = "SELECT * FROM {$table} WHERE tid = $tid";
+			}
+
+
+			return $only_count ? $wpdb->get_var( $query ) : $wpdb->get_results( $query, ARRAY_A );
+		}
 	}
 }

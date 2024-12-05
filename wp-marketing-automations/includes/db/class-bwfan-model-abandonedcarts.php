@@ -65,4 +65,33 @@ class BWFAN_Model_Abandonedcarts extends BWFAN_Model {
 
 		return ! empty( $count );
 	}
+
+
+	/**
+	 * Get duplicate cart in last 12 hrs
+	 *
+	 * @return array|object|stdClass[]|null
+	 */
+	public static function get_duplicate_entry() {
+		global $wpdb;
+		$start_time = date( 'Y-m-d H:i:s', strtotime( '-12 hours' ) );
+
+		$query = "SELECT GROUP_CONCAT(`ID`) AS `pkey` FROM `{$wpdb->prefix}bwfan_abandonedcarts` WHERE `created_time` > %s AND (`status` = 0 OR `status` = 3) GROUP BY `email` HAVING COUNT(`email`) > 1";
+		$query = $wpdb->prepare( $query, $start_time );
+
+		$result = $wpdb->get_results( $query, ARRAY_A );
+		if ( empty( $result ) ) {
+			return [];
+		}
+		$result    = array_column( $result, 'pkey' );
+		$final_ids = [];
+		foreach ( $result as $item ) {
+			$values = array_map( 'trim', explode( ',', $item ) );
+			$values = array_map( 'intval', $values );
+			array_pop( $values );
+			$final_ids = array_merge( $final_ids, $values );
+		};
+
+		return $final_ids;
+	}
 }

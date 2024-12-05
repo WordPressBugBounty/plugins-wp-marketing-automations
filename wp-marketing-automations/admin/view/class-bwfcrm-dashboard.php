@@ -19,6 +19,7 @@ class BWFCRM_Dashboard extends BWFCRM_Base_React_Page {
 	public function __construct() {
 		if ( isset( $_GET['page'] ) && 'autonami' === $_GET['page'] ) {
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ), 100 );
+			add_filter( 'user_can_richedit', '__return_true' );
 		}
 	}
 
@@ -29,7 +30,7 @@ class BWFCRM_Dashboard extends BWFCRM_Base_React_Page {
 
 	public function render() {
 		?>
-		<div id="bwfcrm-page" class="bwfcrm-page"></div>
+        <div id="bwfcrm-page" class="bwfcrm-page"></div>
 		<?php
 	}
 }

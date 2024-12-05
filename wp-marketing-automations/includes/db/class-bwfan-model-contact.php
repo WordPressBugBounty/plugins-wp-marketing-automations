@@ -1358,9 +1358,9 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			if ( empty( $date ) || ! strtotime( $date ) ) {
 				return '';
 			}
-			$format = get_option( 'date_format', 'Y-m-d' );
+			$format = BWFAN_Common::bwfan_get_date_format();
 
-			return wp_date( $format, strtotime( $date ) );
+			return wp_date( $format, strtotime( $date ), new DateTimeZone( 'UTC' ) );
 		}
 
 		/**

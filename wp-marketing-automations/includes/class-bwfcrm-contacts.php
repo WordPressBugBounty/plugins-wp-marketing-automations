@@ -2925,6 +2925,12 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 				case 3:
 					$res = $this->unsubscribe();
 					break;
+				case 4:
+					$res = $this->mark_as_soft_bounced();
+					break;
+				case 5:
+					$res = $this->mark_as_complaint();
+					break;
 			}
 
 			return $res;

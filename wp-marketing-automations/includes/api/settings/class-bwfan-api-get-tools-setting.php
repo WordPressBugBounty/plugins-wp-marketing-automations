@@ -35,11 +35,11 @@ class BWFAN_API_Get_Tools_Setting extends BWFAN_API_Base {
 		];
 
 		$tool_settings[] = [
-			"title"          => __( "Verify Base Tables", "wp-marketing-automations" ),
+			"title"          => __( "Verify Database Tables", "wp-marketing-automations" ),
 			"description"    => __( "This will verify FunnelKit Automations all the base tables which are required for smooth functioning.", "wp-marketing-automations" ),
 			"task"           => "bwfan_validate_db_tables",
 			"task_text"      => __( "Verify", "wp-marketing-automations" ),
-			"processingText" => __( "Validate required Table in Data base", "wp-marketing-automations" ),
+			"processingText" => __( "Validate required tables in database", "wp-marketing-automations" ),
 		];
 
 		if ( bwfan_is_woocommerce_active() ) {

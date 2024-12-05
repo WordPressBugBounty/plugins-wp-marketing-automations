@@ -31,7 +31,8 @@ if ( ! class_exists( 'BWFAN_Contact_DOB' ) && BWFAN_Common::is_pro_3_0() ) {
 		 */
 		public function parse_shortcode( $attr ) {
 			$parameters           = [];
-			$parameters['format'] = isset( $attr['format'] ) ? $attr['format'] : get_option( 'date_format' );
+			$format               = BWFAN_Common::bwfan_get_date_format();
+			$parameters['format'] = isset( $attr['format'] ) ? $attr['format'] : $format;
 
 			if ( isset( $attr['modify'] ) ) {
 				$parameters['modify'] = $attr['modify'];

@@ -49,10 +49,17 @@ if ( ! class_exists( 'BWFAN_Model_Message' ) && BWFAN_Common::is_pro_3_0() ) {
 		public static function get_message_by_track_id( $track_id ) {
 			global $wpdb;
 			$table = self::_table();
+			if ( is_array( $track_id ) ) {
+				$placeholders = array_fill( 0, count( $track_id ), '%d' );
+				$placeholders = implode( ', ', $placeholders );
+				$sql          = "SELECT ID,sub as subject, body as template, data, track_id FROM {$table} WHERE track_id IN ($placeholders)";
 
-			$sql = "SELECT ID,sub as subject, body as template, data FROM {$table} WHERE track_id = $track_id LIMIT 0, 1";
+				return $wpdb->get_results( $wpdb->prepare( $sql, $track_id ), ARRAY_A );
+			}
 
-			return $wpdb->get_row( $sql, ARRAY_A );
+			$sql = "SELECT ID,sub as subject, body as template, data FROM {$table} WHERE track_id = %d LIMIT 0, 1";
+
+			return $wpdb->get_row( $wpdb->prepare( $sql, $track_id ), ARRAY_A );
 		}
 	}
 }

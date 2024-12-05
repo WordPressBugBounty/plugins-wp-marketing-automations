@@ -3,6 +3,7 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
+
 #[AllowDynamicProperties]
 class BWFAN_Tasks {
 	public static $exec_tasks = [];

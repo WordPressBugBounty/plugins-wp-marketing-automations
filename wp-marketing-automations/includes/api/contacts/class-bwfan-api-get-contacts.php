@@ -119,7 +119,7 @@ class BWFAN_API_Get_Contacts extends BWFAN_API_Base {
 		$additional_info['offset'] = $this->pagination->offset;
 		$additional_info['limit']  = $this->pagination->limit;
 
-		$contacts = BWFCRM_Core()->campaigns->get_unopen_broadcast_contacts( absint( $broadcast_id ), $additional_info, );
+		$contacts = BWFCRM_Core()->campaigns->get_unopen_broadcast_contacts( absint( $broadcast_id ), $additional_info );
 
 		if ( ! is_array( $contacts ) ) {
 			$this->response_code = 500;

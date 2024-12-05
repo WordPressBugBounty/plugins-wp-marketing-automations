@@ -49,7 +49,7 @@ class BWFAN_Notification_Metrics_Controller {
 
 		if ( class_exists( 'WooCommerce' ) ) {
 			$this->data['metrics'] = array_merge( $this->data['metrics'], $this->get_total_carts() );
-			$this->data['metrics']                = array_merge( $this->data['metrics'], $this->get_conversions() );
+			$this->data['metrics'] = array_merge( $this->data['metrics'], $this->get_conversions() );
 		}
 	}
 
@@ -87,15 +87,15 @@ class BWFAN_Notification_Metrics_Controller {
 		$engagement_sent          = BWFAN_Dashboards::get_total_engagement_sents( $this->date_params['from_date'], $this->date_params['to_date'], '', '' );
 		$previous_engagement_sent = BWFAN_Dashboards::get_total_engagement_sents( $this->date_params['from_date_previous'], $this->date_params['to_date_previous'], '', '' );
 
-		$engagement_open = BWFAN_Dashboards::get_total_email_open( $this->date_params['from_date'], $this->date_params['to_date'], '', '' );
+		$engagement_open          = BWFAN_Dashboards::get_total_email_open( $this->date_params['from_date'], $this->date_params['to_date'], '', '' );
 		$previous_engagement_open = BWFAN_Dashboards::get_total_email_open( $this->date_params['from_date_previous'], $this->date_params['to_date_previous'], '', '' );
 
-		$engagement_click = BWFAN_Dashboards::get_total_email_click( $this->date_params['from_date'], $this->date_params['to_date'], '', '' );
+		$engagement_click          = BWFAN_Dashboards::get_total_email_click( $this->date_params['from_date'], $this->date_params['to_date'], '', '' );
 		$previous_engagement_click = BWFAN_Dashboards::get_total_email_click( $this->date_params['from_date_previous'], $this->date_params['to_date_previous'], '', '' );
 
 		return array(
-			'email_sent' => $this->get_total_email_sent( $engagement_sent, $previous_engagement_sent ),
-			'email_open' => $this->get_total_email_open( $engagement_open, $previous_engagement_open ),
+			'email_sent'  => $this->get_total_email_sent( $engagement_sent, $previous_engagement_sent ),
+			'email_open'  => $this->get_total_email_open( $engagement_open, $previous_engagement_open ),
 			'email_click' => $this->get_total_email_click( $engagement_click, $previous_engagement_click ),
 		);
 	}
@@ -119,7 +119,7 @@ class BWFAN_Notification_Metrics_Controller {
 		}
 
 		return array(
-			'text'                       => __( 'Email Clicked', 'wp-marketing-automations' ),
+			'text'                       => __( 'Emails Clicked', 'wp-marketing-automations' ),
 			'previous_text'              => sprintf( __( '- Previous %s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
 			'count'                      => $email_click,
 			'previous_count'             => $previous_email_click,
@@ -147,7 +147,7 @@ class BWFAN_Notification_Metrics_Controller {
 		}
 
 		return array(
-			'text'                       => __( 'Email Opened', 'wp-marketing-automations' ),
+			'text'                       => __( 'Emails Opened', 'wp-marketing-automations' ),
 			'previous_text'              => sprintf( __( '- Previous %s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
 			'count'                      => $email_open,
 			'previous_count'             => $previous_engagement_open,
@@ -175,7 +175,7 @@ class BWFAN_Notification_Metrics_Controller {
 		}
 
 		return array(
-			'text'                       => __( 'Email Sent', 'wp-marketing-automations' ),
+			'text'                       => __( 'Emails Sent', 'wp-marketing-automations' ),
 			'previous_text'              => sprintf( __( '- Previous %s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
 			'count'                      => $email_sent,
 			'previous_count'             => $previous_email_sent,
@@ -224,7 +224,7 @@ class BWFAN_Notification_Metrics_Controller {
 		$recovered_cart          = BWFAN_Cart_Analytics::get_recovered_cart( $this->date_params['from_date'], $this->date_params['to_date'] );
 		$previous_recovered_cart = BWFAN_Cart_Analytics::get_recovered_cart( $this->date_params['from_date_previous'], $this->date_params['to_date_previous'] );
 
-		$recovered_count = isset( $recovered_cart[0]['count'] ) ? $recovered_cart[0]['count'] : 0;
+		$recovered_count          = isset( $recovered_cart[0]['count'] ) ? $recovered_cart[0]['count'] : 0;
 		$previous_recovered_count = isset( $previous_recovered_cart[0]['count'] ) ? $previous_recovered_cart[0]['count'] : 0;
 
 		// Calculate percentage change
@@ -326,7 +326,7 @@ class BWFAN_Notification_Metrics_Controller {
 		return array(
 			'text'                       => __( 'Total Revenue', 'wp-marketing-automations' ),
 			'previous_text'              => sprintf( __( '- Previous %s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
-			'count_suffix'               => __( 'USD', 'wp-marketing-automations' ),
+			'count_suffix'               => function_exists( 'get_woocommerce_currency' ) ? get_woocommerce_currency() : __( 'USD', 'wp-marketing-automations' ),
 			'count'                      => round( $total_revenue, 2 ),
 			'previous_count'             => $previous_total_revenue,
 			'percentage_change'          => sprintf( '%s%%', round( $percentage_change, 2 ) ),
@@ -342,7 +342,7 @@ class BWFAN_Notification_Metrics_Controller {
 	public function is_valid() {
 		$is_valid = false;
 		foreach ( $this->data['metrics'] as $metric ) {
-			if ( $metric['count'] > 0 || $metric['previous_count'] > 0 ) {
+			if ( floatval( $metric['count'] ) > 0 ) {
 				$is_valid = true;
 				break;
 			}

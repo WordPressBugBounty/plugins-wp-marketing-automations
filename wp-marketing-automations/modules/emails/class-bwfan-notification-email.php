@@ -74,10 +74,10 @@ class BWFAN_Notification_Email {
 	 *
 	 * This method includes the specified template file and allows passing arguments to it.
 	 *
-	 * @param string $template The name of the template file to include.
-	 * @param array $args Optional. An array of arguments to pass to the template file. Default is an empty array.
+	 * @param $template
+	 * @param $args
 	 *
-	 * @return void
+	 * @return false|string
 	 */
 	public static function get_template_html( $template, $args = array() ) {
 		if ( ! empty( $args ) && is_array( $args ) ) {
@@ -155,7 +155,10 @@ class BWFAN_Notification_Email {
 	}
 
 	/**
+	 * bwfan_run_notifications action callback
+	 *
 	 * @return void
+	 * @throws DateMalformedStringException
 	 */
 	public function run_notifications() {
 		if ( false === $this->is_notification_active() ) {
@@ -163,7 +166,13 @@ class BWFAN_Notification_Email {
 		}
 
 		$frequencies = $this->get_frequencies();
+		if ( empty( $frequencies ) ) {
+			return;
+		}
 		$frequencies = $this->filter_frequencies( $frequencies );
+		if ( empty( $frequencies ) ) {
+			return;
+		}
 		$frequencies = self::prepare_frequencies( $frequencies );
 		if ( empty( $frequencies ) ) {
 			return;
@@ -250,17 +259,6 @@ class BWFAN_Notification_Email {
 	public function mail_sent( $frequency ) {
 		$today = new DateTime();
 
-		/** Case: weekly. Not Monday */
-		if ( 'weekly' === $frequency && 1 !== intval( $today->format( 'N' ) ) ) {
-			/** 1 means Monday */
-			return true;
-		}
-		/** Case: monthly. Not 1st */
-		if ( 'monthly' === $frequency && 1 !== intval( $today->format( 'd' ) ) ) {
-			/** 1st date */
-			return true;
-		}
-
 		/** Check if the last execution time for the given frequency is not set */
 		if ( ! isset( $this->executed_last[ $frequency ] ) || empty( $this->executed_last[ $frequency ] ) ) {
 			return false;
@@ -286,7 +284,7 @@ class BWFAN_Notification_Email {
 			case 'weekly':
 				return ! ( intval( $last_sent->format( 'W' ) ) < intval( $today->format( 'W' ) ) );
 			case 'monthly':
-				return ! ( intval( $last_sent->format( 'm' ) ) < intval( $today->format( 'm' ) ) );
+				return ! ( intval( $last_sent->format( 'Ym' ) ) < intval( $today->format( 'Ym' ) ) );
 			default:
 				return false;
 		}
@@ -298,7 +296,8 @@ class BWFAN_Notification_Email {
 	 * @param $frequency
 	 * @param $dates
 	 *
-	 * @return bool|mixed|void
+	 * @return void
+	 * @throws DateMalformedStringException
 	 */
 	public function send_email( $frequency, $dates ) {
 		/** Prepare metrics */
@@ -313,17 +312,27 @@ class BWFAN_Notification_Email {
 		$data             = $metrics_controller->get_data();
 		$email_controller = new BWFAN_Notification_Email_Controller( $frequency, $data, $dates );
 
-		$to      = $this->get_recipients();
+		/** Check if there are no recipients */
+		$to = $this->get_recipients();
+		if ( empty( $to ) ) {
+			return;
+		}
+
 		$subject = $this->get_email_subject( $frequency, $dates );
 		$body    = $email_controller->get_content_html();
 		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
 
-		$sent = wp_mail( $to, $subject, $body, $headers );
+		$sent = false;
+		if ( is_array( $to ) && count( $to ) > 0 ) {
+			foreach ( $to as $recipient ) {
+				$sent = wp_mail( $recipient, $subject, $body, $headers );
+			}
+		}
 
-		// Update the last execution time if the email was sent.
+		/** Update the last execution time if the email was sent */
 		if ( $sent ) {
 			$this->executed_last[ $frequency ] = date( 'c' );
-			update_option( 'bwfan_email_notification_updated', $this->executed_last );
+			update_option( 'bwfan_email_notification_updated', $this->executed_last, false );
 		}
 	}
 
@@ -354,26 +363,37 @@ class BWFAN_Notification_Email {
 			}
 		}
 
+		/** Filter array */
+		$recipients = array_filter( $recipients, function ( $email ) {
+			return ( strpos( $email, 'support@' ) === false );
+		} );
+
+		if ( is_array( $recipients ) ) {
+			$recipients = array_unique( $recipients );
+			sort( $recipients );
+		}
+
 		return $recipients;
 	}
 
 	/**
 	 * Get the email subject.
 	 *
-	 * @param string $frequency The frequency of the email.
-	 * @param array $dates The dates to use in the email subject.
+	 * @param $frequency
+	 * @param $dates
 	 *
-	 * @return string The email subject.
+	 * @return string
+	 * @throws DateMalformedStringException
 	 */
 	public static function get_email_subject( $frequency, $dates ) {
 		$date_string = self::get_date_string( $dates, $frequency );
 		switch ( $frequency ) {
 			case 'daily':
-				return sprintf( __( 'Daily Report for %s', 'wp-marketing-automations' ), $date_string );
+				return sprintf( __( '%s - Daily Report for %s', 'wp-marketing-automations' ), get_bloginfo( 'name' ), $date_string );
 			case 'weekly':
-				return sprintf( __( 'Weekly Report for %s', 'wp-marketing-automations' ), $date_string );
+				return sprintf( __( '%s - Weekly Report for %s', 'wp-marketing-automations' ), get_bloginfo( 'name' ), $date_string );
 			case 'monthly':
-				return sprintf( __( 'Monthly Report for %s', 'wp-marketing-automations' ), $date_string );
+				return sprintf( __( '%s - Monthly Report for %s', 'wp-marketing-automations' ), get_bloginfo( 'name' ), $date_string );
 			default:
 				return '';
 		}
@@ -382,9 +402,11 @@ class BWFAN_Notification_Email {
 	/**
 	 * Get the date string for the email subject.
 	 *
-	 * @param array $dates The dates to use in the date string.
+	 * @param $dates
+	 * @param $frequency
 	 *
-	 * @return string The date string.
+	 * @return string
+	 * @throws DateMalformedStringException
 	 */
 	public static function get_date_string( $dates = array(), $frequency = 'weekly' ) {
 		if ( 'daily' === $frequency && isset( $dates['from_date'] ) ) {
@@ -401,15 +423,15 @@ class BWFAN_Notification_Email {
 	/**
 	 * Formats a date string to the desired format.
 	 *
-	 * @param string $date_string The date string to format.
+	 * @param $date_string
 	 *
-	 * @return string The formatted date string.
+	 * @return string
+	 * @throws DateMalformedStringException
 	 */
 	public static function format_date( $date_string ) {
-		// Convert date string to a DateTime object
+		/** Convert date string to a DateTime object */
 		$date = new DateTime( $date_string );
 
-		// Format the DateTime object as desired
 		return $date->format( 'F j' );
 	}
 
@@ -417,6 +439,9 @@ class BWFAN_Notification_Email {
 	 * Testing email notification.
 	 */
 	public function test_notification_admin() {
+		if ( false === current_user_can( 'administrator' ) ) {
+			return;
+		}
 		if ( ! isset( $_GET['bwfan_email_preview'] ) ) {
 			return;
 		}
@@ -443,7 +468,7 @@ class BWFAN_Notification_Email {
 			'to_date_previous'   => $range['to_date_previous'],
 		);
 
-		// Prepare metrics.
+		/** Prepare metrics */
 		$metrics_controller = new BWFAN_Notification_Metrics_Controller( $dates, $mode );
 		$metrics_controller->prepare_data();
 
@@ -485,7 +510,7 @@ class BWFAN_Notification_Email {
 			'to_date_previous'   => $range['to_date_previous'],
 		);
 
-		// Prepare metrics.
+		/** Prepare metrics */
 		$metrics_controller = new BWFAN_Notification_Metrics_Controller( $dates, $mode );
 		$metrics_controller->prepare_data();
 

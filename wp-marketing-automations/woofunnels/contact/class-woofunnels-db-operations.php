@@ -17,11 +17,6 @@ class WooFunnels_DB_Operations {
 	public static $ins;
 
 	/**
-	 * @var wp_db
-	 */
-	public $wp_db;
-
-	/**
 	 * @var $contact_tbl
 	 */
 	public $contact_tbl;
@@ -38,10 +33,9 @@ class WooFunnels_DB_Operations {
 	 */
 	public function __construct() {
 		global $wpdb;
-		$this->wp_db            = $wpdb;
-		$this->contact_tbl      = $this->wp_db->prefix . 'bwf_contact';
-		$this->contact_meta_tbl = $this->wp_db->prefix . 'bwf_contact_meta';
-		$this->customer_tbl     = $this->wp_db->prefix . 'bwf_wc_customers';
+		$this->contact_tbl      = $wpdb->prefix . 'bwf_contact';
+		$this->contact_meta_tbl = $wpdb->prefix . 'bwf_contact_meta';
+		$this->customer_tbl     = $wpdb->prefix . 'bwf_wc_customers';
 	}
 
 	/**
@@ -67,13 +61,15 @@ class WooFunnels_DB_Operations {
 		if ( isset( $contact['id'] ) ) {
 			unset( $contact['id'] );
 		}
-		$inserted = $this->wp_db->insert( $this->contact_tbl, $contact );
+		global $wpdb;
+
+		$inserted = $wpdb->insert( $this->contact_tbl, $contact );
 		$lastId   = 0;
 		if ( $inserted ) {
-			$lastId = $this->wp_db->insert_id;
+			$lastId = $wpdb->insert_id;
 		}
-		if ( $this->wp_db->last_error !== '' ) {
-			BWF_Logger::get_instance()->log( 'Get last error in insert_contact: ' . print_r( $this->wp_db->last_error, true ), 'woofunnels_indexing' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
+		if ( $wpdb->last_error !== '' ) {
+			BWF_Logger::get_instance()->log( 'Get last error in insert_contact: ' . print_r( $wpdb->last_error, true ), 'woofunnels_indexing' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 		}
 
 		return $lastId;
@@ -88,17 +84,17 @@ class WooFunnels_DB_Operations {
 	 * @SuppressWarnings(PHPMD.DevelopmentCodeFragment)
 	 */
 	public function update_contact( $contact ) {
-
+		global $wpdb;
 		$update_data = array();
 
 		foreach ( is_array( $contact ) ? $contact : array() as $key => $value ) {
 			$update_data[ $key ] = $value;
 		}
 
-		$this->wp_db->update( $this->contact_tbl, $update_data, array( 'id' => $contact['id'] ) );
+		$wpdb->update( $this->contact_tbl, $update_data, array( 'id' => $contact['id'] ) );
 
-		if ( $this->wp_db->last_error !== '' ) {
-			BWF_Logger::get_instance()->log( "Get last error in update_customer for cid: {$contact['id']} " . print_r( $this->wp_db->last_error, true ), 'woofunnels_indexing' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
+		if ( $wpdb->last_error !== '' ) {
+			BWF_Logger::get_instance()->log( "Get last error in update_customer for cid: {$contact['id']} " . print_r( $wpdb->last_error, true ), 'woofunnels_indexing' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 		}
 	}
 
@@ -108,9 +104,10 @@ class WooFunnels_DB_Operations {
 	 * @return array|object|null
 	 */
 	public function get_all_contacts_count() {
+		global $wpdb;
 		$sql = "SELECT COUNT(id) FROM `$this->contact_tbl`";
 
-		return $this->wp_db->get_var( $sql ); //WPCS: unprepared SQL ok
+		return $wpdb->get_var( $sql ); //WPCS: unprepared SQL ok
 	}
 
 	/**
@@ -121,6 +118,7 @@ class WooFunnels_DB_Operations {
 	 * @return array|object|null
 	 */
 	public function get_contacts( $args ) {
+		global $wpdb;
 		$query = array();
 
 		$query['select'] = 'SELECT * ';
@@ -145,18 +143,19 @@ class WooFunnels_DB_Operations {
 
 		$query = implode( ' ', $query );
 
-		return $this->wp_db->get_results( $query ); //WPCS: unprepared SQL ok
+		return $wpdb->get_results( $query ); //WPCS: unprepared SQL ok
 	}
 
 	protected function get_set_cached_response( $sql, $get = 'row' ) {
+		global $wpdb;
 		if ( 'row' === $get ) {
-			$result = $this->wp_db->get_row( $sql );
+			$result = $wpdb->get_row( $sql );
 		} elseif ( 'var' === $get ) {
-			$result = $this->wp_db->get_var( $sql );
+			$result = $wpdb->get_var( $sql );
 		} elseif ( 'col' === $get ) {
-			$result = $this->wp_db->get_col( $sql );
+			$result = $wpdb->get_col( $sql );
 		} else {
-			$result = $this->wp_db->get_results( $sql );
+			$result = $wpdb->get_results( $sql );
 		}
 
 		return $result;
@@ -167,8 +166,9 @@ class WooFunnels_DB_Operations {
 	 * Get contact for given uid id if it exists
 	 */
 	public function get_contact( $uid ) {
+		global $wpdb;
 		$sql = "SELECT * FROM `$this->contact_tbl` WHERE `uid` = %s";
-		$sql = $this->wp_db->prepare( $sql, $uid );
+		$sql = $wpdb->prepare( $sql, $uid );
 
 		return $this->get_set_cached_response( $sql );
 	}
@@ -177,8 +177,9 @@ class WooFunnels_DB_Operations {
 	 * Get contact for given wpid id if it exists
 	 */
 	public function get_contact_by_wpid( $wp_id ) {
+		global $wpdb;
 		$sql = "SELECT * FROM `$this->contact_tbl` WHERE `wpid` = %d";
-		$sql = $this->wp_db->prepare( $sql, $wp_id );
+		$sql = $wpdb->prepare( $sql, $wp_id );
 
 		return $this->get_set_cached_response( $sql );
 	}
@@ -187,8 +188,9 @@ class WooFunnels_DB_Operations {
 	 * Get contact for given email id if it exists
 	 */
 	public function get_contact_by_email( $email ) {
+		global $wpdb;
 		$sql = "SELECT * FROM `$this->contact_tbl` WHERE `email` = %s";
-		$sql = $this->wp_db->prepare( $sql, $email );
+		$sql = $wpdb->prepare( $sql, $email );
 
 		return $this->get_set_cached_response( $sql );
 	}
@@ -201,8 +203,9 @@ class WooFunnels_DB_Operations {
 	 * @return array|object|void|null
 	 */
 	public function get_contact_by_phone( $phone ) {
+		global $wpdb;
 		$sql = "SELECT * FROM `$this->contact_tbl` WHERE `contact_no` = %s";
-		$sql = $this->wp_db->prepare( $sql, $phone );
+		$sql = $wpdb->prepare( $sql, $phone );
 
 		return $this->get_set_cached_response( $sql );
 	}
@@ -211,8 +214,9 @@ class WooFunnels_DB_Operations {
 	 * Get contact for given contact id if it exists
 	 */
 	public function get_contact_by_contact_id( $contact_id ) {
+		global $wpdb;
 		$sql = "SELECT * FROM `$this->contact_tbl` WHERE `id` = %d";
-		$sql = $this->wp_db->prepare( $sql, $contact_id );
+		$sql = $wpdb->prepare( $sql, $contact_id );
 
 		return $this->get_set_cached_response( $sql );
 	}
@@ -225,8 +229,9 @@ class WooFunnels_DB_Operations {
 	 * @return array|object|null
 	 */
 	public function get_contact_metadata( $contact_id ) {
+		global $wpdb;
 		$sql = "SELECT `meta_key`, `meta_value` FROM `$this->contact_meta_tbl` WHERE `contact_id` = %d";
-		$sql = $this->wp_db->prepare( $sql, $contact_id );
+		$sql = $wpdb->prepare( $sql, $contact_id );
 
 		return $this->get_set_cached_response( $sql, 'results' );
 	}
@@ -236,6 +241,7 @@ class WooFunnels_DB_Operations {
 	 * @param $contact_meta
 	 */
 	public function save_contact_meta( $contact_id, $contact_meta ) {
+		global $wpdb;
 
 		foreach ( is_object( $contact_meta ) ? $contact_meta : array() as $meta_key => $meta_value ) {
 
@@ -244,7 +250,7 @@ class WooFunnels_DB_Operations {
 
 			if ( $this->meta_id_exists( $contact_id, $meta_key ) ) {
 				$meta_exists = true;
-				$this->wp_db->update( $this->contact_meta_tbl, array(
+				$wpdb->update( $this->contact_meta_tbl, array(
 					'meta_value' => $meta_value,    //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 				), array(
 					'meta_key'   => $meta_key,  //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
@@ -259,7 +265,7 @@ class WooFunnels_DB_Operations {
 					'meta_key'   => $meta_key, //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 					'meta_value' => $meta_value, //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 				);
-				$this->wp_db->insert( $this->contact_meta_tbl, $contact_meta ); // WPCS: unprepared SQL ok
+				$wpdb->insert( $this->contact_meta_tbl, $contact_meta ); // WPCS: unprepared SQL ok
 			}
 		}
 
@@ -270,8 +276,9 @@ class WooFunnels_DB_Operations {
 	 * @param $meta_key
 	 */
 	public function meta_id_exists( $contact_id, $meta_key ) {
+		global $wpdb;
 		$sql     = "SELECT `meta_id` FROM `$this->contact_meta_tbl` WHERE `contact_id` = '$contact_id' AND `meta_key` = '$meta_key'";
-		$meta_id = $this->wp_db->get_var( $sql ); // WPCS: unprepared SQL ok
+		$meta_id = $wpdb->get_var( $sql ); // WPCS: unprepared SQL ok
 
 		return ( ! empty( $meta_id ) && $meta_id > 0 ) ? true : false;
 	}
@@ -284,6 +291,7 @@ class WooFunnels_DB_Operations {
 	 * @return int
 	 */
 	public function update_contact_meta( $contact_id, $meta_key, $meta_value ) {
+		global $wpdb;
 		$db_meta_value = $this->get_contact_meta_value( $contact_id, $meta_key );
 
 		if ( is_array( $meta_value ) || is_object( $meta_value ) ) {
@@ -305,7 +313,7 @@ class WooFunnels_DB_Operations {
 
 		if ( $this->meta_id_exists( $contact_id, $meta_key ) ) {
 			$meta_exists = true;
-			$this->wp_db->update( $this->contact_meta_tbl, array(
+			$wpdb->update( $this->contact_meta_tbl, array(
 				'meta_value' => $meta_value,    //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 			), array(
 				'meta_key'   => $meta_key, //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
@@ -320,10 +328,10 @@ class WooFunnels_DB_Operations {
 				'meta_key'   => $meta_key,      //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 				'meta_value' => $meta_value,    //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 			);
-			$inserted     = $this->wp_db->insert( $this->contact_meta_tbl, $contact_meta );
+			$inserted     = $wpdb->insert( $this->contact_meta_tbl, $contact_meta );
 			$last_id      = 0;
 			if ( $inserted ) {
-				$last_id = $this->wp_db->insert_id;
+				$last_id = $wpdb->insert_id;
 			}
 
 			return $last_id;
@@ -338,8 +346,9 @@ class WooFunnels_DB_Operations {
 	 * @return string|null
 	 */
 	public function get_contact_meta_value( $contact_id, $meta_key ) {
+		global $wpdb;
 		$sql = "SELECT `meta_value` FROM `$this->contact_meta_tbl` WHERE `contact_id` = %d AND `meta_key` = %s";
-		$sql = $this->wp_db->prepare( $sql, $contact_id, $meta_key );
+		$sql = $wpdb->prepare( $sql, $contact_id, $meta_key );
 
 		return $this->get_set_cached_response( $sql, 'var' );
 	}
@@ -353,7 +362,7 @@ class WooFunnels_DB_Operations {
 	 * @SuppressWarnings(PHPMD.DevelopmentCodeFragment)
 	 */
 	public function insert_customer( $customer ) {
-
+		global $wpdb;
 		$customer_data = array(
 			'cid'                     => $customer['cid'],
 			'l_order_date'            => $customer['l_order_date'],
@@ -367,15 +376,15 @@ class WooFunnels_DB_Operations {
 			'used_coupons'            => $customer['used_coupons'],
 		);
 
-		$inserted = $this->wp_db->insert( $this->customer_tbl, $customer_data ); // WPCS: unprepared SQL ok
+		$inserted = $wpdb->insert( $this->customer_tbl, $customer_data ); // WPCS: unprepared SQL ok
 
 		$lastId = 0;
 		if ( $inserted ) {
-			$lastId = $this->wp_db->insert_id;
+			$lastId = $wpdb->insert_id;
 		}
 
-		if ( $this->wp_db->last_error !== '' ) {
-			BWF_Logger::get_instance()->log( 'Get last error in insert_customer: ' . print_r( $this->wp_db->last_error, true ), 'woofunnels_indexing' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
+		if ( $wpdb->last_error !== '' ) {
+			BWF_Logger::get_instance()->log( 'Get last error in insert_customer: ' . print_r( $wpdb->last_error, true ), 'woofunnels_indexing' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 		}
 
 		return $lastId;
@@ -390,17 +399,17 @@ class WooFunnels_DB_Operations {
 	 * @SuppressWarnings(PHPMD.DevelopmentCodeFragment)
 	 */
 	public function update_customer( $customer ) {
-
+		global $wpdb;
 		$update_data = array();
 
 		foreach ( is_array( $customer ) ? $customer : array() as $key => $value ) {
 			$update_data[ $key ] = $value;
 		}
 
-		$this->wp_db->update( $this->customer_tbl, $update_data, array( 'id' => $customer['id'] ) );
+		$wpdb->update( $this->customer_tbl, $update_data, array( 'id' => $customer['id'] ) );
 
-		if ( $this->wp_db->last_error !== '' ) {
-			BWF_Logger::get_instance()->log( "Get last error in update_customer for cid: {$customer['cid']} " . print_r( $this->wp_db->last_error, true ), 'woofunnels_indexing' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
+		if ( $wpdb->last_error !== '' ) {
+			BWF_Logger::get_instance()->log( "Get last error in update_customer for cid: {$customer['cid']} " . print_r( $wpdb->last_error, true ), 'woofunnels_indexing' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 		}
 	}
 
@@ -412,6 +421,7 @@ class WooFunnels_DB_Operations {
 	 * @return array|object|null
 	 */
 	public function get_customers( $args ) {
+		global $wpdb;
 		$query = array();
 
 		$query['select'] = 'SELECT * ';
@@ -457,7 +467,7 @@ class WooFunnels_DB_Operations {
 
 		$query = implode( ' ', $query );
 
-		$customers = $this->wp_db->get_results( $query ); // WPCS: unprepared SQL ok
+		$customers = $wpdb->get_results( $query ); // WPCS: unprepared SQL ok
 
 		return $customers;
 	}
@@ -466,8 +476,9 @@ class WooFunnels_DB_Operations {
 	 * Get customer for given uid id if it exists
 	 */
 	public function get_customer( $uid ) {
+		global $wpdb;
 		$sql = "SELECT * FROM `$this->customer_tbl` WHERE `uid` = %s";
-		$sql = $this->wp_db->prepare( $sql, $uid );
+		$sql = $wpdb->prepare( $sql, $uid );
 
 		return $this->get_set_cached_response( $sql );
 	}
@@ -476,8 +487,9 @@ class WooFunnels_DB_Operations {
 	 * Get customer for given cid id if it exists
 	 */
 	public function get_customer_by_cid( $cid ) {
+		global $wpdb;
 		$sql = "SELECT * FROM `$this->customer_tbl` WHERE `cid` = %d";
-		$sql = $this->wp_db->prepare( $sql, $cid );
+		$sql = $wpdb->prepare( $sql, $cid );
 
 		return $this->get_set_cached_response( $sql );
 	}
@@ -486,8 +498,9 @@ class WooFunnels_DB_Operations {
 	 * Get customer for given customer id if it exists
 	 */
 	public function get_customer_by_customer_id( $customer_id ) {
+		global $wpdb;
 		$sql = "SELECT * FROM `$this->customer_tbl` WHERE `id` = %d";
-		$sql = $this->wp_db->prepare( $sql, $customer_id );
+		$sql = $wpdb->prepare( $sql, $customer_id );
 
 		return $this->get_set_cached_response( $sql );
 	}
@@ -499,8 +512,9 @@ class WooFunnels_DB_Operations {
 	 * @param $meta_key
 	 */
 	public function delete_contact_meta( $cid, $meta_key ) {
+		global $wpdb;
 		if ( $this->meta_id_exists( $cid, $meta_key ) ) {
-			$this->wp_db->delete( $this->contact_meta_tbl, array(
+			$wpdb->delete( $this->contact_meta_tbl, array(
 				'contact_id' => $cid,
 				'meta_key'   => $meta_key, //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 			) );

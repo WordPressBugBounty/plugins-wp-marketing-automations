@@ -270,7 +270,15 @@ if ( ! class_exists( 'BWF_Admin_General_Settings' ) ) {
 				'is_ga_custom_bump'                 => '',
 				'custom_aud_opt_conf'               => [],
 				'allow_theme_css'                   => array( 'wfacp_checkout' ),
-
+				'bwf_enable_notification'           => true,
+				'bwf_notification_frequency'        => array( 'weekly', 'monthly' ),
+				'bwf_notification_user_selector'    => array(),
+				'bwf_external_user'                 => array(),
+				'bwf_notification_time'             => [
+					'hours'   => '10',
+					'minutes' => '00',
+					'ampm'    => 'am'
+				],
 			) );
 		}
 
@@ -446,13 +454,13 @@ if ( ! class_exists( 'BWF_Admin_General_Settings' ) ) {
 			if ( $options !== 0 ) {
 				update_option( 'bwf_gen_config', $options, true );
 				update_option( 'bwf_needs_rewrite', 'yes', true );
-
 				if ( class_exists( 'BWF_JSON_Cache' ) && method_exists( 'BWF_JSON_Cache', 'run_json_endpoints_cache_handling' ) ) {
 					BWF_JSON_Cache::run_json_endpoints_cache_handling();
 				}
 
 				$resp['status'] = true;
 			}
+			do_action( 'bwf_general_settings_updated', $options );
 
 			return $resp;
 		}

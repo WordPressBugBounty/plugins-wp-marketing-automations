@@ -28,6 +28,8 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 		public static $TYPE_SMS = 5;
 		public static $TYPE_INCENTIVE = 6;
 
+		public static $TYPE_TRANSACTIONAL = 9;
+
 		public static $STATUS_DRAFT = 1;
 		public static $STATUS_SEND = 2;
 		public static $STATUS_ERROR = 3;
@@ -241,15 +243,14 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 			$is_track_enable = self::is_automation_open_click_track( $automation_id );
 			$send_to         = $mode === self::$MODE_SMS ? $phone : $email;
 			$hash_code       = md5( time() . $send_to . $task_id );
-
-			$contact_email = '';
-			$cid           = 0;
+			$contact_email   = '';
+			$cid             = 0;
 			if ( isset( $data['contact_id'] ) && ! empty( $data['contact_id'] ) ) {
 				$contact       = new WooFunnels_Contact( '', '', '', $data['contact_id'] );
 				$contact_email = $contact->get_email();
 				$cid           = $contact->get_id();
 			}
-			$cid         = ( $send_to !== $contact_email ) ? BWFAN_Common::get_cid_from_contact( $email, 0, $phone ) : $cid;
+			$e_cid       = ( $send_to !== $contact_email ) ? BWFAN_Common::get_cid_from_contact( $email, 0, $phone ) : $cid;
 			$create_time = current_time( 'mysql', 1 );
 
 			/** Template Addition */
@@ -262,7 +263,7 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 			$template_id = self::check_already_exists_template( $subject, $body, $mode, $data );
 
 			$insert_data = array(
-				'cid'           => $cid,
+				'cid'           => $e_cid,
 				'hash_code'     => $hash_code,
 				'created_at'    => $create_time,
 				'updated_at'    => $create_time,
@@ -828,6 +829,13 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 			return $this->get_conversation_array( $con );
 		}
 
+		/**
+		 * Get engagement data
+		 *
+		 * @param $con_id
+		 *
+		 * @return array
+		 */
 		public function get_conversation_email( $con_id ) {
 			$con = BWFAN_Model_Engagement_Tracking::get( $con_id );
 			if ( ! is_array( $con ) || empty( $con ) || ! isset( $con['ID'] ) ) {
@@ -903,7 +911,7 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 				$template    = str_replace( [ '{{contact_first_name}}', '{{contact_last_name}}' ], [ $bwf_contact->get_f_name(), $bwf_contact->get_l_name() ], $template );
 			}
 
-			if ( intval( $template_type ) === 5 && class_exists( 'BWFCRM_Block_Editor' ) ) {
+			if ( in_array(   $template_type, [ 5, 7 ] ) && class_exists( 'BWFCRM_Block_Editor' ) ) {
 				$global_val = BWFCRM_Block_Editor::$global_settings_var;
 				if ( ! empty( $global_val ) ) {
 					$global_val_k = array_keys( $global_val );
@@ -922,6 +930,7 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 				'timeline'      => $final_data,
 				'mode'          => $con['mode'],
 				'template_mode' => $template_mode,
+				'email'         => $con['send_to']
 			);
 			if ( ! empty( $notification_data ) ) {
 				$data['notification_data'] = $notification_data;
@@ -1039,8 +1048,8 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 
 					if ( ! is_array( $campaign ) || ! isset( $campaign['data'] ) || empty( $campaign['data'] ) ) {
 						return array(
-							'name' => __( 'NOT EXISTS', 'wp-marketing-automations' ),
-							'type' => __( 'Campaign', 'wp-marketing-automations' ),
+							'name' => __( '-', 'wp-marketing-automations' ),
+							'type' => __( 'Broadcast', 'wp-marketing-automations' ),
 						);
 					}
 
@@ -1091,7 +1100,7 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 					return array(
 						'id'   => $user->ID,
 						'name' => $user->display_name,
-						'type' => __( 'Direct by', 'wp-marketing-automations' ),
+						'type' => __( 'Direct Message', 'wp-marketing-automations' ),
 						'link' => get_edit_user_link( $user->ID ),
 					);
 				case 6:
@@ -1111,6 +1120,10 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 					return array(
 						'name' => __( 'FORM FEED NOT EXISTS', 'wp-marketing-automations' ),
 						'type' => __( 'Form Feed', 'wp-marketing-automations' ),
+					);
+				case 9:
+					return array(
+						'type' => __( 'Transactional Mail', 'wp-marketing-automations' ),
 					);
 				default:
 					return false;

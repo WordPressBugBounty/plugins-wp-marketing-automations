@@ -2,9 +2,9 @@
 Contributors: xlplugins, amans2k
 Tags: cart abandonment, follow up emails, email marketing, email customizer, crm, woocommerce, newsletter, marketing automation
 Requires at least: 5.0
-Tested up to: 6.7.0
+Tested up to: 6.7.1
 Requires PHP: 7.0
-Stable tag: 3.3.3
+Stable tag: 3.4.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -415,6 +415,37 @@ FunnelKit Automations is 100% self-hosted and fully GDPR compliant.
 
 
 == Change log ==
+
+= 3.4.0 (Dec 05, 2024) =
+* Compatible upto WordPress 6.7.1
+* Compatible upto WooCommerce 9.4.3
+* Added: Pro: WooCommerce Transactional Emails simplified.
+	Design WooCommerce transactional email with the power of FunnelKit Automation's new block builder.
+	Track transactional email opens and clicks.
+	Allow resending emails with one click.
+* Added: Pro: Stripe Recovery Offer, a new feature launched.
+	Pitch Funnel Builder Offer after the buyer rejects the Bump or Upsell product during checkout.
+	Send the Recovery link to any medium and allow multiple follow-ups.
+* Improved: Dashboard admin UI CSS improvements. (#3529)
+* Improved: 'Check missing tables' tool improvement. 3537
+* Improved: Automation Events: Order-related automation events and order objects are always dynamically created. (#3546)
+* Improved: Cart capturing code improved. Sometimes duplicated carts were captured, and automation ran on both, fixed. (#3539, #3551)
+* Improved: Emails: Pre-header related improvements done. (#3553)
+* Improved: The 'ConvertKit' connector was renamed to 'Kit'. (#3557)
+* Improved: Automation Delay step: Delay for a specific period with time and specific week delays, minor code optimization. (#3569)
+* Improved: Manage subscribe page cache issue with Elementor block, fixed. (#3566)
+* Improved: UI: Delete contact modal textual changes. (#3589)
+* Improved: Cart tracking in case of logged-in users where multiple items are added to the cart. Code optimized. (#3531)
+* Improved: Captured cart, cool off period checking code optimized. (#3596)
+* Fixed: Date display error if the WordPress date format setting is empty. Handling done. (#3533)
+* Fixed: Weekly or Monthly performance email. Currency was wrong, fixed. And some minor improvements. (#3541, #3578)
+* Fixed: Pro: Broadcast: Review step. Filters with multiple values were showing just one, fixed. (#3555)
+* Fixed: Analytics, line chart date display issue, Timezone conversion issue is fixed. (#3562)
+* Fixed: During carts restoration, added handling in case any external code produced a PHP error. (#3567)
+* Fixed: Automation Action: Change status to soft bounced wasn't working, fixed. (#3571)
+* Fixed: Pro: New Email Builder: Image block issue during switching modes. Fixed. (#3573)
+* Fixed: Contact listing: Date of birth column value is in UTC 0 timezone rather than store time, fixed. (#3576)
+* Fixed: Compatibility updated with the 'WooCommerce Product Bundles' plugin. Error handling is done. (#3603)
 
 = 3.3.3 (Oct 28, 2024) =
 * Fixed: Contact: Added handling to show the Funnels tab when Funnel Builder is active and WooCommerce is inactive. (#3513)

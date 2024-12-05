@@ -403,7 +403,7 @@ if ( ! class_exists( 'BWFAN_Model_Terms' ) && BWFAN_Common::is_pro_3_0() ) {
 		 * @return int|mixed
 		 */
 		public static function get_first_term_by_type( $type = 1 ) {
-			$query = "SELECT ID FROM `{table_name}` WHERE `type` = '" . $type . "' ORDER BY `ID` ASC LIMIT 1";
+			$query     = "SELECT ID FROM `{table_name}` WHERE `type` = '" . $type . "' ORDER BY `ID` ASC LIMIT 1";
 			$term_data = self::get_results( $query );
 
 			return is_array( $term_data ) && isset( $term_data[0] ) && ! empty( $term_data ) && isset( $term_data[0]['ID'] ) ? $term_data[0]['ID'] : 0;

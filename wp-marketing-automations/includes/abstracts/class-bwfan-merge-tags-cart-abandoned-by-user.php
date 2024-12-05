@@ -1,4 +1,5 @@
 <?php
+
 #[AllowDynamicProperties]
 abstract class Cart_Merge_Tag extends BWFAN_Merge_Tag {
 
@@ -6,15 +7,14 @@ abstract class Cart_Merge_Tag extends BWFAN_Merge_Tag {
 	public $cart_details = null;
 
 	public function get_cart_value( $key, $cart_details ) {
-
 		if ( empty( $cart_details ) ) {
 			return '';
 		}
 
 		$this->cart_details = $cart_details;
 		$field_value        = '';
-		$checkout_data      = $cart_details['checkout_data'];
 
+		$checkout_data = $cart_details['checkout_data'];
 		if ( ! empty( $checkout_data ) ) {
 			$checkout_data       = json_decode( $checkout_data, true );
 			$this->checkout_data = $checkout_data;
@@ -35,5 +35,4 @@ abstract class Cart_Merge_Tag extends BWFAN_Merge_Tag {
 	public function post_value_check( $field_value ) {
 		return $field_value;
 	}
-
 }

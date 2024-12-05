@@ -99,8 +99,8 @@ class BWFAN_API_Get_Recoverable_Carts extends BWFAN_API_Base {
 		if ( empty( $checkout_data ) || ! is_array( $checkout_data ) || empty( $item->token ) ) {
 			return '';
 		}
-		$lang          = isset( $checkout_data['lang'] ) ? $checkout_data['lang'] : '';
-		$cart_url      = BWFAN_Common::wc_get_cart_recovery_url( $item->token, '', $lang, $checkout_data );
+		$lang     = isset( $checkout_data['lang'] ) ? $checkout_data['lang'] : '';
+		$cart_url = BWFAN_Common::wc_get_cart_recovery_url( $item->token, '', $lang, $checkout_data );
 
 		return $cart_url;
 	}

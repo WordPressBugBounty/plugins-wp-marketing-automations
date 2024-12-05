@@ -249,7 +249,7 @@ final class BWFAN_WC_Order_Status_Change extends BWFAN_Event {
 		$data_to_send['global']['from']     = isset( $event_data['from'] ) ? $event_data['from'] : '';
 		$data_to_send['global']['to']       = isset( $event_data['to'] ) ? $event_data['to'] : '';
 
-		$this->order                     = $this->order instanceof WC_Order ? $this->order : wc_get_order( $this->order_id );
+		$this->order                     = wc_get_order( $this->order_id );
 		$data_to_send['global']['email'] = BWFAN_Common::get_email_from_order( $this->order_id, $this->order );
 		$data_to_send['global']['phone'] = BWFAN_Common::get_phone_from_order( $this->order_id, $this->order );
 		$user_id                         = BWFAN_Common::get_wp_user_id_from_order( $this->order_id, $this->order );

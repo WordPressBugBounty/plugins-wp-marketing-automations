@@ -51,6 +51,10 @@ if ( ! class_exists( 'BWFAN_Contact_Status' ) && BWFAN_Common::is_pro_3_0() ) {
 						return __( 'Unverified', 'wp-marketing-automations' );
 					case BWFCRM_Contact::$DISPLAY_STATUS_BOUNCED:
 						return __( 'Bounced', 'wp-marketing-automations' );
+					case BWFCRM_Contact::$DISPLAY_STATUS_COMPLAINT:
+						return __( 'Complaint', 'wp-marketing-automations' );
+					case BWFCRM_Contact::$DISPLAY_STATUS_SOFT_BOUNCED:
+						return __( 'Soft Bounced', 'wp-marketing-automations' );
 				}
 			}
 

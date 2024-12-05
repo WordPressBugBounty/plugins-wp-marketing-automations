@@ -46,7 +46,7 @@ class BWFAN_Dashboards {
 		}
 
 		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
-			$where = " AND " . $date_col . " >= '" . $start_date . "' AND `" . $date_col . "` <= '" . $end_date . "' ";
+			$where = " AND " . $date_col . " >= '" . $start_date . " 00:00:00' AND `" . $date_col . "` <= '" . $end_date . " 23:59:59' ";
 		}
 
 		$where .= " AND  email != '' AND email IS NOT NULL ";
@@ -257,7 +257,7 @@ class BWFAN_Dashboards {
 		}
 
 		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
-			$where = " AND " . $date_col . " >= '" . $start_date . "' AND `" . $date_col . "` <= '" . $end_date . "' ";
+			$where = " AND " . $date_col . " >= '" . $start_date . " 00:00:00' AND `" . $date_col . "` <= '" . $end_date . " 23:59:59' ";
 		}
 		$arr = [];
 
@@ -301,7 +301,7 @@ class BWFAN_Dashboards {
 		}
 
 		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
-			$where = " AND " . $date_col . " >= '" . $start_date . "' AND `" . $date_col . "` <= '" . $end_date . "' ";
+			$where = " AND " . $date_col . " >= '" . $start_date . " 00:00:00' AND `" . $date_col . "` <= '" . $end_date . " 23:59:59' ";
 		}
 
 		$base_query = "SELECT  sum( open ) as email_open" . $interval_query . "  FROM `" . $table . "` WHERE 1 = 1 " . $where . " and c_status = 2 " . $group_by . " ORDER BY " . $order_by . " ASC";
@@ -335,7 +335,7 @@ class BWFAN_Dashboards {
 		}
 
 		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
-			$where = " AND " . $date_col . " >= '" . $start_date . "' AND `" . $date_col . "` <= '" . $end_date . "' ";
+			$where = " AND " . $date_col . " >= '" . $start_date . " 00:00:00' AND `" . $date_col . "` <= '" . $end_date . " 23:59:59' ";
 		}
 
 		$base_query = "SELECT  sum( click ) as email_click" . $interval_query . "  FROM `" . $table . "` WHERE 1 = 1 " . $where . " and c_status = 2 " . $group_by . " ORDER BY " . $order_by . " ASC";
@@ -369,7 +369,7 @@ class BWFAN_Dashboards {
 		}
 
 		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
-			$where = " AND " . $date_col . " >= '" . $start_date . "' AND " . $date_col . " <= '" . $end_date . "' ";
+			$where = " AND " . $date_col . " >= '" . $start_date . " 00:00:00' AND " . $date_col . " <= '" . $end_date . " 23:59:59' ";
 		}
 
 		$base_query = "SELECT  count( c.id ) as total_orders, sum( c.wctotal ) as total_revenue " . $interval_query . "  FROM  $table as c WHERE 1 = 1 " . $where . " and c.wcid != 0 " . $group_by . " ORDER BY " . $order_by . " ASC";

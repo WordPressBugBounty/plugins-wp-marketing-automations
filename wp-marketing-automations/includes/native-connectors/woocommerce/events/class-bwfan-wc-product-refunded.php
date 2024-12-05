@@ -76,7 +76,7 @@ final class BWFAN_WC_Product_Refunded extends BWFAN_Event {
 		$data_to_send['global']['order_id']  = $this->order_id;
 		$data_to_send['global']['refund_id'] = $this->refund_id;
 
-		$this->order = $this->order instanceof WC_Order ? $this->order : wc_get_order( $this->order_id );
+		$this->order = wc_get_order( $this->order_id );
 
 		$data_to_send['global']['email'] = BWFAN_Common::get_email_from_order( $this->order_id, $this->order );
 		$data_to_send['global']['phone'] = BWFAN_Common::get_phone_from_order( $this->order_id, $this->order );

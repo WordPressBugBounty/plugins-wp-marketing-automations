@@ -49,16 +49,16 @@ class BWFAN_Api_Get_Products extends BWFAN_API_Base {
 		}
 
 		/** if isset search param then get the tag by name **/
-		$search       = $this->get_sanitized_arg( 'search', 'text_field' );
-		$type         = $this->get_sanitized_arg( 'type', 'text_field' );
-		$limit        = $this->get_sanitized_arg( 'limit', 'text_field' );
-		$page         = $this->get_sanitized_arg( 'page', 'text_field' );
-		$stock_status = $this->get_sanitized_arg( 'stock_status', 'text_field' );
-		$category_in  = $this->args['category_in'] ?? [];
-		$category_not_in  = $this->args['category_not_in'] ?? [];
-		$ids          = $this->args['ids'] ?? [];
-		$sortby       = $this->get_sanitized_arg( 'sortby', 'text_field' );
-		$exclude_ids  = $this->args['exclude_ids'] ?? [];
+		$search          = $this->get_sanitized_arg( 'search', 'text_field' );
+		$type            = $this->get_sanitized_arg( 'type', 'text_field' );
+		$limit           = $this->get_sanitized_arg( 'limit', 'text_field' );
+		$page            = $this->get_sanitized_arg( 'page', 'text_field' );
+		$stock_status    = $this->get_sanitized_arg( 'stock_status', 'text_field' );
+		$category_in     = $this->args['category_in'] ?? [];
+		$category_not_in = $this->args['category_not_in'] ?? [];
+		$ids             = $this->args['ids'] ?? [];
+		$sortby          = $this->get_sanitized_arg( 'sortby', 'text_field' );
+		$exclude_ids     = $this->args['exclude_ids'] ?? [];
 
 		if ( ! empty( $search ) ) {
 			$this->serach_title = $search;
@@ -98,9 +98,9 @@ class BWFAN_Api_Get_Products extends BWFAN_API_Base {
 			$this->p_ids = explode( ',', $ids );
 		}
 
-		$result              = $this->get_data( $type, $limit, $page );
-		$products            = $result['products'];
-		$this->total_count   = $result['total'];
+		$result            = $this->get_data( $type, $limit, $page );
+		$products          = $result['products'];
+		$this->total_count = $result['total'];
 
 		$this->response_code = 200;
 

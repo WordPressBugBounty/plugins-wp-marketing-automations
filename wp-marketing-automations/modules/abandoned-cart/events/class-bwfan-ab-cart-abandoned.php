@@ -86,9 +86,7 @@ final class BWFAN_AB_Cart_Abandoned extends BWFAN_Event {
 
 		$days_to_check = isset( $global_settings['bwfan_disable_abandonment_days'] ) && intval( $global_settings['bwfan_disable_abandonment_days'] ) > 0 ? intval( $global_settings['bwfan_disable_abandonment_days'] ) : 0;
 		if ( ! empty( $days_to_check ) ) {
-			$after_date      = date( 'Y-m-d H:i:s', strtotime( " -$days_to_check day" ) );
-			$failed_statuses = [ 'wc-pending', 'wc-failed', 'wc-cancelled', 'wc-refunded', 'wc-auto-draft' ];
-			$failed_statuses = implode( "','", array_map( 'esc_sql', $failed_statuses ) );
+			$after_date = date( 'Y-m-d H:i:s', strtotime( " -$days_to_check day" ) );
 		}
 
 		foreach ( $active_abandoned_carts as $active_abandoned_cart ) {
@@ -98,31 +96,17 @@ final class BWFAN_AB_Cart_Abandoned extends BWFAN_Event {
 				$this->process( $active_abandoned_cart );
 				continue;
 			}
-
 			/** Cool Off period checking */
-			$email = $active_abandoned_cart['email'];
-			if ( BWF_WC_Compatibility::is_hpos_enabled() ) {
-				$order_query = "SELECT posts.id
-            FROM {$wpdb->prefix}wc_orders AS posts
-            LEFT JOIN {$wpdb->prefix}wc_orders_meta AS meta on posts.id = meta.order_id
-            WHERE posts.billing_email = '" . $email . "'
-            AND   posts.type = 'shop_order'
-            AND   posts.status NOT IN ( '" . $failed_statuses . "' )
-            AND date(posts.date_created_gmt) >='" . $after_date . "'
-            ORDER BY posts.id DESC LIMIT 0,1";
-				$last_order  = $wpdb->get_var( $order_query );
-			} else {
-				$order_query = "SELECT posts.ID
-            FROM $wpdb->posts AS posts
-            LEFT JOIN {$wpdb->postmeta} AS meta on posts.ID = meta.post_id
-            WHERE meta.meta_key = '_billing_email'
-            AND   meta.meta_value = '" . $email . "'
-            AND   posts.post_type = 'shop_order'
-            AND   posts.post_status NOT IN ( '" . $failed_statuses . "' )
-            AND date(posts.post_date) >='" . $after_date . "'
-            ORDER BY posts.ID DESC LIMIT 0,1";
-				$last_order  = $wpdb->get_var( $order_query );
-			}
+			$query      = "SELECT customers.l_order_date FROM {$wpdb->prefix}bwf_wc_customers AS customers
+					WHERE EXISTS (
+						SELECT 1
+						FROM {$wpdb->prefix}bwf_contact AS contact
+						WHERE contact.email = %s
+						AND contact.id = customers.cid
+					)
+					AND customers.l_order_date >= %s
+					LIMIT 1";
+			$last_order = $wpdb->get_var( $wpdb->prepare( $query, $active_abandoned_cart['email'], $after_date ) );
 
 			if ( ! empty( $last_order ) ) {
 				/** Order found. No need to process the cart */
@@ -629,6 +613,24 @@ final class BWFAN_AB_Cart_Abandoned extends BWFAN_Event {
 		);
 
 		return array_merge( $automation_data, $data );
+	}
+
+	/**
+	 * @return bool|void
+	 */
+	public static function maybe_clean() {
+		$duplicate_entries = BWFAN_Model_Abandonedcarts::get_duplicate_entry();
+		if ( empty( $duplicate_entries ) ) {
+			return;
+		}
+
+		global $wpdb;
+		$string_placeholder = array_fill( 0, count( $duplicate_entries ), '%d' );
+		$placeholder        = implode( ', ', $string_placeholder );
+
+		$query = $wpdb->prepare( "DELETE FROM `{$wpdb->prefix}bwfan_abandonedcarts` WHERE `ID` IN ({$placeholder})", $duplicate_entries );
+
+		return ( $wpdb->query( $query ) > 0 );
 	}
 }
 
