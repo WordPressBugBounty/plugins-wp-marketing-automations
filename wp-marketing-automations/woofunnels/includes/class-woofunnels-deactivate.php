@@ -193,56 +193,6 @@ class WooFunnels_Deactivate {
 
 	}
 
-	public static function get_recent_fatal_error_logs( $limit = 2 ) {
-		try {
-			// Get the WordPress uploads directory information
-			$upload_dir          = wp_upload_dir();
-			$log_directory       = trailingslashit( $upload_dir['basedir'] ) . 'wc-logs/';
-			$log_url_base        = trailingslashit( $upload_dir['baseurl'] ) . 'wc-logs/';
-			$fatal_error_pattern = '/^fatal-errors-.*\.log$/';
-			$log_files           = [];
-
-			// Check if the directory exists
-			if ( ! is_dir( $log_directory ) ) {
-				return [];
-			}
-
-			// Scan the directory for files
-			$files = scandir( $log_directory );
-			if ( $files === false ) {
-				throw new Exception( "Failed to scan directory: $log_directory" );
-			}
-
-			foreach ( $files as $file ) {
-				if ( preg_match( $fatal_error_pattern, $file ) ) {
-					$full_path = $log_directory . $file;
-					$mtime     = filemtime( $full_path );
-					if ( $mtime === false ) {
-						throw new Exception( "Failed to get modification time for file: $full_path" );
-					}
-					$log_files[ $file ] = $mtime;
-				}
-			}
-
-			// Sort files by modification time, newest first
-			arsort( $log_files );
-
-			// Get the full URLs of the most recent log files
-			$recent_log_urls = [];
-			$count           = 0;
-			foreach ( $log_files as $file => $mtime ) {
-				if ( $count >= $limit ) {
-					break;
-				}
-				$recent_log_urls[] = $log_url_base . $file;
-				$count ++;
-			}
-
-			return $recent_log_urls;
-		} catch ( Exception|Error $e ) {
-			// Log the exception or error
-			return [];
-		}
-	}
+	
 
 }

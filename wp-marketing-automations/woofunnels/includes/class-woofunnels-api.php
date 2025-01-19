@@ -170,8 +170,7 @@ if ( ! class_exists( 'WooFunnels_API' ) ) :
 		public static function post_deactivation_data( $deactivations ) {
 			$get_deactivation_data = array(
 				'site'          => home_url(),
-				'deactivations' => $deactivations,
-				'error_files'   => WooFunnels_Deactivate::get_recent_fatal_error_logs( 2 ),
+				'deactivations' => $deactivations
 
 			);
 
