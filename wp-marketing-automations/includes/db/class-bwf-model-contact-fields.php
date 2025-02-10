@@ -44,6 +44,10 @@ if ( ! class_exists( 'BWF_Model_Contact_Fields' ) && BWFAN_Common::is_pro_3_0() 
 			'8' => [
 				'name' => 'Datetime',
 				'type' => 'DATETIME'
+			],
+			'9' => [
+				'name' => 'Time',
+				'type' => 'TIME'
 			]
 		];
 

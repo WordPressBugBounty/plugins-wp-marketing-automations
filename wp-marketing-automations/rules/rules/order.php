@@ -2076,6 +2076,161 @@ class BWFAN_Rule_Order_Shipping_Method extends BWFAN_Rule_Base {
 
 }
 
+/** Order Shipping Method Zone Class  */
+class BWFAN_Rule_Order_Shipping_Method_Zone extends BWFAN_Rule_Base {
+	public function __construct() {
+		$this->v1 = false;
+		$this->v2 = true;
+		parent::__construct( 'order_shipping_method_zone' );
+	}
+
+	/** v2 Methods: START */
+
+	public function get_options( $term = '' ) {
+		return $this->get_possible_rule_values( $term );
+	}
+
+	public function get_rule_type() {
+		return 'Search';
+	}
+
+	public function is_match_v2( $automation_data, $rule_data ) {
+		if ( ! isset( $automation_data['global'] ) || ! is_array( $automation_data['global'] ) ) {
+			return $this->return_is_match( false, $rule_data );
+		}
+
+		if ( ! isset( $automation_data['global']['order_id'] ) ) {
+			return $this->return_is_match( false, $rule_data );
+		}
+
+		$order = BWFAN_Rules::get_order_object( $automation_data );
+		if ( ! $order instanceof WC_Order ) {
+			return $this->return_is_match( false, $rule_data );
+		}
+
+		$type = $rule_data['rule'];
+		$data = $rule_data['data'];
+		if ( ! is_array( $data ) && empty( $data ) ) {
+			return $this->return_is_match( false, $rule_data );
+		}
+
+		$saved_methods = array_map( function ( $term ) {
+			return $term['key'];
+		}, $data );
+
+		$methods = array();
+		foreach ( $order->get_shipping_methods() as $method ) {
+			// extract method slug only, discard instance id
+			$split = strpos( $method['instance_id'], ':' );
+			if ( $split ) {
+				$methods[] = substr( $method['instance_id'], 0, $split );
+			} else {
+				$methods[] = $method['instance_id'];
+			}
+		}
+		$result = false;
+		switch ( $type ) {
+			case 'any':
+				if ( is_array( $saved_methods ) && is_array( $methods ) ) {
+					$result = count( array_intersect( $saved_methods, $methods ) ) >= 1;
+				}
+				break;
+			case 'none':
+				if ( is_array( $saved_methods ) && is_array( $methods ) ) {
+					$result = count( array_intersect( $saved_methods, $methods ) ) === 0;
+				}
+				break;
+			default:
+				break;
+		}
+
+		return $this->return_is_match( $result, $rule_data );
+	}
+
+	/** v2 Methods: END */
+
+	public function get_possible_rule_values( $term = '' ) {
+		$result = array();
+		$zones  = WC_Shipping_Zones::get_zones();
+
+		if ( empty( $zones ) || ! is_array( $zones ) ) {
+			return $result;
+		}
+
+		foreach ( $zones as $zone ) {
+			$zone_obj     = new WC_Shipping_Zone( $zone['id'] );
+			$zone_name    = ! empty( $zone_obj->get_zone_name() ) ? $zone_obj->get_zone_name() : '';
+			$zone_methods = $zone_obj->get_shipping_methods();
+
+			if ( empty( $zone_methods ) || ! is_array( $zone_methods ) ) {
+				continue;
+			}
+
+			foreach ( $zone_methods as $method_id => $method ) {
+				/** Check if the shipping method is enabled */
+				if ( ! $method->is_enabled() ) {
+					continue;
+				}
+
+				$method_title = $method->get_title();
+
+				if ( ! empty( $term ) && stripos( $method_title, $term ) === false ) {
+					continue;
+				}
+				$result[ $method_id ] = sprintf( '%s ( %s )', $method_title, $zone_name );
+			}
+		}
+
+		return $result;
+	}
+
+	public function get_condition_input_type() {
+		return 'Chosen_Select';
+	}
+
+	public function is_match( $rule_data ) {
+		$type    = $rule_data['operator'];
+		$order   = BWFAN_Core()->rules->getRulesData( 'wc_order' );
+		$methods = array();
+
+		foreach ( $order->get_shipping_methods() as $method ) {
+			// extract method slug only, discard instance id
+			$split = strpos( $method['method_id'], ':' );
+			if ( $split ) {
+				$methods[] = substr( $method['method_id'], 0, $split );
+			} else {
+				$methods[] = $method['method_id'];
+			}
+		}
+
+		$result = false;
+		switch ( $type ) {
+			case 'any':
+				if ( is_array( $rule_data['condition'] ) && is_array( $methods ) ) {
+					$result = count( array_intersect( $rule_data['condition'], $methods ) ) >= 1;
+				}
+				break;
+			case 'none':
+				if ( is_array( $rule_data['condition'] ) && is_array( $methods ) ) {
+					$result = count( array_intersect( $rule_data['condition'], $methods ) ) === 0;
+				}
+				break;
+			default:
+				break;
+		}
+
+		return $this->return_is_match( $result, $rule_data );
+	}
+
+
+	public function get_possible_rule_operators() {
+		return array(
+			'any'  => __( 'matches any of', 'wp-marketing-automations' ),
+			'none' => __( 'matches none of', 'wp-marketing-automations' ),
+		);
+	}
+}
+
 class BWFAN_Rule_Order_Billing_Country extends BWFAN_Rule_Country {
 
 	public function __construct() {

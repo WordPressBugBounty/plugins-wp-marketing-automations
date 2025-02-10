@@ -280,7 +280,7 @@ final class WooFunnels_AS_DS {
 		if ( ( defined( 'BWF_CHECK_CRON_SCHEDULE' ) && true === BWF_CHECK_CRON_SCHEDULE ) || true === apply_filters( 'bwf_check_cron_schedule_logging', false ) ) {
 			add_filter( 'bwf_logs_allowed', '__return_true', PHP_INT_MAX );
 			$logger_obj = BWF_Logger::get_instance();
-			$logger_obj->log( $resp['time'], 'cron-check', 'autonami' );
+			$logger_obj->log( $resp['time'], 'fka-cron-check', 'autonami' );
 		}
 		wp_send_json( $resp );
 	}
@@ -652,4 +652,28 @@ function bwf_scheduled_action_count( $hook, $args = array(), $group = '', $statu
 	}
 
 	return count( $action_ids );
+}
+
+/**
+ * Delete recurring action
+ *
+ * @param $hook
+ * @param $status
+ * @param $exclude_id
+ *
+ * @return void
+ */
+function bwf_delete_scheduled_recurring_action( $hook, $status, $exclude_id = '' ) {
+	if ( empty( $hook ) ) {
+		return;
+	}
+	global $wpdb;
+	$query = "DELETE FROM {$wpdb->prefix}bwf_actions WHERE `hook`=%s AND `status` = %d";
+	$args  = [ $hook, $status ];
+	if ( ! empty( $exclude_id ) ) {
+		$query  .= " AND `id` != %d";
+		$args[] = $exclude_id;
+	}
+	$query = $wpdb->prepare( $query, $args );
+	$wpdb->query( $query );
 }

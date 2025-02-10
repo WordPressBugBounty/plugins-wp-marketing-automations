@@ -30,13 +30,6 @@ class BWFAN_Notification_Email {
 		/** global settings */
 		$this->global_settings = BWFAN_Common::get_global_settings();
 
-		/** Fetch the saved notifications data */
-		$this->executed_last = get_option( 'bwfan_email_notification_updated', array(
-			'daily'   => '',
-			'weekly'  => '',
-			'monthly' => '',
-		) );
-
 		$this->init();
 	}
 
@@ -169,6 +162,14 @@ class BWFAN_Notification_Email {
 		if ( empty( $frequencies ) ) {
 			return;
 		}
+
+		/** Fetch the saved notifications data */
+		$this->executed_last = get_option( 'bwfan_email_notification_updated', array(
+			'daily'   => '',
+			'weekly'  => '',
+			'monthly' => '',
+		) );
+
 		$frequencies = $this->filter_frequencies( $frequencies );
 		if ( empty( $frequencies ) ) {
 			return;
@@ -282,7 +283,7 @@ class BWFAN_Notification_Email {
 			case 'daily':
 				return ! ( intval( $last_sent->format( 'Ymd' ) ) < intval( $today->format( 'Ymd' ) ) );
 			case 'weekly':
-				return ! ( intval( $last_sent->format( 'W' ) ) < intval( $today->format( 'W' ) ) );
+				return ! ( intval( $last_sent->format( 'YW' ) ) < intval( $today->format( 'YW' ) ) );
 			case 'monthly':
 				return ! ( intval( $last_sent->format( 'Ym' ) ) < intval( $today->format( 'Ym' ) ) );
 			default:

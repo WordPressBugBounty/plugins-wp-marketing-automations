@@ -186,6 +186,9 @@ class BWFAN_DB {
 		);
 		update_option( 'bwfan_email_notification_updated', $executed_last, false );
 
+		/** Check for old drag & drop email builder */
+		$this->check_for_old_visual_builder();
+
 		/** Log if any mysql errors */
 		if ( ! empty( $db_errors ) ) {
 			BWFAN_Common::log_test_data( array_merge( [ __FUNCTION__ ], $db_errors ), 'db-creation-errors' );
@@ -279,6 +282,7 @@ class BWFAN_DB {
 			'3.0.5'    => '3_0_5',
 			'3.2.1'    => '3_2_1',
 			'3.2.2'    => '3_2_2',
+			'3.4.1'    => '3_4_1',
 		);
 		$db_version = get_option( 'bwfan_db', '2.0' );
 
@@ -1416,6 +1420,28 @@ class BWFAN_DB {
 		] );
 
 		return ! empty( $page ) ? strval( $page[0]->ID ) : 0;
+	}
+
+	public function db_update_3_4_1( $version_key ) {
+		if ( is_array( $this->method_run ) && in_array( '1.0.0', $this->method_run, true ) ) {
+			update_option( 'bwfan_db', $version_key, true );
+			$this->method_run[] = $version_key;
+
+			return;
+		}
+
+		/** Check for old drag & drop email builder */
+		$this->check_for_old_visual_builder();
+
+		/** Updating version key */
+		update_option( 'bwfan_db', $version_key, true );
+	}
+
+	public function check_for_old_visual_builder() {
+		global $wpdb;
+		$query   = "SELECT ID FROM {$wpdb->prefix}bwfan_templates WHERE `mode`=4 ORDER BY ID DESC LIMIT 1 ";
+		$is_used = ! empty( $wpdb->get_var( $query ) ) ? 1 : 0;
+		bwf_options_update( 'fk_legacy_builder', $is_used );
 	}
 }
 

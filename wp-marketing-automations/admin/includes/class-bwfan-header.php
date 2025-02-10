@@ -147,6 +147,8 @@ final class BWFAN_Header {
 	}
 
 	public static function left_navigation() {
+		$menu_data = BWFAN_Common::get_user_menu_access();
+
 		$left_nav_data = array(
 			'dashboard'      => array(
 				'name' => __( 'Dashboard', 'wp-marketing-automations' ),
@@ -170,7 +172,7 @@ final class BWFAN_Header {
 			),
 			'templates'      => array(
 				'name' => __( 'Emails', 'wp-marketing-automations' ),
-				'link' => admin_url( 'admin.php?page=autonami&path=/templates' ),
+				'link' => admin_url( 'admin.php?page=autonami&path=/' . ( bwfan_is_woocommerce_active() ? 'transactional-emails' : 'templates' ) ),
 			),
 			'analytics'      => array(
 				'name' => __( 'Analytics', 'wp-marketing-automations' ),
@@ -179,12 +181,22 @@ final class BWFAN_Header {
 			'tools'          => array(
 				'name'         => __( 'Tools', 'wp-marketing-automations' ),
 				'isExpandable' => true,
-				'items'        => self::get_tools_menu(),
+				'items'        => self::get_tools_menu( $menu_data ),
 			),
 		);
 
 		if ( ! bwfan_is_woocommerce_active() ) {
 			unset( $left_nav_data['carts'] );
+		}
+
+		/** Remove the keys which are not present in menudata */
+		if ( ! empty( $menu_data ) && is_array( $menu_data ) ) {
+			$left_nav_data = array_filter( $left_nav_data, function ( $key ) use ( $menu_data ) {
+				return $key === 'tools' || in_array( $key, $menu_data );
+			}, ARRAY_FILTER_USE_KEY );
+			if( isset( $left_nav_data['tools'] ) && empty( $left_nav_data['tools']['items'] ) ){
+				unset( $left_nav_data['tools'] );
+			}
 		}
 
 		return $left_nav_data;
@@ -193,9 +205,11 @@ final class BWFAN_Header {
 	/**
 	 * Returns tools menu
 	 *
+	 * @param array $menu_data
+	 *
 	 * @return array[]
 	 */
-	public static function get_tools_menu() {
+	public static function get_tools_menu( $menu_data = [] ) {
 		$tool_menu = array(
 			'forms'         => array(
 				'name' => __( 'Forms', 'wp-marketing-automations' ),
@@ -216,6 +230,13 @@ final class BWFAN_Header {
 				'name' => __( 'Email Setup', 'wp-marketing-automations' ),
 				'link' => admin_url( 'admin.php?page=autonami&path=/mail-setup' ),
 			);
+		}
+
+		/** Remove the keys which are not present in menudata */
+		if ( ! empty( $menu_data ) && is_array( $menu_data ) ) {
+			return array_filter( $tool_menu, function ( $key ) use ( $menu_data ) {
+				return in_array( $key, $menu_data );
+			}, ARRAY_FILTER_USE_KEY );
 		}
 
 		return $tool_menu;
@@ -494,7 +515,14 @@ final class BWFAN_Header {
 	}
 
 	public static function level_2_navigation_templates() {
-		$template_menu = array(
+		$template_menu = [];
+		if ( bwfan_is_woocommerce_active() ) {
+			$template_menu['transactional'] = array(
+				'name' => __( 'Transactional Emails', 'wp-marketing-automations' ),
+				'link' => admin_url( 'admin.php?page=autonami&path=/transactional-emails' ),
+			);
+		}
+		$template_menu = array_merge( $template_menu, [
 			'templates'    => array(
 				'name' => __( 'Templates', 'wp-marketing-automations' ),
 				'link' => admin_url( 'admin.php?page=autonami&path=/templates' ),
@@ -502,18 +530,13 @@ final class BWFAN_Header {
 			'global-style' => array(
 				'name' => __( 'Global Styles', 'wp-marketing-automations' ),
 				'link' => admin_url( 'admin.php?page=autonami&path=/global-style' ),
+			),
+			'history' => array(
+				'name' => __( 'Email History', 'wp-marketing-automations' ),
+				'link' => admin_url( 'admin.php?page=autonami&path=/history' ),
 			)
-		);
-		if ( bwfan_is_woocommerce_active() ) {
-			$template_menu['transactional'] = array(
-				'name' => __( 'Transactional Emails', 'wp-marketing-automations' ),
-				'link' => admin_url( 'admin.php?page=autonami&path=/transactional-emails' ),
-			);
-		}
-		$template_menu['history'] = array(
-			'name' => __( 'History', 'wp-marketing-automations' ),
-			'link' => admin_url( 'admin.php?page=autonami&path=/history' ),
-		);
+		] );
+
 
 		return $template_menu;
 	}

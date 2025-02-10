@@ -97,6 +97,8 @@ if ( ! function_exists( 'bwf_create_update_contact_customer' ) ) {
 
 
 		WooFunnels_DB_Updater::$indexing = true;
+
+		remove_all_actions( 'woocommerce_update_order' );
 		foreach ( $order_ids as $order_id ) {
 			WooFunnels_Dashboard::$classes['WooFunnels_DB_Updater']->set_order_id_in_process( $order_id );
 			bwf_create_update_contact( $order_id, array(), 0, true );

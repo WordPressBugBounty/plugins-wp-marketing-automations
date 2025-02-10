@@ -135,6 +135,10 @@ class BWFAN_Action_Controller extends BWFAN_Base_Step_Controller {
 		}
 
 		BWFAN_Merge_Tag_Loader::reset_data();
+
+		/** Set automation contact id */
+		$this->automation_data['global']['automation_cid'] = $this->automation_contact_id;
+
 		BWFAN_Merge_Tag_Loader::set_data( $this->automation_data['global'] );
 		$this->set_user_language();
 	}

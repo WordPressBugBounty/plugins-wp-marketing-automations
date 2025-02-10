@@ -402,8 +402,11 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 
 		public static function get_most_interacted_template( $oid, $otype, $mode ) {
 			global $wpdb;
-			$interaction = BWFAN_Email_Conversations::$MODE_SMS === absint( $mode ) ? 'click' : 'open';
-			$sql         = "SELECT tid, SUM($interaction) as $interaction FROM `{$wpdb->prefix}bwfan_engagement_tracking` WHERE oid=$oid AND type=$otype AND c_status=2 GROUP BY tid ORDER BY $interaction DESC LIMIT 0, 1";
+
+			$interaction = ( BWFAN_Email_Conversations::$MODE_SMS === intval( $mode ) ) ? 'click' : 'open';
+			$interaction = apply_filters( 'bwfan_most_interacted_template_based_on', $interaction, $mode, $oid );
+
+			$sql = "SELECT tid, SUM($interaction) AS $interaction FROM `{$wpdb->prefix}bwfan_engagement_tracking` WHERE oid=$oid AND type=$otype AND c_status=2 GROUP BY tid ORDER BY $interaction DESC LIMIT 0, 1";
 
 			return $wpdb->get_row( $sql, ARRAY_A );
 		}
@@ -549,13 +552,20 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 							case 1:
 								if ( ! empty( $oid ) ) {
 									$filter_query .= " AND oid IN (" . implode( ', ', $oid ) . ") AND type = 1";
+								} else {
+									$filter_query .= " AND type = 1";
 								}
 								break;
 
 							case 2:
 								if ( ! empty( $oid ) ) {
 									$filter_query .= " AND oid IN (" . implode( ', ', $oid ) . ") AND type = 2";
+								} else {
+									$filter_query .= " AND type = 2";
 								}
+								break;
+							case 9:
+								$filter_query .= " AND type = 9";
 								break;
 						}
 						break;
@@ -610,13 +620,29 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 				$tids[] = $result['tid'];
 			}
 
-			$template      = $wpdb->prepare( "SELECT ct.ID, ct.subject FROM {$wpdb->prefix}bwfan_templates AS ct WHERE ct.ID IN (" . implode( ',', array_map( 'absint', $tids ) ) . ")" );
+			$template      = $wpdb->prepare( "SELECT ct.ID, ct.subject, ct.title, ct.mode FROM {$wpdb->prefix}bwfan_templates AS ct WHERE ct.ID IN (" . implode( ',', array_map( 'absint', $tids ) ) . ")" );
 			$template_data = $wpdb->get_results( $template, ARRAY_A );
 
 			// Map subjects by ID
 			$template_map = [];
+			$transactional_data = [];
 			foreach ( $template_data as $template ) {
-				$template_map[ $template['ID'] ] = $template['subject'];
+				if( isset( BWFCRM_Core()->transactional_mails ) && ! empty( $template['mode'] ) && 7 === absint( $template['mode'] ) ) {
+					if( ! isset( $transactional_data[ $template['title'] ] ) ) {
+						$mail_class = BWFCRM_Core()->transactional_mails;
+						$transactional_val =  $mail_class->get_transactional_mail_by_slug( $template['title'] );
+						$title = ! empty( $transactional_val['title'] ) ? $transactional_val['title'] : $template['title'];
+						$transactional_data[ $template['title'] ] = $transactional_val['title'];
+					} else {
+						$transactional_data[ $template['title'] ] = $template['title'];
+					}
+				} else {
+					$title = '';
+				}
+				$template_map[ $template['ID'] ] = [
+					'subject' => $template['subject'],
+					'title'   => $title
+				];
 			}
 
 			$message_data = [];
@@ -653,7 +679,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 					'oid'       => $val['oid'],
 					'type'      => $val['type'],
 					'author_id' => $val['author_id']
-				] );
+				], ! empty( $val['tid'] ) && isset( $template_map[ $val['tid'] ] ) ? $template_map[ $val['tid'] ] : [] );
 
 				if ( ! empty( $source ) ) {
 					$con_data[ $key ]['source'] = $source;
@@ -667,11 +693,10 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 				$con_data[ $key ]['send_to']  = $val['send_to'];
 
 				// Retrieve subject from map
-				$subject                     = ! empty( $val['tid'] ) ? $template_map[ $val['tid'] ] : '';
+				$subject                     = ! empty( $val['tid'] ) && isset( $template_map[ $val['tid'] ] ) && $template_map[ $val['tid'] ]['subject'] ? $template_map[ $val['tid'] ]['subject'] : '';
 				$subject                     = empty( $subject ) && isset( $message_data[ $val['ID'] ] ) ? $message_data[ $val['ID'] ] : $subject;
 				$con_data[ $key ]['subject'] = ! empty( $subject ) ? $subject : __( 'No Subject', 'wp-marketing-automations' );
 			}
-
 			return [
 				'data'  => $con_data,
 				'total' => $wpdb->get_var( $count . $filter_query )

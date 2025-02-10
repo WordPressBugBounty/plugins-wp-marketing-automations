@@ -53,15 +53,18 @@ if ( ! class_exists( 'WooFunnels_Funnel_Builder_Commons' ) ) {
 			if ( 'order_total' === $column_name ) {
 				$show_combined = true;
 				if ( class_exists( 'WFOCU_Admin' ) ) {
-					$result_in_order_currency = BWF_WC_Compatibility::get_order_meta( $order, '_wfocu_upsell_amount_currency' );
+					$result_in_order_currency = $order->get_meta( '_wfocu_upsell_amount_currency' );
 					if ( true === $show_combined && ! empty( $result_in_order_currency ) ) {
 						$total_woofunnels = $total_woofunnels + $result_in_order_currency;
 					}
 				}
 				if ( class_exists( 'WFOB_Admin' ) ) {
 					if ( true === $show_combined ) {
-						$bump_total = method_exists( 'WFOB_Common', 'get_bump_items_total' ) ? WFOB_Common::get_bump_items_total( $order ) : false;
-						if ( false !== $bump_total ) {
+						/**
+						 * Check if bump accepted in order meta
+						 */
+						$bump_total = $order->get_meta( '_bump_purchase_item_total' );
+						if ( ! empty( $bump_total ) ) {
 							$total_woofunnels += $bump_total;
 						}
 					}

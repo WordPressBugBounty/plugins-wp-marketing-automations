@@ -263,10 +263,22 @@ foreach ( $reasons as $reason ) {
             $deactivateLink.on("click", function (evt) {
                 evt.preventDefault();
 
+                try {
+                    currentPluginName = $(this).siblings(".woofunnels-slug").attr('data-slug');
 
-                currentPluginName = $(this).siblings(".woofunnels-slug").attr('data-slug');
-                showModal();
+                    // Assuming showModal() is a function that might throw an error
+                    showModal();
+                } catch (error) {
+                    console.error("An error occurred:", error);
+
+                    // Redirect to the href of the clicked link if an error occurs
+                    const linkHref = $(this).attr('href');
+                    if (linkHref) {
+                        window.location.href = linkHref;
+                    }
+                }
             });
+
 
 
             $modal.on('click', '.show_m_reason a', function (evt) {

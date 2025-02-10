@@ -218,19 +218,21 @@ abstract class BWFCRM_Base_React_Page {
 
 		$this->page_data['is_wcs_active'] = function_exists( 'bwfan_is_woocommerce_subscriptions_active' ) ? bwfan_is_woocommerce_subscriptions_active() : false;
 
-		$this->page_data['default_utm_params'] = apply_filters( 'bwfan_default_utm_params', [
+		$this->page_data['default_utm_params']           = apply_filters( 'bwfan_default_utm_params', [
 			'source'  => 'Newsletter',
 			'medium'  => 'email',
 			'name'    => '',
 			'content' => '',
 			'term'    => '',
 		] );
-		$this->page_data['wizard_status']      = get_option( '_bwfan_onboarding_completed', false ) || get_option( '_wffn_onboarding_completed', false );
-		$this->page_data['user_email']         = get_user_by( 'id', get_current_user_id() )->user_email;
-		$this->page_data['siteLang']           = BWFAN_Common::get_site_current_language();
-		$this->page_data['multiLangSetting']   = method_exists( 'BWFAN_PRO_Common', 'get_language_settings' ) ? BWFAN_PRO_Common::get_language_settings(): [];
+		$this->page_data['wizard_status']                = get_option( '_bwfan_onboarding_completed', false ) || get_option( '_wffn_onboarding_completed', false );
+		$this->page_data['user_email']                   = get_user_by( 'id', get_current_user_id() )->user_email;
+		$this->page_data['siteLang']                     = BWFAN_Common::get_site_current_language();
+		$this->page_data['multiLangSetting']             = method_exists( 'BWFAN_PRO_Common', 'get_language_settings' ) ? BWFAN_PRO_Common::get_language_settings() : [];
 		$this->page_data['bwfan_table_validation_error'] = BWFAN_Table_Validation_Controller::get_table_validate_option();
-
+		$menu_data                                       = BWFAN_Common::get_user_menu_access();
+		$this->page_data['is_settings_enabled']          = empty( $menu_data ) || in_array( 'settings', $menu_data ) ? true : false;
+		$this->page_data['older_visual_builder']         = bwf_options_get( 'fk_legacy_builder', '', 1 );
 		do_action( 'bwfan_admin_view_localize_data', $this );
 	}
 

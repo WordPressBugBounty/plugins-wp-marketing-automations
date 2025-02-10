@@ -255,6 +255,8 @@ class BWFAN_Admin {
 	public function register_admin_menu() {
 		$capability = $this->menu_cap();
 
+		$menu_data = BWFAN_Common::get_user_menu_access();
+
 		/** Check if Autonami is in sandbox mode */
 		$title = __( 'FunnelKit Automations', 'wp-marketing-automations' );
 		if ( true === BWFAN_Common::is_sandbox_mode_active() ) {
@@ -264,65 +266,84 @@ class BWFAN_Admin {
 
 		add_submenu_page( 'autonami', __( 'Dashboard', 'wp-marketing-automations' ), __( 'Dashboard', 'wp-marketing-automations' ), $capability, 'autonami', false, 10 );
 
-		add_submenu_page( 'autonami', __( 'Contacts', 'wp-marketing-automations' ), __( 'Contacts', 'wp-marketing-automations' ), $capability, 'autonami&path=/contacts', array(
-			$this,
-			'autonami_page'
-		), 20 );
+		if ( empty( $menu_data ) || in_array( 'contacts', $menu_data ) ) {
+			add_submenu_page( 'autonami', __( 'Contacts', 'wp-marketing-automations' ), __( 'Contacts', 'wp-marketing-automations' ), $capability, 'autonami&path=/contacts', array(
+				$this,
+				'autonami_page'
+			), 20 );
+		}
 
-		if ( false !== BWFAN_Plugin_Dependency::woocommerce_active_check() ) {
+		if ( ( empty( $menu_data ) || in_array( 'carts', $menu_data ) ) && false !== BWFAN_Plugin_Dependency::woocommerce_active_check() ) {
 			add_submenu_page( 'autonami', __( 'Carts', 'wp-marketing-automations' ), __( 'Carts', 'wp-marketing-automations' ), $capability, 'autonami&path=/carts/recoverable', function () {
 			}, 27 );
-
 			$position = apply_filters( 'bwfan_cart_submenu_position', 5 );
 			$position = ( empty( absint( $position ) ) ) ? 5 : absint( $position );
 
 			add_submenu_page( 'woocommerce', __( 'Carts', 'wp-marketing-automations' ), __( 'Carts', 'wp-marketing-automations' ), $capability, 'admin.php?page=autonami&path=/carts/recoverable', false, $position );
 		}
 
-		add_submenu_page( 'autonami', __( 'Automations', 'wp-marketing-automations' ), __( 'Automations', 'wp-marketing-automations' ), $capability, 'autonami&path=/automations', array(
-			$this,
-			'autonami_automations_page'
-		), 24 );
-
-		if ( BWFAN_Common::is_automation_v1_active() ) {
-			add_submenu_page( 'autonami', __( 'Automations', 'wp-marketing-automations' ), __( 'Automations', 'wp-marketing-automations' ) . ' <span style="background-color:#ece6e4; color: #000;white-space: nowrap; border-radius:10px;margin-left:2px;font-size:10px;padding:3px 6px;">Legacy</span>', $capability, 'autonami-automations', array(
+		if ( empty( $menu_data ) || in_array( 'automations-v2', $menu_data ) ) {
+			add_submenu_page( 'autonami', __( 'Automations', 'wp-marketing-automations' ), __( 'Automations', 'wp-marketing-automations' ), $capability, 'autonami&path=/automations', array(
 				$this,
 				'autonami_automations_page'
-			), 25 );
+			), 24 );
+
+			if ( BWFAN_Common::is_automation_v1_active() ) {
+				add_submenu_page( 'autonami', __( 'Automations', 'wp-marketing-automations' ), __( 'Automations', 'wp-marketing-automations' ) . ' <span style="background-color:#ece6e4; color: #000;white-space: nowrap; border-radius:10px;margin-left:2px;font-size:10px;padding:3px 6px;">Legacy</span>', $capability, 'autonami-automations', array(
+					$this,
+					'autonami_automations_page'
+				), 25 );
+			}
 		}
 
 		if ( true === bwfan_is_autonami_pro_active() ) {
-			add_submenu_page( 'autonami', __( 'Broadcasts', 'wp-marketing-automations' ), __( 'Broadcasts', 'wp-marketing-automations' ), $capability, 'autonami&path=/broadcasts/email', function () {
-			}, 30 );
+			if ( empty( $menu_data ) || in_array( 'broadcasts', $menu_data ) ) {
+				add_submenu_page( 'autonami', __( 'Broadcasts', 'wp-marketing-automations' ), __( 'Broadcasts', 'wp-marketing-automations' ), $capability, 'autonami&path=/broadcasts/email', function () {
+				}, 30 );
+			}
 
-			add_submenu_page( 'autonami', __( 'Emails', 'wp-marketing-automations' ), __( 'Emails', 'wp-marketing-automations' ), $capability, 'autonami&path=/templates', function () {
-			}, 30 );
+			if ( empty( $menu_data ) || in_array( 'templates', $menu_data ) ) {
+				add_submenu_page( 'autonami', __( 'Emails', 'wp-marketing-automations' ), __( 'Emails', 'wp-marketing-automations' ), $capability, 'autonami&path=/' . ( bwfan_is_woocommerce_active() ? 'transactional-emails' : 'templates' ), function () {
+				}, 30 );
+			}
+
 		}
 
-		add_submenu_page( 'autonami', __( 'Analytics', 'wp-marketing-automations' ), __( 'Analytics', 'wp-marketing-automations' ), $capability, 'autonami&path=/analytics', function () {
-		}, 15 );
+		if ( empty( $menu_data ) || in_array( 'analytics', $menu_data ) ) {
+			add_submenu_page( 'autonami', __( 'Analytics', 'wp-marketing-automations' ), __( 'Analytics', 'wp-marketing-automations' ), $capability, 'autonami&path=/analytics', function () {
+			}, 15 );
+		}
+
 
 		if ( true === bwfan_is_autonami_pro_active() ) {
 
-			add_submenu_page( 'autonami', __( 'Forms', 'wp-marketing-automations' ), __( 'Forms', 'wp-marketing-automations' ), $capability, 'autonami&path=/forms', function () {
-			}, 50 );
+			if ( empty( $menu_data ) || in_array( 'forms', $menu_data ) ) {
+				add_submenu_page( 'autonami', __( 'Forms', 'wp-marketing-automations' ), __( 'Forms', 'wp-marketing-automations' ), $capability, 'autonami&path=/forms', function () {
+				}, 50 );
+			}
 
-			add_submenu_page( 'autonami', __( 'Link Triggers', 'wp-marketing-automations' ), __( 'Link Triggers', 'wp-marketing-automations' ), $capability, 'autonami&path=/link-triggers', function () {
-			}, 50 );
+			if ( empty( $menu_data ) || in_array( 'link-triggers', $menu_data ) ) {
+				add_submenu_page( 'autonami', __( 'Link Triggers', 'wp-marketing-automations' ), __( 'Link Triggers', 'wp-marketing-automations' ), $capability, 'autonami&path=/link-triggers', function () {
+				}, 50 );
+			}
+
 		}
 
-		if ( ! get_option( 'bwfan_smtp_recommend', false ) ) {
+		if ( ( empty( $menu_data ) || in_array( 'mail-setup', $menu_data ) ) && ! get_option( 'bwfan_smtp_recommend', false ) ) {
 			add_submenu_page( 'autonami', __( 'Email Setup', 'wp-marketing-automations' ), __( 'Email Setup', 'wp-marketing-automations' ), $capability, 'autonami&path=/mail-setup', function () {
 			}, 50 );
 		}
 
-		if ( true === bwfan_is_autonami_pro_active() ) {
+		if ( ( empty( $menu_data ) || in_array( 'connectors', $menu_data ) ) && true === bwfan_is_autonami_pro_active() ) {
 			add_submenu_page( 'autonami', __( 'Connectors', 'wp-marketing-automations' ), __( 'Connectors', 'wp-marketing-automations' ), $capability, 'autonami&path=/connectors', function () {
 			}, 15 );
 		}
 
-		add_submenu_page( 'autonami', __( 'Settings', 'wp-marketing-automations' ), __( 'Settings', 'wp-marketing-automations' ), $capability, 'autonami&path=/settings', function () {
-		}, 45 );
+		if ( empty( $menu_data ) || in_array( 'settings', $menu_data ) ) {
+			add_submenu_page( 'autonami', __( 'Settings', 'wp-marketing-automations' ), __( 'Settings', 'wp-marketing-automations' ), $capability, 'autonami&path=/settings', function () {
+			}, 45 );
+		}
+
 
 		/** Adding Buy Pro sub menu when pro not activated */
 		if ( false === bwfan_is_autonami_pro_active() ) {
@@ -1017,8 +1038,9 @@ class BWFAN_Admin {
 			bwf_schedule_recurring_action( time(), MINUTE_IN_SECONDS, 'bwfan_run_event_queue' );
 		}
 
+		$midnight_time = self::get_midnight_store_time();
 		if ( ! BWFAN_Common::bwf_has_action_scheduled( 'bwfan_run_midnight_cron' ) ) {
-			bwf_schedule_recurring_action( time(), MINUTE_IN_SECONDS, 'bwfan_run_midnight_cron' );
+			bwf_schedule_recurring_action( $midnight_time, DAY_IN_SECONDS, 'bwfan_run_midnight_cron' );
 		}
 	}
 
@@ -1834,6 +1856,16 @@ class BWFAN_Admin {
 		delete_option( 'bwfan_new_user' );
 		wp_safe_redirect( $this->wizard_url );
 		exit;
+	}
+
+	public static function get_midnight_store_time() {
+		$timezone = new DateTimeZone( wp_timezone_string() );
+		$date     = new DateTime();
+		$date->modify( '+1 days' );
+		$date->setTimezone( $timezone );
+		$date->setTime( 0, 0, 0 );
+
+		return $date->getTimestamp();
 	}
 }
 

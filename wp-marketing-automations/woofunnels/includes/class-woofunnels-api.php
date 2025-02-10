@@ -170,8 +170,8 @@ if ( ! class_exists( 'WooFunnels_API' ) ) :
 		public static function post_deactivation_data( $deactivations ) {
 			$get_deactivation_data = array(
 				'site'          => home_url(),
-				'deactivations' => $deactivations
-
+				'deactivations' => $deactivations,
+				'logged_errors' => apply_filters( 'send_filter_deactivations_data', [] )
 			);
 
 			$api_params = self::get_api_args( array(
@@ -184,7 +184,7 @@ if ( ! class_exists( 'WooFunnels_API' ) ) :
 				'sslverify' => self::$is_ssl,
 				'body'      => urlencode_deep( $api_params ),
 			) );
-			$request = wp_remote_post( self::get_api_url( self::$woofunnels_api_url ), $request_args );
+			$request      = wp_remote_post( self::get_api_url( self::$woofunnels_api_url ), $request_args );
 
 			return $request;
 		}

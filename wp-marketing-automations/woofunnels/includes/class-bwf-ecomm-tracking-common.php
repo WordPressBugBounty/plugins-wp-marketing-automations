@@ -39,6 +39,10 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 
 
 			add_action( 'bwf_conversion_tracking_index_completed', array( $this, 'update_conversion_table' ), 10, 2 );
+
+
+			add_action( 'wfocu_schedule_thankyou_action', array( $this, 'maybe_execute_thankyou_hook' ), 999 );
+
 		}
 
 		/**
@@ -77,7 +81,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				'site_url'           => esc_url( site_url() ),
 				'genericParamEvents' => wp_json_encode( $this->get_generic_event_params() ),
 				'cookieKeys'         => [ "flt", "timezone", "is_mobile", "browser", "fbclid", "gclid", "referrer", "fl_url" ],
-				'excludeDomain'         => ['paypal.com', 'klarna.com', 'quickpay.net']
+				'excludeDomain'      => [ 'paypal.com', 'klarna.com', 'quickpay.net' ]
 
 			] );
 
@@ -307,7 +311,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 
 			$get_data = $this->get_common_tracking_data();
 			$order->update_meta_data( '_wffn_tracking_data', $get_data );
-			$order->save_meta_data();
+
 		}
 
 		/**
@@ -349,7 +353,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 						$get_data['offer_total']    = ! empty( $package['total'] ) ? $this->get_price_value_for_db( $package['total'], $parent_order->get_currency() ) : 0;
 						$get_data['offer_accepted'] = wp_json_encode( array( ( string ) $offer_id ) );
 						$get_data['offer_rejected'] = '';
-						$get_data['timestamp'] =  current_time( 'mysql' );
+						$get_data['timestamp']      = current_time( 'mysql' );
 						$this->insert_tracking_data( $get_data );
 					} else {
 
@@ -519,19 +523,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				 * reaching this code means, 1) we have a ipn gateway OR 2) we have meta stored during thankyou
 				 */
 				if ( $order_id > 0 && in_array( $to, wc_get_is_paid_statuses(), true ) ) {
-					$offer_id = BWF_WC_Compatibility::get_order_meta( $order, '_wfocu_offer_id' );
-					if ( ! empty( $offer_id ) ) {
-						$this->insert_tracking_data( $tracking_data );
-						$order->delete_meta_data( '_wffn_need_normalize' );
-						$order->delete_meta_data( '_wfocu_offer_id' );
-						$order->delete_meta_data( '_wffn_tracking_data' );
-						$order->save_meta_data();
-
-					} else {
-						$this->insert_tracking_order( $order, $tracking_data );
-						$order->delete_meta_data( '_wffn_need_normalize' );
-						$order->save_meta_data();
-					}
+					$this->insert_data_without_thankyou( $order, $tracking_data );
 
 				}
 			}
@@ -1226,6 +1218,174 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 
 		public function get_price_value_for_db( $total, $currency ) {
 			return class_exists( 'BWF_Plugin_Compatibilities' ) ? round( BWF_Plugin_Compatibilities::get_fixed_currency_price_reverse( $total, $currency ), 2 ) : $total;
+
+		}
+
+		/**
+		 * We are handling cases of insert funnel analytics for which order thankyou page not open
+		 */
+		public function maybe_execute_thankyou_hook() {
+			// Ensure WFOCU_Core is available before proceeding
+			if ( ! class_exists( 'WFOCU_Core' ) ) {
+				return;
+			}
+
+			global $wpdb;
+
+			// Get paid statuses for WooCommerce orders
+			$status_to_query = wc_get_is_paid_statuses();
+			$status_in       = implode( ',', array_map( function ( $a ) {
+				return "'wc-{$a}'";
+			}, $status_to_query ) );
+
+			// Set the start time for the batch process
+			WFOCU_Common::$start_time = time();
+
+			if ( BWF_WC_Compatibility::is_hpos_enabled() ) {
+				$order_table      = $wpdb->prefix . 'wc_orders';
+				$order_meta_table = $wpdb->prefix . 'wc_orders_meta';
+				$query            = $wpdb->prepare( "SELECT ord.id as ID FROM {$order_table} ord
+                                INNER JOIN {$order_meta_table} om ON (ord.id = om.order_id AND om.meta_key = '_wffn_tracking_data')
+                                WHERE ord.type = %s
+                                AND ord.status IN ({$status_in}) 
+                                ORDER BY ord.date_created_gmt DESC LIMIT 0, 10", 'shop_order' );
+
+			} else {
+				$query = $wpdb->prepare( "SELECT p.ID FROM {$wpdb->posts} p
+                                INNER JOIN {$wpdb->postmeta} pm ON (p.ID = pm.post_id AND pm.meta_key = '_wffn_tracking_data')
+                                WHERE p.post_type = %s 
+                                AND p.post_status IN ({$status_in}) 
+                                ORDER BY p.post_date DESC LIMIT 0, 10", 'shop_order' );
+			}
+
+			$query_results = $wpdb->get_results( $query );
+
+			if ( ! empty( $query_results ) && is_array( $query_results ) ) {
+
+				$get_orders = array_filter( array_map( function ( $query_instance ) {
+					return wc_get_order( $query_instance->ID );
+				}, $query_results ) );
+
+				$i = 0;
+
+				while ( ! ( WFOCU_Common::time_exceeded() || WFOCU_Common::memory_exceeded() ) && ! empty( $get_orders ) ) {
+					$order = $get_orders[ $i ] ?? null;
+					$i ++;
+
+					// Skip if the order is invalid
+					if ( empty( $order ) || ! $order instanceof WC_Order ) {
+						continue;
+					}
+
+					try {
+
+						$tracking_data = BWF_WC_Compatibility::get_order_meta( $order, '_wffn_tracking_data' );
+
+						// Skip orders with missing or invalid tracking data
+						if ( empty( $tracking_data ) || ! is_array( $tracking_data ) ) {
+							continue;
+						}
+
+						// Insert data for orders without the thank-you page
+						$this->insert_data_without_thankyou( $order, $tracking_data );
+
+					} catch ( Error|Exception $e ) {
+
+						WFOCU_Core()->log->log( 'Upsell schedule Error occurred on insert funnel analytics - order id #' . $order->get_id() . ' error ' . $e->getMessage() );
+					}
+
+					// Remove the processed order from the array
+					unset( $get_orders[ $i - 1 ] );
+				}
+			}
+
+			try {
+				$limit = 10;
+				// run this snippet for recover checkout data
+				if ( class_exists( 'WFACP_Reporting' ) ) {
+
+					if ( BWF_WC_Compatibility::is_hpos_enabled() ) {
+						$wfacp_results = $wpdb->get_results( $wpdb->prepare( "select * from {$wpdb->prefix}wc_orders_meta where meta_key='_wfacp_report_data' LIMIT %d ", $limit ), ARRAY_A );
+					} else {
+						$wfacp_results = $wpdb->get_results( $wpdb->prepare( "select * from {$wpdb->prefix}postmeta where meta_key='_wfacp_report_data' LIMIT %d ", $limit ), ARRAY_A );
+					}
+
+					if ( is_array( $wfacp_results ) && count( $wfacp_results ) > 0 ) {
+						$wfacp_report = WFACP_Reporting::get_instance();
+						foreach ( $wfacp_results as $result ) {
+							$post_id = isset( $result['post_id'] ) ? absint( $result['post_id'] ) : ( isset( $result['order_id'] ) ? absint( $result['order_id'] ) : 0 );
+
+							if ( 0 !== $post_id ) {
+								$aero_order = wc_get_order( $post_id );
+								if ( $aero_order instanceof WC_Order ) {
+									if ( $this->is_order_renewal( $aero_order ) ) {
+										$aero_order->delete_meta_data( '_wfacp_report_data' );
+										$aero_order->delete_meta_data( '_wfacp_report_needs_normalization' );
+										$aero_order->save();
+									} else {
+										$wfacp_report->updating_reports_from_orders( $post_id );
+									}
+								}
+							}
+						}
+					}
+				}
+
+				/**
+				 * run this snippet for recover OrderBump data
+				 * order bump need always run after checkout
+				 */
+				if ( class_exists( 'WFOB_Reporting' ) ) {
+					if ( BWF_WC_Compatibility::is_hpos_enabled() ) {
+						$ob_results = $wpdb->get_results( $wpdb->prepare( "select * from {$wpdb->prefix}wc_orders_meta where meta_key='_wfob_report_data' LIMIT %d ", $limit ), ARRAY_A );
+					} else {
+						$ob_results = $wpdb->get_results( $wpdb->prepare( "select * from {$wpdb->prefix}postmeta where meta_key='_wfob_report_data' LIMIT %d ", $limit ), ARRAY_A );
+					}
+					if ( is_array( $wfacp_results ) && count( $ob_results ) > 0 ) {
+						$ob_report = WFOB_Reporting::get_instance();
+						foreach ( $ob_results as $ob_result ) {
+							$ob_id    = isset( $ob_result['post_id'] ) ? absint( $ob_result['post_id'] ) : ( isset( $ob_result['order_id'] ) ? absint( $ob_result['order_id'] ) : 0 );
+							$ob_order = wc_get_order( $ob_id );
+							if ( $ob_order instanceof WC_Order ) {
+								if ( $this->is_order_renewal( $ob_order ) ) {
+									$ob_order->delete_meta_data( '_wfob_report_data' );
+									$ob_order->delete_meta_data( '_wfob_report_needs_normalization' );
+									$ob_order->save();
+								} else {
+									$ob_report->insert_custom_row_from_meta( $ob_id );
+								}
+							}
+						}
+					}
+				}
+			} catch ( Error|Exception $e ) {
+				if ( isset( $ob_order ) ) {
+					$ob_order->delete_meta_data( '_wfob_report_data' );
+					$ob_order->delete_meta_data( '_wfob_report_needs_normalization' );
+					$ob_order->save();
+				}
+				if ( isset( $aero_order ) ) {
+					$aero_order->delete_meta_data( '_wfacp_report_data' );
+					$aero_order->delete_meta_data( '_wfacp_report_needs_normalization' );
+					$aero_order->save();
+				}
+			}
+		}
+
+		public function insert_data_without_thankyou( $order, $tracking_data ) {
+			$offer_id = BWF_WC_Compatibility::get_order_meta( $order, '_wfocu_offer_id' );
+			if ( ! empty( $offer_id ) ) {
+				$this->insert_tracking_data( $tracking_data );
+				$order->delete_meta_data( '_wffn_need_normalize' );
+				$order->delete_meta_data( '_wfocu_offer_id' );
+				$order->delete_meta_data( '_wffn_tracking_data' );
+				$order->save_meta_data();
+
+			} else {
+				$this->insert_tracking_order( $order, $tracking_data );
+				$order->delete_meta_data( '_wffn_need_normalize' );
+				$order->save_meta_data();
+			}
 
 		}
 

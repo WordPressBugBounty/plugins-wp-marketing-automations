@@ -50,7 +50,7 @@ if ( ! class_exists( 'BWFAN_Model_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 			! empty( $vmode ) && $query .= " AND vmode = $vmode";
 			! empty( $searchable ) && $query .= " AND search = $searchable";
 			! empty( $viewable ) && $query .= " AND view = $viewable";
-			! empty( $type ) && $query .= " AND type = $type";
+			! empty( $type ) && $query .= " AND type IN ( $type )";
 
 			$fields = self::get_results( $query );
 

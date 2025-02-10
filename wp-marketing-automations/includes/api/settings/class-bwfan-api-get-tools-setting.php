@@ -91,6 +91,15 @@ class BWFAN_API_Get_Tools_Setting extends BWFAN_API_Base {
 				"processingText" => __( "We are deleting all the failed tasks", "wp-marketing-automations" ),
 			);
 		}
+		$is_opted        = WooFunnels_OptIn_Manager::get_optIn_state();
+		$tool_settings[] = array(
+			"title"          => __( "Usage Tracking", "wp-marketing-automations" ),
+			"type"           => 'toggle',
+			"description"    => __( "This action controls Usage Tracking", "wp-marketing-automations" ),
+			"task"           => "toggle_usage_tracking",
+			"status"         => ! empty( $is_opted ),
+			"processingText" => __( "Updating usage tracking", "wp-marketing-automations" ),
+		);
 
 		$this->response_code = 200;
 

@@ -4,7 +4,7 @@ Tags: cart abandonment, follow up emails, email marketing, email customizer, crm
 Requires at least: 5.0
 Tested up to: 6.7.1
 Requires PHP: 7.0
-Stable tag: 3.4.0
+Stable tag: 3.5.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -415,6 +415,41 @@ FunnelKit Automations is 100% self-hosted and fully GDPR compliant.
 
 
 == Change log ==
+
+= 3.5.0 (Feb 10, 2025) =
+* New: Introduced functionality to migrate content from the legacy builder to the new block builder, ensuring a seamless transition. (#3692)
+* New: Added compatibility for Breakdance Builder with the unsubscribe page shortcode for a smoother user experience. (#3638)
+* New: Enhanced compatibility with WooCommerce Product Add-ons to improve cart abandonment handling. (#3661)
+* New: Added an audit mail component in the transactional mail preview for better visibility. (#3645)
+* Added: Implemented an SVG image type restriction when uploading logos to maintain email compatibility. (#3627)
+* Added: Introduced a filter to modify the most interacted template based on opens or clicks, offering better insights. (#3643)
+* Added: Enabled copy mail functionality in the single contact header for ease of use. (#3645)
+* Added: Improved handling for datetime and time fields in older pro versions to maintain consistency. (#3651)
+* Added: Provided a hint message in the "Send Mail" action and transactional "Send To" field for better clarity. (#3674)
+* Added: Introduced a new rule for Shipping Zone to enhance order-related event handling. (#3676)
+* Added: Included a UID parameter in link triggers when sending a test mail for better tracking. (#3686)
+* Added: Added hooks to track connector connections and disconnections for better automation management. (#3705)
+* Improved: Transactional Mail Menu - Now includes an option to add additional recipients in customer emails. (#3636)
+* Improved: Reset Password Link - Now redirects to the WooCommerce "My Account" page when WooCommerce is activated. (#3624)
+* Improved: Conditional Sidebar - Enhanced to properly handle "not exists" condition cases. (#3629)
+* Improved: CSV Upload Route - Optimized to prevent conflicts with certain server settings for smoother uploads. (#3640)
+* Improved: Audience Filters - Enhanced by replacing previous filters with new, more efficient ones. (#3656)
+* Improved: Email Component - Added merge tags for subject and preheader fields for better personalization. (#3665)
+* Improved: Progress Bar Classes - Updated to prevent unintended CSS overrides. (#3667)
+* Improved: State & City Filters - Now include helpful hints for better usability. (#3688)
+* Improved: Broadcast Overview Notice - Added an option to customize the icon for better visual distinction. (#3690)
+* Improved: MySQL Queries - Optimized for better performance across all pages. (#3702)
+* Improved: Multiple Tag & List Addition - Users can now add multiple tags and lists by separating them with commas for easier management. (#3698)
+* Improved: Transactional Mail - Added a filter to show only transactional mails and display their type in the table for clarity. (#3685)
+* Fixed: Ensured accurate open rate data in email analytics. (#3631)
+* Fixed: Improved error handling in actions for nested error messages, ensuring smooth operation. (#3633)
+* Fixed: Resolved an issue with the `include_unsubscribe` parameter when using the status filter. (#3658)
+* Fixed: Addressed an export issue in "Get Contact" when modifying per-page and limit settings in Step 2. (#3663)
+* Fixed: Adjusted default preheader space to prevent body content from displaying incorrectly. (#3671)
+* Fixed: Resolved an issue with saving block email content in automation workflows. (#3678)
+* Fixed: Improved automation contact data fetching based on ID for accurate results. (#3698)
+* Fixed: Ensured correct scheduling for the midnight action scheduler's recurring time interval. (#3695)
+* Removed: Deprecated `pre_wp_mail` filter before sending mail for improved system efficiency. (#3703) 
 
 = 3.4.0 (Dec 05, 2024) =
 * Compatible upto WordPress 6.7.1

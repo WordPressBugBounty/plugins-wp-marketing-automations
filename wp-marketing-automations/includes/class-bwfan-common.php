@@ -232,6 +232,11 @@ class BWFAN_Common {
 		add_action( 'bwfan_run_midnight_cron', array( 'BWFAN_Table_Validation_Controller', 'get_table_validate_option' ) );
 
 		add_action( 'bwfan_run_midnight_cron', [ __CLASS__, 'schedule_notification' ] );
+
+		/** Enable cron check logging if enabled in setting */
+		add_filter( 'bwf_check_cron_schedule_logging', function () {
+			return self::is_log_enabled( 'bwfan_cron_check_logging' );
+		} );
 	}
 
 	public static function display_marketing_optin_checkbox() {
@@ -364,6 +369,9 @@ class BWFAN_Common {
 			'after_confirmation_type'                      => 'show_message',
 			'bwfan_confirmation_message'                   => '<h2>' . __( 'Subscription Confirmed', 'wp-marketing-automations' ) . '</h2><p>' . __( 'Your subscription to our list has been confirmed.', 'wp-marketing-automations' ) . '</p><p>' . __( 'Thank you for subscribing!', 'wp-marketing-automations' ) . '</p><p>&nbsp;</p>',
 			'bwfan_enable_notification'                    => 0,
+			'bwfan_contact_export_logging'                 => '',
+			'bwfan_contact_query_logging'                  => '',
+			'bwfan_webhook_received_logging'               => '',
 		), $email_settings );
 
 		if ( self::is_whatsapp_services_enabled() ) {
@@ -2602,10 +2610,11 @@ class BWFAN_Common {
 		self::worker_as_run();
 
 		/** Logs */
-		if ( defined( 'BWF_CHECK_CRON_SCHEDULE' ) && true === BWF_CHECK_CRON_SCHEDULE ) {
+		$cron_check = self::is_log_enabled( 'bwfan_cron_check_logging' );
+		if ( true === $cron_check || ( defined( 'BWF_CHECK_CRON_SCHEDULE' ) && true === BWF_CHECK_CRON_SCHEDULE ) ) {
 			add_filter( 'bwf_logs_allowed', '__return_true', PHP_INT_MAX );
 			$logger_obj = BWF_Logger::get_instance();
-			$logger_obj->log( date_i18n( 'Y-m-d H:i:s' ) . ' - after worker run', 'cron-check-v' . $v, 'autonami' );
+			$logger_obj->log( date_i18n( 'Y-m-d H:i:s' ) . ' - after worker run', 'fka-cron-check-v' . $v, 'autonami' );
 		}
 
 		$resp        = array();
@@ -2873,10 +2882,11 @@ class BWFAN_Common {
 		self::event_advanced_logs( 'V2 action callback' );
 
 		/** Logs */
-		if ( defined( 'BWF_CHECK_CRON_SCHEDULE' ) && true === BWF_CHECK_CRON_SCHEDULE ) {
+		$cron_check = self::is_log_enabled( 'bwfan_cron_check_logging' );
+		if ( true === $cron_check || ( defined( 'BWF_CHECK_CRON_SCHEDULE' ) && true === BWF_CHECK_CRON_SCHEDULE ) ) {
 			add_filter( 'bwf_logs_allowed', '__return_true', PHP_INT_MAX );
 			$logger_obj = BWF_Logger::get_instance();
-			$logger_obj->log( date_i18n( 'Y-m-d H:i:s' ) . ' - before worker hit', 'cron-check-v2', 'autonami' );
+			$logger_obj->log( date_i18n( 'Y-m-d H:i:s' ) . ' - before worker hit', 'fka-cron-check-v2', 'autonami' );
 		}
 
 		/** Check if any contact in automation can proceed */
@@ -3479,9 +3489,6 @@ class BWFAN_Common {
 		if ( empty( $global_settings['bwfan_ab_enable'] ) ) {
 			return;
 		}
-
-		/** Check duplicate carts */
-		BWFAN_AB_Cart_Abandoned::maybe_clean();
 
 		/** Maybe run */
 		if ( false === BWFAN_Model_Abandonedcarts::maybe_run( $global_settings['bwfan_ab_init_wait_time'] ) ) {
@@ -4460,7 +4467,7 @@ class BWFAN_Common {
 			$query = $wpdb->prepare( $query, $offset, $limit );
 		}
 
-		return ! empty( $query ) ? $wpdb->get_results( $query, ARRAY_A ) : [];
+		return ! empty( $query ) ? $wpdb->get_results( $query, ARRAY_A ) : [];;
 	}
 
 	/**
@@ -4564,10 +4571,11 @@ class BWFAN_Common {
 	/** run global tools
 	 *
 	 * @param $tool_type
+	 * @param $data
 	 *
 	 * @return array
 	 */
-	public static function run_global_tools( $tool_type ) {
+	public static function run_global_tools( $tool_type, $data = [] ) {
 		global $wpdb;
 		$result = array();
 
@@ -4723,6 +4731,16 @@ class BWFAN_Common {
 				$result['msg'] = $table_created === true ? __( 'The following tables were created: ', 'wp-marketing-automations' ) . implode( ', ', $missing_tables ) : __( 'Error while creating table', 'wp-marketing-automations' );
 
 				break;
+			case 'toggle_usage_tracking':
+				if ( isset( $data['value'] ) && true === $data['value'] ) {
+					WooFunnels_optIn_Manager::Allow_optin( true, 'FKA' );
+				} else {
+					WooFunnels_optIn_Manager::reset_optin();
+				}
+
+				$result['msg']    = __( 'Status Updated', 'wp-marketing-automations' );
+				$result['status'] = true;
+				break;
 		}
 
 		return $result;
@@ -4784,7 +4802,7 @@ class BWFAN_Common {
 				"min"         => '0',
 				'class'       => 'bwfan_email_per_second_limit',
 				'placeholder' => '15',
-				'hint'        => __( 'Enter maximum email sending limit. Note: This is an indicative limit and not the actual sending rate for Funnelkit Automation. The real sending rate would vary based on site configuration, plugin used and even SMTP API connection.', 'wp-marketing-automations' ),
+				'hint'        => __( 'Enter maximum email sending limit. Note: This is an indicative limit and not the actual sending rate for Funnelkit Automation. ', 'wp-marketing-automations' ) . '<strong>' . __( 'The real sending rate would vary based on site configuration, plugin used and even SMTP API connection.', 'wp-marketing-automations' ) . '</strong>',
 				'required'    => false,
 				'show'        => $show_fields,
 				'toggler'     => array(),
@@ -4796,7 +4814,7 @@ class BWFAN_Common {
 				"min"         => '0',
 				'class'       => 'bwfan_email_daily_limit ',
 				'placeholder' => '10000',
-				'hint'        => __( 'Enter maximum email sending limit allowed in 24 hours', 'wp-marketing-automations' ),
+				'hint'        => __( 'Set the maximum emails allowed per 24 hours. Once this limit is reached, sending pauses and resumes after the quota resets. This ensures manageable daily output and compliance with email provider policies.', 'wp-marketing-automations' ),
 				'required'    => false,
 				'show'        => $show_fields,
 				'toggler'     => array(),
@@ -4976,7 +4994,7 @@ class BWFAN_Common {
 					'type'        => 'multisitenotice',
 					'linkButton'  => esc_url( $main_site_admin_url ),
 					'label'       => __( 'FunnelKit Automations Pro', 'wp-marketing-automations' ),
-					'msg'         => __( 'You have activated FunnelKit on a multisite network, So the licenses will be managed on the main site and not on the sub sites. ', 'wp-marketing-automations' ),
+					'msg'         => __( 'Manage your FunnelKit Automations Pro license centrally from the main site of your multisite network. Simply head there to manage. ', 'wp-marketing-automations' ),
 					'wrap_before' => '<h3 style="margin-bottom: 0;">' . __( 'License', 'wp-marketing-automations' ) . '</h3>',
 					'hint'        => '',
 				);
@@ -5719,20 +5737,9 @@ class BWFAN_Common {
 								'id'            => 'bwfan_sandbox_mode',
 								'label'         => __( 'Sandbox Mode', 'wp-marketing-automations' ),
 								'type'          => 'checkbox',
-								'checkboxlabel' => __( 'Enable sandbox mode', 'wp-marketing-automations' ),
+								'checkboxlabel' => __( 'Enable Sandbox Mode', 'wp-marketing-automations' ),
 								'hint'          => __( "When sandbox mode is enabled, Automations won't create new tasks, and existing tasks won't run", 'wp-marketing-automations' ),
 								'class'         => 'bwfan_sandbox_mode',
-								'required'      => false,
-								'wrap_before'   => '',
-								'toggler'       => array(),
-							),
-							array(
-								'id'            => 'bwfan_make_logs',
-								'label'         => __( 'Logging', 'wp-marketing-automations' ),
-								'type'          => 'checkbox',
-								'checkboxlabel' => __( 'Enable logs creation for debugging', 'wp-marketing-automations' ),
-								'hint'          => __( 'When enabled, logs will be saved to Funnelkit Automation > Settings > Logs. Disable this settings after debugging is finished.', 'wp-marketing-automations' ),
-								'class'         => 'bwfan_make_logs',
 								'required'      => false,
 								'wrap_before'   => '',
 								'toggler'       => array(),
@@ -5751,6 +5758,200 @@ class BWFAN_Common {
 								'toggler'     => array(),
 							),
 							$engagement_meta_record_delete,
+							array(
+								'id'          => 'debug_notice',
+								'type'        => 'notice',
+								'class'       => '',
+								'status'      => 'warning',
+								'message'     => __( 'It is highly recommended to disable logging once troubleshooting is complete.', 'wp-marketing-automations' ),
+								'wrap_before' => '<br/><h3>' . __( 'Debug Logs (For Developers)', 'wp-marketing-automations' ) . '</h3>',
+								'dismiss'     => false,
+								'required'    => false,
+								'toggler'     => array(),
+							),
+							array(
+								'id'            => 'bwfan_make_logs',
+								'label'         => __( 'Basic Logging', 'wp-marketing-automations' ),
+								'type'          => 'checkbox',
+								'checkboxlabel' => __( 'Enable Basic Logs', 'wp-marketing-automations' ),
+								'hint'          => __( 'These are basic operational logs. Logs will be saved on path <b>Funnelkit Automation > Settings > Logs</b>. Disable this settings after debugging is finished.', 'wp-marketing-automations' ),
+								'class'         => 'bwfan_make_logs',
+								'required'      => false,
+								'toggler'       => array(),
+							),
+							array(
+								'id'            => 'bwfan_advance_logs',
+								'label'         => __( 'Advance Logging', 'wp-marketing-automations' ),
+								'type'          => 'checkbox',
+								'checkboxlabel' => __( 'Enable Advanced Logs', 'wp-marketing-automations' ),
+								'hint'          => __( 'These are advanced logs for deeper troubleshooting for specific modules. Logs will be saved on path <b>Funnelkit Automation > Settings > Logs</b>. Disable this settings after debugging is finished.', 'wp-marketing-automations' ),
+								'class'         => 'bwfan_make_logs',
+								'required'      => false,
+								'wrap_before'   => '',
+								'toggler'       => array(),
+							),
+							array(
+								'id'            => 'bwfan_cron_check_logging',
+								'type'          => 'checkbox',
+								'label'         => ' ',
+								'checkboxlabel' => __( 'Enable Logs for Cron Execution Time', 'wp-marketing-automations' ),
+								'hint'          => __( "It logs the execution time of FunnelKit Automation worker. Logs are captured in file named <i>fka-cron-check-xxx</i>", 'wp-marketing-automations' ),
+								'class'         => 'bwfan_make_logs',
+								'required'      => false,
+								'wrap_before'   => '',
+								'toggler'       => array(
+									'fields' => array(
+										array(
+											'id'    => 'bwfan_advance_logs',
+											'value' => true,
+										),
+									),
+								),
+							),
+							array(
+								'id'            => 'bwfan_end_point_logging',
+								'type'          => 'checkbox',
+								'label'         => ' ',
+								'checkboxlabel' => __( "Enable Logs for Event JSON endpoint", "wp-marketing-automations" ),
+								'hint'          => __( "It logs the payload and response of the call. Logs are captured in file named <i>fka-event-endpoint-check-xxx</i>", 'wp-marketing-automations' ),
+								'class'         => 'bwfan_make_logs',
+								'required'      => false,
+								'wrap_before'   => '',
+								'toggler'       => array(
+									'fields' => array(
+										array(
+											'id'    => 'bwfan_advance_logs',
+											'value' => true,
+										),
+									),
+								),
+							),
+							array(
+								'id'            => 'bwfan_step_logging',
+								'label'         => ' ',
+								'type'          => 'checkbox',
+								'checkboxlabel' => __( 'Enable Logs for Automation Steps', 'wp-marketing-automations' ),
+								'hint'          => __( "It logs step by step execution in Automation. Logs are captured in file named <i>fka-automation-step-id-xxx</i>", 'wp-marketing-automations' ),
+								'class'         => 'bwfan_make_logs',
+								'required'      => false,
+								'wrap_before'   => '',
+								'toggler'       => array(
+									'fields' => array(
+										array(
+											'id'    => 'bwfan_advance_logs',
+											'value' => true,
+										),
+									),
+								),
+							),
+							array(
+								'id'            => 'bwfan_broadcast_logging',
+								'type'          => 'checkbox',
+								'label'         => ' ',
+								'checkboxlabel' => __( 'Enable Logs for Broadcast', 'wp-marketing-automations' ),
+								'hint'          => __( "It logs step by step execution in Broadcast. Logs are captured in file named <i>fka-broadcast-xxx</i>", 'wp-marketing-automations' ),
+								'class'         => 'bwfan_make_logs',
+								'required'      => false,
+								'wrap_before'   => '',
+								'toggler'       => array(
+									'fields' => array(
+										array(
+											'id'    => 'bwfan_advance_logs',
+											'value' => true,
+										),
+									),
+								),
+							),
+							array(
+								'id'            => 'bwfan_bulk_action_logging',
+								'type'          => 'checkbox',
+								'label'         => ' ',
+								'checkboxlabel' => __( 'Enable Logs for Bulk Actions', 'wp-marketing-automations' ),
+								'hint'          => __( "It logs step by step execution in Bulk Action. Logs are captured in file named <i>fka-bulk-action-xxx</i>", "wp-marketing-automatoins" ),
+								'class'         => 'bwfan_make_logs',
+								'required'      => false,
+								'wrap_before'   => '',
+								'toggler'       => array(
+									'fields' => array(
+										array(
+											'id'    => 'bwfan_advance_logs',
+											'value' => true,
+										),
+									),
+								),
+							),
+							array(
+								'id'            => 'bwfan_contact_export_logging',
+								'type'          => 'checkbox',
+								'label'         => ' ',
+								'checkboxlabel' => __( 'Enable Logs for Contact Export Process', 'wp-marketing-automations' ),
+								'hint'          => __( "It logs step by step execution in Contact Export. Logs are captured in file named <i>fka-contact-export-xxx</i>", 'wp-marketing-automatons' ),
+								'class'         => 'bwfan_make_logs',
+								'required'      => false,
+								'wrap_before'   => '',
+								'toggler'       => array(
+									'fields' => array(
+										array(
+											'id'    => 'bwfan_advance_logs',
+											'value' => true,
+										),
+									),
+								),
+							),
+							array(
+								'id'            => 'bwfan_contact_query_logging',
+								'type'          => 'checkbox',
+								'label'         => ' ',
+								'checkboxlabel' => __( 'Enable Logs for Contact Query', 'wp-marketing-automations' ),
+								'hint'          => __( "It logs the contact fetching query and time spent in fetching the data. Logs are captured in file named <i>fka-contacts-query-xxx</i>", 'wp-marketing-automatons' ),
+								'class'         => 'bwfan_make_logs',
+								'required'      => false,
+								'wrap_before'   => '',
+								'toggler'       => array(
+									'fields' => array(
+										array(
+											'id'    => 'bwfan_advance_logs',
+											'value' => true,
+										),
+									),
+								),
+							),
+							array(
+								'id'            => 'bwfan_email_bounce_logging',
+								'type'          => 'checkbox',
+								'label'         => ' ',
+								'checkboxlabel' => __( 'Enable Logs for Email Bounce Webhook', 'wp-marketing-automations' ),
+								'hint'          => __( "It logs the received data from email service provider related to bounce and complaint. Logs are captured in file named <i>fka-email-webhook-request-xxx</i>", 'wp-marketing-automatons' ),
+								'class'         => 'bwfan_make_logs',
+								'required'      => false,
+								'wrap_before'   => '',
+								'toggler'       => array(
+									'fields' => array(
+										array(
+											'id'    => 'bwfan_advance_logs',
+											'value' => true,
+										),
+									),
+								),
+							),
+							array(
+								'id'            => 'bwfan_webhook_received_logging',
+								'type'          => 'checkbox',
+								'label'         => ' ',
+								'checkboxlabel' => __( 'Enable Logs for Webhook Received event automation', 'wp-marketing-automations' ),
+								'hint'          => __( "It logs the received data on a 'Webhook Received' automation. Logs are captured in file named <i>fka-webhook-logs-xxx</i>", 'wp-marketing-automatons' ),
+								'class'         => 'bwfan_make_logs',
+								'required'      => false,
+								'wrap_before'   => '',
+								'toggler'       => array(
+									'fields' => array(
+										array(
+											'id'    => 'bwfan_advance_logs',
+											'value' => true,
+										),
+									),
+								),
+							),
 						),
 					),
 					array(
@@ -6261,28 +6462,84 @@ class BWFAN_Common {
 	public static function is_unsubscribe_page_valid() {
 		$arr     = [ 'status' => 0, 'message' => '' ];
 		$setting = self::get_global_settings();
+
+		/** Check if unsubscribe page is set */
 		if ( ! isset( $setting['bwfan_unsubscribe_page'] ) || empty( $setting['bwfan_unsubscribe_page'] ) ) {
 			return $arr;
 		}
+
 		$post = get_post( $setting['bwfan_unsubscribe_page'] );
 		if ( ! $post instanceof WP_Post ) {
-			$arr = [ 'status' => 3, 'message' => __( 'Page not exists.', 'wp-marketing-automations' ) ];
-
-			return $arr;
+			return [
+				'status'  => 3,
+				'message' => __( 'Page not exists.', 'wp-marketing-automations' ),
+			];
 		}
 
-		$content       = $post->post_content;
-		$has_shortcode = has_shortcode( $content, 'wfan_unsubscribe_button' ) || has_shortcode( $content, 'bwfan_unsubscribe_button' ) || strpos( $content, 'id="bwfan_unsubscribe"' ) !== false;
-		if ( empty( $content ) || false === $has_shortcode ) {
-			$arr = [
-				'status'  => 2,
-				'message' => __( 'The above selected Subscribe page doesn’t contain the necessary required shortcode. Kindly please add in your subscribe page.', 'wp-marketing-automations' )
-			];
+		/** Fetch Breakdance content if active */
+		$content = bwfan_is_breakdance_active() ? self::get_breakdance_content( $post->ID ) : '';
+		$content = empty( $content ) ? $post->post_content : $content;
 
-			return $arr;
+		/** Check for required shortcodes */
+		$has_shortcode = has_shortcode( $content, 'wfan_unsubscribe_button' ) || has_shortcode( $content, 'bwfan_unsubscribe_button' ) || strpos( $content, 'id="bwfan_unsubscribe"' ) !== false;
+
+		if ( empty( $content ) || ! $has_shortcode ) {
+			return [
+				'status'  => 2,
+				'message' => __( 'The selected unsubscribe page doesn\'t contain the required shortcode. Please add.', 'wp-marketing-automations' ),
+			];
 		}
 
 		return [ 'status' => 1, 'message' => '' ]; // success
+	}
+
+	/**
+	 * Get the Breakdance post content
+	 *
+	 * @param $page_id
+	 *
+	 * @return string
+	 */
+	public static function get_breakdance_content( $page_id ) {
+		if ( empty( $page_id ) ) {
+			return '';
+		}
+
+		$data = get_post_meta( $page_id, '_breakdance_data', true );
+		if ( empty( $data ) ) {
+			return '';
+		}
+
+		$decoded_data = json_decode( $data, true );
+		$tree_json    = $decoded_data['tree_json_string'] ?? '';
+		if ( empty( $tree_json ) ) {
+			return '';
+		}
+
+		$tree_data = json_decode( $tree_json, true );
+
+		return ! empty( $tree_data['root']['children'] ) ? self::extract_shortcodes_from_breakdance( $tree_data['root']['children'] ) : '';
+	}
+
+	/**
+	 * Extract shortcodes from Breakdance JSON tree.
+	 *
+	 * @param array $children
+	 *
+	 * @return string
+	 */
+	private static function extract_shortcodes_from_breakdance( $children ) {
+		$shortcodes = '';
+		foreach ( $children as $child ) {
+			if ( isset( $child['data']['type'] ) && $child['data']['type'] === 'EssentialElements\\Shortcode' ) {
+				$shortcodes .= $child['data']['properties']['content']['shortcode']['full_shortcode'] ?? '';
+			}
+			if ( ! empty( $child['children'] ) ) {
+				$shortcodes .= self::extract_shortcodes_from_breakdance( $child['children'] );
+			}
+		}
+
+		return $shortcodes;
 	}
 
 	public static function get_lists_preference_schema() {
@@ -7534,6 +7791,9 @@ class BWFAN_Common {
 			$pre_header = $args['preheader'] ?? '';
 			$body       = ! empty( $pre_header ) ? $send_email_ins->append_to_email_body( $body, $pre_header, '' ) : $body;
 
+			/** Append contact uid in all a href link trigger links  */
+			$body = self::append_uid_to_links( $body );
+
 			/** Email Headers */
 			$from_name      = $global_email_settings['bwfan_email_from_name'] ?? '';
 			$from_email     = $global_email_settings['bwfan_email_from'] ?? '';
@@ -7584,10 +7844,59 @@ class BWFAN_Common {
 	}
 
 	/**
+	 * Auto append logged-in user contact UID in a links
+	 *
+	 * @param $body
+	 *
+	 * @return array|mixed|string|string[]|null
+	 */
+	public static function append_uid_to_links( $body ) {
+		if ( empty( $body ) ) {
+			return $body;
+		}
+
+		/** Check if 'bwfan-link-trigger=' exists in the body */
+		if ( strpos( $body, 'bwfan-link-trigger=' ) === false ) {
+			return $body;
+		}
+
+		$current_user_id = get_current_user_id();
+		if ( empty( $current_user_id ) ) {
+			return $body;
+		}
+
+		$contact = new WooFunnels_Contact( $current_user_id );
+		if ( empty( $contact->get_id() ) || empty( $contact->get_uid() ) ) {
+			return $body;
+		}
+
+		$uid = $contact->get_uid();
+
+		/** Regex pattern to match href attributes only within <a> tags (handling both single and double quotes) */
+		$pattern = '/<a[^>]+href=("|\')(.*?)\1/i';
+
+		return preg_replace_callback( $pattern, function ( $matches ) use ( $uid ) {
+			$quote = $matches[1]; // Capture quote type
+			$tag   = $matches[0];
+
+			/** Extract href URL */
+			preg_match( '/href=' . $quote . '(.*?)' . $quote . '/', $tag, $hrefMatch );
+			$url = $hrefMatch[1] ?? '';
+
+			/** Append uid parameter correctly */
+			$separator = ( strpos( $url, '?' ) !== false ) ? '&' : '?';
+			$new_url   = $url . $separator . 'uid=' . $uid;
+
+			return str_replace( $url, $new_url, $tag );
+		}, $body );
+	}
+
+	/**
 	 * Add UTM parameters in test email
 	 *
 	 * @param $body
 	 * @param $args
+	 * @param $mode
 	 *
 	 * @return array|mixed|string|string[]|null
 	 */
@@ -7848,7 +8157,7 @@ class BWFAN_Common {
 			$ins->contact_id    = $data['cid'];
 			$ins->automation_id = $data['aid'];
 			$ins->step_id       = $step_id;
-			$ins->populate_automation_contact_data();
+			$ins->populate_automation_contact_data( $data );
 			$ins->populate_step_data();
 
 			$new_e_time = $ins->get_time( $data['last_time'] );
@@ -8855,6 +9164,9 @@ class BWFAN_Common {
 	 * @return bool
 	 */
 	public static function event_cb_advanced_log_enabled() {
+		if ( self::is_log_enabled( 'bwfan_end_point_logging' ) ) {
+			return true;
+		}
 		if ( defined( 'BWFAN_ALLOW_EVENT_ENDPOINT_LOGS' ) && true === BWFAN_ALLOW_EVENT_ENDPOINT_LOGS ) {
 			return true;
 		}
@@ -8880,7 +9192,7 @@ class BWFAN_Common {
 			't' => microtime( true ),
 			'm' => $log,
 		);
-		BWFAN_Common::log_test_data( $log, 'event-endpoint-check', true );
+		BWFAN_Common::log_test_data( $log, 'fka-event-endpoint-check', true );
 	}
 
 	/**
@@ -9483,7 +9795,6 @@ class BWFAN_Common {
 	 */
 	public static function bwf_remove_filter_before_wp_mail() {
 		remove_all_filters( 'wp_mail_from' );
-		remove_all_filters( 'pre_wp_mail' );
 		remove_all_filters( 'wp_mail_from_name' );
 		remove_all_filters( 'wp_mail_content_type' );
 		remove_all_filters( 'wp_mail_charset' );
@@ -10609,6 +10920,7 @@ class BWFAN_Common {
 			return $term;
 		}, $terms );
 
+		$terms = self::check_for_comma_seperated( $terms );
 		$terms = BWFCRM_Term::get_or_create_terms( $terms, $type, true );
 
 		/** Preparing Data */
@@ -11116,5 +11428,59 @@ class BWFAN_Common {
 		} catch ( Exception|Error $e ) {
 			return '';
 		}
+	}
+
+	public static function get_user_menu_access() {
+		$user_menu_access = apply_filters( 'bwfan_user_menu_access_data', [] );
+		$menu_data        = [];
+
+		if ( ! empty( $user_menu_access ) && isset( $user_menu_access[ get_current_user_id() ] ) ) {
+			$menu_data = $user_menu_access[ get_current_user_id() ];
+		}
+
+		return $menu_data;
+	}
+
+	/**
+	 * Check advance log enabled
+	 *
+	 * @param $log
+	 *
+	 * @return bool
+	 */
+	public static function is_log_enabled( $log ) {
+		$global_settings = BWFAN_Common::get_global_settings();
+
+		return isset( $global_settings['bwfan_advance_logs'] ) && ! empty( $global_settings['bwfan_advance_logs'] ) && isset( $global_settings[ $log ] ) && ! empty( $global_settings[ $log ] );
+	}
+
+	/**
+	 * Get formatted tag & list data if comma exists in value
+	 *
+	 * @param $data
+	 *
+	 * @return array|string[]
+	 */
+	public static function check_for_comma_seperated( $data ) {
+		if ( empty( $data ) || ! is_array( $data ) ) {
+			return [];
+		}
+		$formatted_data = [];
+		foreach ( $data as $value ) {
+			if ( ! empty( ( $value['id'] ) ) || false === strpos( $value['value'], ',' ) ) {
+				$formatted_data[] = $value;
+				continue;
+			}
+			$comma_separated_values = explode( ',', $value['value'] );
+			$comma_separated_values = array_map( function ( $single_value ) {
+				return [
+					'id'    => 0,
+					'value' => trim( $single_value )
+				];
+			}, $comma_separated_values );
+			$formatted_data         = array_merge( $formatted_data, $comma_separated_values );
+		}
+
+		return $formatted_data;
 	}
 }

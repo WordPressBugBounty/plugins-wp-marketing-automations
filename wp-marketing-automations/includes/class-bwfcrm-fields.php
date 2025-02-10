@@ -9,6 +9,8 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 		public static $TYPE_RADIO = 5;
 		public static $TYPE_CHECKBOX = 6;
 		public static $TYPE_DATE = 7;
+		public static $TYPE_DATETIME = 8;
+		public static $TYPE_TIME = 9;
 
 		public static $contact_columns = array(
 			'f_name'        => 'First Name',
@@ -183,6 +185,9 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 				if ( $exclude_sys_fields && $is_system_field ) {
 					continue;
 				}
+				if ( version_compare( BWFAN_PRO_VERSION, '3.4.0', '<=' ) && in_array( intval( $field['type'] ), [ self::$TYPE_DATETIME, self::$TYPE_TIME ], true ) ) {
+					continue;
+				}
 
 				$field_data[ $field['ID'] ] = array(
 					'group_id'   => $field['gid'],
@@ -326,11 +331,17 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 					'created_at' => isset( $field['created_at'] ) ? $field['created_at'] : '',
 				);
 
-				if ( true === $mapping && 7 === absint( $field['type'] ) ) {
+				if ( true === $mapping && self::$TYPE_DATE === intval( $field['type'] ) ) {
 					$field_data[ $group_id ]['fields'][ $field['field_id'] ]['name'] = __( $field['name'] . ' (Y-m-d)', 'wp-marketing-automations' );
 				}
-				if ( true === $mapping && 2 === absint( $field['type'] ) ) {
+				if ( true === $mapping && self::$TYPE_NUMBER === intval( $field['type'] ) ) {
 					$field_data[ $group_id ]['fields'][ $field['field_id'] ]['name'] = __( $field['name'] . ' (number)', 'wp-marketing-automations' );
+				}
+				if ( true === $mapping && self::$TYPE_DATETIME === intval( $field['type'] ) ) {
+					$field_data[ $group_id ]['fields'][ $field['field_id'] ]['name'] = __( $field['name'] . ' (Y-m-d H:i:s)', 'wp-marketing-automations' );
+				}
+				if ( true === $mapping && self::$TYPE_TIME === intval( $field['type'] ) ) {
+					$field_data[ $group_id ]['fields'][ $field['field_id'] ]['name'] = __( $field['name'] . ' (H:i)', 'wp-marketing-automations' );
 				}
 			}
 

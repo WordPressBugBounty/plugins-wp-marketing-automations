@@ -28,6 +28,7 @@ class BWFAN_Table_Validation_Controller {
 		'bwf_contact',
 		'bwf_contact_meta',
 		'bwf_wc_customers',
+		'bwfan_automation_contact_claim'
 	];
 
 	public static $pro_tables = [
@@ -46,7 +47,6 @@ class BWFAN_Table_Validation_Controller {
 		'bwfan_tasks',
 		'bwfan_taskmeta',
 		'bwfan_task_claim',
-		'bwfan_automation_contact_claim'
 	];
 
 	public static $core_tables = [

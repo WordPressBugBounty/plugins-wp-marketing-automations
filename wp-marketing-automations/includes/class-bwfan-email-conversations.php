@@ -1013,7 +1013,7 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 			return $string;
 		}
 
-		public function get_source( $con ) {
+		public function get_source( $con, $template_data = [] ) {
 			if ( ! isset( $con['oid'] ) || ( ! absint( $con['oid'] ) > 0 && absint( $con['type'] ) < 4 ) ) {
 				return false;
 			}
@@ -1122,9 +1122,15 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 						'type' => __( 'Form Feed', 'wp-marketing-automations' ),
 					);
 				case 9:
-					return array(
-						'type' => __( 'Transactional Mail', 'wp-marketing-automations' ),
-					);
+					$data = [
+						'type' => __( 'Transactional', 'wp-marketing-automations' )
+					];
+					if ( ! empty( $template_data ) && ! empty( $template_data['title'] ) ) {
+						if ( ! empty( $template_data['title'] ) ) {
+							$data['name'] = $template_data['title'];
+						}
+					}
+					return $data;
 				default:
 					return false;
 			}

@@ -700,7 +700,7 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 
 		/** it will add the space after the pre-header to not show the email body content */
 		if ( ! empty( $pre_header ) ) {
-			$pre_header .= '<div style="display: none; max-height: 0; overflow: hidden;">' . str_repeat( '&#847;&zwnj;&nbsp;', apply_filters( 'bwfan_email_pre_header_space', 70 ) ) . '</div>'; // Adding 70 instances to create enough hidden space
+			$pre_header .= '<div style="display: none; max-height: 0; overflow: hidden;">' . str_repeat( '&#847;&zwnj;&nbsp;', apply_filters( 'bwfan_email_pre_header_space', 100 ) ) . '</div>'; // Adding 70 instances to create enough hidden space
 		}
 
 		$appended_body = $pre_header . ' ' . $body;
@@ -875,7 +875,7 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 				'type'                  => 'text_with_button',
 				'class'                 => '',
 				'placeholder'           => __( 'Enter email', 'wp-marketing-automations' ),
-				'hint'                  => '',
+				'hint'                  => __( 'Use comma separated values to send email to multiple users.', 'wp-marketing-automations' ),
 				'required'              => true,
 				'toggler'               => array(),
 				'automation_merge_tags' => true
@@ -1007,7 +1007,8 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 		if ( ! is_array( $this->logs ) || 0 === count( $this->logs ) ) {
 			return;
 		}
-		if ( false === apply_filters( 'bwfan_allow_broadcast_logging', false ) ) {
+
+		if ( false === apply_filters( 'bwfan_allow_broadcast_logging', BWFAN_Common::is_log_enabled( 'bwfan_broadcast_logging' ) ) ) {
 			return;
 		}
 

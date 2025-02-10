@@ -134,9 +134,15 @@ class WooFunnels_DB_Updater {
 	 */
 	public static function capture_order_status_change_event( $request ) {
 		self::nocache_headers();
-
 		$posted_data = $request->get_body_params();
+		self::process_events( $posted_data );
+	}
 
+	public static function process_events( $posted_data ) {
+
+		if ( empty( $posted_data ) ) {
+			return;
+		}
 		$ins = WooFunnels_DB_Updater::get_instance();
 		$ins->event_advanced_logs( "Order status change endpoint data received" );
 		$ins->event_advanced_logs( $posted_data );
@@ -157,10 +163,10 @@ class WooFunnels_DB_Updater {
 		}
 
 		try {
-			do_action( 'fk_order_status_change_async_capture', $posted_data );
-
 			$paid_status = $order->has_status( wc_get_is_paid_statuses() );
 			if ( false === $paid_status ) {
+				do_action( 'fk_order_status_change_async_capture', $posted_data );
+
 				return;
 			}
 			$temp_cid = BWF_WC_Compatibility::get_order_meta( $order, '_woofunnel_custid' );
@@ -168,6 +174,7 @@ class WooFunnels_DB_Updater {
 				/** Update customer when order is paid and not indexed */
 				bwf_create_update_contact( $order_id, array(), 0, true );
 			}
+			do_action( 'fk_order_status_change_async_capture', $posted_data );
 		} catch ( Error $r ) {
 			$ins->event_advanced_logs( "Error occurred: " . $r->getMessage() );
 		}
@@ -498,6 +505,10 @@ class WooFunnels_DB_Updater {
 	public static function verify_nonce( $nonce, $action ) {
 		$expected = self::create_nonce( $action );
 
+		if ( empty( $expected ) || empty( $nonce ) ) {
+			return false;
+		}
+
 		return ( hash_equals( $expected, $nonce ) );
 	}
 
@@ -534,30 +545,37 @@ class WooFunnels_DB_Updater {
 			$data = array_merge( $extra_data, $data );
 		}
 
-		$url  = home_url() . '/?rest_route=/woofunnel_customer/v1/order_status_changed';
-		$args = bwf_get_remote_rest_args( $data );
+		$flag_saved_val = get_transient( 'bwfan_stop_async_call' );
+		if ( 1 === intval( $flag_saved_val ) ) {
+			$this->process_events( $data );
+		} else {
 
-		$this->event_advanced_logs( "Sending data for order status change JSON endpoint. URL: " . $url );
-		$this->event_advanced_logs( $data );
+			$url  = home_url() . '/?rest_route=/woofunnel_customer/v1/order_status_changed';
+			$args = bwf_get_remote_rest_args( $data );
 
-		$start_time = microtime( true );
-		$response   = wp_remote_post( $url, $args );
-		$end_time   = microtime( true );
+			$this->event_advanced_logs( "Sending data for order status change JSON endpoint. URL: " . $url );
+			$this->event_advanced_logs( $data );
 
-		if ( ( $end_time - $start_time ) > 0.2 ) {
-			/** Curl took minimum 0.2 secs */
-			$flag_saved_val = get_transient( 'bwfan_stop_async_call' );
-			if ( empty( $flag_saved_val ) ) {
-				set_transient( 'bwfan_stop_async_call', 1, WEEK_IN_SECONDS );
+			$start_time = microtime( true );
+			$response   = wp_remote_post( $url, $args );
+			$end_time   = microtime( true );
+
+			if ( ( $end_time - $start_time ) > 0.2 ) {
+				/** Curl took minimum 0.2 secs */
+				$flag_saved_val = get_transient( 'bwfan_stop_async_call' );
+				if ( empty( $flag_saved_val ) ) {
+					set_transient( 'bwfan_stop_async_call', 1, WEEK_IN_SECONDS );
+				}
 			}
-		}
 
-		$this->event_advanced_logs( "Order status change async call response" );
-		if ( is_wp_error( $response ) ) {
-			$this->event_advanced_logs( $response->get_error_message() );
-		} elseif ( isset( $response['body'] ) ) {
-			$this->event_advanced_logs( $response['body'] );
-			$this->event_advanced_logs( $response['response'] );
+
+			$this->event_advanced_logs( "Order status change async call response" );
+			if ( is_wp_error( $response ) ) {
+				$this->event_advanced_logs( $response->get_error_message() );
+			} elseif ( isset( $response['body'] ) ) {
+				$this->event_advanced_logs( $response['body'] );
+				$this->event_advanced_logs( $response['response'] );
+			}
 		}
 
 		/** Reducing total_value with remaining order total (if partial earlier refund made) */
@@ -577,7 +595,7 @@ class WooFunnels_DB_Updater {
 		);
 
 		add_filter( 'bwf_logs_allowed', array( $this, 'overriding_bwf_logging' ), 99999 );
-		BWF_Logger::get_instance()->log( print_r( $log, true ), 'event-endpoint-check', 'autonami' );
+		BWF_Logger::get_instance()->log( print_r( $log, true ), 'fka-event-endpoint-check', 'autonami' );
 		remove_filter( 'bwf_logs_allowed', array( $this, 'overriding_bwf_logging' ), 99999 );
 	}
 
@@ -844,6 +862,10 @@ class WooFunnels_DB_Updater {
 			return;
 		}
 
+		if ( did_action( 'woocommerce_checkout_process' ) > 0 ) {
+			return;
+		}
+
 		if ( 'profile_update' === current_action() ) {
 			$this->do_profile_update_async_call( $user_id, $old_user_data );
 
@@ -1057,22 +1079,22 @@ class WooFunnels_DB_Updater {
 			$wpdb->query( "DROP TABLE IF EXISTS $bwf_table" );  //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		}
 
-        /**
-         * Remove bwf_wc_customers table from table list for attempt to recreate table
-         */
-        $current_table_list = get_option( '_bwf_db_table_list' );
+		/**
+		 * Remove bwf_wc_customers table from table list for attempt to recreate table
+		 */
+		$current_table_list = get_option( '_bwf_db_table_list' );
 
-        if ( is_array( $current_table_list ) && isset( $current_table_list['tables'] ) && count( $current_table_list['tables'] ) > 0 ) {
-            $table_list = array_unique( $current_table_list['tables'] );
-            foreach ( $table_list as $key ) {
-                if ( 'bwf_wc_customers' === $key ) {
-                    unset( $table_list[ $key ] );
-	                $current_table_list['tables'] = array_values( $table_list );
-                    update_option( '_bwf_db_table_list', $current_table_list, true );
-                    break;
-                }
-            }
-        }
+		if ( is_array( $current_table_list ) && isset( $current_table_list['tables'] ) && count( $current_table_list['tables'] ) > 0 ) {
+			$table_list = array_unique( $current_table_list['tables'] );
+			foreach ( $table_list as $key ) {
+				if ( 'bwf_wc_customers' === $key ) {
+					unset( $table_list[ $key ] );
+					$current_table_list['tables'] = array_values( $table_list );
+					update_option( '_bwf_db_table_list', $current_table_list, true );
+					break;
+				}
+			}
+		}
 		delete_option( '_bwf_db_upgrade' );
 		delete_option( '_bwf_order_threshold' );
 		delete_option( '_bwf_offset' );

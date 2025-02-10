@@ -21,7 +21,7 @@ class BWF_Logger {
 		return self::$ins;
 	}
 
-	public function log( $message, $file_name = '', $folder_prefix = 'buildwoofunnels', $force = false ) {
+	public function log( $message, $file_name = '', $folder_prefix = 'fk-temp', $force = false ) {
 
 		if ( ! $force && false === apply_filters( 'bwf_logs_allowed', false, $file_name ) ) {
 			return;

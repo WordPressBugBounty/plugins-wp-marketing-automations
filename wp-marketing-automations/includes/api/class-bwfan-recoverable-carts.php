@@ -16,7 +16,8 @@ class BWFAN_Recoverable_Carts {
 		}
 		$result = [];
 		if ( $count === false ) {
-			$result = BWFAN_Model_Abandonedcarts::get_abandoned_data( $where, $offset, $limit, 'last_modified' );
+			$order_by = apply_filters( 'bwfan_cart_listing_order_by', 'last_modified' );
+			$result   = BWFAN_Model_Abandonedcarts::get_abandoned_data( $where, $offset, $limit, $order_by );
 		}
 		$query                 = "SELECT COUNT(*) FROM {$wpdb->prefix}bwfan_abandonedcarts $where";
 		$result['total_count'] = $wpdb->get_var( $query ); // WPCS: unprepared SQL OK

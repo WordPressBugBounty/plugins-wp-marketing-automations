@@ -50,6 +50,8 @@ class BWFAN_API_Apply_Lists extends BWFAN_API_Base {
 			return $this->error_response( $response );
 		}
 
+		/** Checking for comma in tag values */
+		$lists       = BWFAN_Common::check_for_comma_seperated( $lists );
 		$added_lists = $contact->add_lists( $lists );
 
 		if ( is_wp_error( $added_lists ) ) {

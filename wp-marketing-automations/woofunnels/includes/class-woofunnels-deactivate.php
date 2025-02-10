@@ -155,44 +155,47 @@ class WooFunnels_Deactivate {
 	 * @since  1.1.2
 	 */
 	public static function _submit_uninstall_reason_action() {
-		check_admin_referer( 'bwf_secure_key', '_nonce' );
+		try {
+			check_admin_referer('bwf_secure_key', '_nonce');
 
-		if ( ! current_user_can( 'install_plugins' ) ) {
-			wp_send_json_error();
-		}
-		if ( ! isset( $_POST['reason_id'] ) ) {
-			exit;
-		}
+			if (!current_user_can('install_plugins')) {
+				wp_send_json_error();
+			}
+			if (!isset($_POST['reason_id'])) {
+				wp_send_json_error();
+			}
 
-		$reason_info = isset( $_POST['reason_info'] ) ? sanitize_textarea_field( stripslashes( bwf_clean( $_POST['reason_info'] ) ) ) : '';
+			$reason_info = isset($_POST['reason_info']) ? sanitize_textarea_field(stripslashes(bwf_clean($_POST['reason_info']))) : '';
 
-		$reason = array(
-			'id'   => sanitize_text_field( $_POST['reason_id'] ),
-			'info' => substr( $reason_info, 0, 128 ),
-		);
+			$reason = array(
+				'id'   => sanitize_text_field($_POST['reason_id']),
+				'info' => substr($reason_info, 0, 128),
+			);
 
-		$licenses        = WooFunnels_addons::get_installed_plugins();
-		$version         = 'NA';
-		$plugin_basename = isset( $_POST['plugin_basename'] ) ? bwf_clean( $_POST['plugin_basename'] ) : '';
+			$licenses        = WooFunnels_addons::get_installed_plugins();
+			$version         = 'NA';
+			$plugin_basename = isset($_POST['plugin_basename']) ? bwf_clean($_POST['plugin_basename']) : '';
 
-		if ( $licenses && count( $licenses ) > 0 ) {
-			foreach ( $licenses as $key => $license ) {
-				if ( $key === $plugin_basename ) {
-					$version = $license['Version'];
+			if ($licenses && count($licenses) > 0) {
+				foreach ($licenses as $key => $license) {
+					if ($key === $plugin_basename) {
+						$version = $license['Version'];
+					}
 				}
 			}
+
+			$deactivations = array(
+				$plugin_basename . '(' . $version . ')' => $reason,
+			);
+
+			WooFunnels_API::post_deactivation_data($deactivations);
+
+		} catch (Exception $e) {
+			// Log the exception if necessary
 		}
 
-		$deactivations = array(
-			$plugin_basename . '(' . $version . ')' => $reason,
-		);
-
-
-		WooFunnels_API::post_deactivation_data( $deactivations );
 		wp_send_json_success();
-
 	}
 
-	
 
 }

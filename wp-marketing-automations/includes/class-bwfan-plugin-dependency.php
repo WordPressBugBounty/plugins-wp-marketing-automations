@@ -357,4 +357,12 @@ class BWFAN_Plugin_Dependency {
 
 		return in_array( 'thank-you-page-for-woocommerce-nextmove/woocommerce-thankyou-pages.php', self::$active_plugins, true ) || array_key_exists( 'thank-you-page-for-woocommerce-nextmove/woocommerce-thankyou-pages.php', self::$active_plugins );
 	}
+
+	public static function bwfan_breakdance_check() {
+		if ( ! self::$active_plugins ) {
+			self::init();
+		}
+
+		return in_array( 'breakdance/plugin.php', self::$active_plugins, true ) || array_key_exists( 'breakdance/plugin.php', self::$active_plugins );
+	}
 }

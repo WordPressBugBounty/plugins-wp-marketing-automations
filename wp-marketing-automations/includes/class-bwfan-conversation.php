@@ -167,7 +167,7 @@ class BWFAN_Conversation {
 
 		/** it will add the space after the pre-header to not show the email body content */
 		if ( ! empty( $pre_header ) ) {
-			$pre_header .= '<div style="display: none; max-height: 0; overflow: hidden;">' . str_repeat( '&#847;&zwnj;&nbsp;', apply_filters( 'bwfan_email_pre_header_space', 70 ) ) . '</div>'; // Adding 70 instances to create enough hidden space
+			$pre_header .= '<div style="display: none; max-height: 0; overflow: hidden;">' . str_repeat( '&#847;&zwnj;&nbsp;', apply_filters( 'bwfan_email_pre_header_space', 100 ) ) . '</div>'; // Adding 70 instances to create enough hidden space
 		}
 
 

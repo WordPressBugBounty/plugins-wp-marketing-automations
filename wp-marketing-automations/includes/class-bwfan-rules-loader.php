@@ -179,20 +179,21 @@ class BWFAN_Rules_Loader extends BWFAN_Rules {
 		}
 
 		$order_other_rules = [
-			'order_total'             => __( 'Order Total', 'wp-marketing-automations' ),
-			'order_sub_total'         => __( 'Order Subtotal', 'wp-marketing-automations' ),
-			'order_coupons'           => __( 'Order Coupons', 'wp-marketing-automations' ),
-			'order_has_coupon'        => __( 'Order Has Coupon', 'wp-marketing-automations' ),
-			'order_coupon_text_match' => __( 'Order Coupon Text', 'wp-marketing-automations' ),
-			'order_payment_gateway'   => __( 'Order Payment Gateway', 'wp-marketing-automations' ),
-			'order_shipping_method'   => __( 'Order Shipping Method', 'wp-marketing-automations' ),
-			'order_billing_country'   => __( 'Order Billing Country', 'wp-marketing-automations' ),
-			'order_shipping_country'  => __( 'Order Shipping Country', 'wp-marketing-automations' ),
-			'order_custom_field'      => __( 'Order Custom Field', 'wp-marketing-automations' ),
-			'is_guest'                => __( 'Is Guest Order', 'wp-marketing-automations' ),
-			'is_first_order'          => __( 'Is First Order', 'wp-marketing-automations' ),
-			'order_status'            => __( 'Order Status', 'wp-marketing-automations' ),
-			'order_note_text_match'   => __( 'Order Note Text', 'wp-marketing-automations' ),
+			'order_total'                => __( 'Order Total', 'wp-marketing-automations' ),
+			'order_sub_total'            => __( 'Order Subtotal', 'wp-marketing-automations' ),
+			'order_coupons'              => __( 'Order Coupons', 'wp-marketing-automations' ),
+			'order_has_coupon'           => __( 'Order Has Coupon', 'wp-marketing-automations' ),
+			'order_coupon_text_match'    => __( 'Order Coupon Text', 'wp-marketing-automations' ),
+			'order_payment_gateway'      => __( 'Order Payment Gateway', 'wp-marketing-automations' ),
+			'order_shipping_method'      => __( 'Order Shipping Method', 'wp-marketing-automations' ),
+			'order_shipping_method_zone' => __( 'Order Shipping Method Zone', 'wp-marketing-automations' ),
+			'order_billing_country'      => __( 'Order Billing Country', 'wp-marketing-automations' ),
+			'order_shipping_country'     => __( 'Order Shipping Country', 'wp-marketing-automations' ),
+			'order_custom_field'         => __( 'Order Custom Field', 'wp-marketing-automations' ),
+			'is_guest'                   => __( 'Is Guest Order', 'wp-marketing-automations' ),
+			'is_first_order'             => __( 'Is First Order', 'wp-marketing-automations' ),
+			'order_status'               => __( 'Order Status', 'wp-marketing-automations' ),
+			'order_note_text_match'      => __( 'Order Note Text', 'wp-marketing-automations' ),
 		];
 		$types['wc_order'] = array_merge( $types['wc_order'], $order_other_rules );
 

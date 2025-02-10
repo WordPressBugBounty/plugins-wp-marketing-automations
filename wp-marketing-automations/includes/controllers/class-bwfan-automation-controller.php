@@ -560,12 +560,15 @@ class BWFAN_Automation_Controller {
 			'c_time' => time(),
 			'status' => $status,
 		);
-		if ( isset( $message['msg'] ) && strlen( $message['msg'] ) > 220 ) {
+
+		if ( isset( $message['msg'] ) && is_string( $message['msg'] ) && strlen( $message['msg'] ) > 220 ) {
 			$message['msg'] = substr( $message['msg'], 0, 220 );
 		}
-		if ( isset( $message['error_msg'] ) && strlen( $message['error_msg'] ) > 220 ) {
+
+		if ( isset( $message['error_msg'] ) && is_string( $message['error_msg'] ) && strlen( $message['error_msg'] ) > 220 ) {
 			$message['error_msg'] = substr( $message['error_msg'], 0, 220 );
 		}
+
 		if ( ! empty( $message ) ) {
 			$arr['data'] = json_encode( $message );
 		}

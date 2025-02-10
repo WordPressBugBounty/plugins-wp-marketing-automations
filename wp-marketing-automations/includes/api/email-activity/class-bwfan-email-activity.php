@@ -69,6 +69,7 @@ class BWFAN_API_Email_Activity extends BWFAN_API_Base {
 		];
 		if ( bwfan_is_autonami_pro_active() ) {
 			$operators[2] = __( 'Broadcast', 'wp-marketing-automations' );
+			$operators[9] = __( 'Transactional', 'wp-marketing-automations' );
 		}
 
 		return [
@@ -82,11 +83,16 @@ class BWFAN_API_Email_Activity extends BWFAN_API_Base {
 						'op_label'      => __( 'Source', 'wp-marketing-automations' ),
 						'type'          => 'search',
 						'val_label'     => __( 'Source', 'wp-marketing-automations' ),
-						'required'      => [ 'rule', 'data' ],
+						'required'      => [ 'rule' ],
 						'readable_text' => '{{rule /}} - {{value /}}',
+						'rule_dependent'=> true,
 						'api'           => [
 							1 => '/search/automations?search={{search}}&version=2',
 							2 => '/analytics/engagements/search?type=2&search={{search}}'
+						],
+						'data_toggler'  => [
+							'operator' => '===',
+							'value'    => [ 1, 2, '1', '2' ]
 						],
 					],
 					[

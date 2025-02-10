@@ -121,19 +121,19 @@ class BWF_AS_Action_Store extends ActionScheduler_Store {
 			if ( isset( $this->bwf_action_data[ $action_id ] ) ) {
 				$this->bwf_action_data[ $action_id ]->status = '2';
 			}
-
-			/** Needs to re-schedule */
-		} else {
-			/** Checking already scheduled actions count */
-			$count = bwf_scheduled_action_count( $data->hook, $args, $group, '0', 'recurring' );
-			$this->log( __FUNCTION__ . ' id ' . $action_id . ', already schedule count: ' . $count );
-			/**
-			 * Do not create schedule action if we already have min one pending action to run.
-			 */
-			if ( 1 <= $count ) {
-				return;
-			}
 		}
+
+		/** Validate non-running actions */
+		$count = bwf_scheduled_action_count( $data->hook, $args, $group, '0', 'recurring' );
+		if ( 1 === $count ) {
+			/** if one current and one more action non-running found then no need to schedule */
+			return;
+		}
+		if ( 1 < $count ) {
+			/** delete all non running actions i.e. 0 except current action  */
+			bwf_delete_scheduled_recurring_action( $data->hook, 0, $action_id );
+		}
+
 		/** Scheduling new action */
 		$curr_time = current_time( 'mysql', 1 );
 		$exec_time = time() + (int) $data->recurring_interval;

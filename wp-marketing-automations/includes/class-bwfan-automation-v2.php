@@ -614,7 +614,12 @@ class BWFAN_Automation_V2 {
 	public function update_automation_meta_data( $meta, $steps, $links, $count ) {
 		$response        = false;
 		$meta_data_arr   = [];
-		$iteration_array = $this->get_step_iteration_array( $steps, $links );
+		$step_link_data  = $this->get_step_iteration_array( $steps, $links );
+
+		$iteration_array = $step_link_data['iteration_array'];
+		$steps           = $step_link_data['steps'];
+		$links           = $step_link_data['links'];
+
 		/** Update Automation meta data */
 		if ( ! empty( $meta ) ) {
 			$meta_data = $this->get_automation_meta_data();
@@ -760,6 +765,9 @@ class BWFAN_Automation_V2 {
 	public function get_step_iteration_array( $steps, $links ) {
 		$automationSteps = [];
 		foreach ( $steps as $step ) {
+			if ( empty( $step['id'] ) ) {
+				continue;
+			}
 			if ( 'yesNoNode' === $step['type'] ) {
 				$step['stepId'] = $step['id'];
 			}
@@ -768,12 +776,16 @@ class BWFAN_Automation_V2 {
 		}
 
 		$link_data = [];
+		$filtered_links = [];
 		foreach ( $links as $link ) {
 			if ( empty( $link ) ) {
 				continue;
 			}
 			$source = $link['source'] != 'start' ? $automationSteps[ $link['source'] ]['stepId'] : $link['source'];
 			$target = $link['target'] != 'end' ? $automationSteps[ $link['target'] ]['stepId'] : $link['target'];
+			if( empty($source) || empty($target) || ( ! isset( $automationSteps[ $link['source'] ] ) && ! isset( $automationSteps[$link['target']] ) ) ) {
+				continue;
+			}
 			if ( $automationSteps[ $link['target'] ]['type'] == 'yesNoNode' ) {
 				$index                          = strpos( $target, 'yes' ) !== false ? 'yes' : 'no';
 				$link_data[ $source ][ $index ] = array(
@@ -786,9 +798,14 @@ class BWFAN_Automation_V2 {
 					'type' => $automationSteps[ $link['target'] ]['type'],
 				);
 			}
+			$filtered_links[] = $link;
 		}
 
-		return $link_data;
+		return [
+			'iteration_array' => $link_data,
+			'steps'           => $steps,
+			'links'           => $filtered_links,
+		];
 	}
 
 	/**

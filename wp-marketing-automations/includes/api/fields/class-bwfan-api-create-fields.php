@@ -75,7 +75,6 @@ class BWFAN_API_Create_Fields extends BWFAN_API_Base {
 		$options = ! empty( $options ) && is_array( $options ) ? $options : [];
 
 		$placeholder = isset( $field['placeholder'] ) ? $field['placeholder'] : '';
-
 		$field = BWFCRM_Fields::add_field( $field_name, $type, $options, $placeholder, $mode, $vmode, $search, $group_id );
 		if ( is_wp_error( $field ) ) {
 			return $this->error_response( '', $field, $field->get_error_code() );

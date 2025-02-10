@@ -79,7 +79,9 @@ class WooFunnels_License_check {
 			$data['api_key'] = $data['license_key'];
 		}
 
-		$data['instance']   = $this->pass_instance();
+
+		$data['instance'] = $this->pass_instance();
+
 		$this->license_data = wp_parse_args( $data, $default );
 	}
 
@@ -371,6 +373,7 @@ class WooFunnels_License_check {
 				unset( $plugin_info[ $slug ]["manually_deactivated"] );
 				$plugin_info[ $slug ]["expired"] = 1;
 				$this->update_plugins( $plugin_info );
+				do_action('fk_license_expired',$plugin_info,$slug);
 			}
 		}
 	}
@@ -456,7 +459,7 @@ class WooFunnels_License_check {
 		if ( ! is_object( $_transient_data ) ) {
 			$_transient_data = new stdClass;
 		}
-		
+
 		if ( ! empty( $_transient_data->response ) && ! empty( $_transient_data->response[ $this->name ] ) && false === $this->wp_override ) {
 			return $_transient_data;
 		}
@@ -550,6 +553,14 @@ class WooFunnels_License_check {
 			if ( version_compare( $this->version, $output['new_version'], '<' ) ) {
 
 				$parse_data            = $this->get_data();
+				if (! empty( $parse_data['domain'] ) ) {
+					global $wpdb;
+					$db_domain = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s", 'siteurl' ) );
+
+					if ( ! empty( $db_domain ) && $db_domain !== $parse_data['domain'] ) {
+						$parse_data['db_domain'] = rtrim( $db_domain, '/' );
+					}
+				}
 				$parse_data['request'] = 'plugininformation';
 				$end_point_url         = add_query_arg( $parse_data, $this->update_end_point );
 
@@ -664,7 +675,7 @@ class WooFunnels_License_check {
 	 */
 	public function http_request_args( $args, $url ) {
 		$verify_ssl = $this->verify_ssl();
-		if ( !is_null($url ) && (strpos( $url, 'https://' ) !== false && strpos( $url, 'edd_action=package_download' )) ) {
+		if ( ! is_null( $url ) && ( strpos( $url, 'https://' ) !== false && strpos( $url, 'edd_action=package_download' ) ) ) {
 			$args['sslverify'] = $verify_ssl;
 		}
 

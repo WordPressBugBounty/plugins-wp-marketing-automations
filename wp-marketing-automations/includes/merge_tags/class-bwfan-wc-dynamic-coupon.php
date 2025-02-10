@@ -37,19 +37,12 @@ class BWFAN_WC_Dynamic_Coupon extends BWFAN_Merge_Tag {
 			return $this->parse_shortcode_output( $this->get_dummy_preview(), true );
 		}
 
-		$step_id    = isset( $attr['id'] ) ? $attr['id'] : 0;
-		$contact_id = BWFAN_Merge_Tag_Loader::get_data( 'cid' );
-
-		$contact_id = empty( $contact_id ) ? BWFAN_Merge_Tag_Loader::get_data( 'contact_id' ) : $contact_id;
-
-		$automation_id = BWFAN_Merge_Tag_Loader::get_data( 'automation_id' );
-
-		/** return if either contact_id or automation_id empty */
-		if ( empty( $contact_id ) || empty( $automation_id ) ) {
+		$a_cid = BWFAN_Merge_Tag_Loader::get_data( 'automation_cid' );
+		if ( empty( $a_cid ) ) {
 			return $this->parse_shortcode_output( '', $attr );
 		}
 
-		$automation_contact_data = BWFAN_Model_Automation_Contact::get_automation_contact( $automation_id, $contact_id );
+		$automation_contact_data = BWFAN_Model_Automation_Contact::get_data( $a_cid );
 		$column_data             = json_decode( $automation_contact_data['data'], true );
 
 		/** check for coupons */
@@ -57,6 +50,7 @@ class BWFAN_WC_Dynamic_Coupon extends BWFAN_Merge_Tag {
 			return $this->parse_shortcode_output( '', $attr );
 		}
 
+		$step_id = $attr['id'] ?? 0;
 		/** get step id from column data (coupons) in case empty */
 		if ( empty( $step_id ) && isset( $column_data['coupons'] ) ) {
 			$step_id = array_key_first( $column_data['coupons'] );

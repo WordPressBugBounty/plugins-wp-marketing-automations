@@ -90,6 +90,17 @@ class BWFAN_Contact_Password_Setup_Link extends BWFAN_Merge_Tag {
 				return '';
 			}
 		}
+		/** Check if WooCommerce is active then redirect to my account page */
+		if ( bwfan_is_woocommerce_active() ) {
+			$lost_password_url = wc_get_account_endpoint_url( 'lost-password' );
+			if ( ! empty( $lost_password_url ) ) {
+				return add_query_arg( array(
+					'action' => 'rp',
+					'key'    => rawurlencode( $key ),
+					'login'  => rawurlencode( $user->user_login ),
+				), $lost_password_url );
+			}
+		}
 
 		return add_query_arg( array(
 			'action' => 'rp',

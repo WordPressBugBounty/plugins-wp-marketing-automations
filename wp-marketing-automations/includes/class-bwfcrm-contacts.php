@@ -1480,6 +1480,8 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 				}
 
 				$new = new DateTime( $value, wp_timezone() );
+			} catch ( Error $e ) {
+				return '';
 			} catch ( Exception $e ) {
 				return '';
 			}

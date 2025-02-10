@@ -32,7 +32,7 @@ class BWFAN_API_Tools_Setting extends BWFAN_API_Base {
 			return $this->error_response( __( 'Action type is missing', 'wp-marketing-automations' ) );
 		}
 
-		$result = BWFAN_Common::run_global_tools( $action_type );
+		$result = BWFAN_Common::run_global_tools( $action_type, $this->args );
 		if ( isset( $result['status'] ) && false === $result['status'] ) {
 			return $this->success_response( $result, __( 'Unable to execute action', 'wp-marketing-automations' ) );
 		}

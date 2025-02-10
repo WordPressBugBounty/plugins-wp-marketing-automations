@@ -133,7 +133,8 @@ class BWFAN_Delay_Controller extends BWFAN_Base_Step_Controller {
 		$timezone = new DateTimeZone( wp_timezone_string() );
 		$datetime = new DateTime( date( 'Y-m-d H:i:s', $current_timestamp ), $timezone );
 
-		if ( empty( $delay_time ) ) {
+		/** If time type is not full date time and delay time is empty */
+		if ( empty( $delay_time ) && ( ! isset( $this->data['occurrence'] ) || 'fulldatetime' !== $this->data['occurrence'] ) ) {
 			return $datetime;
 		}
 
@@ -149,6 +150,12 @@ class BWFAN_Delay_Controller extends BWFAN_Base_Step_Controller {
 			}
 			$datetime = new DateTime( date( 'Y-m-d H:i:s', $current_timestamp ), $timezone );
 		}
+
+		/** If time type is full date time or delay time is empty */
+		if ( ( isset( $this->data['occurrence'] ) && 'fulldatetime' === $this->data['occurrence'] ) || empty( $delay_time ) ) {
+			return $datetime;
+		}
+
 		sscanf( $delay_time, '%d:%d', $hours, $minutes );
 		$datetime->setTime( $hours, $minutes, 0 );
 
@@ -218,7 +225,10 @@ class BWFAN_Delay_Controller extends BWFAN_Base_Step_Controller {
 			$this->is_contact_timezone = true;
 		}
 
-		$delay_time = empty( $this->data['custom_field']['time'] ) ? '10:00' : $this->data['custom_field']['time'];
+		$delay_time = '';
+		if ( $this->data['occurrence'] !== 'fulldatetime' ) {
+			$delay_time = empty( $this->data['custom_field']['time'] ) ? '10:00' : $this->data['custom_field']['time'];
+		}
 
 		/** Get time according to contact's timezone */
 		$datetime = $this->get_contact_time( strtotime( $field_val ), $delay_time );

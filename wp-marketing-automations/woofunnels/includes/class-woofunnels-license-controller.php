@@ -55,6 +55,15 @@ class WooFunnels_License_Controller {
 			if ( is_array( $parse_url ) && ! empty( $parse_url['host'] ) && ! empty( ip2long( $parse_url['host'] ) ) ) {
 				continue;
 			}
+
+			if (! empty( $data['domain'] ) ) {
+				global $wpdb;
+				$db_domain = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s", 'siteurl' ) );
+
+				if ( ! empty( $db_domain ) && $db_domain !== $data['domain'] ) {
+					$data['db_domain'] = rtrim( $db_domain, '/' );
+				}
+			}
 			$parse_data['plugins'][ $hash ] = $plugins_to_send[ $hash ] = $data;
 		}
 
@@ -134,6 +143,14 @@ class WooFunnels_License_Controller {
 			$data = $plugin->get_data();
 			if ( empty( $data['plugin_slug'] ) ) {
 				continue;
+			}
+			if (! empty( $data['domain'] ) ) {
+				global $wpdb;
+				$db_domain = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s", 'siteurl' ) );
+
+				if ( ! empty( $db_domain ) && $db_domain !== $data['domain'] ) {
+					$data['db_domain'] = rtrim( $db_domain, '/' );
+				}
 			}
 			$parse_data['plugins'][ $hash ] = $plugins_to_send[ $hash ] = $data;
 			$prepare_dummy[ $hash ]         = [];

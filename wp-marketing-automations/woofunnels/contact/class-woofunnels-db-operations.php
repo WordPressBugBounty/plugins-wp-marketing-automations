@@ -26,7 +26,10 @@ class WooFunnels_DB_Operations {
 	 */
 	public $customer_tbl;
 
-	protected $cache_query = [];
+	public $cache_query = [];
+
+	public $cache_meta_query = false;
+	public $cache_field_query = false;
 
 	/**
 	 * WooFunnels_DB_Operations constructor.
@@ -124,8 +127,6 @@ class WooFunnels_DB_Operations {
 		$query['select'] = 'SELECT * ';
 
 		$query['from'] = "FROM {$this->contact_tbl} AS contact";
-
-		$query['where'] = '';
 
 		$query['where'] = ' WHERE 1=1 ';
 
@@ -232,6 +233,20 @@ class WooFunnels_DB_Operations {
 		global $wpdb;
 		$sql = "SELECT `meta_key`, `meta_value` FROM `$this->contact_meta_tbl` WHERE `contact_id` = %d";
 		$sql = $wpdb->prepare( $sql, $contact_id );
+
+		if ( true === $this->cache_meta_query ) {
+			// extra caching when variable is set, used in actions like FKA broadcast
+			if ( isset( $this->cache_query['meta'] ) && isset( $this->cache_query['meta'][ $contact_id ] ) ) {
+				return $this->cache_query['meta'][ $contact_id ];
+			}
+			if ( ! isset( $this->cache_query['meta'] ) ) {
+				$this->cache_query['meta'] = [];
+			}
+
+			$this->cache_query['meta'][ $contact_id ] = $this->get_set_cached_response( $sql, 'results' );
+
+			return $this->cache_query['meta'][ $contact_id ];
+		}
 
 		return $this->get_set_cached_response( $sql, 'results' );
 	}

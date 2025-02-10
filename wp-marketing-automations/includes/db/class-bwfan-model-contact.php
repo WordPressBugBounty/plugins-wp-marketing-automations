@@ -68,7 +68,6 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			$sql_queries = self::_get_contacts_sql( $search, $limit, $offset, $normalized_filters, $additional_info, $filter_match );
 
 			self::set_log( 'contact sql: ' . $sql_queries['base'] );
-			self::log();
 
 			$total_count = '';
 			if ( (bool) $grab_totals || (bool) $only_count ) {
@@ -82,7 +81,12 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 				}
 			}
 
+			$time     = microtime( true );
 			$contacts = $wpdb->get_results( $sql_queries['base'], ARRAY_A );
+			$time     = microtime( true ) - $time;
+			self::set_log( 'Time to execute the query: ' . $time . ' secs' );
+
+			self::log();
 
 			/** In case there is DB error and no contacts */
 			if ( empty( $contacts ) && ! empty( $wpdb->last_error ) ) {
@@ -149,6 +153,9 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 					$filters['c']  = array_filter( $filters['c'], function ( $v ) {
 						return ( 'status' !== $v['key'] || 3 !== absint( $v['value'] ) );
 					}, ARRAY_FILTER_USE_BOTH );
+					if( isset( $additional_info['include_unsubscribe'] ) ) {
+						unset( $additional_info['include_unsubscribe'] );
+					}
 				}
 
 				/** Unset contact filters array if there are no items, to prevent buggy SQL ANDs */
@@ -326,35 +333,37 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 						continue;
 					}
 
-					switch ( $filter['type'] ) {
-						case BWFCRM_Filters::$TYPE_JSON_ARRAY:
+					switch ( true ) {
+						case $filter['type'] === BWFCRM_Filters::$TYPE_JSON_ARRAY:
 							self::_set_json_array_filter_sql( $filter, $filter_group_key );
 							break;
-						case BWFCRM_Filters::$TYPE_STRING:
+						case $filter['type'] === BWFCRM_Filters::$TYPE_STRING:
 							self::_set_string_filter_sql( $filter, $filter_group_key );
 							break;
-						case BWFCRM_Filters::$TYPE_STRING_EXACT:
+						case $filter['type'] === BWFCRM_Filters::$TYPE_STRING_EXACT:
 							self::_set_string_exact_filter_sql( $filter, $filter_group_key );
 							break;
-						case BWFCRM_Filters::$TYPE_DATE:
+						case $filter['type'] === BWFCRM_Filters::$TYPE_DATE:
+						case version_compare( BWFAN_PRO_VERSION, '3.4.0', '>' ) && $filter['type'] === BWFCRM_Filters::$TYPE_TIME:
+						case version_compare( BWFAN_PRO_VERSION, '3.4.0', '>' ) && $filter['type'] === BWFCRM_Filters::$TYPE_DATETIME:
 							self::_set_date_filter_sql( $filter, $filter_group_key );
 							break;
-						case BWFCRM_Filters::$TYPE_BOOL:
+						case $filter['type'] === BWFCRM_Filters::$TYPE_BOOL:
 							self::_set_bool_filter_sql( $filter, $filter_group_key );
 							break;
-						case BWFCRM_Filters::$TYPE_NUMBER:
+						case $filter['type'] === BWFCRM_Filters::$TYPE_NUMBER:
 							self::_set_number_filter_sql( $filter, $filter_group_key );
 							break;
-						case BWFCRM_Filters::$TYPE_NUMBER_EXACT:
+						case $filter['type'] === BWFCRM_Filters::$TYPE_NUMBER_EXACT:
 							self::_set_number_exact_filter_sql( $filter, $filter_group_key );
 							break;
-						case BWFCRM_Filters::$TYPE_CURRENCY:
+						case $filter['type'] === BWFCRM_Filters::$TYPE_CURRENCY:
 							self::_set_currency_filter_sql( $filter, $filter_group_key );
 							break;
-						case BWFCRM_Filters::$TYPE_DATE_RELATIVE:
+						case $filter['type'] === BWFCRM_Filters::$TYPE_DATE_RELATIVE:
 							self::_set_date_relative_filter_sql( $filter, $filter_group_key );
 							break;
-						case BWFCRM_Filters::$TYPE_CUSTOM_FILTER:
+						case $filter['type'] === BWFCRM_Filters::$TYPE_CUSTOM_FILTER:
 							self::_set_custom_filter_sql( $filter, $filter_group_key );
 							break;
 					}
@@ -536,33 +545,67 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 				$filter['value'] = $filter['value'][0];
 			}
 
+			$format  = 'Y-m-d';
+			$is_null = $filter_rule = '';
+			if ( version_compare( BWFAN_PRO_VERSION, '3.4.0', '>' ) && intval( $filter['type'] ) === BWFCRM_Filters::$TYPE_DATETIME ) {
+				$format = 'Y-m-d H:i:s';
+			}
+			if ( version_compare( BWFAN_PRO_VERSION, '3.4.0', '>' ) && intval( $filter['type'] ) == BWFCRM_Filters::$TYPE_TIME ) {
+				$format = 'H:i';
+			}
+
 			if ( is_array( $filter['value'] ) ) {
 				/** For 'between' rule */
-				$filter_before_date = bwfcrm_maybe_get_datetime( $filter['value'][0] );
-				$filter_after_date  = bwfcrm_maybe_get_datetime( $filter['value'][1] );
+				$filter_before_date = bwfcrm_maybe_get_datetime( $filter['value'][0], $format );
+				$filter_after_date  = bwfcrm_maybe_get_datetime( $filter['value'][1], $format );
 
-				$filter_before_date = date( 'Y-m-d', $filter_before_date->getTimestamp() );
-				$filter_after_date  = date( 'Y-m-d', $filter_after_date->getTimestamp() );
+				$filter_before_date = date( $format, $filter_before_date->getTimestamp() );
+				$filter_after_date  = date( $format, $filter_after_date->getTimestamp() );
 
-				$filter_before_date = "$filter_before_date 00:00:00";
-				$filter_after_date  = "$filter_after_date 23:59:59";
+				if ( 'Y-m-d' === $format ) {
+					$filter_before_date = "$filter_before_date 00:00:00";
+					$filter_after_date  = "$filter_after_date 23:59:59";
+				}
 
 				$filter_rule = '=';
 			} else {
-				$filter_value = bwfcrm_maybe_get_datetime( $filter['value'] );
+				$filter_value = bwfcrm_maybe_get_datetime( $filter['value'], $format );
 
-				$filter_date        = date( 'Y-m-d', $filter_value->getTimestamp() );
-				$filter_before_date = "$filter_date 00:00:00";
-				$filter_after_date  = "$filter_date 23:59:59";
+				$filter_date = date( $format, $filter_value->getTimestamp() );
 
-				$filter_rule = ( 'is' === $filter['rule'] ) ? '=' : ( 'before' === $filter['rule'] ? '<' : '>' );
+				if ( 'Y-m-d' === $format ) {
+					$filter_before_date = "$filter_date 00:00:00";
+					$filter_after_date  = "$filter_date 23:59:59";
+				} else {
+					$filter_after_date = $filter_before_date = $filter_date;
+				}
+
+				switch ( $filter['rule'] ) {
+					case 'is':
+						$filter_rule = '=';
+						break;
+					case 'is_not':
+						$filter_rule = '!=';
+						$is_null     = "$filter_group_key.$filter_key IS NULL OR";
+						break;
+					case 'before':
+						$filter_rule = '<';
+						break;
+					case 'after':
+						$filter_rule = '>';
+						break;
+					case 'on_after':
+						$filter_rule = '>=';
+						break;
+					case 'on_before':
+						$filter_rule = '<=';
+						break;
+				}
 			}
-
-			$where = '';
-			if ( isset( $filter_rule ) && '=' !== $filter_rule ) {
+			if ( ! empty( $filter_rule ) && ( '=' !== $filter_rule || 'Y-m-d' !== $format ) ) {
 				/** For 'more_than' and 'less_than' rules */
-				$date_value = ( ( '>' === $filter_rule ) ? $filter_after_date : $filter_before_date );
-				$where      = "($filter_group_key.$filter_key $filter_rule '$date_value')";
+				$date_value = ( ( '>' === $filter_rule || '>=' === $filter_rule ) ? $filter_after_date : $filter_before_date );
+				$where      = "($is_null $filter_group_key.$filter_key $filter_rule '$date_value')";
 			} else {
 				/** For 'is' and 'between' rules */
 				$where = "($filter_group_key.$filter_key >= '$filter_before_date' AND $filter_group_key.$filter_key <= '$filter_after_date')";
@@ -1143,11 +1186,12 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			if ( ! is_array( self::$logs ) || 0 === count( self::$logs ) ) {
 				return;
 			}
-			if ( false === apply_filters( 'bwfan_allow_contact_query_logging', false ) ) {
+
+			if ( false === apply_filters( 'bwfan_allow_contact_query_logging', BWFAN_Common::is_log_enabled( 'bwfan_contact_query_logging' ) ) ) {
 				return;
 			}
 			add_filter( 'bwfan_before_making_logs', '__return_true' );
-			BWFAN_Core()->logger->log( print_r( self::$logs, true ), 'crm_contacts_query' );
+			BWFAN_Core()->logger->log( print_r( self::$logs, true ), 'fka-contacts-query' );
 
 			self::$logs = [];
 		}
@@ -1160,10 +1204,13 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			global $wpdb;
 			/** Get Contacts */
 			$sql_queries = self::_get_contacts_sql( $search, $limit, $offset, $normalized_filters, $additional_info, $filter_match, true );
-			self::set_log( $sql_queries );
-			self::log();
+			self::set_log( $sql_queries['base'] );
 
+			$time     = microtime( true );
 			$contacts = $wpdb->get_results( $sql_queries['base'], ARRAY_A );
+			$time     = microtime( true ) - $time;
+			self::set_log( 'Time to execute the query: ' . $time . ' secs' );
+			self::log();
 
 			/** In case there is DB error and no contacts */
 			if ( empty( $contacts ) && ! empty( $wpdb->last_error ) ) {
@@ -1213,6 +1260,12 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 						switch ( absint( $field_type ) ) {
 							case BWFCRM_Fields::$TYPE_DATE :
 								$value = self::get_formatted_date( $value );
+								break;
+							case BWFCRM_Fields::$TYPE_DATETIME :
+								$value = self::get_formatted_date( $value, true );
+								break;
+							case BWFCRM_Fields::$TYPE_TIME :
+								$value = self::get_formatted_time( $value );
 								break;
 							case BWFCRM_Fields::$TYPE_CHECKBOX :
 								$options = ! empty( $value ) ? json_decode( $value, true ) : [];
@@ -1354,13 +1407,33 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			}, $contacts );
 		}
 
-		public static function get_formatted_date( $date ) {
+		public static function get_formatted_date( $date, $time = false ) {
 			if ( empty( $date ) || ! strtotime( $date ) ) {
 				return '';
 			}
-			$format = BWFAN_Common::bwfan_get_date_format();
+
+			if ( true === $time ) {
+				$format = BWFAN_Common::bwfan_get_date_format() . ' ' . BWFAN_Common::bwfan_get_time_format();
+			} else {
+				$format = BWFAN_Common::bwfan_get_date_format();
+			}
 
 			return wp_date( $format, strtotime( $date ), new DateTimeZone( 'UTC' ) );
+		}
+
+		/**
+		 * Get formated time
+		 *
+		 * @param $time
+		 *
+		 * @return false|string
+		 */
+		public static function get_formatted_time( $time ) {
+			if ( empty( $time ) || ! strtotime( $time ) ) {
+				return '';
+			}
+
+			return wp_date( BWFAN_Common::bwfan_get_time_format(), strtotime( $time ), new DateTimeZone( 'UTC' ) );
 		}
 
 		/**

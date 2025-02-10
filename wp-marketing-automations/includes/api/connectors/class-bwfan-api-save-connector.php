@@ -49,6 +49,8 @@ class BWFAN_API_Save_Connector extends BWFAN_API_Base {
 			if ( is_array( $next_step ) && isset( $next_step['step_type'] ) && 'handle_settings_with_params' === $next_step['step_type'] ) {
 				$this->args = $next_step['params'];
 			} elseif ( true !== $next_step ) {
+				do_action( 'bwfan_connector_connected', $wfco_connector );
+
 				/** If true, then go through handle_settings_form, else get next step data */
 				return $this->success_response( $next_step );
 			}
@@ -63,6 +65,7 @@ class BWFAN_API_Save_Connector extends BWFAN_API_Base {
 
 			return $this->error_response( $message );
 		}
+		do_action( 'bwfan_connector_connected', $wfco_connector );
 
 		return $this->success_response( $response, __( 'Connector updated', 'wp-marketing-automations' ) );
 	}

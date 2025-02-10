@@ -240,3 +240,12 @@ if ( ! function_exists( 'bwfan_is_xl_nextmove_thankyou_active' ) ) {
 		return BWFAN_Plugin_Dependency::xl_nextmove_thankyou_active_check();
 	}
 }
+
+/**
+ * Breakdance Detection
+ */
+if ( ! function_exists( 'bwfan_is_breakdance_active' ) ) {
+	function bwfan_is_breakdance_active() {
+		return BWFAN_Plugin_Dependency::bwfan_breakdance_check();
+	}
+}

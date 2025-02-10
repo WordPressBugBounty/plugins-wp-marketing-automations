@@ -51,7 +51,7 @@ class BWFAN_API_Delete_Connector extends BWFAN_API_Base {
 		$connector_meta_sql = "DELETE from {table_name} where connector_id IN ($connector_ids)";
 		WFCO_Model_ConnectorMeta::delete_multiple( $connector_meta_sql );
 		WFCO_Model_Connectors::delete_multiple( $connector_sql );
-		do_action( 'connector_disconnected', $slug, true );
+		do_action( 'bwfan_connector_disconnected', $slug );
 
 		return $this->success_response( array(), __( 'Connector deleted', 'wp-marketing-automations' ) );
 	}

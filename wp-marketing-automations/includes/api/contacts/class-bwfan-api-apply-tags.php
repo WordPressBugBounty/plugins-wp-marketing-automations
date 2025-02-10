@@ -50,6 +50,7 @@ class BWFAN_API_Apply_Tags extends BWFAN_API_Base {
 			return $this->error_response( $response );
 		}
 
+		$tags       = BWFAN_Common::check_for_comma_seperated( $tags );
 		$added_tags = $contact->add_tags( $tags );
 		if ( is_wp_error( $added_tags ) ) {
 			$this->response_code = 500;

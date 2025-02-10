@@ -438,14 +438,15 @@ class BWFAN_Traversal_Controller {
 	 *
 	 * @return void
 	 */
-	public function log( $log, $name = 'step-id' ) {
+	public function log( $log, $name = 'fka-automation-step-id' ) {
 		if ( empty( $log ) ) {
 			return;
 		}
 		if ( false === $this->step_log ) {
 			return;
 		}
-		if ( is_null( $this->step_log ) && false === apply_filters( 'bwfan_allow_automation_step_logging', false ) ) {
+
+		if ( is_null( $this->step_log ) && false === apply_filters( 'bwfan_allow_automation_step_logging', BWFAN_Common::is_log_enabled( 'bwfan_step_logging' ) ) ) {
 			$this->step_log = false;
 
 			return;
