@@ -31,7 +31,14 @@ class BWFAN_Api_Block_Migrator extends BWFAN_API_Base {
 
 		if ( empty( $unlayer_json ) || empty( $domain ) || empty( $key ) ) {
 			$this->response_code = 404;
+
 			return $this->error_response( __( 'Required data not found', 'wp-marketing-automations' ) );
+		}
+		if ( is_multisite() ) {
+			$active_plugins = get_site_option( 'active_sitewide_plugins', array() );
+			if ( is_array( $active_plugins ) && ( in_array( BWFAN_PLUGIN_BASENAME, apply_filters( 'active_plugins', $active_plugins ), true ) || array_key_exists( BWFAN_PLUGIN_BASENAME, apply_filters( 'active_plugins', $active_plugins ) ) ) && ! is_main_site() ) {
+				$domain = get_site_url( get_main_site_id() );
+			}
 		}
 
 		$body = [
@@ -52,19 +59,20 @@ class BWFAN_Api_Block_Migrator extends BWFAN_API_Base {
 
 		if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 || empty( $result ) || ! isset( $result['status'] ) || ! $result['status'] ) {
 			$message = $result['message'] ?? __( 'Error occurred while migrating block', 'wp-marketing-automations' );
+			$data    = [
+				'status' => false,
+			];
+
 			if ( isset( $result['license_error'] ) ) {
-				$message = empty( $result['license_error'] ) ? $result['license_error'] : __( 'License error occurred', 'wp-marketing-automations' );
+				$data['license_error'] = ! empty( $result['license_error'] ) ? $result['license_error'] : __( 'License error occurred', 'wp-marketing-automations' );
 			}
 
-			return $this->success_response( [
-				'status'        => false,
-				'license_error' => $message,
-			], $message );
+			return $this->success_response( $data, $message );
 		}
 
 		if ( empty( $result['block_data'] || empty( $result['block_data']['body'] ) || empty( $result['block_data']['setting'] ) ) ) {
 			return $this->success_response( [
-				'status'        => false,
+				'status' => false,
 			], __( 'Error occurred while migrating block, data not found.', 'wp-marketing-automations' ) );
 		}
 

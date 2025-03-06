@@ -77,9 +77,8 @@ class BWFAN_API_Get_Contact_Orders extends BWFAN_API_Base {
 			return [];
 		}
 
-		$all_orders     = [];
-		$sales_data     = [];
-		$order_statuses = wc_get_order_statuses();
+		$all_orders = [];
+		$sales_data = [];
 		foreach ( $order_ids as $order_id ) {
 			$conv_order   = $tags = $categories = [];
 			$product_data = $this->get_single_order_info( $order_id, $cid );
@@ -140,6 +139,7 @@ class BWFAN_API_Get_Contact_Orders extends BWFAN_API_Base {
 				'shipping_address' => '',
 			);
 			$conv_order['coupons']       = [];
+
 			if ( ! empty( $order_id ) && absint( $order_id ) > 0 && function_exists( 'wc_get_order' ) ) {
 				$order_data = wc_get_order( $order_id );
 				if ( $order_data instanceof WC_Order ) {
@@ -154,7 +154,7 @@ class BWFAN_API_Get_Contact_Orders extends BWFAN_API_Base {
 						'payment_method'   => $order_data->get_payment_method_title(),
 					];
 					$conv_order['status']        = [
-						'label' => $order_statuses[ 'wc-' . $order_data->get_status() ],
+						'label' => ( 'trash' === $order_data->get_status() ) ? __( 'Trashed', 'wp-marketing-automations' ) : ucwords( wc_get_order_status_name( $order_data->get_status() ) ),
 						'value' => 'wc-' . $order_data->get_status()
 					];
 				}

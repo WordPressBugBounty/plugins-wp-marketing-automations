@@ -2,9 +2,9 @@
 Contributors: xlplugins, amans2k
 Tags: cart abandonment, follow up emails, email marketing, email customizer, crm, woocommerce, newsletter, marketing automation
 Requires at least: 5.0
-Tested up to: 6.7.1
+Tested up to: 6.7.2
 Requires PHP: 7.0
-Stable tag: 3.5.0
+Stable tag: 3.5.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -416,6 +416,33 @@ FunnelKit Automations is 100% self-hosted and fully GDPR compliant.
 
 == Change log ==
 
+= 3.5.1 (Mar 6, 2025) =
+* Compatible upto WordPress 6.7.1
+* Compatible upto WooCommerce 9.4.3
+* Compatible with PHP 8.3
+* Added: Global Email Activity: Added Sent, Open & Click columns for quick discovery. (#3721)
+* Improved: Recurring Actions: Now allows changing execution time to a set time, like midnight. (#3714)
+* Improved: Emails: Zoom link is now excluded from tracking clicks. (#3729)
+* Improved: Automation Builder: Improved delete conditional step React flow. (#3755)
+* Improved: Pro API: Enhanced error handling during email migration. (#3732)
+* Improved: Contact Filters: Added comma support in some filters. Example: First name is James, Shawn. (#3734)
+* Improved: Database Optimization: Optimized some database calls in the app. (#3697)
+* Improved: Contact Handling: Improved handling of soft bounce and bounce status when engagement is open or clicked. (#3669)
+* Fixed: WooCommerce Checkout: Resolved issue where multiple carts were created when multiple emails were entered. (#3735)
+* Fixed: API Error: FKA Pro plugin handling was causing an API break. (#3725)
+* Fixed: Pro: Broadcast Test Email: Fixed UTM data issue. (#3727)
+* Fixed: Cart Analytics: Stats were not showing due to a database query error. (#3759)
+* Fixed: Global Email History: Fixed issue where SMS engagements were also appearing. (#3752)
+* Fixed: License Handling: Fixed email migration failure in a multisite environment. (#3766)
+* Fixed: Editor Usage: Fixed issue where the cursor sometimes moved to the top unexpectedly. (#3738)
+* Fixed: Order Email Preview: Fixed price addition issue. (#3723)
+* Fixed: Unsubscribe Link: Fixed issue with the uid argument. (#3740)
+* Fixed: SMTP Plugin Compatibility: Fixed intermittent email-sending issue with an SMTP plugin. (#3744)
+* Fixed: Cart Tracking: Fixed rare notice issue during cart tracking. (#3746)
+* Fixed: Pro: Automation Step Trail: Goal completion time was not being saved, now fixed. (#3768)
+* Fixed: Load Textdomain Warning: Fixed warning issue. (#3712)
+* Fixed: CSS Fixes: Minor UI fixes in the admin app. (#3718)
+
 = 3.5.0 (Feb 10, 2025) =
 * New: Introduced functionality to migrate content from the legacy builder to the new block builder, ensuring a seamless transition. (#3692)
 * New: Added compatibility for Breakdance Builder with the unsubscribe page shortcode for a smoother user experience. (#3638)
@@ -449,7 +476,7 @@ FunnelKit Automations is 100% self-hosted and fully GDPR compliant.
 * Fixed: Resolved an issue with saving block email content in automation workflows. (#3678)
 * Fixed: Improved automation contact data fetching based on ID for accurate results. (#3698)
 * Fixed: Ensured correct scheduling for the midnight action scheduler's recurring time interval. (#3695)
-* Removed: Deprecated `pre_wp_mail` filter before sending mail for improved system efficiency. (#3703) 
+* Removed: Deprecated `pre_wp_mail` filter before sending mail for improved system efficiency. (#3703)
 
 = 3.4.0 (Dec 05, 2024) =
 * Compatible upto WordPress 6.7.1

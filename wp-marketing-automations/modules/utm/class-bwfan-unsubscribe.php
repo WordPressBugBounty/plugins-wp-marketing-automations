@@ -150,7 +150,7 @@ class BWFAN_unsubscribe {
 		}
 
 		$track_action = filter_input( INPUT_GET, 'bwfan-track-action' );
-		if ( 'unsubscribe' === $action || is_null( $track_action ) ) {
+		if ( 'unsubscribe' === $action && is_null( $track_action ) ) {
 			$this->set_data();
 			$this->display_unsubscribe_page();
 

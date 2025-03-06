@@ -196,7 +196,7 @@ var BWFAN_Public;
             if ('' === email) {
                 return;
             }
-            if ($('#bwfan_email_consent').length && 1 != $('#bwfan_email_consent').val()) {
+            if ($('#bwfan_gdpr_consent').length && 1 != $('#bwfan_gdpr_consent').val()) {
                 return;
             }
 
@@ -438,7 +438,7 @@ var BWFAN_Public;
                 }
             }
 
-            var emailConsentHtml = '<input type="hidden" id="bwfan_email_consent" value="1" />';
+            var emailConsentHtml = '<input type="hidden" id="bwfan_gdpr_consent" value="1" />';
             if ('' === bwfan_email_consent_message) {
                 $('#billing_email_field').after(emailConsentHtml);
             } else {
@@ -457,7 +457,7 @@ var BWFAN_Public;
                         //
                     }
                 );
-                $('#bwfan_email_consent').val('0');
+                $('#bwfan_gdpr_consent').val('0');
                 $(this).parent().fadeOut("slow");
             });
         }

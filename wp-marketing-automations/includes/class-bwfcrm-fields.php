@@ -185,7 +185,7 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 				if ( $exclude_sys_fields && $is_system_field ) {
 					continue;
 				}
-				if ( version_compare( BWFAN_PRO_VERSION, '3.4.0', '<=' ) && in_array( intval( $field['type'] ), [ self::$TYPE_DATETIME, self::$TYPE_TIME ], true ) ) {
+				if ( bwfan_is_autonami_pro_active() && version_compare( BWFAN_PRO_VERSION, '3.4.0', '<=' ) && in_array( intval( $field['type'] ), [ self::$TYPE_DATETIME, self::$TYPE_TIME ], true ) ) {
 					continue;
 				}
 

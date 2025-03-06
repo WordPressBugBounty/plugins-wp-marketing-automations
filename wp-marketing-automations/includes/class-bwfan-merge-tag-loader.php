@@ -56,8 +56,8 @@ class BWFAN_Merge_Tag_Loader {
 	 * @access public
 	 */
 	public function __construct() {
-		add_action( 'plugins_loaded', [ $this, 'load_merge_tags' ], 8 );
-		add_action( 'plugins_loaded', [ $this, 'register_classes' ], 9 );
+		add_action( 'init', [ $this, 'load_merge_tags' ], 8 );
+		add_action( 'init', [ $this, 'register_classes' ], 9 );
 	}
 
 	/**

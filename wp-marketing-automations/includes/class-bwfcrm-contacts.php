@@ -2727,9 +2727,12 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			/** Remove data from unsubscribe table */
 			$this->remove_unsubscribe_data();
 
+			/** save last status in contact meta */
+			$this->save_last_status();
 			$this->contact->set_status( self::$STATUS_BOUNCED );
 			$this->contact->set_last_modified( current_time( 'mysql', 1 ) );
 			$this->save();
+			$this->contact->save_meta();
 
 			$this->remove_soft_bounce_limit();
 
@@ -2764,7 +2767,7 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 
 				/** Remove data from unsubscribe table */
 				$this->remove_unsubscribe_data();
-
+				$this->save_last_status();
 				$this->contact->set_status( self::$STATUS_BOUNCED );
 				$this->contact->set_last_modified( current_time( 'mysql', 1 ) );
 				$this->save();
@@ -2790,9 +2793,11 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			/** Mark contact soft bounced */
 			$soft_bounce_count ++;
 			$this->contact->set_meta( 'soft_bounce_count', $soft_bounce_count );
+
+			/** save last status in contact meta */
+			$this->save_last_status();
 			$this->contact->set_status( self::$STATUS_SOFT_BOUNCED );
 			$this->contact->set_last_modified( current_time( 'mysql', 1 ) );
-
 			$this->save();
 			$this->contact->save_meta();
 
@@ -2936,6 +2941,19 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			}
 
 			return $res;
+		}
+
+		/**
+		 * Save last status meta for a contact when status is changed to soft bounced or bounced
+		 *
+		 * @return void
+		 */
+		public function save_last_status() {
+			if ( self::$DISPLAY_STATUS_SOFT_BOUNCED === $this->get_display_status() ) {
+				return;
+			}
+
+			$this->contact->set_meta( 'last_status', [ 'status' => $this->get_display_status(), 'time' => current_time( 'mysql', 1 ) ] );
 		}
 	}
 }

@@ -525,17 +525,24 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 		 * @param array $filters
 		 * @param int $offset
 		 * @param int $limit Limit
+		 * @param int $mode
 		 *
 		 * @return array
 		 *
 		 */
-		public static function get_engagements_activity( $filter_list, $search = '', $filters = [], $offset = 0, $limit = 10 ) {
+		public static function get_engagements_activity( $filter_list, $search = '', $filters = [], $offset = 0, $limit = 10, $mode = 0 ) {
 			global $wpdb;
 			$table        = self::_table();
 			$query        = "SELECT `ID`,`cid`,`created_at`,`type`,`send_to`,`open`,`click`,`oid`,`author_id`,`tid`,`c_status`,`mode` FROM {$table} WHERE 1=1";
 			$count        = "SELECT COUNT(`ID`) AS total_count FROM {$table} WHERE 1=1";
 			$con_data     = [];
 			$filter_query = '';
+
+			if ( intval( $mode ) > 0 ) {
+				$mode_query = $wpdb->prepare( " AND mode = %d", intval( $mode ) );
+				$query      .= $mode_query;
+				$count      .= $mode_query;
+			}
 
 			if ( ! empty( $search ) ) {
 				$filter_query .= $wpdb->prepare( " AND send_to LIKE %s", "%" . esc_sql( $search ) . "%" );
@@ -624,14 +631,14 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 			$template_data = $wpdb->get_results( $template, ARRAY_A );
 
 			// Map subjects by ID
-			$template_map = [];
+			$template_map       = [];
 			$transactional_data = [];
 			foreach ( $template_data as $template ) {
-				if( isset( BWFCRM_Core()->transactional_mails ) && ! empty( $template['mode'] ) && 7 === absint( $template['mode'] ) ) {
-					if( ! isset( $transactional_data[ $template['title'] ] ) ) {
-						$mail_class = BWFCRM_Core()->transactional_mails;
-						$transactional_val =  $mail_class->get_transactional_mail_by_slug( $template['title'] );
-						$title = ! empty( $transactional_val['title'] ) ? $transactional_val['title'] : $template['title'];
+				if ( class_exists( 'BWFCRM_Core' ) && isset( BWFCRM_Core()->transactional_mails ) && ! empty( $template['mode'] ) && 7 === absint( $template['mode'] ) ) {
+					if ( ! isset( $transactional_data[ $template['title'] ] ) ) {
+						$mail_class                               = BWFCRM_Core()->transactional_mails;
+						$transactional_val                        = $mail_class->get_transactional_mail_by_slug( $template['title'] );
+						$title                                    = ! empty( $transactional_val['title'] ) ? $transactional_val['title'] : $template['title'];
 						$transactional_data[ $template['title'] ] = $transactional_val['title'];
 					} else {
 						$transactional_data[ $template['title'] ] = $template['title'];
@@ -697,11 +704,11 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 				$subject                     = empty( $subject ) && isset( $message_data[ $val['ID'] ] ) ? $message_data[ $val['ID'] ] : $subject;
 				$con_data[ $key ]['subject'] = ! empty( $subject ) ? $subject : __( 'No Subject', 'wp-marketing-automations' );
 			}
+
 			return [
 				'data'  => $con_data,
 				'total' => $wpdb->get_var( $count . $filter_query )
 			];
-
 		}
 
 		public static function get_engagements_by_tid( $tid, $only_count = false ) {

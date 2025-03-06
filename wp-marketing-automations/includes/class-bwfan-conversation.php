@@ -739,6 +739,8 @@ class BWFAN_Conversation {
 		/** Removed wp mail filters */
 		BWFAN_Common::bwf_remove_filter_before_wp_mail();
 
+		$subject = __( 'TEST: ', 'wp-marketing-automations' ) . $subject;
+
 		return wp_mail( $args['email'], $subject, $body, $header );
 	}
 

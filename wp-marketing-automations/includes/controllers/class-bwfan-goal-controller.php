@@ -287,9 +287,9 @@ class BWFAN_Goal_Controller extends BWFAN_Base_Step_Controller {
 		global $wpdb;
 		$string_placeholder = array_fill( 0, count( $filtered ), '%d' );
 		$placeholder        = implode( ', ', $string_placeholder );
-
-		$data  = array_merge( [ 1 ], $filtered );
-		$query = $wpdb->prepare( "UPDATE `{$wpdb->prefix}bwfan_automation_contact_trail` SET `status` = %d WHERE `ID` IN ($placeholder)", $data );
+		/**  Update status and time   */
+		$data  = array_merge( [ 1, time() ], $filtered );
+		$query = $wpdb->prepare( "UPDATE `{$wpdb->prefix}bwfan_automation_contact_trail` SET `status` = %d, `c_time` = %d  WHERE `ID` IN ($placeholder)", $data );
 		$wpdb->query( $query );
 
 		$this->update_status = true;

@@ -58,9 +58,7 @@ if ( ! class_exists( 'BWFAN_Model_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 		}
 
 		public static function get_field_by_slug( $slug ) {
-			$field = self::get_fields_by_slugs_cache( [ $slug ] );
-
-			return $field;
+			return self::get_fields_by_slugs_cache( [ $slug ] );
 		}
 
 		public static function get_fields_by_multiple_slugs( $slugs = [] ) {
@@ -69,8 +67,15 @@ if ( ! class_exists( 'BWFAN_Model_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 			return $fields;
 		}
 
+		/**
+		 * Get fields by slugs
+		 *
+		 * @param $slugs
+		 * @param string $return_by
+		 *
+		 * @return array
+		 */
 		public static function get_fields_by_slugs_cache( $slugs, $return_by = 'slug' ) {
-
 			if ( empty( $slugs ) ) {
 				return [];
 			}
@@ -80,7 +85,7 @@ if ( ! class_exists( 'BWFAN_Model_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 				global $wpdb;
 				$table = self::_table();
 
-				$query = "SELECT * from $table";
+				$query = "SELECT * FROM $table";
 
 				$rest_fields = $wpdb->get_results( $query, ARRAY_A );
 				$fields      = [];
@@ -94,19 +99,19 @@ if ( ! class_exists( 'BWFAN_Model_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 				self::$fields_cache_by_slug = $fields;
 			}
 
+			if ( 1 === count( $slugs ) ) {
+				return $fields[ $slugs[0] ] ?? '';
+			}
+
 			$return = [];
 			foreach ( $slugs as $slug ) {
 				if ( ! isset( $fields[ $slug ] ) || ! is_array( $fields[ $slug ] ) ) {
 					continue;
 				}
 
-				$field = $fields[ $slug ];
-				$key   = 'slug' === $return_by ? $slug : $field['id'];
+				$key = 'slug' === $return_by ? $slug : $fields[ $slug ]['id'];
 
-				if ( 1 === count( $slugs ) ) {
-					return $field;
-				}
-				$return[ $key ] = $field;
+				$return[ $key ] = $fields[ $slug ];
 			}
 
 			return $return;

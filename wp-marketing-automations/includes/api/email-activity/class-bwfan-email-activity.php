@@ -33,7 +33,7 @@ class BWFAN_API_Email_Activity extends BWFAN_API_Base {
 		$filter_list   = isset( $this->args['filter_list'] ) ? $this->args['filter_list'] : '';
 		$filters       = isset( $this->args['filters'] ) ? $this->args['filters'] : [];
 		$filters       = BWFAN_Common::is_json( $filters ) ? json_decode( $filters, true ) : [];
-		$activity_data = BWFAN_Model_Engagement_Tracking::get_engagements_activity( $filter_list, $search, $filters, $offset, $limit );
+		$activity_data = BWFAN_Model_Engagement_Tracking::get_engagements_activity( $filter_list, $search, $filters, $offset, $limit, 1 );
 
 		$this->total_count = $activity_data['total'];
 

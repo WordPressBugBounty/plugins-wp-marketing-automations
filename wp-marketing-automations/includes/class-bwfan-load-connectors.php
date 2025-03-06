@@ -34,8 +34,8 @@ class BWFAN_Load_Connectors {
 	 * BWFAN_Load_Connectors constructor.
 	 */
 	public function __construct() {
-		add_action( 'plugins_loaded', [ $this, 'load_native_integrations' ], 8 );
-		add_action( 'plugins_loaded', [ $this, 'register_classes' ], 9 );
+		add_action( 'init', [ $this, 'load_native_integrations' ], 11 );
+		add_action( 'init', [ $this, 'register_classes' ], 12 );
 
 		add_action( 'current_screen', [ $this, 'load_connectors' ], 9 );
 		add_action( 'rest_api_init', [ $this, 'load_connectors_rest_call' ] );

@@ -27,8 +27,6 @@ class BWFAN_Notification_Email {
 	 * Constructor.
 	 */
 	public function __construct() {
-		/** global settings */
-		$this->global_settings = BWFAN_Common::get_global_settings();
 
 		$this->init();
 	}
@@ -154,6 +152,9 @@ class BWFAN_Notification_Email {
 	 * @throws DateMalformedStringException
 	 */
 	public function run_notifications() {
+		/** global settings */
+		$this->global_settings = BWFAN_Common::get_global_settings();
+
 		if ( false === $this->is_notification_active() ) {
 			return;
 		}

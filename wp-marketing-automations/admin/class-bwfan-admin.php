@@ -1038,7 +1038,7 @@ class BWFAN_Admin {
 			bwf_schedule_recurring_action( time(), MINUTE_IN_SECONDS, 'bwfan_run_event_queue' );
 		}
 
-		$midnight_time = self::get_midnight_store_time();
+		$midnight_time = BWFAN_Common::get_midnight_store_time();
 		if ( ! BWFAN_Common::bwf_has_action_scheduled( 'bwfan_run_midnight_cron' ) ) {
 			bwf_schedule_recurring_action( $midnight_time, DAY_IN_SECONDS, 'bwfan_run_midnight_cron' );
 		}
@@ -1856,16 +1856,6 @@ class BWFAN_Admin {
 		delete_option( 'bwfan_new_user' );
 		wp_safe_redirect( $this->wizard_url );
 		exit;
-	}
-
-	public static function get_midnight_store_time() {
-		$timezone = new DateTimeZone( wp_timezone_string() );
-		$date     = new DateTime();
-		$date->modify( '+1 days' );
-		$date->setTimezone( $timezone );
-		$date->setTime( 0, 0, 0 );
-
-		return $date->getTimestamp();
 	}
 }
 

@@ -329,7 +329,7 @@ class BWFAN_Abandoned_Cart {
 	 * Create session cookies for tracking logged in and users
 	 */
 	public function set_session_cookies() {
-		if ( 1 === intval( BWFAN_Common::get_cookie( 'bwfan_session' ) ) ) {
+		if ( 1 === intval( BWFAN_Common::get_cookie( 'bwfan_session' ) ) || 1 === intval( WC()->session->get( 'bwfan_session' ) ) ) {
 			return;
 		}
 
@@ -339,6 +339,8 @@ class BWFAN_Abandoned_Cart {
 
 		global $cookie_set;
 		$cookie_set = [ 'bwfan_session' => 1, 'bwfan_visitor' => $token ];
+		WC()->session->set( 'bwfan_session', 1 );
+		WC()->session->set( 'bwfan_visitor', $token );
 	}
 
 	public function handle_restore_cart() {
@@ -575,13 +577,17 @@ class BWFAN_Abandoned_Cart {
 		/** Clear show notices for added coupons or products */
 		if ( ! is_null( WC()->session ) ) {
 			WC()->session->set( 'wc_notices', array() );
+			WC()->session->set( 'bwfan_session', '' );
+			WC()->session->set( 'bwfan_visitor', '' );
 		}
 
 		BWFAN_Common::clear_cookie( 'bwfan_visitor' );
 		BWFAN_Common::clear_cookie( 'bwfan_session' );
 
 		BWFAN_Common::set_cookie( 'bwfan_visitor', $cart_details['cookie_key'], time() + DAY_IN_SECONDS * 365 );
+		WC()->session->set( 'bwfan_visitor', $cart_details['cookie_key'] );
 		BWFAN_Common::set_cookie( 'bwfan_session', 1, time() + DAY_IN_SECONDS * 365 ); // set tracking cookie for 1 year from now
+		WC()->session->set( 'bwfan_session', 1 );
 		BWFAN_Common::set_cookie( 'bwfan_cart_restored', 1, time() + MINUTE_IN_SECONDS * 30 ); // set restored tracking cookie for 30 minutes, this will help in firing cart recovered event
 
 		/** If any order_id is found for this abandoned row, then set this order_id in woocommerce session */
@@ -646,6 +652,7 @@ class BWFAN_Abandoned_Cart {
 		$ab_cart_id = filter_input( INPUT_POST, 'bwfan_cart_id' );
 		if ( 0 === intval( $ab_cart_id ) ) {
 			$tracking_cookie = BWFAN_Common::get_cookie( 'bwfan_visitor' );
+			$tracking_cookie = empty( $tracking_cookie ) ? WC()->session->get( 'bwfan_visitor' ) : $tracking_cookie;
 			$billing_email   = BWFAN_Woocommerce_Compatibility::get_billing_email( $order );
 			$sql_where       = 'email = %s OR cookie_key = %s';
 			$sql_where       = $wpdb->prepare( $sql_where, $billing_email, $tracking_cookie ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
@@ -844,6 +851,7 @@ class BWFAN_Abandoned_Cart {
 
 	public function update_items_in_abandoned_table( $wfacp_id, $request ) {
 		$tracking_cookie = BWFAN_Common::get_cookie( 'bwfan_visitor' );
+		$tracking_cookie = empty( $tracking_cookie ) ? WC()->session->get( 'bwfan_visitor' ) : $tracking_cookie;
 		$cart_details    = $this->get_cart_by_key( 'cookie_key', $tracking_cookie, '%s' ); // check cart by cookie
 
 		if ( false === $cart_details || ! is_array( $cart_details ) || empty( $cart_details ) ) {
@@ -910,13 +918,13 @@ class BWFAN_Abandoned_Cart {
 		$data                    = [
 			'fields'               => isset( $_POST['checkout_fields_data'] ) ? $_POST['checkout_fields_data'] : [],
 			//phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
-			'current_page_id'      => sanitize_text_field( $_POST['current_page_id'] ),
+			'current_page_id'      => isset( $_POST['current_page_id'] ) ? sanitize_text_field( $_POST['current_page_id'] ) : '',
 			//phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
-			'aerocheckout_page_id' => sanitize_text_field( $_POST['aerocheckout_page_id'] ),
+			'aerocheckout_page_id' => isset( $_POST['aerocheckout_page_id'] ) ? sanitize_text_field( $_POST['aerocheckout_page_id'] ) : '',
 			//phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
-			'last_edit_field'      => sanitize_text_field( $_POST['last_edit_field'] ),
+			'last_edit_field'      => isset( $_POST['last_edit_field'] ) ? sanitize_text_field( $_POST['last_edit_field'] ) : '',
 			//phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
-			'current_step'         => sanitize_text_field( $_POST['current_step'] ),
+			'current_step'         => isset( $_POST['current_step'] ) ? sanitize_text_field( $_POST['current_step'] ) : '',
 			//phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
 		];
 		if ( isset( $_POST['pushengage_token'] ) && ! empty( $_POST['pushengage_token'] ) ) {
@@ -963,7 +971,7 @@ class BWFAN_Abandoned_Cart {
 			);
 		}
 
-		$data['fields']['timezone'] = $_POST['timezone']; //phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
+		$data['fields']['timezone'] = isset( $_POST['timezone'] ) ? sanitize_text_field( $_POST['timezone'] ) : '';
 		$data                       = apply_filters( 'bwfan_ab_change_checkout_data_for_external_use', array_filter( $data ) );
 
 		if ( defined( 'ICL_LANGUAGE_CODE' ) ) {
@@ -1050,7 +1058,7 @@ class BWFAN_Abandoned_Cart {
 	 * @return int
 	 */
 	public function process_abandoned_cart( $email, $checkout_fields_data ) {
-		if ( '1' === BWFAN_Common::get_cookie( 'bwfan_session' ) ) {
+		if ( '1' === BWFAN_Common::get_cookie( 'bwfan_session' ) || 1 === intval( WC()->session->get( 'bwfan_session' ) ) ) {
 			return $this->process_guest_cart_details( $email, $checkout_fields_data );
 		}
 
@@ -1092,6 +1100,7 @@ class BWFAN_Abandoned_Cart {
 
 		/** First time cart */
 		$tracking_cookie = BWFAN_Common::get_cookie( 'bwfan_visitor' );
+		$tracking_cookie = empty( $tracking_cookie ) ? WC()->session->get( 'bwfan_visitor' ) : $tracking_cookie;
 		if ( empty( $tracking_cookie ) ) {
 			global $cookie_set;
 			if ( is_array( $cookie_set ) && isset( $cookie_set['bwfan_visitor'] ) ) {
@@ -1399,7 +1408,7 @@ class BWFAN_Abandoned_Cart {
 
 		/** Check excluded emails or user roles */
 		$global_settings = BWFAN_Common::get_global_settings();
-		$email           = $customer->get_billing_email();
+		$email           = method_exists( $customer, 'get_billing_email' ) ? $customer->get_billing_email() : '';
 		if ( 0 !== absint( $global_settings['bwfan_ab_exclude_users_cart_tracking'] ) ) {
 			if ( isset( $global_settings['bwfan_ab_exclude_emails'] ) && ! empty( $global_settings['bwfan_ab_exclude_emails'] ) ) {
 				$global_settings['bwfan_ab_exclude_emails'] = str_replace( ' ', '', $global_settings['bwfan_ab_exclude_emails'] );
@@ -1456,13 +1465,13 @@ class BWFAN_Abandoned_Cart {
 		$data                    = [
 			'fields'               => array_merge( $billing, $shipping ),
 			//phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
-			'current_page_id'      => sanitize_text_field( $_POST['current_page_id'] ),
+			'current_page_id'      => isset( $_POST['current_page_id'] ) ? sanitize_text_field( $_POST['current_page_id'] ) : '',
 			//phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
-			'aerocheckout_page_id' => sanitize_text_field( $_POST['aerocheckout_page_id'] ),
+			'aerocheckout_page_id' => isset( $_POST['aerocheckout_page_id'] ) ? sanitize_text_field( $_POST['aerocheckout_page_id'] ) : '',
 			//phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
-			'last_edit_field'      => sanitize_text_field( $_POST['last_edit_field'] ),
+			'last_edit_field'      => isset( $_POST['last_edit_field'] ) ? sanitize_text_field( $_POST['last_edit_field'] ) : '',
 			//phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
-			'current_step'         => sanitize_text_field( $_POST['current_step'] ),
+			'current_step'         => isset( $_POST['current_step'] ) ? sanitize_text_field( $_POST['current_step'] ) : '',
 			//phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
 		];
 
@@ -1501,7 +1510,7 @@ class BWFAN_Abandoned_Cart {
 			);
 		}
 
-		$data['fields']['timezone'] = $_POST['timezone']; //phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
+		$data['fields']['timezone'] = isset( $_POST['timezone'] ) ? sanitize_text_field( $_POST['timezone'] ) : '';  //phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
 		$data                       = apply_filters( 'bwfan_ab_change_checkout_data_for_external_use', array_filter( $data ) );
 
 		if ( defined( 'ICL_LANGUAGE_CODE' ) ) {
@@ -1676,17 +1685,18 @@ class BWFAN_Abandoned_Cart {
 			];
 		}
 
-		$url = rest_url( '/autonami/v1/wc-add-to-cart' );
-
-		$body_data = array(
+		$url             = rest_url( '/autonami/v1/wc-add-to-cart' );
+		$tracking_cookie = BWFAN_Common::get_cookie( 'bwfan_visitor' );
+		$tracking_cookie = empty( $tracking_cookie ) ? WC()->session->get( 'bwfan_visitor' ) : $tracking_cookie;
+		$body_data       = array(
 			'id'            => $this->user_id,
 			'coupon_data'   => maybe_serialize( $coupon_data ),
 			'items'         => maybe_serialize( WC()->cart->get_cart() ),
 			'fees'          => maybe_serialize( WC()->cart->get_fees() ),
 			'unique_key'    => get_option( 'bwfan_u_key', false ),
-			'bwfan_visitor' => BWFAN_Common::get_cookie( 'bwfan_visitor' )
+			'bwfan_visitor' => $tracking_cookie
 		);
-		$args      = bwf_get_remote_rest_args( $body_data );
+		$args            = bwf_get_remote_rest_args( $body_data );
 		wp_remote_post( $url, $args );
 	}
 }

@@ -44,6 +44,7 @@ class BWFAN_API_Add_Unsubscribers extends BWFAN_API_Base {
 			$insert_data = array(
 				'recipient' => sanitize_email( $email ),
 				'c_date'    => current_time( 'mysql' ),
+				'c_type'    => 3,
 			);
 
 			BWFAN_Model_Message_Unsubscribe::insert( $insert_data );

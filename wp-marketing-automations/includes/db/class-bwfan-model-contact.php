@@ -153,7 +153,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 					$filters['c']  = array_filter( $filters['c'], function ( $v ) {
 						return ( 'status' !== $v['key'] || 3 !== absint( $v['value'] ) );
 					}, ARRAY_FILTER_USE_BOTH );
-					if( isset( $additional_info['include_unsubscribe'] ) ) {
+					if ( isset( $additional_info['include_unsubscribe'] ) ) {
 						unset( $additional_info['include_unsubscribe'] );
 					}
 				}
@@ -344,8 +344,8 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 							self::_set_string_exact_filter_sql( $filter, $filter_group_key );
 							break;
 						case $filter['type'] === BWFCRM_Filters::$TYPE_DATE:
-						case version_compare( BWFAN_PRO_VERSION, '3.4.0', '>' ) && $filter['type'] === BWFCRM_Filters::$TYPE_TIME:
-						case version_compare( BWFAN_PRO_VERSION, '3.4.0', '>' ) && $filter['type'] === BWFCRM_Filters::$TYPE_DATETIME:
+						case bwfan_is_autonami_pro_active() && version_compare( BWFAN_PRO_VERSION, '3.4.0', '>' ) && $filter['type'] === BWFCRM_Filters::$TYPE_TIME:
+						case bwfan_is_autonami_pro_active() && version_compare( BWFAN_PRO_VERSION, '3.4.0', '>' ) && $filter['type'] === BWFCRM_Filters::$TYPE_DATETIME:
 							self::_set_date_filter_sql( $filter, $filter_group_key );
 							break;
 						case $filter['type'] === BWFCRM_Filters::$TYPE_BOOL:
@@ -445,7 +445,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			$filter_rule  = $filter['rule'];
 			$filter_key   = $filter['key'];
 
-			if ( ( 'country' === $filter_key || 'state' === $filter_key ) && strpos( $filter_value, ',' ) ) {
+			if ( strpos( $filter_value, ',' ) ) {
 				$filter_value = explode( ',', $filter_value );
 			}
 
@@ -509,7 +509,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 				$if_column_exists = "{$filter_group_key}.{$filter_key} IS NOT NULL AND";
 			}
 
-			if ( 'state' === $filter_key && is_array( $filter_value ) && in_array( $filter['rule'], array( 'contains', 'not_contains', 'starts_with', 'ends_with' ), true ) ) {
+			if ( is_array( $filter_value ) && in_array( $filter['rule'], array( 'contains', 'not_contains', 'starts_with', 'ends_with' ), true ) ) {
 				$filter_value           = array_filter( $filter_value );
 				$sub_rule               = ( 'LIKE' === $filter_rule ) ? 'OR' : 'AND';
 				$filter_value           = implode( " {$sub_rule} ", $filter_value );
@@ -547,10 +547,10 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 
 			$format  = 'Y-m-d';
 			$is_null = $filter_rule = '';
-			if ( version_compare( BWFAN_PRO_VERSION, '3.4.0', '>' ) && intval( $filter['type'] ) === BWFCRM_Filters::$TYPE_DATETIME ) {
+			if ( bwfan_is_autonami_pro_active() && version_compare( BWFAN_PRO_VERSION, '3.4.0', '>' ) && intval( $filter['type'] ) === BWFCRM_Filters::$TYPE_DATETIME ) {
 				$format = 'Y-m-d H:i:s';
 			}
-			if ( version_compare( BWFAN_PRO_VERSION, '3.4.0', '>' ) && intval( $filter['type'] ) == BWFCRM_Filters::$TYPE_TIME ) {
+			if ( bwfan_is_autonami_pro_active() && version_compare( BWFAN_PRO_VERSION, '3.4.0', '>' ) && intval( $filter['type'] ) == BWFCRM_Filters::$TYPE_TIME ) {
 				$format = 'H:i';
 			}
 
@@ -1671,6 +1671,45 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			global $wpdb;
 
 			return $wpdb->update( "{$wpdb->prefix}bwf_contact", [ 'last_modified' => current_time( 'mysql', 1 ) ], [ 'id' => $cid ] );
+		}
+
+		/**
+		 * Get contact row by id
+		 *
+		 * @param $id
+		 * @param $type
+		 *
+		 * @return array|object|stdClass|void|null
+		 */
+		public static function get_contact_id( $id, $type = 'object' ) {
+			global $wpdb;
+			$query = "SELECT * FROM {$wpdb->prefix}bwf_contact WHERE `id` = %d";
+
+			$type = 'object' === $type ? OBJECT : ARRAY_A;
+
+			return $wpdb->get_row( $wpdb->prepare( $query, $id ), $type );
+		}
+
+		/**
+		 * Maybe set contact object as cache so that when WooFunnels_Contact object is created it can pick the value from cache.
+		 *
+		 * @param $contact_id
+		 * @param $contact_row
+		 *
+		 * @return void
+		 */
+		public static function maybe_set_cache_contact_row( $contact_id, $contact_row ) {
+			if ( empty( $contact_id ) || empty( $contact_row ) || ! is_object( $contact_row ) || ! isset( $contact_row->status ) ) {
+				return;
+			}
+
+			$obj = BWF_Contacts::get_instance();
+
+			if ( ! isset( $obj->cached_contact_obj['cid'] ) ) {
+				$obj->cached_contact_obj['cid'] = [];
+			}
+
+			$obj->cached_contact_obj['cid'][ $contact_id ] = $contact_row;
 		}
 	}
 }

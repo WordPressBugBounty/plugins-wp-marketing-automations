@@ -32,7 +32,6 @@ class BWFAN_API_Loader {
 	 */
 	public function __construct() {
 		self::load_api_supporter_classes();
-		self::load_api_classes();
 		add_action( 'rest_api_init', [ __CLASS__, 'register_routes' ] );
 	}
 
@@ -103,6 +102,8 @@ class BWFAN_API_Loader {
 	}
 
 	public static function register_routes() {
+		self::load_api_classes();
+
 		foreach ( self::$registered_apis as $route => $registered_api ) {
 			if ( empty( $registered_api ) ) {
 				continue;

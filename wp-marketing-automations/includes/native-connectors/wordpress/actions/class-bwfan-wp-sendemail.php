@@ -486,10 +486,18 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 		}
 
 		/** Checking if contact is bounced than skip the action */
-		if ( 2 === absint( $status ) ) {
+		if ( 2 === intval( $status ) ) {
 			return [
 				'status'  => BWFAN_Action::$RESPONSE_SKIPPED,
-				'message' => __( 'Contact is Bounced', 'wp-marketing-automations' )
+				'message' => __( 'Contact has a Bounced status.', 'wp-marketing-automations' )
+			];
+		}
+
+		/** Checking if contact is complaint than skip the action */
+		if ( 5 === intval( $status ) ) {
+			return [
+				'status'  => BWFAN_Action::$RESPONSE_SKIPPED,
+				'message' => __( 'Contact has a Complaint status.', 'wp-marketing-automations' )
 			];
 		}
 
@@ -581,7 +589,6 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 
 		do_action( 'bwfan_before_send_email', $this->data, $body );
 		/** this function will remove all wp_mail from_name and from_email filters  */
-		$this->before_executing_automation();
 
 		if ( ! isset( $global_settings['bwfan_email_service'] ) || 'wp' === $global_settings['bwfan_email_service'] ) {
 			foreach ( $emails as $email ) {
@@ -664,21 +671,6 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 		$this->log();
 
 		return $return;
-	}
-
-	/**
-	 * remove default wp mail filters before sending email
-	 *
-	 * @return void
-	 */
-	public function before_executing_automation() {
-		if ( ! class_exists( 'BWFAN_Compatibility_With_WP_SMTP' ) || ! method_exists( 'BWFAN_Compatibility_With_WP_SMTP', 'has_multiple_connections' ) || ! BWFAN_Compatibility_With_WP_SMTP::has_multiple_connections() ) {
-			remove_all_filters( 'wp_mail' );
-			remove_all_filters( 'wp_mail_from' );
-		}
-		remove_all_filters( 'wp_mail_from_name' );
-		remove_all_filters( 'wp_mail_content_type' );
-		remove_all_filters( 'wp_mail_charset' );
 	}
 
 	/**
@@ -767,10 +759,18 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 		if ( $bwf_contact instanceof WooFunnels_Contact ) {
 			$status = $bwf_contact->get_status();
 		}
+
 		if ( 2 === intval( $status ) ) {
 			return [
 				'status'  => 4,
-				'message' => __( 'Contact is bounced', 'wp-marketing-automations' )
+				'message' => __( 'Contact has a Bounced status.', 'wp-marketing-automations' )
+			];
+		}
+		/** Checking if contact is complaint than skip the action */
+		if ( 5 === intval( $status ) ) {
+			return [
+				'status'  => BWFAN_Action::$RESPONSE_SKIPPED,
+				'message' => __( 'Contact has a Complaint status.', 'wp-marketing-automations' )
 			];
 		}
 		if ( 1 === absint( $this->data['promotional_email'] ) && ( false === apply_filters( 'bwfan_force_promotional_email', false, $this->data ) ) ) {

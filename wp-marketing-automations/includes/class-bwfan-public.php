@@ -52,8 +52,7 @@ class BWFAN_Public {
 		$data = [];
 
 		$data['bwfan_checkout_js_data'] = 'no';
-		$data['bwfan_no_thanks']        = __( 'No Thanks', 'woofunnels-autonami-automation-abandoned-cart' );
-		$data['is_user_loggedin']       = 0;
+		$data['bwfan_no_thanks']        = __( 'No Thanks', 'wp-marketing-automations' );
 		$data['ajax_url']               = admin_url( 'admin-ajax.php' );
 		$data['wc_ajax_url']            = class_exists( 'WC_AJAX' ) ? WC_AJAX::get_endpoint( '%%endpoint%%' ) : '';
 		$data['ajax_nonce']             = wp_create_nonce( 'bwfan-action-admin' );
@@ -91,16 +90,6 @@ class BWFAN_Public {
 
 		if ( isset( $setting_data['bwfan_ab_email_consent_message'] ) ) {
 			$data['bwfan_ab_email_consent_message'] = $setting_data['bwfan_ab_email_consent_message'];
-		}
-
-		if ( is_user_logged_in() ) {
-			$data['is_user_loggedin'] = 1;
-			$user                     = wp_get_current_user();
-			$bwf_contact              = bwf_get_contact( $user->ID, $user->user_email );
-			$data['marketing_status'] = 0;
-			if ( isset( $bwf_contact->meta->marketing_status ) ) {
-				$data['marketing_status'] = 1;
-			}
 		}
 
 		$site_language               = BWFAN_Common::get_site_current_language();

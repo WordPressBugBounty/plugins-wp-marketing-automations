@@ -729,20 +729,48 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 		public function insert_tracking_data( $args ) {
 			global $wpdb;
 
-			$args     = apply_filters( 'bwf_insert_conversion_tracking_data', $args );
-			$inserted = $wpdb->insert( $wpdb->prefix . $this->conv_table, $args );
+			try {
+				$args = apply_filters( 'bwf_insert_conversion_tracking_data', $args );
 
-			$lastId = 0;
-			if ( $inserted ) {
-				$lastId = $wpdb->insert_id;
-			}
-			if ( ! empty( $wpdb->last_error ) ) {
-				BWF_Logger::get_instance()->log( 'Get last error in ' . $this->conv_table . ' : ' . $wpdb->last_error . ' --- Last query ' . $wpdb->last_query, 'woofunnel-failed-actions', 'buildwoofunnels', true ); //phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
-			}
+				// Ensure the necessary keys exist
+				if ( isset( $args['checkout_total'], $args['bump_total'], $args['offer_total'], $args['value'] ) ) {
+					// Calculate sum up to 2 decimal places
+					$sumTotal     = round( $args['checkout_total'] + $args['offer_total'] + $args['bump_total'], 2 );
+					$valueRounded = round( $args['value'], 2 );
 
+					// If mismatched, adjust checkout_total
+					if ( $sumTotal !== $valueRounded ) {
+						$difference = $valueRounded - $sumTotal;
+
+						// If positive, add to checkout_total
+						if ( $difference > 0 ) {
+							$args['checkout_total'] = round( $args['checkout_total'] + $difference, 2 );
+						}
+					}
+				}
+				$lastId = 0;
+
+                $conv_table = $wpdb->prefix . $this->conv_table;
+				$get_id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$conv_table} WHERE type = 2 AND source = %d", $args['source'] ) ); //phpcs:ignore
+                if ( ! empty( $get_id ) && absint( $get_id ) > 0 ) {
+					$lastId = $get_id;
+					$wpdb->update( $conv_table, $args, [ 'id' => $get_id ] );
+				} else {
+					$inserted = $wpdb->insert( $conv_table, $args );
+					if ( $inserted ) {
+						$lastId = $wpdb->insert_id;
+					}
+				}
+				if ( ! empty( $wpdb->last_error ) ) {
+					BWF_Logger::get_instance()->log( 'Get last error in ' . $this->conv_table . ' : ' . $wpdb->last_error . ' --- Last query ' . $wpdb->last_query, 'woofunnel-failed-actions', 'buildwoofunnels', true );
+				}
+			} catch ( Exception $e ) {
+				BWF_Logger::get_instance()->log( 'insert_tracking_data last error in ' . $e->getMessage(), 'woofunnel-failed-actions', 'buildwoofunnels', true );
+			}
 
 			return $lastId;
 		}
+
 
 		/**
 		 * @param $timezone
@@ -1197,6 +1225,11 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 						'bump_total'     => ( $total_refund === 0 || $bump_total <= $bump_refund ) ? 0 : $bump_total - $bump_refund,
 						'offer_total'    => ( $total_refund === 0 || $offer_total <= $offer_refund ) ? 0 : $offer_total - $offer_refund
 					);
+
+					if ( 0 === $update_args['bump_total'] && 0 === $update_args['offer_total'] ) {
+						$update_args['checkout_total'] = $update_args['value'];
+					}
+
 					$wpdb->update( $wpdb->prefix . $this->conv_table, $update_args, [ 'type' => 2, 'source' => $order_id ] );
 
 				}
@@ -1287,7 +1320,13 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 						}
 
 						// Insert data for orders without the thank-you page
-						$this->insert_data_without_thankyou( $order, $tracking_data );
+						if ( $this->is_order_renewal( $order ) ) {
+							$order->delete_meta_data( '_wffn_tracking_data' );
+							$order->save();
+
+						} else {
+							$this->insert_data_without_thankyou( $order, $tracking_data );
+						}
 
 					} catch ( Error|Exception $e ) {
 
@@ -1299,21 +1338,42 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				}
 			}
 
+			$this->maybe_pending_report_data( $status_in );
+		}
+
+		public function maybe_pending_report_data( $status_in ) {
 			try {
-				$limit = 10;
+				global $wpdb;
 				// run this snippet for recover checkout data
 				if ( class_exists( 'WFACP_Reporting' ) ) {
 
 					if ( BWF_WC_Compatibility::is_hpos_enabled() ) {
-						$wfacp_results = $wpdb->get_results( $wpdb->prepare( "select * from {$wpdb->prefix}wc_orders_meta where meta_key='_wfacp_report_data' LIMIT %d ", $limit ), ARRAY_A );
+						$order_table      = $wpdb->prefix . 'wc_orders';
+						$order_meta_table = $wpdb->prefix . 'wc_orders_meta';
+						$wfacp_query      = $wpdb->prepare( "SELECT ord.id as ID FROM {$order_table} ord
+                                INNER JOIN {$order_meta_table} om ON (ord.id = om.order_id AND om.meta_key = '_wfacp_report_data')
+                                WHERE ord.type = %s
+                                AND ord.status IN ({$status_in}) 
+                                ORDER BY ord.date_created_gmt DESC LIMIT 0, 10", 'shop_order' );
+
 					} else {
-						$wfacp_results = $wpdb->get_results( $wpdb->prepare( "select * from {$wpdb->prefix}postmeta where meta_key='_wfacp_report_data' LIMIT %d ", $limit ), ARRAY_A );
+						$wfacp_query = $wpdb->prepare( "SELECT p.ID FROM {$wpdb->posts} p
+                                INNER JOIN {$wpdb->postmeta} pm ON (p.ID = pm.post_id AND pm.meta_key = '_wfacp_report_data')
+                                WHERE p.post_type = %s 
+                                AND p.post_status IN ({$status_in}) 
+                                ORDER BY p.post_date DESC LIMIT 0, 10", 'shop_order' );
 					}
+
+					$wfacp_results = $wpdb->get_results( $wfacp_query );
 
 					if ( is_array( $wfacp_results ) && count( $wfacp_results ) > 0 ) {
 						$wfacp_report = WFACP_Reporting::get_instance();
 						foreach ( $wfacp_results as $result ) {
 							$post_id = isset( $result['post_id'] ) ? absint( $result['post_id'] ) : ( isset( $result['order_id'] ) ? absint( $result['order_id'] ) : 0 );
+
+							if ( ( WFOCU_Common::time_exceeded() || WFOCU_Common::memory_exceeded() ) ) {
+								break;
+							}
 
 							if ( 0 !== $post_id ) {
 								$aero_order = wc_get_order( $post_id );
@@ -1337,13 +1397,29 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				 */
 				if ( class_exists( 'WFOB_Reporting' ) ) {
 					if ( BWF_WC_Compatibility::is_hpos_enabled() ) {
-						$ob_results = $wpdb->get_results( $wpdb->prepare( "select * from {$wpdb->prefix}wc_orders_meta where meta_key='_wfob_report_data' LIMIT %d ", $limit ), ARRAY_A );
+						$order_table      = $wpdb->prefix . 'wc_orders';
+						$order_meta_table = $wpdb->prefix . 'wc_orders_meta';
+						$ob_query         = $wpdb->prepare( "SELECT ord.id as ID FROM {$order_table} ord
+                                INNER JOIN {$order_meta_table} om ON (ord.id = om.order_id AND om.meta_key = '_wfob_report_data')
+                                WHERE ord.type = %s
+                                AND ord.status IN ({$status_in}) 
+                                ORDER BY ord.date_created_gmt DESC LIMIT 0, 10", 'shop_order' );
+
 					} else {
-						$ob_results = $wpdb->get_results( $wpdb->prepare( "select * from {$wpdb->prefix}postmeta where meta_key='_wfob_report_data' LIMIT %d ", $limit ), ARRAY_A );
+						$ob_query = $wpdb->prepare( "SELECT p.ID FROM {$wpdb->posts} p
+                                INNER JOIN {$wpdb->postmeta} pm ON (p.ID = pm.post_id AND pm.meta_key = '_wfob_report_data')
+                                WHERE p.post_type = %s 
+                                AND p.post_status IN ({$status_in}) 
+                                ORDER BY p.post_date DESC LIMIT 0, 10", 'shop_order' );
 					}
-					if ( is_array( $wfacp_results ) && count( $ob_results ) > 0 ) {
+
+					$ob_results = $wpdb->get_results( $ob_query );
+					if ( is_array( $ob_results ) && count( $ob_results ) > 0 ) {
 						$ob_report = WFOB_Reporting::get_instance();
 						foreach ( $ob_results as $ob_result ) {
+							if ( ( WFOCU_Common::time_exceeded() || WFOCU_Common::memory_exceeded() ) ) {
+								break;
+							}
 							$ob_id    = isset( $ob_result['post_id'] ) ? absint( $ob_result['post_id'] ) : ( isset( $ob_result['order_id'] ) ? absint( $ob_result['order_id'] ) : 0 );
 							$ob_order = wc_get_order( $ob_id );
 							if ( $ob_order instanceof WC_Order ) {
@@ -1373,6 +1449,11 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 		}
 
 		public function insert_data_without_thankyou( $order, $tracking_data ) {
+
+			if ( ! $order instanceof WC_Order || $this->is_order_renewal( $order ) ) {
+				return false;
+			}
+
 			$offer_id = BWF_WC_Compatibility::get_order_meta( $order, '_wfocu_offer_id' );
 			if ( ! empty( $offer_id ) ) {
 				$this->insert_tracking_data( $tracking_data );

@@ -58,18 +58,23 @@ class BWFAN_WC_Cart_Items extends Merge_Tag_Abstract_Product_Display {
 				if ( ! $pro_obj instanceof WC_Product ) {
 					continue;
 				}
+
+				$price = $pro_obj->get_price();
+				if ( empty( $price ) ) {
+					$price = 0;
+				}
 				$cart_item['data']                   = $pro_obj;
-				$cart_item['line_subtotal']          = $pro_obj->get_price();
+				$cart_item['line_subtotal']          = $price;
 				$cart_item['line_subtotal_tax']      = 0;
-				$cart_item['line_total']             = $pro_obj->get_price();
+				$cart_item['line_total']             = $price;
 				$cart_item['line_tax']               = 0;
 				$product_qty[ $pro_obj->get_id() ]   = wp_rand( 1, 5 );
 				$product_sku[ $pro_obj->get_id() ]   = $pro_obj->get_sku();
-				$product_price[ $pro_obj->get_id() ] = wc_price( $pro_obj->get_price() );
+				$product_price[ $pro_obj->get_id() ] = ! empty( $price ) ? wc_price( $price ) : 0;
 
 				$cart[ $pro_obj->get_id() ] = $cart_item;
 
-				$total = $total + $pro_obj->get_price();
+				$total = $total + $price;
 			}
 			$this->cart              = $cart;
 			$this->products_quantity = $product_qty;

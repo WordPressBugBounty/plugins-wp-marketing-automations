@@ -31,7 +31,7 @@ return apply_filters( 'bwf_settings_config', array(
 				'type'  => 'html',
 				'label' => __( 'Set Funnel as Homepage', 'woofunnels' ),
 				'hint'  => '',
-				'html'  => __( 'Select the Funnel page you want to set as the Homepage.  <a href="' . admin_url( 'options-reading.php' ) . '">Go to Wordpress Settings</a>', 'woofunnels' ),
+				'html' => sprintf( __( "Select the Funnel page you want to set as the Homepage. <a href='%s'>Go to WordPress Settings</a>", 'woofunnels' ), admin_url( 'options-reading.php' ) ),
 			),
 		) ),
 		'priority' => 1,
@@ -1431,45 +1431,45 @@ return apply_filters( 'bwf_settings_config', array(
 		'priority' => 5,
 	),
 	'funnelkit_advanced'    => array(
-		'title'    => __( 'Theme CSS and JavaScript', 'funnel-builder' ),
-		'heading'  => __( 'Enabling this setting will apply theme CSS and JavaScript for FunnelKit canvas and FunnelKit Boxed made template', 'funnel-builder' ),
+		'title'    => __( 'Theme CSS and JavaScript', 'woofunnels' ),
+		'heading'  => __( 'Enabling this setting will apply theme CSS and JavaScript for FunnelKit canvas and FunnelKit Boxed made template', 'woofunnels' ),
 		'slug'     => 'allow_theme_css',
 		'fields'   => array(
 			array(
 				'type'             => 'checklist',
 				'key'              => 'allow_theme_css',
-				'label'            => __( 'Enable theme CSS and JavaScript', 'funnel-builder' ),
+				'label'            => __( 'Enable theme CSS and JavaScript', 'woofunnels' ),
 				'value'            => [],
 				'options'          => array(
 					array(
 						'value' => 'wfacp_checkout',
-						'label' => __( 'Checkout', 'funnel-builder' )
+						'label' => __( 'Checkout', 'woofunnels' )
 					),
 					array(
 						'value' => 'wffn_landing',
-						'label' => __( 'Sales', 'funnel-builder' )
+						'label' => __( 'Sales', 'woofunnels' )
 					),
 					array(
 						'value' => 'wfocu_offer',
-						'label' => __( 'One Click Upsell Offer', 'funnel-builder' ),
+						'label' => __( 'One Click Upsell Offer', 'woofunnels' ),
 						'isPro' => true
 					),
 					array(
 						'value' => 'wffn_ty',
-						'label' => __( 'Thank you', 'funnel-builder' )
+						'label' => __( 'Thank you', 'woofunnels' )
 					),
 
 					array(
 						'value' => 'wffn_optin',
-						'label' => __( 'Optin', 'funnel-builder' )
+						'label' => __( 'Optin', 'woofunnels' )
 					),
 					array(
 						'value' => 'wffn_oty',
-						'label' => __( 'Optin Confirmation', 'funnel-builder' )
+						'label' => __( 'Optin Confirmation', 'woofunnels' )
 					),
 				),
 				'select_all'       => true,
-				'select_all_label' => __( 'Select All Steps', 'funnel-builder' ),
+				'select_all_label' => __( 'Select All Steps', 'woofunnels' ),
 				'orientation'      => 'horizontal'
 			)
 		),

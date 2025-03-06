@@ -92,6 +92,11 @@ if ( ! class_exists( 'WooFunnels_Transient' ) ) {
 
 					return $value;
 				}
+
+				/**
+				 * Restricted get value search only file if saving file enabled
+				 */
+				return false;
 			}
 
 			// woofunnels file api method not available

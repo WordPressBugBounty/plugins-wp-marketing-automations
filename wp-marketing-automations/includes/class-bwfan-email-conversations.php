@@ -489,6 +489,11 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 			return add_query_arg( $this->track_click_utm_parameters, $home_url );
 		}
 
+		/**
+		 * Handle open tracking code
+		 *
+		 * @return void
+		 */
 		public function handle_track_open() {
 			if ( ! isset( $_GET['bwfan-track-action'] ) || ! isset( $_GET['bwfan-track-id'] ) || 'open' !== $_GET['bwfan-track-action'] || empty( $_GET['bwfan-track-id'] ) ) {
 				return;
@@ -524,7 +529,8 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 			exit;
 		}
 
-		/** saving tracking details of email
+		/**
+		 * Saving tracking details of email against a contact
 		 *
 		 * @param $bwfan_track_id
 		 * @param $type
@@ -591,77 +597,109 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 				'ID' => $get_row[0]['ID'],
 			);
 			BWFAN_Model_Engagement_Tracking::update( $values, $where );
-
-			if ( ! isset( $get_row[0]['cid'] ) || empty( $get_row[0]['cid'] ) ) {
+			$cid = $get_row[0]['cid'];
+			if ( empty( $cid ) ) {
 				return;
 			}
 
+			$contact = BWFCRM_Model_Contact::get_contact_id( $cid );
+
 			/** Set cookie */
-			if ( $type === 'click' ) {
-				$contact = new WooFunnels_Contact( '', '', '', $get_row[0]['cid'] );
-				if ( $contact instanceof WooFunnels_Contact ) {
-					$uid = $contact->get_uid();
-					if ( ! empty( $uid ) ) {
-						BWFAN_Common::set_cookie( '_fk_contact_uid', $uid, time() + 10 * 365 * 24 * 60 * 60 );
-					}
-				}
+			if ( $type === 'click' && is_object( $contact ) && ! empty( $contact->uid ) ) {
+				BWFAN_Common::set_cookie( '_fk_contact_uid', $contact->uid, time() + 10 * 365 * 24 * 60 * 60 );
 			}
 
 			/** Set last open & click custom field */
-			$open_col = BWFAN_Model_Fields::get_field_by_slug( "last-open" );
-			$fields   = [];
-			if ( isset( $open_col['ID'] ) ) {
-				$fields = array(
-					'f' . $open_col['ID'] => $current_time
-				);
+			$this->update_contact_engagement( $cid, $type );
+
+			/** Update contact status if needed */
+			$this->maybe_subscribe_contact( $contact );
+		}
+
+		/**
+		 * Update contact last open and click time
+		 *
+		 * @param $cid
+		 * @param $type
+		 *
+		 * @return void
+		 */
+		public function update_contact_engagement( $cid, $type = 'open' ) {
+			$current_time = current_time( 'mysql' );
+			$fields       = [];
+
+			$col = BWFAN_Model_Fields::get_field_by_slug( "last-open" );
+			if ( isset( $col['ID'] ) ) {
+				$fields[ 'f' . $col['ID'] ] = $current_time;
 			}
 
 			if ( $type === 'click' ) {
-				$click_col = BWFAN_Model_Fields::get_field_by_slug( "last-click" );
-				if ( isset( $click_col['ID'] ) ) {
-					$fields[ 'f' . $click_col['ID'] ] = $current_time;
+				$col = BWFAN_Model_Fields::get_field_by_slug( "last-click" );
+				if ( isset( $col['ID'] ) ) {
+					$fields[ 'f' . $col['ID'] ] = $current_time;
 				}
 			}
 
 			if ( empty( $fields ) ) {
 				return;
 			}
-			$where = array( 'cid' => absint( $get_row[0]['cid'] ) );
+
+			$where = array( 'cid' => intval( $cid ) );
 			BWF_Model_Contact_Fields::update( $fields, $where );
 		}
 
 		/**
-		 * handling email tracking on click
+		 * Mark contact subscribed if status is bounce or soft-bounce
+		 *
+		 * @param $contact - db row
+		 *
+		 * @return void
 		 */
-		public function handle_track_click() {
-			if ( ! isset( $_GET['bwfan-track-id'] ) || empty( $_GET['bwfan-track-id'] ) ) {
+		public function maybe_subscribe_contact( $contact ) {
+			if ( ! in_array( intval( $contact->status ), [ 2, 4 ], true ) ) {
 				return;
 			}
 
-			if ( ! isset( $_GET['bwfan-track-action'] ) || 'click' !== $_GET['bwfan-track-action'] ) {
+			global $wpdb;
+			$wpdb->update( "{$wpdb->prefix}bwf_contact", [ 'status' => 1 ], [ 'id' => $contact->id ] );
+
+			/** Delete soft bounce count meta */
+			$ins = WooFunnels_DB_Operations::get_instance();
+			$ins->delete_contact_meta( $contact->id, 'soft_bounce_count' );
+		}
+
+		/**
+		 * Handle click tracking code
+		 *
+		 * @return void
+		 */
+		public function handle_track_click() {
+			$track_id     = filter_input( INPUT_GET, 'bwfan-track-id' );
+			$track_action = filter_input( INPUT_GET, 'bwfan-track-action' );
+			if ( empty( $track_id ) || empty( $track_action ) || ( 'click' !== $track_action ) ) {
 				return;
 			}
 
 			$link = filter_input( INPUT_GET, 'bwfan-link' );
-			if ( is_null( $link ) || empty( $link ) ) {
+			if ( empty( $link ) ) {
 				$this->track_click_skip();
 
 				return;
 			}
 
 			/** Checking source of click */
-			if ( self::checking_user_agent() ) {
+			if ( self::skipping_user_agent() ) {
 				BWFAN_Common::wp_redirect( $link );
 				exit;
 			}
 
+			/** Redirect if incentive email action */
 			if ( false !== strpos( $link, 'bwfan-action=incentive' ) ) {
 				BWFAN_Common::wp_redirect( $link );
 				exit;
 			}
 
 			$link = self::validate_link( $link );
-
 			if ( false === wp_http_validate_url( $link ) ) {
 				/** check if uid is available in the link */
 				if ( strpos( $link, 'uid' ) !== false ) {
@@ -911,7 +949,7 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 				$template    = str_replace( [ '{{contact_first_name}}', '{{contact_last_name}}' ], [ $bwf_contact->get_f_name(), $bwf_contact->get_l_name() ], $template );
 			}
 
-			if ( in_array(   $template_type, [ 5, 7 ] ) && class_exists( 'BWFCRM_Block_Editor' ) ) {
+			if ( in_array( $template_type, [ 5, 7 ] ) && class_exists( 'BWFCRM_Block_Editor' ) ) {
 				$global_val = BWFCRM_Block_Editor::$global_settings_var;
 				if ( ! empty( $global_val ) ) {
 					$global_val_k = array_keys( $global_val );
@@ -1130,6 +1168,7 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 							$data['name'] = $template_data['title'];
 						}
 					}
+
 					return $data;
 				default:
 					return false;
@@ -1277,14 +1316,13 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 		 *
 		 * @return bool
 		 */
-		public static function checking_user_agent() {
+		public static function skipping_user_agent() {
 			$skip_user_agents = apply_filters( 'bwfan_skip_user_agents', [] );
 			if ( empty( $skip_user_agents ) || ! is_array( $skip_user_agents ) ) {
 				return false;
 			}
 
 			$user_agent = $_SERVER['HTTP_USER_AGENT'];
-
 			foreach ( $skip_user_agents as $skip_user_agent ) {
 				if ( false !== strpos( $user_agent, $skip_user_agent ) ) {
 					return true;

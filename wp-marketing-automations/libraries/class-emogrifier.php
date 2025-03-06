@@ -400,7 +400,7 @@ class Emogrifier
 
 		$this->process();
 
-		return $this->render();
+		return defined( 'BWFAN_MINIFY_MAIL_CONTENT' ) && BWFAN_MINIFY_MAIL_CONTENT && method_exists( 'BWFAN_Common', 'minifyHtmlData' ) ? \BWFAN_Common::minifyHtmlData( $this->render() ) : $this->render();
 	}
 
 	/**
@@ -1419,6 +1419,9 @@ class Emogrifier
 		$css = '';
 		/** @var \DOMNode $styleNode */
 		foreach ($styleNodes as $styleNode) {
+			if ( $styleNode->getAttribute( 'id' ) === 'email-stylesheet' ) {
+				continue;
+			}
 			$css .= "\n\n" . $styleNode->nodeValue;
 			preg_match_all('/@font-face\s*{[^}]*}/i', $css, $matches);
 			if ( empty( $matches ) ) {

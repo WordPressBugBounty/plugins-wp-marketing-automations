@@ -237,6 +237,20 @@ class BWFAN_Common {
 		add_filter( 'bwf_check_cron_schedule_logging', function () {
 			return self::is_log_enabled( 'bwfan_cron_check_logging' );
 		} );
+
+		/** Modify midnight cron action scheduler's execution time to store time */
+		$midnight_actions = [
+			'bwfan_run_midnight_cron',
+			'bwfan_delete_logs',
+			'bwfan_delete_expired_autonami_coupons',
+			'bwfan_mark_abandoned_lost_cart',
+			'bwfan_run_midnight_connectors_sync',
+		];
+		foreach ( $midnight_actions as $action ) {
+			add_filter( 'bwf_recurring_action_' . $action . '_execution_time', function ( $e_time ) {
+				return self::get_midnight_store_time();
+			} );
+		}
 	}
 
 	public static function display_marketing_optin_checkbox() {
@@ -556,11 +570,24 @@ class BWFAN_Common {
 
 		if ( empty( $marketing_status ) && is_user_logged_in() ) {
 			$user        = wp_get_current_user();
-			$bwf_contact = bwf_get_contact( $user->ID, $user->user_email );
-			$status      = self::get_contact_status( $bwf_contact );
-			/** Check contact's marketing status, email and sms status */
-			if ( 1 === absint( $status['status'] ) && 1 === absint( $status['email_status'] ) && 1 === absint( $status['sms_status'] ) ) {
-				$marketing_status = 1;
+			$ins         = WooFunnels_DB_Operations::get_instance();
+			$contact_row = $ins->get_contact_by_wpid( $user->ID );
+			if ( property_exists( $contact_row, 'status' ) ) {
+				$status = self::get_contact_status( $contact_row->status, $contact_row->email, $contact_row->contact_no );
+				/** Check contact's marketing status, email and sms status */
+				if ( 1 === absint( $status['status'] ) && 1 === absint( $status['email_status'] ) && 1 === absint( $status['sms_status'] ) ) {
+					$marketing_status = 1;
+				}
+			}
+		}
+
+		if ( 1 === $marketing_status ) {
+			if ( ! $return ) {
+				echo '<input id="bwfan_user_consent" name="bwfan_user_consent" value="1" type="hidden" />';
+
+				return;
+			} else {
+				return '<input id="bwfan_user_consent" name="bwfan_user_consent" value="1" type="hidden" />';
 			}
 		}
 
@@ -569,11 +596,13 @@ class BWFAN_Common {
 		$check                   = in_array( $country_code, $tax_supported_countries, true );
 
 		if ( true === $check ) {
+			/** EU country */
 			$checked = 'checked';
 			if ( empty( $global_settings['bwfan_user_consent_eu'] ) ) {
 				$checked = '';
 			}
 		} else {
+			/** Non EU country */
 			$checked = 'checked';
 			if ( empty( $global_settings['bwfan_user_consent_non_eu'] ) ) {
 				$checked = '';
@@ -583,11 +612,6 @@ class BWFAN_Common {
 		$user_consent_message = self::get_user_consent_message_in_site_language( $global_settings );
 
 		if ( ! $return ) {
-			if ( 1 === $marketing_status ) {
-				echo '<input id="bwfan_user_consent" name="bwfan_user_consent" value="1" type="hidden" />';
-
-				return;
-			}
 			echo '<p class="bwfan_user_consent wfacp-form-control-wrapper wfacp-col-full wfacp-consent-term-condition form-row">';
 			echo '<label for="bwfan_user_consent" class="checkbox">';
 			echo '<input id="bwfan_user_consent" name="bwfan_user_consent" type="checkbox" value="1" ' . esc_html( $checked ) . ' />';
@@ -595,9 +619,6 @@ class BWFAN_Common {
 			echo '</label>';
 			echo '</p>';
 		} else {
-			if ( 1 === $marketing_status ) {
-				return '<input id="bwfan_user_consent" name="bwfan_user_consent" value="1" type="hidden" />';
-			}
 			$field_priority = ! empty( $field_priority ) ? 'data-priority="' . ( absint( $field_priority ) + 5 ) . '"' : '';
 			$return         = '<p class="bwfan_user_consent wfacp-form-control-wrapper wfacp-col-full wfacp-consent-term-condition form-row" ' . $field_priority . '>';
 			$return         .= '<label for="bwfan_user_consent" class="checkbox">';
@@ -2341,6 +2362,12 @@ class BWFAN_Common {
 			'callback'            => array( __CLASS__, 'run_worker_tasks' ),
 			'permission_callback' => '__return_true',
 		) );
+
+		register_rest_route( 'autonami/v2', '/worker', array(
+			'methods'             => WP_REST_Server::READABLE,
+			'callback'            => array( __CLASS__, 'run_v2_worker_tasks' ),
+			'permission_callback' => '__return_true',
+		) );
 	}
 
 	/**
@@ -2891,6 +2918,10 @@ class BWFAN_Common {
 
 		/** Check if any contact in automation can proceed */
 		if ( false === BWFAN_Model_Automation_Contact::maybe_can_execute() ) {
+			return;
+		}
+
+		if ( false === apply_filters( 'bwfan_run_automation_v2_worker', true ) ) {
 			return;
 		}
 
@@ -5189,10 +5220,11 @@ class BWFAN_Common {
 						'fields'  => $email_field,
 					),
 					array(
-						'key'     => 'sms',
-						'label'   => __( 'SMS', 'wp-marketing-automations' ),
-						'heading' => __( 'SMS Settings', 'wp-marketing-automations' ),
-						'fields'  => $sms_fields,
+						'key'         => 'sms',
+						'label'       => __( 'SMS', 'wp-marketing-automations' ),
+						'heading'     => __( 'SMS Settings', 'wp-marketing-automations' ),
+						"showSection" => bwfan_is_autonami_pro_active(),
+						'fields'      => $sms_fields,
 					),
 					array(
 						"key"         => 'whatsapp',
@@ -5668,6 +5700,7 @@ class BWFAN_Common {
 						'key'     => 'double-optin',
 						'label'   => __( 'Double Opt-in', 'wp-marketing-automations' ),
 						'heading' => __( 'Double Opt-in', 'wp-marketing-automations' ),
+						'isProSection' => true,
 						'fields'  => array(
 							array(
 								'id'          => 'after_confirmation_type',
@@ -5751,7 +5784,8 @@ class BWFAN_Common {
 								"min"         => '0',
 								'class'       => 'bwfan_delete_autonami_generated_coupons_time',
 								'placeholder' => '1',
-								"isWooField"  => true,
+								'isWooField'  => true,
+								'isProField'  => true,
 								'wrap_before' => '<br/><h3>' . __( 'WooCommerce Coupons', 'wp-marketing-automations' ) . '</h3>',
 								'hint'        => __( 'Delete personalized coupons after expiry', 'wp-marketing-automations' ),
 								'required'    => false,
@@ -5853,6 +5887,7 @@ class BWFAN_Common {
 								'class'         => 'bwfan_make_logs',
 								'required'      => false,
 								'wrap_before'   => '',
+								'isProField'    => true,
 								'toggler'       => array(
 									'fields' => array(
 										array(
@@ -5871,6 +5906,7 @@ class BWFAN_Common {
 								'class'         => 'bwfan_make_logs',
 								'required'      => false,
 								'wrap_before'   => '',
+								'isProField'    => true,
 								'toggler'       => array(
 									'fields' => array(
 										array(
@@ -5889,6 +5925,7 @@ class BWFAN_Common {
 								'class'         => 'bwfan_make_logs',
 								'required'      => false,
 								'wrap_before'   => '',
+								'isProField'    => true,
 								'toggler'       => array(
 									'fields' => array(
 										array(
@@ -5907,6 +5944,7 @@ class BWFAN_Common {
 								'class'         => 'bwfan_make_logs',
 								'required'      => false,
 								'wrap_before'   => '',
+								'isProField'    => true,
 								'toggler'       => array(
 									'fields' => array(
 										array(
@@ -5925,6 +5963,7 @@ class BWFAN_Common {
 								'class'         => 'bwfan_make_logs',
 								'required'      => false,
 								'wrap_before'   => '',
+								'isProField'    => true,
 								'toggler'       => array(
 									'fields' => array(
 										array(
@@ -5943,6 +5982,7 @@ class BWFAN_Common {
 								'class'         => 'bwfan_make_logs',
 								'required'      => false,
 								'wrap_before'   => '',
+								'isProField'    => true,
 								'toggler'       => array(
 									'fields' => array(
 										array(
@@ -6257,6 +6297,12 @@ class BWFAN_Common {
 
 	public static function get_pro_license( $onlyKey = true ) {
 		$bwf_licenses = get_option( 'woofunnels_plugins_info', false );
+		if ( is_multisite() ) {
+			$active_plugins = get_site_option( 'active_sitewide_plugins', array() );
+			if ( is_array( $active_plugins ) && ( in_array( BWFAN_PLUGIN_BASENAME, apply_filters( 'active_plugins', $active_plugins ), true ) || array_key_exists( BWFAN_PLUGIN_BASENAME, apply_filters( 'active_plugins', $active_plugins ) ) ) && ! is_main_site() ) {
+				$bwf_licenses = get_blog_option( get_network()->site_id, 'woofunnels_plugins_info', [] );
+			}
+		}
 		if ( ! defined( 'BWFAN_PRO_ENCODE' ) || empty( $bwf_licenses ) || ! is_array( $bwf_licenses ) ) {
 			return false;
 		}
@@ -7835,8 +7881,8 @@ class BWFAN_Common {
 				$header[] = "List-Unsubscribe-Post: List-Unsubscribe=One-Click";
 			}
 
-			/** Removed wp mail filters */
-			$send_email_ins->before_executing_automation();
+			$subject = __( 'TEST: ', 'wp-marketing-automations' ) . $subject;
+
 			$res = wp_mail( $email, $subject, $body, $header );
 		}
 
@@ -7883,9 +7929,13 @@ class BWFAN_Common {
 			preg_match( '/href=' . $quote . '(.*?)' . $quote . '/', $tag, $hrefMatch );
 			$url = $hrefMatch[1] ?? '';
 
+			/** Check if 'bwfan-link-trigger=' exists in the url */
+			if ( strpos( $url, 'bwfan-link-trigger=' ) === false ) {
+				return $tag;
+			}
 			/** Append uid parameter correctly */
 			$separator = ( strpos( $url, '?' ) !== false ) ? '&' : '?';
-			$new_url   = $url . $separator . 'uid=' . $uid;
+			$new_url   = $url . $separator . 'bwfan-uid=' . $uid;
 
 			return str_replace( $url, $new_url, $tag );
 		}, $body );
@@ -9355,34 +9405,35 @@ class BWFAN_Common {
 	/**
 	 * Get contact marketing status
 	 *
-	 * @param $contact
+	 * @param $contact_status
+	 * @param $email
+	 * @param $phone
 	 *
 	 * @return array
 	 */
-	public static function get_contact_status( $contact ) {
-		if ( ! $contact instanceof WooFunnels_Contact ) {
+	public static function get_contact_status( $contact_status = 0, $email = '', $phone = '' ) {
+		if ( empty( $email ) && empty( $phone ) ) {
 			return [];
 		}
-
 		$data = array(
-			'recipient' => array( $contact->get_email(), $contact->get_contact_no() ),
+			'recipient' => array( $email, $phone ),
 		);
 
 		$unsubscribed_rows = BWFAN_Model_Message_Unsubscribe::get_message_unsubscribe_row( $data, false );
 		if ( empty( $unsubscribed_rows ) || 0 === count( $unsubscribed_rows ) ) {
 			return [
-				'status'       => $contact->get_status(),
+				'status'       => $contact_status,
 				'email_status' => 1,
 				'sms_status'   => 1
 			];
 		}
 
 		$unsubscribed_rows = array_column( $unsubscribed_rows, 'recipient' );
-		$email_status      = in_array( $contact->get_email(), $unsubscribed_rows, true ) ? 0 : 1;
-		$sms_status        = in_array( $contact->get_contact_no(), $unsubscribed_rows, true ) ? 0 : 1;
+		$email_status      = in_array( $email, $unsubscribed_rows, true ) ? 0 : 1;
+		$sms_status        = in_array( $phone, $unsubscribed_rows, true ) ? 0 : 1;
 
 		return [
-			'status'       => $contact->get_status(),
+			'status'       => $contact_status,
 			'email_status' => $email_status,
 			'sms_status'   => $sms_status
 		];
@@ -9831,7 +9882,7 @@ class BWFAN_Common {
 	 */
 	public static function get_prices_with_tax( $product ) {
 		if ( ! wc_tax_enabled() ) {
-			return $product instanceof WC_Product ? $product->get_price() : 0;
+			return $product instanceof WC_Product && ! empty( $product->get_price() ) ? $product->get_price() : 0;
 		}
 		if ( ! $product instanceof WC_Product ) {
 			return 0;
@@ -10608,7 +10659,8 @@ class BWFAN_Common {
 			'flickr.com',
 			'github.com',
 			'discord.gg',
-			'tiktok.com'
+			'tiktok.com',
+			'zoom.us'
 		];
 		$excluded_urls = apply_filters( 'bwfan_exclude_click_track_urls', $excluded_urls );
 
@@ -11482,5 +11534,120 @@ class BWFAN_Common {
 		}
 
 		return $formatted_data;
+	}
+
+	public static function minifyHtmlData( $content ) {
+		if ( empty( $content ) ) {
+			return '';
+		}
+
+		// Remove unnecessary whitespaces and newlines between tags
+		$htmlMinified = preg_replace( '/\s+/', ' ', $content );
+		$htmlMinified = preg_replace( '/> </', '><', $htmlMinified ); // Remove space between tags
+//		$htmlMinified = preg_replace('/<!--.*?-->/', '', $htmlMinified); // Remove comments
+
+		// Call minifyCSS to handle embedded CSS inside <style> tags
+		$htmlMinified = self::minifyCSSInHTML( $htmlMinified );
+
+		// Return the minified HTML content
+		return $htmlMinified;
+
+	}
+
+	private static function minifyCSSContent( $css ) {
+		// Remove unnecessary whitespaces, comments, and newlines
+		$cssMinified = preg_replace( '/\s+/', ' ', $css ); // Collapse multiple spaces into one
+		$cssMinified = preg_replace( '/\/\*.*?\*\//', '', $cssMinified ); // Remove comments
+		$cssMinified = preg_replace( '/\s*([{:},;])\s*/', '$1', $cssMinified ); // Remove spaces around colons, commas, semicolons
+		$cssMinified = preg_replace( '/\s*([{:},;])\s*/', '$1', $cssMinified ); // Remove spaces around colons, commas, semicolons
+		$cssMinified = preg_replace( '/[^\}]+\{\s*\}/', '', $cssMinified ); // Remove empty CSS selectors
+
+		return $cssMinified;
+	}
+
+	// Minify embedded CSS in HTML content (inside <style> tags)
+	private static function minifyCSSInHTML( $html ) {
+		// Find all <style> tags and minify their content
+		preg_match_all( '/<style.*?>(.*?)<\/style>/is', $html, $matches );
+
+		if ( ! empty( $matches[1] ) ) {
+			foreach ( $matches[1] as $cssContent ) {
+				$minifiedCSS = self::minifyCSSContent( $cssContent ); // Minify CSS content inside the <style> tag
+				$html        = str_replace( $cssContent, $minifiedCSS, $html ); // Replace the original CSS with the minified one
+			}
+		}
+
+		preg_match_all( '/<style\b[^>]*>(.*?)<\/style>/is', $html, $matches );
+		$mergedCSS   = implode( ' ', $matches[1] );
+		$mergedCSS   = self::mergeDuplicateMediaQueries( $mergedCSS );
+		$minifiedCSS = self::minifyCSSContent( $mergedCSS ); // Minify CSS content inside the <style> tag
+		$html        = preg_replace( '/<style\b[^>]*>(.*?)<\/style>/is', '', $html );
+		$html        = preg_replace( '/<\/head>/', '<style>' . $minifiedCSS . '</style></head>', $html, 1 );
+
+		return $html;
+	}
+
+	private static function mergeDuplicateMediaQueries( $style ) {
+		// Extract all media queries and their rules
+		$mediaQueries = [];
+
+		preg_match_all( '/@media[^{]+\{([\s\S]*?)\}}/i', $style, $mediaMatches );
+		foreach ( $mediaMatches[0] as $mediaQuery ) {
+			// Split the media query and its rules
+			$parts = explode( '{', $mediaQuery, 2 );
+			$query = trim( $parts[0] );
+			$rules = trim( $parts[1] );
+
+			// Store rules in the mediaQueries array
+			if ( ! isset( $mediaQueries[ $query ] ) ) {
+				$mediaQueries[ $query ] = [];
+			}
+
+			if ( str_ends_with( $rules, '}' ) ) {
+				// Remove the last character (brace) from the string
+				$rules = substr( $rules, 0, - 1 );
+			}
+
+			$mediaQueries[ $query ][] = $rules;
+		}
+
+		// Combine the media query rules into a single string
+		$combinedCSS = '';
+		foreach ( $mediaQueries as $query => $rules ) {
+			$combinedCSS .= "{$query} { " . implode( ' ', $rules ) . " }\n";
+		}
+
+		// Remove all media queries from the style
+		$style = preg_replace( '/@media[^{]*{([^{}]*{[^{}]*})*[^{}]*}/', '', $style );
+
+		return $style . " " . $combinedCSS;
+	}
+
+
+
+	/**
+	 * Callback function for running v2 automation
+	 *
+	 * @param $request
+	 *
+	 * @return void
+	 */
+	public static function run_v2_worker_tasks( $request = '' ) {
+		self::event_advanced_logs( "V2 worker callback received" );
+		self::worker_as_run();
+
+		/** Logs */
+		$cron_check = self::is_log_enabled( 'bwfan_cron_check_logging' );
+		if ( true === $cron_check || ( defined( 'BWF_CHECK_CRON_SCHEDULE' ) && true === BWF_CHECK_CRON_SCHEDULE ) ) {
+			add_filter( 'bwf_logs_allowed', '__return_true', PHP_INT_MAX );
+			$logger_obj = BWF_Logger::get_instance();
+			$logger_obj->log( date_i18n( 'Y-m-d H:i:s' ) . ' - after worker run', 'fka-cron-check-v2', 'autonami' );
+		}
+
+		wp_send_json( [
+			'msg'       => 'success',
+			'time'      => date_i18n( 'Y-m-d H:i:s' ),
+			'datastore' => get_class( ActionScheduler_Store::instance() ),
+		] );
 	}
 }

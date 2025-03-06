@@ -2,48 +2,48 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-/**
- * Class WooFunnels_DB_Tables
- */
-#[AllowDynamicProperties]
-class WooFunnels_DB_Tables {
-
+if ( ! class_exists( 'WooFunnels_DB_Tables' ) ) {
 	/**
-	 * instance of class
-	 * @var null
+	 * Class WooFunnels_DB_Tables
 	 */
-	private static $ins = null;
+	#[AllowDynamicProperties]
+	class WooFunnels_DB_Tables {
 
-	/**
-	 * WooFunnels_DB_Tables constructor.
-	 */
-	public function __construct() {
-		add_filter( 'bwf_add_db_table_schema', array( $this, 'create_db_tables' ), 10, 2 );
-	}
+		/**
+		 * instance of class
+		 * @var null
+		 */
+		private static $ins = null;
 
-	/**
-	 * @return WooFunnels_DB_Tables|null
-	 */
-	public static function get_instance() {
-		if ( null === self::$ins ) {
-			self::$ins = new self;
+		/**
+		 * WooFunnels_DB_Tables constructor.
+		 */
+		public function __construct() {
+			add_filter( 'bwf_add_db_table_schema', array( $this, 'create_db_tables' ), 10, 2 );
 		}
 
-		return self::$ins;
-	}
+		/**
+		 * @return WooFunnels_DB_Tables|null
+		 */
+		public static function get_instance() {
+			if ( null === self::$ins ) {
+				self::$ins = new self;
+			}
 
-	/**
-	 * Add bwf_contact table
-	 *
-	 *  Warning: check if it exists first, which could cause SQL errors.
-	 */
-	public function create_db_tables( $args, $tables ) {
+			return self::$ins;
+		}
 
-		if ( $tables['version'] !== BWF_DB_VERSION || ! in_array( 'bwf_contact', $tables['tables'], true ) ) {
-			$args[] = [
-				'name'   => 'bwf_contact',
-				'schema' => "CREATE TABLE `{table_prefix}bwf_contact` (
+		/**
+		 * Add bwf_contact table
+		 *
+		 *  Warning: check if it exists first, which could cause SQL errors.
+		 */
+		public function create_db_tables( $args, $tables ) {
+
+			if ( $tables['version'] !== BWF_DB_VERSION || ! in_array( 'bwf_contact', $tables['tables'], true ) ) {
+				$args[] = [
+					'name'   => 'bwf_contact',
+					'schema' => "CREATE TABLE `{table_prefix}bwf_contact` (
 					`id` int(12) unsigned NOT NULL AUTO_INCREMENT,
 					`wpid` int(12) NOT NULL,
 					`uid` varchar(35) NOT NULL DEFAULT '',
@@ -68,25 +68,25 @@ class WooFunnels_DB_Tables {
 					KEY `uid` (`uid`),
 					UNIQUE KEY `email` (`email`)
 	                ) {table_collate};",
-			];
-		}
-		if ( $tables['version'] !== BWF_DB_VERSION || ! in_array( 'bwf_contact_meta', $tables['tables'], true ) ) {
-			$args[] = [
-				'name'   => 'bwf_contact_meta',
-				'schema' => "CREATE TABLE `{table_prefix}bwf_contact_meta` (
+				];
+			}
+			if ( $tables['version'] !== BWF_DB_VERSION || ! in_array( 'bwf_contact_meta', $tables['tables'], true ) ) {
+				$args[] = [
+					'name'   => 'bwf_contact_meta',
+					'schema' => "CREATE TABLE `{table_prefix}bwf_contact_meta` (
 					`meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 					`contact_id` bigint(20) unsigned NOT NULL DEFAULT '0',
 					`meta_key` varchar(50) DEFAULT NULL,    
 					`meta_value` longtext,
 					PRIMARY KEY (`meta_id`)
 		            ) {table_collate};",
-			];
-		}
+				];
+			}
 
-		if ( $tables['version'] !== BWF_DB_VERSION || ! in_array( 'bwf_wc_customers', $tables['tables'], true ) ) {
-			$args[] = [
-				'name'   => 'bwf_wc_customers',
-				'schema' => "CREATE TABLE `{table_prefix}bwf_wc_customers` (
+			if ( $tables['version'] !== BWF_DB_VERSION || ! in_array( 'bwf_wc_customers', $tables['tables'], true ) ) {
+				$args[] = [
+					'name'   => 'bwf_wc_customers',
+					'schema' => "CREATE TABLE `{table_prefix}bwf_wc_customers` (
 	                `id` int(12) unsigned NOT NULL AUTO_INCREMENT,
 	                `cid` int(12) NOT NULL,
 	                `l_order_date` DateTime NOT NULL,
@@ -102,13 +102,13 @@ class WooFunnels_DB_Tables {
 	                KEY `id` (`id`), 
 	                UNIQUE KEY `cid` (`cid`)
 	                )  {table_collate};",
-			];
-		}
+				];
+			}
 
-		if ( $tables['version'] !== BWF_DB_VERSION || ! in_array( 'wfco_report_views', $tables['tables'], true ) ) {
-			$args[] = [
-				'name'   => 'wfco_report_views',
-				'schema' => "CREATE TABLE `{table_prefix}wfco_report_views` (
+			if ( $tables['version'] !== BWF_DB_VERSION || ! in_array( 'wfco_report_views', $tables['tables'], true ) ) {
+				$args[] = [
+					'name'   => 'wfco_report_views',
+					'schema' => "CREATE TABLE `{table_prefix}wfco_report_views` (
 					id bigint(20) unsigned NOT NULL auto_increment,
 					date date NOT NULL,
 					no_of_sessions int(11) NOT NULL DEFAULT '1',
@@ -119,12 +119,13 @@ class WooFunnels_DB_Tables {
 					KEY object_id (object_id),
 					KEY type (type)
 				) {table_collate};",
-			];
+				];
+			}
+
+
+			return $args;
 		}
-
-
-		return $args;
 	}
-}
 
-WooFunnels_DB_Tables::get_instance();
+	WooFunnels_DB_Tables::get_instance();
+}

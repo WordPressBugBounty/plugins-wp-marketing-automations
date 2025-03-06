@@ -41,15 +41,21 @@ class BWFAN_Cart_Analytics {
 		}
 		$start_date_query = '';
 		if ( ! empty( $start_date ) ) {
-			$start_date_query = " AND `" . $date_col . "` >= '" . $start_date . " 00:00:00' ";
+			if ( strpos( $start_date, ' ' ) === false ) {
+				$start_date = $start_date . " 00:00:00";
+			}
+			$start_date_query = " AND `" . $date_col . "` >= '" . $start_date . "'";
 		}
 
 		$end_date_query = '';
 		if ( ! empty( $end_date ) ) {
-			$end_date_query = " AND `" . $date_col . "` <= '" . $end_date . " 23:59:59' ";
+			if ( strpos( $end_date, ' ' ) === false ) {
+				$end_date = $end_date . " 23:59:59";
+			}
+			$end_date_query = " AND `" . $date_col . "` <= '" . $end_date . "'";
 		}
 
-		$base_query = "SELECT SUM(total_base) as `sum`, COUNT(ID) as `count` " . $interval_query . " FROM `" . $table . "` WHERE `status` != 2  $start_date_query $end_date_query $group_by ORDER BY $order_by ASC";
+		$base_query = "SELECT SUM(total_base) as `sum`, COUNT(ID) as `count` " . $interval_query . " FROM `" . $table . "` WHERE 1=1 $start_date_query $end_date_query $group_by ORDER BY $order_by ASC";
 
 		return $wpdb->get_results( $base_query, ARRAY_A );
 	}
@@ -121,7 +127,13 @@ class BWFAN_Cart_Analytics {
 		}
 		$where = '';
 		if ( ! empty( $start_date ) && ! empty( $end_date ) ) {
-			$where = "AND p.post_date >= '{$start_date} 00:00:00' AND p.post_date <='{$end_date} 23:59:59'";
+			if ( strpos( $start_date, ' ' ) === false ) {
+				$start_date = $start_date . " 00:00:00";
+			}
+			if ( strpos( $end_date, ' ' ) === false ) {
+				$end_date = $end_date . " 23:59:59";
+			}
+			$where = "AND p.post_date >= '{$start_date}' AND p.post_date <='{$end_date}'";
 		}
 		$where .= " AND m2.meta_value > 0";
 
@@ -145,10 +157,14 @@ class BWFAN_Cart_Analytics {
 			$order_by       = ' time_interval ';
 		}
 
-		$start_date = $start_date . ' 00:00:00';
+		if ( strpos( $start_date, ' ' ) === false ) {
+			$start_date = $start_date . " 00:00:00";
+		}
 		$start_date = BWFAN_Common::get_utc_date_from_store_date( $start_date );
 
-		$end_date = $end_date . ' 23:59:59';
+		if ( strpos( $end_date, ' ' ) === false ) {
+			$end_date = $end_date . " 23:59:59";
+		}
 		$end_date = BWFAN_Common::get_utc_date_from_store_date( $end_date );
 
 		$where = "AND p.date_created_gmt >= '{$start_date}' AND p.date_created_gmt <='{$end_date}'";

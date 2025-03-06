@@ -412,6 +412,10 @@ abstract class BWFCRM_Base_React_Page {
 			return false === strpos( $dep, 'css' );
 		} );
 
+		if( ! empty( $script_deps ) && ! in_array( 'wp-block-library', $script_deps ) ) {
+			$script_deps[] = 'wp-block-library';
+		}
+
 		return array(
 			'dependencies' => $script_deps,
 			'version'      => $version,
