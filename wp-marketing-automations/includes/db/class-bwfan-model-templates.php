@@ -12,9 +12,10 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 		 * @param $limit
 		 * @param $search
 		 * @param $id
-		 * @param bool $get_template
+		 * @param $get_template
+		 * @param $mode
 		 *
-		 * @return array|object
+		 * @return array|object|stdClass[]
 		 */
 		public static function bwfan_get_templates( $offset, $limit, $search, $id, $get_template = true, $mode = '' ) {
 			global $wpdb;
@@ -25,7 +26,11 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 			$query = "SELECT $column FROM {table_name} WHERE 1=1 AND type = 1 AND canned = 1";
 
 			if ( ! empty( $id ) ) {
-				$query .= $wpdb->prepare( " AND ID in ( " . implode( ',', $id ) . " )" );
+				$id = array_filter( array_map( 'intval', $id ) );
+				if ( ! empty( $id ) ) {
+					$placeholders = array_fill( 0, count( $id ), '%d' );
+					$query        .= $wpdb->prepare( " AND ID in ( " . implode( ',', $placeholders ) . " )", $id );
+				}
 			}
 			if ( ! empty( $mode ) ) {
 				$query .= $wpdb->prepare( " AND mode = %d", $mode );
@@ -63,7 +68,11 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 			$query = "SELECT * FROM {table_name} WHERE 1=1 AND type = 1 AND canned = 0 AND mode = 6";
 
 			if ( ! empty( $id ) ) {
-				$query .= $wpdb->prepare( " AND ID in ( " . implode( ',', $id ) . " )" );
+				$id = array_filter( array_map( 'intval', $id ) );
+				if ( ! empty( $id ) ) {
+					$placeholders = array_fill( 0, count( $id ), '%d' );
+					$query        .= $wpdb->prepare( " AND ID in ( " . implode( ',', $placeholders ) . " )", $id );
+				}
 			}
 			if ( ! empty( $search ) ) {
 				$query .= $wpdb->prepare( " AND title LIKE %s", "%" . esc_sql( $search ) . "%" );
@@ -86,17 +95,22 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 		 *
 		 * @param $search
 		 * @param $id
+		 * @param $mode
 		 *
 		 * @return int
 		 */
-		public static function bwfan_get_templates_count( $search, $id, $mode ) {
+		public static function bwfan_get_templates_count( $search = '', $id = [], $mode = 0 ) {
 			global $wpdb;
 			$table = $wpdb->prefix . 'bwfan_templates';
 
 			$query = 'SELECT count(ID) FROM ' . $table . ' WHERE 1=1 AND type = 1 AND canned = 1';
 
 			if ( ! empty( $id ) ) {
-				$query .= $wpdb->prepare( " AND ID in ( " . implode( ',', $id ) . " )" );
+				$id = array_filter( array_map( 'intval', $id ) );
+				if ( ! empty( $id ) ) {
+					$placeholders = array_fill( 0, count( $id ), '%d' );
+					$query        .= $wpdb->prepare( " AND ID in ( " . implode( ',', $placeholders ) . " )", $id );
+				}
 			}
 			if ( ! empty( $mode ) ) {
 				$query .= $wpdb->prepare( " AND mode = %d", $mode );
@@ -125,7 +139,11 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 			$query = 'SELECT count(ID) FROM ' . $table . ' WHERE 1=1 AND type = 1 AND canned = 0 AND mode=6';
 
 			if ( ! empty( $id ) ) {
-				$query .= $wpdb->prepare( " AND ID in ( " . implode( ',', $id ) . " )" );
+				$id = array_filter( array_map( 'intval', $id ) );
+				if ( ! empty( $id ) ) {
+					$placeholders = array_fill( 0, count( $id ), '%d' );
+					$query        .= $wpdb->prepare( " AND ID in ( " . implode( ',', $placeholders ) . " )", $id );
+				}
 			}
 			if ( ! empty( $search ) ) {
 				$query .= $wpdb->prepare( " AND title LIKE %s", "%" . esc_sql( $search ) . "%" );
@@ -178,6 +196,8 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 		 * Insert new template to db
 		 *
 		 * @param $data
+		 *
+		 * @return int|void
 		 */
 		public static function bwfan_create_new_template( $data ) {
 			if ( empty( $data ) ) {
@@ -198,14 +218,23 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 		 * @return bool
 		 */
 		public static function bwf_delete_template( $id ) {
+			if ( empty( $id ) ) {
+				return false;
+			}
+
+			global $wpdb;
 			$template_data = [
 				'canned' => 0,
 			];
 			$table_name    = self::_table();
 			if ( is_array( $id ) ) {
 				/**Update multiple rows */
-				$query = "UPDATE $table_name SET `canned` = 0 WHERE `ID` IN ('" . implode( "','", array_map( 'esc_sql', $id ) ) . "')";
-				self::update_multiple( $query );
+				$id = array_filter( array_map( 'intval', $id ) );
+				if ( ! empty( $id ) ) {
+					$placeholders = array_fill( 0, count( $id ), '%d' );
+					$query        = $wpdb->prepare( "UPDATE $table_name SET `canned` = 0 WHERE ID in ( " . implode( ',', $placeholders ) . " )", $id );
+					self::update_multiple( $query );
+				}
 			} else {
 				$delete_template = self::update( $template_data, array(
 					'id' => absint( $id ),
@@ -241,8 +270,9 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 		 * Fetch template by id
 		 *
 		 * @param $id
+		 * @param $canned
 		 *
-		 * @return array|mixed
+		 * @return array|mixed|stdClass
 		 */
 		public static function bwfan_get_template( $id, $canned = 1 ) {
 			global $wpdb;
@@ -250,9 +280,7 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 
 			$result = self::get_results( $query );
 
-			$result = is_array( $result ) && ! empty( $result ) ? $result[0] : array();
-
-			return $result;
+			return is_array( $result ) && ! empty( $result ) ? $result[0] : array();
 		}
 
 		/**
@@ -260,6 +288,8 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 		 *
 		 * @param $id
 		 * @param $data
+		 *
+		 * @return bool
 		 */
 		public static function bwfan_update_template( $id, $data ) {
 			if ( ! is_array( $data ) ) {
@@ -347,7 +377,6 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 			}
 
 			return $data;
-
 		}
 	}
 }

@@ -572,7 +572,7 @@ class BWFAN_Common {
 			$user        = wp_get_current_user();
 			$ins         = WooFunnels_DB_Operations::get_instance();
 			$contact_row = $ins->get_contact_by_wpid( $user->ID );
-			if ( property_exists( $contact_row, 'status' ) ) {
+			if ( ! is_null( $contact_row ) && property_exists( $contact_row, 'status' ) ) {
 				$status = self::get_contact_status( $contact_row->status, $contact_row->email, $contact_row->contact_no );
 				/** Check contact's marketing status, email and sms status */
 				if ( 1 === absint( $status['status'] ) && 1 === absint( $status['email_status'] ) && 1 === absint( $status['sms_status'] ) ) {
@@ -5697,11 +5697,11 @@ class BWFAN_Common {
 						) ),
 					),
 					array(
-						'key'     => 'double-optin',
-						'label'   => __( 'Double Opt-in', 'wp-marketing-automations' ),
-						'heading' => __( 'Double Opt-in', 'wp-marketing-automations' ),
+						'key'          => 'double-optin',
+						'label'        => __( 'Double Opt-in', 'wp-marketing-automations' ),
+						'heading'      => __( 'Double Opt-in', 'wp-marketing-automations' ),
 						'isProSection' => true,
-						'fields'  => array(
+						'fields'       => array(
 							array(
 								'id'          => 'after_confirmation_type',
 								'label'       => __( 'After Confirmation Type', 'wp-marketing-automations' ),
@@ -9412,8 +9412,13 @@ class BWFAN_Common {
 	 * @return array
 	 */
 	public static function get_contact_status( $contact_status = 0, $email = '', $phone = '' ) {
+		$response = [
+			'status'       => $contact_status,
+			'email_status' => 1,
+			'sms_status'   => 1
+		];
 		if ( empty( $email ) && empty( $phone ) ) {
-			return [];
+			return $response;
 		}
 		$data = array(
 			'recipient' => array( $email, $phone ),
@@ -9421,22 +9426,14 @@ class BWFAN_Common {
 
 		$unsubscribed_rows = BWFAN_Model_Message_Unsubscribe::get_message_unsubscribe_row( $data, false );
 		if ( empty( $unsubscribed_rows ) || 0 === count( $unsubscribed_rows ) ) {
-			return [
-				'status'       => $contact_status,
-				'email_status' => 1,
-				'sms_status'   => 1
-			];
+			return $response;
 		}
 
-		$unsubscribed_rows = array_column( $unsubscribed_rows, 'recipient' );
-		$email_status      = in_array( $email, $unsubscribed_rows, true ) ? 0 : 1;
-		$sms_status        = in_array( $phone, $unsubscribed_rows, true ) ? 0 : 1;
+		$unsubscribed_rows        = array_column( $unsubscribed_rows, 'recipient' );
+		$response['email_status'] = in_array( $email, $unsubscribed_rows, true ) ? 0 : 1;
+		$response['sms_status']   = in_array( $phone, $unsubscribed_rows, true ) ? 0 : 1;
 
-		return [
-			'status'       => $contact_status,
-			'email_status' => $email_status,
-			'sms_status'   => $sms_status
-		];
+		return $response;
 	}
 
 	/**
@@ -11624,7 +11621,6 @@ class BWFAN_Common {
 	}
 
 
-
 	/**
 	 * Callback function for running v2 automation
 	 *
@@ -11649,5 +11645,40 @@ class BWFAN_Common {
 			'time'      => date_i18n( 'Y-m-d H:i:s' ),
 			'datastore' => get_class( ActionScheduler_Store::instance() ),
 		] );
+	}
+
+	/**
+	 * Validate redirect link by domain
+	 *
+	 * @param $link string
+	 *
+	 * @return string
+	 */
+	public static function validate_target_link( $link = '' ) {
+		try {
+			$link_host     = wp_parse_url( urldecode( $link ), PHP_URL_HOST );
+			$site_url      = home_url();
+			$site_url_host = wp_parse_url( $site_url, PHP_URL_HOST );
+		} catch ( Error|Exception $e ) {
+			return $link;
+		}
+
+		/** If site url and redirect url host are same */
+		if ( $link_host === $site_url_host ) {
+			return $link;
+		}
+
+		/** Allowed domains */
+		$allowed_domains = apply_filters( 'bwfan_allowed_redirect_domains', [] );
+		if ( empty( $allowed_domains ) ) {
+			return $link;
+		}
+
+		/** Filter valid domains */
+		$allowed_domains = array_filter( array_map( function ( $domain ) {
+			return ! empty( $domain ) && is_string( $domain ) ? wp_parse_url( $domain, PHP_URL_HOST ) : false;
+		}, $allowed_domains ) );
+
+		return in_array( $link_host, $allowed_domains, true ) ? $link : $site_url;
 	}
 }

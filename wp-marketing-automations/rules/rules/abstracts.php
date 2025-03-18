@@ -323,6 +323,11 @@ if ( class_exists( 'WooCommerce' ) ) {
 				return $this->return_is_match( $result, $rule_data );
 			}
 
+			// Get translated term ID.
+			if ( class_exists( 'BWFAN_Compatibility_With_WPML' ) && method_exists( 'BWFAN_Compatibility_With_WPML', 'get_translated_term_ids' ) ) {
+				$saved_terms = BWFAN_Compatibility_With_WPML::get_translated_term_ids( $saved_terms, $this->taxonomy_name, $automation_data );
+			}
+
 			switch ( $type ) {
 				case 'all':
 					if ( is_array( $saved_terms ) && is_array( $all_terms ) ) {

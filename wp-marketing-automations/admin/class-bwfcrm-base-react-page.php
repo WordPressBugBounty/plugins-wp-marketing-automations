@@ -110,18 +110,20 @@ abstract class BWFCRM_Base_React_Page {
 				'orderby' => 'last_modified'
 			];
 		}
-		$this->page_data['table_column_data']         = array(
+		$this->page_data['table_column_data']    = array(
 			'contact'         => get_user_meta( get_current_user_id(), '_bwfan_contact_columns', true ),
 			'contactv2'       => BWFAN_Common::get_contact_columns(),
 			'campaign'        => get_user_meta( get_current_user_id(), '_bwfan_broadcast_columns', true ),
 			'table_sort_data' => $sort_data
-
 		);
-		$this->page_data['welcome_note_dismiss']      = get_user_meta( get_current_user_id(), '_bwfan_welcome_note_dismissed', true );
-		$this->page_data['bwfan_header_notification'] = get_user_meta( get_current_user_id(), '_bwfan_header_notification', true );
-		if ( empty( $this->page_data['bwfan_header_notification'] ) ) {
-			$this->page_data['bwfan_header_notification'] = [];
-		}
+		$this->page_data['welcome_note_dismiss'] = get_user_meta( get_current_user_id(), '_bwfan_welcome_note_dismissed', true );
+
+		$user_header_notification = get_user_meta( get_current_user_id(), '_bwfan_header_notification', true );
+		$user_header_notification = is_array( $user_header_notification ) ? array_values( array_filter( array_unique( $user_header_notification ) ) ) : [];
+
+		$this->page_data['bwfan_header_notification'] = $user_header_notification;
+		/** @todo remove on May 2025 */
+
 		if ( class_exists( 'WooCommerce' ) ) {
 			$this->page_data['currency']        = function_exists( 'get_woocommerce_currency' ) ? get_woocommerce_currency() : 'USD';
 			$this->page_data['currency_symbol'] = function_exists( 'get_woocommerce_currency_symbol' ) ? get_woocommerce_currency_symbol( $this->page_data['currency'] ) : '$';
@@ -412,7 +414,7 @@ abstract class BWFCRM_Base_React_Page {
 			return false === strpos( $dep, 'css' );
 		} );
 
-		if( ! empty( $script_deps ) && ! in_array( 'wp-block-library', $script_deps ) ) {
+		if ( ! empty( $script_deps ) && ! in_array( 'wp-block-library', $script_deps ) ) {
 			$script_deps[] = 'wp-block-library';
 		}
 

@@ -34,6 +34,14 @@ if ( ! bwfan_is_autonami_pro_active() || version_compare( BWFAN_PRO_VERSION, '2.
 				return $this->parse_shortcode_output( $this->get_dummy_preview(), $attr );
 			}
 
+			/** If needed contact phone not wc order phone */
+			if ( defined( 'BWFAN_GET_CONTACT_PHONE' ) && true === BWFAN_GET_CONTACT_PHONE && isset( $get_data['contact_id'] ) ) {
+				$phone = $this->get_phone_by_cid( $get_data['contact_id'] );
+				if ( ! empty( $phone ) ) {
+					return $this->parse_shortcode_output( $phone, $attr );
+				}
+			}
+
 			/** If cart */
 			if ( isset( $get_data['cart_details'] ) && ! empty( $get_data['cart_details'] ) ) {
 				$data = json_decode( $get_data['cart_details']['checkout_data'], true );

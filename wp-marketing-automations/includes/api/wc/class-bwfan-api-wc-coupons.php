@@ -37,13 +37,17 @@ class BWFAN_Api_Get_WC_Coupons extends BWFAN_API_Base {
 
 		$this->response_code = 200;
 
-		return $this->success_response( $coupons );
+		return $this->success_response( $coupons, count( $coupons ) > 0 ? __( 'Successfully fetched coupons', 'wp-marketing-automations' ) : __( 'No coupon found.', 'wp-marketing-automations' ) );
 	}
 
 	/**
 	 * Get all WC coupons
 	 *
+	 * @param $search
+	 * @param $exclude_autonami
+	 *
 	 * @return array
+	 * @throws Exception
 	 */
 	public function get_all_coupons( $search, $exclude_autonami = false ) {
 		$args = array(
@@ -90,7 +94,6 @@ class BWFAN_Api_Get_WC_Coupons extends BWFAN_API_Base {
 
 		return $coupon_data;
 	}
-
 }
 
 BWFAN_API_Loader::register( 'BWFAN_Api_Get_WC_Coupons' );

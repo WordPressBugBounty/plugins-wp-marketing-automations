@@ -390,8 +390,10 @@ class BWFAN_Abandoned_Cart {
 
 		$token    = sanitize_text_field( $_GET['bwfan-ab-id'] ); //phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
 		$restored = $this->restore_abandoned_cart( $token );
-		$redirect = 'cart';
-		$url      = wc_get_page_permalink( $redirect );
+
+		/** Redirect to shop page if cart restore failed. */
+		$shop_url = wc_get_page_permalink( 'shop' );
+		$url      = ! empty( $shop_url ) ? $shop_url : home_url();
 
 		if ( false === $restored ) {
 			$global_settings = BWFAN_Common::get_global_settings();

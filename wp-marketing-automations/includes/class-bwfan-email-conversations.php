@@ -353,14 +353,30 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 			}
 
 			$canned_query = ( true === $create_if_canned ) ? ' AND canned = 0' : '';
-
-			$query = $wpdb->prepare( 'SELECT `ID` FROM {table_name} WHERE `template` = "%s" AND `subject` = "%s"' . $canned_query, $template_body, $template_subject );
+			$table_name   = $wpdb->prefix . 'bwfan_templates';
+			$query        = $wpdb->prepare( 'SELECT `ID` FROM ' . $table_name . ' WHERE `template` = "%s" AND `subject` = "%s"' . $canned_query, $template_body, $template_subject );
 
 			$core_cache_obj = WooFunnels_Cache::get_instance();
 
 			$template_id = $core_cache_obj->get_cache( md5( $query ), 'fka-automation' );
 			if ( false === $template_id ) {
-				$template_data = BWFAN_Model_Templates::get_results( $query );
+				try {
+					$template_data = $wpdb->get_results( $query, ARRAY_A );
+				} catch ( Exception $e ) {
+					if ( false !== strpos( $e->getMessage(), 'collation' ) ) {
+						$wp_collation = $wpdb->get_var( "SELECT @@collation_database" );
+						if ( ! empty( $wp_collation ) && false !== strpos( $wp_collation, 'unicode' ) ) {
+							$wp_collation = str_replace( 'unicode', 'general', $wp_collation );
+						}
+						if ( empty( $wp_collation ) ) {
+							$wp_collation = 'utf8mb4_general_ci';
+						}
+						$wpdb->query( "ALTER TABLE $table_name MODIFY `template` longtext COLLATE $wp_collation" );
+						$template_data = $wpdb->get_results( $query );
+					}
+				}
+
+
 				if ( ! empty( $template_data[0]['ID'] ) ) {
 					$template_id = intval( $template_data[0]['ID'] );
 					$core_cache_obj->set_cache( md5( $query ), $template_id, 'fka-automation' );
@@ -687,6 +703,8 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 				return;
 			}
 
+			$link = BWFAN_Common::validate_target_link( $link );
+
 			/** Checking source of click */
 			if ( self::skipping_user_agent() ) {
 				BWFAN_Common::wp_redirect( $link );
@@ -749,6 +767,7 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 			if ( false === strpos( $link, 'bwfan-action=unsubscribe' ) ) {
 				return;
 			}
+			$link = BWFAN_Common::validate_target_link( $link );
 
 			$engagement_data = $this->get_engagement_data();
 			if ( empty( $engagement_data ) ) {

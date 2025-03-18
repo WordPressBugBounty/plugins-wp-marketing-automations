@@ -57,7 +57,10 @@ class BWFAN_Api_Get_WC_Category extends BWFAN_API_Base {
 		];
 
 		if ( ! empty( $ids ) ) {
-			$param['include'] = $ids;
+			$ids = array_filter( array_map( 'intval', explode( ',', $ids ) ) );
+			if ( ! empty( $ids ) ) {
+				$param['include'] = $ids;
+			}
 		} else {
 			$param['number'] = 10;
 		}

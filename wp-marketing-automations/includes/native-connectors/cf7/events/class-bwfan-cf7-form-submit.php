@@ -258,7 +258,8 @@ final class BWFAN_CF7_Form_Submit extends BWFAN_Event {
 	}
 
 	public function process( $form, $result ) {
-		if ( 'validation_failed' === $result['status'] || ( isset( $result['demo_mode'] ) && false !== $result['demo_mode'] ) ) {
+		$invalid_status = [ 'validation_failed', 'spam' ];
+		if ( ( isset( $result['status'] ) && in_array( $result['status'], $invalid_status, true ) ) || ( isset( $result['demo_mode'] ) && false !== $result['demo_mode'] ) ) {
 			return;
 		}
 

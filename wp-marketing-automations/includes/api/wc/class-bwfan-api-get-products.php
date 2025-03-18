@@ -65,24 +65,24 @@ class BWFAN_Api_Get_Products extends BWFAN_API_Base {
 		}
 		if ( ! empty( $category_in ) ) {
 			if ( is_array( $category_in ) ) {
-				$this->category_in = $category_in;
+				$this->category_in = array_filter( array_map( 'intval', $category_in ) );
 			} else {
-				$this->category_in = [ $category_in ];
+				$this->category_in = [ intval( $category_in ) ];
 			}
 		}
 		if ( ! empty( $category_not_in ) ) {
 			if ( is_array( $category_not_in ) ) {
-				$this->category_not_in = $category_not_in;
+				$this->category_not_in = array_filter( array_map( 'intval', $category_not_in ) );;
 			} else {
-				$this->category_not_in = [ $category_not_in ];
+				$this->category_not_in = [ intval( $category_not_in ) ];
 			}
 		}
 
 		if ( ! empty( $exclude_ids ) ) {
 			if ( is_array( $exclude_ids ) ) {
-				$this->exclude_ids = $exclude_ids;
+				$this->exclude_ids = array_filter( array_map( 'intval', $exclude_ids ) );
 			} else {
-				$this->exclude_ids = [ $exclude_ids ];
+				$this->exclude_ids = [ intval( $exclude_ids ) ];
 			}
 		}
 
@@ -95,7 +95,7 @@ class BWFAN_Api_Get_Products extends BWFAN_API_Base {
 		}
 
 		if ( ! empty( $ids ) ) {
-			$this->p_ids = explode( ',', $ids );
+			$this->p_ids = array_filter( array_map( 'intval', explode( ',', $ids ) ) );
 		}
 
 		$result            = $this->get_data( $type, $limit, $page );
@@ -104,7 +104,7 @@ class BWFAN_Api_Get_Products extends BWFAN_API_Base {
 
 		$this->response_code = 200;
 
-		return $this->success_response( $products );
+		return $this->success_response( $products, count( $products ) > 0 ? __( 'Successfully fetched products', 'wp-marketing-automations' ) : __( 'No products found.', 'wp-marketing-automations' ) );
 	}
 
 	/**

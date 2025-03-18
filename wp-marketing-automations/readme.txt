@@ -4,7 +4,7 @@ Tags: cart abandonment, follow up emails, email marketing, email customizer, crm
 Requires at least: 5.0
 Tested up to: 6.7.2
 Requires PHP: 7.0
-Stable tag: 3.5.1
+Stable tag: 3.5.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -416,9 +416,19 @@ FunnelKit Automations is 100% self-hosted and fully GDPR compliant.
 
 == Change log ==
 
+= 3.5.2 (Mar 18, 2025) =
+* Security: Fixed a database update call security issue by a logged in user. (#3812)
+* Added: Admin Quick Help: A mini quick help or support info box has been added to the admin app for easy assistance. (#3795)
+* Improved: Form Submission: Disallowed spam entries from triggering form submission events. (#3813)
+* Improved: Pro: WPML Compatibility: WooCommerce translated terms are now correctly passed in automation rules. (#3800)
+* Fixed: Email Validation: Custom is_email function added in the JS app, similar to the native WordPress PHP function. (#3797)
+* Fixed: Checkout Page Error: Resolved PHP error that occurred on the checkout page for logged-in users when cart tracking was active. (#3805)
+* Fixed: Database Collation Handling: Added extra handling to address mixed collation issues in the templates table. (#3820)
+* Developer Updates: New Filter Hook: Introduced BWFAN_GET_CONTACT_PHONE filter hook to fetch phone numbers from contacts instead of order billing phone. (#3807)
+
 = 3.5.1 (Mar 6, 2025) =
-* Compatible upto WordPress 6.7.1
-* Compatible upto WooCommerce 9.4.3
+* Compatible upto WordPress 6.7.2
+* Compatible upto WooCommerce 9.7.1
 * Compatible with PHP 8.3
 * Added: Global Email Activity: Added Sent, Open & Click columns for quick discovery. (#3721)
 * Improved: Recurring Actions: Now allows changing execution time to a set time, like midnight. (#3714)
