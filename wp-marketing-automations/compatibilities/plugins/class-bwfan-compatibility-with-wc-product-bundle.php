@@ -42,10 +42,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_WC_Product_Bundle' ) ) {
 		}
 	}
 
-	/**
-	 * Checking WC Product Bundle existence
-	 */
-	if ( class_exists( 'WC_Bundles' ) ) {
-		new BWFAN_Compatibility_With_WC_Product_Bundle();
-	}
+	new BWFAN_Compatibility_With_WC_Product_Bundle();
 }

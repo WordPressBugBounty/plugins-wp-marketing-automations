@@ -13,7 +13,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_MailPoet' ) ) {
 		}
 	}
 
-	if ( class_exists( 'MailPoet\Config\Initializer' ) ) {
-		new BWFAN_Compatibility_With_MailPoet();
-	}
+	new BWFAN_Compatibility_With_MailPoet();
 }

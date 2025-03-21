@@ -324,7 +324,7 @@ if ( class_exists( 'WooCommerce' ) ) {
 			}
 
 			// Get translated term ID.
-			if ( class_exists( 'BWFAN_Compatibility_With_WPML' ) && method_exists( 'BWFAN_Compatibility_With_WPML', 'get_translated_term_ids' ) ) {
+			if ( defined( 'ICL_SITEPRESS_VERSION' ) && class_exists( 'BWFAN_Compatibility_With_WPML' ) && method_exists( 'BWFAN_Compatibility_With_WPML', 'get_translated_term_ids' ) ) {
 				$saved_terms = BWFAN_Compatibility_With_WPML::get_translated_term_ids( $saved_terms, $this->taxonomy_name, $automation_data );
 			}
 

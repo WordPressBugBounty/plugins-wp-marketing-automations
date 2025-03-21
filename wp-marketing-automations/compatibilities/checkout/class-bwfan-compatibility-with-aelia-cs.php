@@ -71,7 +71,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_Aelia_CS' ) ) {
 
 	}
 
-	if ( class_exists( 'Aelia\WC\CurrencySwitcher\WC_Aelia_CurrencySwitcher' ) ) {
-		new BWFAN_Compatibility_With_Aelia_CS();
-	}
+	new BWFAN_Compatibility_With_Aelia_CS();
 }

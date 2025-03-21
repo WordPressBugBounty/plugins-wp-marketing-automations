@@ -30,7 +30,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_WP_SES' ) ) {
 		}
 	}
 
-	if ( isset( $GLOBALS['wposes_meta'] ) ) {
-		new BWFAN_Compatibility_With_WP_SES();
-	}
+	new BWFAN_Compatibility_With_WP_SES();
 }

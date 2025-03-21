@@ -33,7 +33,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_Password_Protected' ) ) {
 		}
 	}
 
-	if ( class_exists( 'Password_Protected' ) ) {
-		new BWFAN_Compatibility_With_Password_Protected();
-	}
+	new BWFAN_Compatibility_With_Password_Protected();
 }

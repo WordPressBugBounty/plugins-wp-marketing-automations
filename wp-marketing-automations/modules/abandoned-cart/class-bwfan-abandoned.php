@@ -1366,7 +1366,7 @@ class BWFAN_Abandoned_Cart {
 	/**
 	 * @param $contact_email
 	 *
-	 * @return array|object|null
+	 * @return int[]
 	 */
 	public function get_last_abandoned_cart( $contact_email ) {
 		$abandoned_data = array(
@@ -1377,13 +1377,15 @@ class BWFAN_Abandoned_Cart {
 		if ( ! is_email( $contact_email ) ) {
 			return $abandoned_data;
 		}
-		$where                   = 'WHERE status IN (1,3,4) and email="' . $contact_email . '"';
-		$contact_abandoned_carts = BWFAN_Model_Automations::get_last_abandoned_cart( $where );
 
+		global $wpdb;
+		$where                   = $wpdb->prepare( "WHERE status IN (1,3,4) and email = %s", $contact_email );
+		$contact_abandoned_carts = BWFAN_Model_Automations::get_last_abandoned_cart( $where );
 		if ( empty( $contact_abandoned_carts ) ) {
 			return $abandoned_data;
 		}
-		$cart_items                      = maybe_unserialize( $contact_abandoned_carts[0]['items'] );
+		$cart_items = maybe_unserialize( $contact_abandoned_carts[0]['items'] );
+
 		$abandoned_data['items_count']   = is_array( $cart_items ) ? count( $cart_items ) : 0;
 		$abandoned_data['last_modified'] = isset( $contact_abandoned_carts[0]['last_modified'] ) ? $contact_abandoned_carts[0]['last_modified'] : '';
 		$abandoned_data['total']         = isset( $contact_abandoned_carts[0]['total'] ) ? $contact_abandoned_carts[0]['total'] : 0;

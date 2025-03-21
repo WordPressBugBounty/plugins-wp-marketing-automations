@@ -29,7 +29,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_Logged_In_Only' ) ) {
 		}
 	}
 
-	if ( function_exists( 'logged_in_only_rest_api' ) ) {
-		new BWFAN_Compatibility_With_Logged_In_Only();
-	}
+	new BWFAN_Compatibility_With_Logged_In_Only();
 }

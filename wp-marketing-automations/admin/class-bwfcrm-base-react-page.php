@@ -233,7 +233,7 @@ abstract class BWFCRM_Base_React_Page {
 		$this->page_data['multiLangSetting']             = method_exists( 'BWFAN_PRO_Common', 'get_language_settings' ) ? BWFAN_PRO_Common::get_language_settings() : [];
 		$this->page_data['bwfan_table_validation_error'] = BWFAN_Table_Validation_Controller::get_table_validate_option();
 		$menu_data                                       = BWFAN_Common::get_user_menu_access();
-		$this->page_data['is_settings_enabled']          = empty( $menu_data ) || in_array( 'settings', $menu_data ) ? true : false;
+		$this->page_data['is_settings_enabled']          = empty( $menu_data ) || in_array( 'settings', $menu_data, true );
 		$this->page_data['older_visual_builder']         = bwf_options_get( 'fk_legacy_builder', '', 1 );
 		do_action( 'bwfan_admin_view_localize_data', $this );
 	}
@@ -406,15 +406,16 @@ abstract class BWFCRM_Base_React_Page {
 
 	public function get_deps( $app_name ) {
 		$assets_path = BWFAN_PLUGIN_DIR . "/admin/frontend/dist/$app_name.asset.php";
-		$assets      = require_once $assets_path;
-		$deps        = ( isset( $assets['dependencies'] ) ? array_merge( $assets['dependencies'], array( 'jquery' ) ) : array( 'jquery' ) );
-		$version     = ( isset( $assets['version'] ) ? $assets['version'] : BWFAN_VERSION );
+		$assets      = require_once $assets_path; // phpcs:ignore WordPressVIPMinimum.Files.IncludingFile.UsingVariable
 
-		$script_deps = array_filter( $deps, function ( $dep ) use ( &$style_deps ) {
+		$deps    = ( isset( $assets['dependencies'] ) ? array_merge( $assets['dependencies'], array( 'jquery' ) ) : array( 'jquery' ) );
+		$version = ( isset( $assets['version'] ) ? $assets['version'] : BWFAN_VERSION );
+
+		$script_deps = array_filter( $deps, function ( $dep ) {
 			return false === strpos( $dep, 'css' );
 		} );
 
-		if ( ! empty( $script_deps ) && ! in_array( 'wp-block-library', $script_deps ) ) {
+		if ( ! empty( $script_deps ) && ! in_array( 'wp-block-library', $script_deps, true ) ) {
 			$script_deps[] = 'wp-block-library';
 		}
 
@@ -435,8 +436,7 @@ abstract class BWFCRM_Base_React_Page {
 	}
 
 	public function setup_js_for_localization( $app_name, $deps, $version ) {
-
-		if ( defined( BWFCRM_REACT_ENVIRONMENT ) && 0 === BWFCRM_REACT_ENVIRONMENT ) {
+		if ( defined( 'BWFCRM_REACT_ENVIRONMENT' ) && 0 === BWFCRM_REACT_ENVIRONMENT ) {
 			return;
 		}
 

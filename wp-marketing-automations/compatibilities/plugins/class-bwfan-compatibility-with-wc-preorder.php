@@ -25,7 +25,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_WC_PreOrders' ) ) {
 		}
 	}
 
-	if ( class_exists( 'WC_Pre_Orders' ) ) {
-		new BWFAN_Compatibility_With_WC_PreOrders();
-	}
+	new BWFAN_Compatibility_With_WC_PreOrders();
 }

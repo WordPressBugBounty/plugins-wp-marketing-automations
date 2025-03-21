@@ -68,7 +68,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_WC_Multi_Currency_Villatheme' ) )
 		}
 	}
 
-	if ( defined( 'WOOMULTI_CURRENCY_VERSION' ) || defined( 'WOOMULTI_CURRENCY_F_VERSION' ) ) {
-		new BWFAN_Compatibility_With_WC_Multi_Currency_Villatheme();
-	}
+	new BWFAN_Compatibility_With_WC_Multi_Currency_Villatheme();
 }

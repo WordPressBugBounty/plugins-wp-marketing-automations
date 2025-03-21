@@ -401,8 +401,12 @@ var BWFAN_Public;
                         $('.bwfan-unsubscribe-lists').hide();
                         $('a#bwfan_unsubscribe').hide();
                     } else {
+                        /** Content is refresh after success */
+                        $('#bwfan-unsubscribe-lists').load(
+                            location.href + ' #bwfan-unsubscribe-lists > *'
+                        );
                         setTimeout(function () {
-                            $('.bwfan_response').fadeOut("slow");
+                            $('.bwfan_response').fadeOut('slow');
                         }, 2500);
                     }
                 }

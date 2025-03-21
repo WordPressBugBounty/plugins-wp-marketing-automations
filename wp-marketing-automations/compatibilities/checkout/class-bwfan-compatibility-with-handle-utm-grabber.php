@@ -92,7 +92,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_Handle_UTM_Grabber' ) ) {
 		}
 	}
 
-	if ( function_exists( 'bwfan_is_utm_grabber_active' ) && bwfan_is_utm_grabber_active() ) {
-		new BWFAN_Compatibility_With_Handle_UTM_Grabber();
-	}
+	new BWFAN_Compatibility_With_Handle_UTM_Grabber();
 }

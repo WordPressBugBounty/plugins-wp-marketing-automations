@@ -3,7 +3,7 @@
  * WP Mail SMTP
  * https://wordpress.org/plugins/wp-mail-smtp/
  */
-if ( ! class_exists( 'BWFAN_Compatibility_With_WP_SMTP' ) && defined( 'WPMS_PLUGIN_VER' ) ) {
+if ( ! class_exists( 'BWFAN_Compatibility_With_WP_SMTP' ) ) {
 	class BWFAN_Compatibility_With_WP_SMTP {
 
 		/**

@@ -29,7 +29,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_Force_Login' ) ) {
 		}
 	}
 
-	if ( function_exists( 'v_forcelogin_rest_access' ) ) {
-		new BWFAN_Compatibility_With_Force_Login();
-	}
+	new BWFAN_Compatibility_With_Force_Login();
 }

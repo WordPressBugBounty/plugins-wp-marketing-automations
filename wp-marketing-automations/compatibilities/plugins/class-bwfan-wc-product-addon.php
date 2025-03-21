@@ -28,7 +28,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_WC_Product_Addon' ) ) {
 		}
 	}
 
-	if ( defined( 'PEWC_PLUGIN_VERSION' ) ) {
-		new BWFAN_Compatibility_With_WC_Product_Addon();
-	}
+	new BWFAN_Compatibility_With_WC_Product_Addon();
 }

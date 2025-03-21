@@ -399,7 +399,8 @@ class BWFAN_Api_Get_Products extends BWFAN_API_Base {
 
 		/** Add post__in argument **/
 		if ( ! empty( $this->p_ids ) ) {
-			$data['post__in'] = $this->p_ids;
+			$data['posts_per_page'] = 20;
+			$data['post__in']       = $this->p_ids;
 		}
 
 		/** Add exclude_ids argument **/

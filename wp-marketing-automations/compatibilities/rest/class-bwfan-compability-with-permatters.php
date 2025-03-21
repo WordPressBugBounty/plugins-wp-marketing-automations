@@ -33,7 +33,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_Perfmatters' ) ) {
 		}
 	}
 
-	if ( defined( 'PERFMATTERS_VERSION' ) ) {
-		new BWFAN_Compatibility_With_Perfmatters();
-	}
+	new BWFAN_Compatibility_With_Perfmatters();
 }

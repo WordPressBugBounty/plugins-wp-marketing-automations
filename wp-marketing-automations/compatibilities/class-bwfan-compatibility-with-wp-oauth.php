@@ -26,7 +26,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_WP_Oauth' ) ) {
 		}
 	}
 
-	if ( defined( 'WPOAUTH_VERSION' ) && class_exists( 'WO_SERVER' ) ) {
-		new BWFAN_Compatibility_With_WP_Oauth();
-	}
+	new BWFAN_Compatibility_With_WP_Oauth();
 }

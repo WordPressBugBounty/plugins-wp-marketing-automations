@@ -30,7 +30,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_Clearfy' ) ) {
 		}
 	}
 
-	if ( class_exists( 'Clearfy_Plugin' ) ) {
-		new BWFAN_Compatibility_With_Clearfy();
-	}
+	new BWFAN_Compatibility_With_Clearfy();
 }

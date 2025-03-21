@@ -47,10 +47,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_UTM_Leads_Tracker' ) ) {
 		}
 	}
 
-	/**
-	 * Checking Xlutm_Core existence
-	 */
-	if ( class_exists( 'Xlutm_Core' ) ) {
-		new BWFAN_Compatibility_With_UTM_Leads_Tracker();
-	}
+	new BWFAN_Compatibility_With_UTM_Leads_Tracker();
 }

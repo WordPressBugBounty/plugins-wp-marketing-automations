@@ -32,7 +32,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_Breeze_Cache' ) ) {
 		}
 	}
 
-	if ( defined( 'BREEZE_VERSION' ) ) {
-		new BWFAN_Compatibility_With_Breeze_Cache();
-	}
+	new BWFAN_Compatibility_With_Breeze_Cache();
 }

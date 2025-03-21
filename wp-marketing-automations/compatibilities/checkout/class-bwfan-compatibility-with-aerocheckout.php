@@ -28,7 +28,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_Aero_Checkout' ) ) {
 		}
 	}
 
-	if ( class_exists( 'WFACP_Common' ) && method_exists( 'WFACP_Common', 'is_theme_builder' ) ) {
-		new BWFAN_Compatibility_With_Aero_Checkout();
-	}
+	new BWFAN_Compatibility_With_Aero_Checkout();
 }

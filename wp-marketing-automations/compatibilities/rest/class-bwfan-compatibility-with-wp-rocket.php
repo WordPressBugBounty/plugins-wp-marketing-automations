@@ -28,7 +28,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_Wp_Rocket' ) ) {
 		}
 	}
 
-	if ( function_exists( 'rocket_clean_home' ) ) {
-		new BWFAN_Compatibility_With_Wp_Rocket();
-	}
+	new BWFAN_Compatibility_With_Wp_Rocket();
 }

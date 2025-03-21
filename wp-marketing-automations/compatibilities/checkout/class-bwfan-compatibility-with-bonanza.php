@@ -29,7 +29,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_Bonanza' ) ) {
 		}
 	}
 
-	if ( class_exists( 'XLWCFG_Core' ) ) {
-		new BWFAN_Compatibility_With_Bonanza();
-	}
+	new BWFAN_Compatibility_With_Bonanza();
 }

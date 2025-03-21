@@ -42,7 +42,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_Elastic_Email' ) ) {
 		}
 	}
 
-	if ( class_exists( 'eemail' ) ) {
-		new BWFAN_Compatibility_With_Elastic_Email();
-	}
+	new BWFAN_Compatibility_With_Elastic_Email();
 }

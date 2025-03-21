@@ -17,7 +17,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_Weglot' ) ) {
 		}
 	}
 
-	if ( bwfan_is_weglot_active() ) {
-		new BWFAN_Compatibility_With_Weglot();
-	}
+	new BWFAN_Compatibility_With_Weglot();
 }

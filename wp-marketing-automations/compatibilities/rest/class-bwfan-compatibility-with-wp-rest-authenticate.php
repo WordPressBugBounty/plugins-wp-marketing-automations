@@ -27,7 +27,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_WP_Rest_Authenticate' ) ) {
 		}
 	}
 
-	if ( function_exists( 'mo_api_auth_activate_miniorange_api_authentication' ) ) {
-		new BWFAN_Compatibility_With_WP_Rest_Authenticate();
-	}
+	new BWFAN_Compatibility_With_WP_Rest_Authenticate();
 }

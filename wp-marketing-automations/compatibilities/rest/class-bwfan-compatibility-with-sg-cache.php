@@ -32,7 +32,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_SG_Cache' ) ) {
 		}
 	}
 
-	if ( function_exists( 'sg_cachepress_purge_cache' ) ) {
-		new BWFAN_Compatibility_With_SG_Cache();
-	}
+	new BWFAN_Compatibility_With_SG_Cache();
 }

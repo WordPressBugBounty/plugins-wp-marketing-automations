@@ -32,7 +32,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_Uni_Cpo' ) ) {
 		}
 	}
 
-	if ( defined( 'UNI_CPO_PLUGIN_FILE' ) ) {
-		new BWFAN_Compatibility_With_Uni_Cpo();
-	}
+	new BWFAN_Compatibility_With_Uni_Cpo();
 }

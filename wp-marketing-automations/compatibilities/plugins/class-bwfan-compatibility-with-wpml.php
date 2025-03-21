@@ -93,7 +93,5 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_WPML' ) ) {
 		}
 	}
 
-	if ( defined( 'ICL_SITEPRESS_VERSION' ) ) {
-		new BWFAN_Compatibility_With_WPML();
-	}
+	new BWFAN_Compatibility_With_WPML();
 }

@@ -1,10 +1,10 @@
-=== Recover WooCommerce Cart Abandonment, Newsletter, Email Marketing, Marketing Automation By FunnelKit ===
+=== FunnelKit Automations - Email Marketing Automation and CRM for WordPress & WooCommerce ===
 Contributors: xlplugins, amans2k
-Tags: cart abandonment, follow up emails, email marketing, email customizer, crm, woocommerce, newsletter, marketing automation
+Tags: cart abandonment, follow up emails, email marketing, newsletter, marketing automation
 Requires at least: 5.0
 Tested up to: 6.7.2
 Requires PHP: 7.0
-Stable tag: 3.5.2
+Stable tag: 3.5.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -415,6 +415,12 @@ FunnelKit Automations is 100% self-hosted and fully GDPR compliant.
 
 
 == Change log ==
+
+= 3.5.3 (Mar 21, 2025) =
+Fixed: Abandoned Cart: Modified database call to correctly fetch the last abandoned cart. (#3829)
+Fixed: Email Templates: Fixed issue where template data wasn't retained after import and closing without any modifications. (#3837)
+Fixed: Manage Subscribe Page: Fixed issue where unsubscribed lists were still being shown after a user unsubscribed from them. (#3839)
+Fixed: Automation Errors: Conditional step failures now show the reason for failure. Fixed PHP error related to getting the default language during automation execution. (#3842)
 
 = 3.5.2 (Mar 18, 2025) =
 * Security: Fixed a database update call security issue by a logged in user. (#3812)

@@ -101,7 +101,7 @@ class BWFAN_API_Get_Automation_Contact_Trail extends BWFAN_API_Base {
 			/** Check if conditional or split node and set last step connecting */
 			switch ( $data['type'] ) {
 				case BWFAN_Automation_Controller::$TYPE_CONDITIONAL:
-					$last_sid = $data['sid'] . '-condi';
+					$last_sid = 1 === count( $tdata ) ? $data['sid'] : ( $data['sid'] . '-condi' );
 					break;
 				case BWFAN_Automation_Controller::$TYPE_SPLIT:
 					$last_sid = $data['sid'] . '-split';
