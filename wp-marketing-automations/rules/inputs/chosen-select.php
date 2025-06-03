@@ -36,7 +36,7 @@ class bwfan_Input_Chosen_Select {
 
 		?>
 
-        <select <?php echo( $data_attr ); //phpcs:ignore WordPress.Security.EscapeOutput ?> id="<?php echo esc_attr( $field['id'] ); ?>" name="<?php echo $field['name']; //phpcs:ignore WordPress.Security.EscapeOutput ?>[]" class="<?php echo esc_attr( $chosen_class ) . esc_attr( $field['class'] ); ?>" <?php echo esc_attr__( $multiple ); ?> data-placeholder="<?php echo( isset( $field['placeholder'] ) ? esc_attr__( sanitize_text_field( $field['placeholder'] ) ) : esc_html( 'Search...', 'wp-marketing-automations' ) ); ?>">
+        <select <?php echo( $data_attr ); //phpcs:ignore WordPress.Security.EscapeOutput ?> id="<?php echo esc_attr( $field['id'] ); ?>" name="<?php echo $field['name']; //phpcs:ignore WordPress.Security.EscapeOutput ?>[]" class="<?php echo esc_attr( $chosen_class ) . esc_attr( $field['class'] ); ?>" <?php echo esc_attr( $multiple ); ?> data-placeholder="<?php echo( isset( $field['placeholder'] ) ? esc_attr( sanitize_text_field( $field['placeholder'] ) ) : esc_html__( 'Search...', 'wp-marketing-automations' ) ); ?>">
 			<?php
 			foreach ( $choices as $choice => $title ) {
 				$selected = in_array( $choice, $current, true );

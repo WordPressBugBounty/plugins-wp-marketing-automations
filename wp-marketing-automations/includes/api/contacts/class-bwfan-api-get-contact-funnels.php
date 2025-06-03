@@ -42,7 +42,9 @@ class BWFAN_API_Get_Contact_Funnels extends BWFAN_API_Base {
 		if ( ! $contact->is_contact_exists() ) {
 			$this->response_code = 404;
 
-			return $this->error_response( sprintf( __( 'No contact found with given id #%s', 'wp-marketing-automations' ), $contact_id ) );
+			/* translators: 1: Contact ID */
+
+			return $this->error_response( sprintf( __( 'No contact found with given id #%1$d', 'wp-marketing-automations' ), $contact_id ) );
 		}
 
 		$contacts_funnel           = array();

@@ -134,7 +134,7 @@ if ( ! bwfan_is_autonami_pro_active() || version_compare( BWFAN_PRO_VERSION, '2.
 				return $last_name;
 			}
 
-			return $contact->get_l_name();
+			return ucfirst( $contact->get_l_name() );
 		}
 	}
 

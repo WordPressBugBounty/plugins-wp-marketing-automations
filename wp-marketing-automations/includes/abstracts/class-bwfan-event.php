@@ -6,6 +6,8 @@ abstract class BWFAN_Event {
 	public $log_type = 'event_triggered';
 	public $global_data = array();
 	public $event_data = array();
+	protected $sync_start_time = 0;
+	protected $sync_id = 0;
 	public $message_validate_event = null;
 	/** @var string Source that event belongs to */
 	protected $source_type = 'wp';
@@ -131,9 +133,9 @@ abstract class BWFAN_Event {
 	public function get_validation_html( $unique_slug, $section_label, $field_label ) {
 		?>
         <div class="bwfan-col-sm-12 bwfan-pl-0 bwfan_mt15">
-        <label for="" class="bwfan-label-title"><?php esc_html_e( $section_label ); ?></label>
-        <input type="checkbox" name="event_meta[validate_event]" id="bwfan-validate_event" value="1" class="validate_event_1 <?php esc_html_e( $unique_slug ); ?>-validate_event" {{is_validated}}/>
-        <label for="bwfan-validate_event" class="bwfan-checkbox-label"><?php esc_html_e( $field_label ); ?></label>
+        <label for="" class="bwfan-label-title"><?php echo esc_html( $section_label ); ?></label>
+        <input type="checkbox" name="event_meta[validate_event]" id="bwfan-validate_event" value="1" class="validate_event_1 <?php echo esc_html( $unique_slug ); ?>-validate_event" {{is_validated}}/>
+        <label for="bwfan-validate_event" class="bwfan-checkbox-label"><?php echo esc_html( $field_label ); ?></label>
         <div class="clearfix bwfan_field_desc"><?php echo wp_kses_post( 'This setting is useful to <u>verify time-delayed Actions</u>. For instance, you can create a follow-up Action that runs after 30 days of placing an order. That Action won\'t trigger if the above selected Order Statuses are not matched to the order.', 'wp-marketing-automations' ); ?></label>
         </div>
 		<?php
@@ -630,7 +632,7 @@ abstract class BWFAN_Event {
 		$placeholders = implode( ', ', $placeholders );
 
 		$query = $wpdb->prepare( "UPDATE `{$wpdb->prefix}bwfan_tasks` SET `claim_id` = 1 WHERE `ID` IN ($placeholders)", $task_ids );
-		$wpdb->query( $query );
+		$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		/** @var BWFAN_Tasks $task_ins */
 		$task_ins = BWFAN_Tasks::get_instance();
@@ -996,9 +998,11 @@ abstract class BWFAN_Event {
 	/**
 	 * Returns event data
 	 *
+	 * @param string $selected_event
+	 *
 	 * @return mixed
 	 */
-	public function get_event_data_for_api() {
+	public function get_event_data_for_api( $selected_event = '' ) {
 		if ( ! $this->is_v2() ) {
 			return [];
 		}
@@ -1043,11 +1047,13 @@ abstract class BWFAN_Event {
 			'bwfan_automation_run' => 'once'
 		];
 
-		$fields         = method_exists( $this, 'get_fields_schema' ) ? $this->get_fields_schema() : [];
-		$default_values = method_exists( $this, 'get_default_values' ) ? $this->get_default_values() : [];
+		$is_selected_event = $selected_event === $this->get_slug();
 
-		$data['fields']         = $this->disable_default_fields ? $fields : array_merge( $fields, $default_event_field );
-		$data['default_values'] = $this->disable_default_fields ? $default_values : array_merge( $default_values, $default_run_value );
+		$fields         = $is_selected_event && method_exists( $this, 'get_fields_schema' ) ? $this->get_fields_schema() : [];
+		$default_values = $is_selected_event && method_exists( $this, 'get_default_values' ) ? $this->get_default_values() : [];
+
+		$data['fields']         = ! $is_selected_event || $this->disable_default_fields ? $fields : array_merge( $fields, $default_event_field );
+		$data['default_values'] = ! $is_selected_event || $this->disable_default_fields ? $default_values : array_merge( $default_values, $default_run_value );
 
 		return $data;
 	}
@@ -1142,6 +1148,10 @@ abstract class BWFAN_Event {
 		}
 
 		$this->event_merge_tag_groups[] = 'bwfan_default';
+		/** Added Advanced Coupon merge tags group  */
+		if ( function_exists( 'bwfan_is_advanced_coupon_for_woocommerce_active' ) && bwfan_is_advanced_coupon_for_woocommerce_active() && defined( 'BWFAN_PRO_VERSION' ) && version_compare( BWFAN_PRO_VERSION, '3.5.3', '>=' ) ) {
+			$this->event_merge_tag_groups[] = 'bwfan_adv_coupon';
+		}
 
 		return apply_filters( 'bwfan_event_' . $this->get_slug() . '_merge_tag_group', $this->event_merge_tag_groups, $this );
 	}

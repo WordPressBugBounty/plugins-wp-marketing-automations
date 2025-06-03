@@ -28,7 +28,7 @@ class BWFAN_Model_Automationmeta extends BWFAN_Model {
 			$table     = self::_table();
 			$sql_query = "SELECT bwfan_automation_id, meta_key, meta_value FROM {$table} WHERE bwfan_automation_id =%d";
 			$sql_query = $wpdb->prepare( $sql_query, $automation_id ); // WPCS: unprepared SQL OK
-			$result    = $wpdb->get_results( $sql_query, ARRAY_A ); // WPCS: unprepared SQL OK
+			$result    = $wpdb->get_results( $sql_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$meta      = [];
 
 			if ( is_array( $result ) && count( $result ) > 0 ) {
@@ -51,6 +51,7 @@ class BWFAN_Model_Automationmeta extends BWFAN_Model {
 		global $wpdb;
 		$table = self::_table();
 		foreach ( $data as $key => $value ) {
+			//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->update( $table, [
 				'meta_value' => $value
 			], [
@@ -70,6 +71,7 @@ class BWFAN_Model_Automationmeta extends BWFAN_Model {
 		global $wpdb;
 		$table = self::_table();
 		foreach ( $data as $key => $value ) {
+			//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->insert( $table, [
 				'bwfan_automation_id' => intval( $automation_id ),
 				'meta_key'            => $key,
@@ -93,7 +95,7 @@ class BWFAN_Model_Automationmeta extends BWFAN_Model {
 			$sql_query .= " AND meta_key= 'event_meta'";
 		}
 
-		$result = $wpdb->get_results( $sql_query, ARRAY_A ); // WPCS: unprepared SQL OK
+		$result = $wpdb->get_results( $sql_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$meta   = [];
 
 		if ( is_array( $result ) && count( $result ) > 0 ) {
@@ -111,6 +113,6 @@ class BWFAN_Model_Automationmeta extends BWFAN_Model {
 		$table = self::_table();
 		$query = "DELETE FROM {$table} WHERE `bwfan_automation_id` = %d AND `meta_key` = %s ";
 
-		$wpdb->query( $wpdb->prepare( $query, $aid, $meta_key ) );
+		$wpdb->query( $wpdb->prepare( $query, $aid, $meta_key ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 }

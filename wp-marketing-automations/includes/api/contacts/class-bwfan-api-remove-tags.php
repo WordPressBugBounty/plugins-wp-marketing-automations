@@ -47,7 +47,9 @@ class BWFAN_API_Remove_Tags extends BWFAN_API_Base {
 		if ( ! $contact->is_contact_exists() ) {
 			$this->response_code = 404;
 
-			return $this->error_response( sprintf( __( 'No contact found with given id #%s', 'wp-marketing-automations' ), $contact_id ) );
+			/* translators: 1: Contact ID */
+
+			return $this->error_response( sprintf( __( 'No contact found with given id #%1$d', 'wp-marketing-automations' ), $contact_id ) );
 		}
 
 		/** If provided tags not array */
@@ -85,7 +87,8 @@ class BWFAN_API_Remove_Tags extends BWFAN_API_Base {
 		$response = __( 'Tag removed', 'wp-marketing-automations' );
 		if ( ! empty( $tags_not_removed ) ) {
 			$removed_tags_text = implode( ', ', $removed_tags );
-			$response          = sprintf( __( 'Some tags removed: %s', 'wp-marketing-automations' ), $removed_tags_text );
+			/* translators: 1: comma seperated tags  */
+			$response = sprintf( __( 'Some tags removed: %1$s', 'wp-marketing-automations' ), $removed_tags_text );
 		}
 		$result['last_modified'] = $contact->contact->get_last_modified();
 

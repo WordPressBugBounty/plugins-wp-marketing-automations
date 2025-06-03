@@ -38,7 +38,9 @@ class BWFAN_API_Apply_Lists extends BWFAN_API_Base {
 		if ( ! $contact->is_contact_exists() ) {
 			$this->response_code = 404;
 
-			return $this->error_response( __( 'No contact found with given id #' . $contact_id, 'wp-marketing-automations' ) );
+			/* translators: 1: Contact ID */
+
+			return $this->error_response( sprintf( __( 'No contact found with given id #%1$d', 'wp-marketing-automations' ), $contact_id ) );
 		}
 
 		$lists = $this->args['lists'];
@@ -79,7 +81,8 @@ class BWFAN_API_Apply_Lists extends BWFAN_API_Base {
 
 			$added_lists_names   = implode( ', ', $added_lists_names );
 			$this->response_code = 200;
-			$message             = sprintf( __( 'Some lists are applied already. Applied Lists are: %s', 'wp-marketing-automations' ), $added_lists_names );
+			/* translators: 1: comma seperated list  */
+			$message = sprintf( __( 'Some lists are applied already. Applied Lists are: %1$s', 'wp-marketing-automations' ), $added_lists_names );
 		}
 		$result['list_added']    = is_array( $lists_added ) ? array_values( $lists_added ) : $lists_added;
 		$result['last_modified'] = $contact->contact->get_last_modified();

@@ -154,13 +154,18 @@ final class BWFAN_WC_Product_Stock_Reduced extends BWFAN_Event {
 		$data_to_send['global']['qty']               = $this->qty;
 		$data_to_send['global']['single_item']       = $this->single_item;
 
-		$this->order                     = $this->order instanceof WC_Order ? $this->order : wc_get_order( $this->order_id );
-		$data_to_send['global']['email'] = BWFAN_Common::get_email_from_order( $this->order_id, $this->order );
-		$data_to_send['global']['phone'] = BWFAN_Common::get_phone_from_order( $this->order_id, $this->order );
-		$user_id                         = BWFAN_Common::get_wp_user_id_from_order( $this->order_id, $this->order );
+		$this->order = $this->order instanceof WC_Order ? $this->order : wc_get_order( $this->order_id );
+		$user_id     = BWFAN_Common::get_wp_user_id_from_order( $this->order_id, $this->order );
 		if ( intval( $user_id ) > 0 ) {
 			$data_to_send['global']['user_id'] = $user_id;
 		}
+
+		$email = ! empty( $user_id ) ? BWFAN_Common::get_contact_email( $user_id ) : '';
+
+		/** Set billing email if email is empty */
+		$data_to_send['global']['email'] = ! empty( $email ) ? $email : BWFAN_Common::get_email_from_order( $this->order_id, $this->order );
+		$data_to_send['global']['phone'] = BWFAN_Common::get_phone_from_order( $this->order_id, $this->order );
+
 		$order_lang = BWFAN_Common::get_order_language( $this->order );
 
 		if ( ! empty( $order_lang ) ) {

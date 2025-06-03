@@ -43,18 +43,29 @@ if ( ! class_exists( 'BWFAN_Model_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 			return $fields;
 		}
 
-		public static function get_custom_fields( $mode = null, $vmode = null, $searchable = null, $viewable = null, $type = null ) {
+		public static function get_custom_fields( $mode = null, $vmode = null, $searchable = null, $viewable = null, $type = null, $limit = 0, $offset = 0 ) {
+			global $wpdb;
+
 			$query = "SELECT * FROM {table_name} WHERE 1=1";
+			! empty( $mode ) && $query .= $wpdb->prepare( " AND mode = %d", $mode );
+			! empty( $vmode ) && $query .= $wpdb->prepare( " AND vmode = %d", $vmode );
+			! empty( $searchable ) && $query .= $wpdb->prepare( " AND search = %d", $searchable );
+			! empty( $viewable ) && $query .= $wpdb->prepare( " AND view = %d", $viewable );
 
-			! empty( $mode ) && $query .= " AND mode = $mode";
-			! empty( $vmode ) && $query .= " AND vmode = $vmode";
-			! empty( $searchable ) && $query .= " AND search = $searchable";
-			! empty( $viewable ) && $query .= " AND view = $viewable";
-			! empty( $type ) && $query .= " AND type IN ( $type )";
+			if ( ! empty( $type ) ) {
+				$type = ! is_array( $type ) ? explode( ',', $type ) : $type;
+				$type = array_filter( array_map( 'absint', $type ) );
+				if ( ! empty( $type ) ) {
+					$placeholder = implode( ',', array_fill( 0, count( $type ), '%d' ) );
+					$query       .= $wpdb->prepare( " AND type IN ($placeholder)", $type );
+				}
+			}
 
-			$fields = self::get_results( $query );
+			if ( $limit > 0 ) {
+				$query .= $wpdb->prepare( " LIMIT %d, %d", $offset, $limit );
+			}
 
-			return $fields;
+			return self::get_results( $query );
 		}
 
 		public static function get_field_by_slug( $slug ) {
@@ -87,7 +98,7 @@ if ( ! class_exists( 'BWFAN_Model_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 
 				$query = "SELECT * FROM $table";
 
-				$rest_fields = $wpdb->get_results( $query, ARRAY_A );
+				$rest_fields = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$fields      = [];
 				foreach ( $rest_fields as $field ) {
 					if ( ! is_array( $field ) ) {
@@ -126,7 +137,7 @@ if ( ! class_exists( 'BWFAN_Model_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 				return self::$cache_query[ md5( $query ) ];
 			}
 
-			self::$cache_query[ md5( $query ) ] = $wpdb->get_var( $query );
+			self::$cache_query[ md5( $query ) ] = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			return self::$cache_query[ md5( $query ) ];
 		}
@@ -145,7 +156,7 @@ if ( ! class_exists( 'BWFAN_Model_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 				return self::$cache_query[ md5( $query ) ];
 			}
 
-			self::$cache_query[ md5( $query ) ] = $wpdb->get_results( $query, ARRAY_A );
+			self::$cache_query[ md5( $query ) ] = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			return self::$cache_query[ md5( $query ) ];
 		}
@@ -157,7 +168,7 @@ if ( ! class_exists( 'BWFAN_Model_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 			$addressfield = implode( "', '", array_keys( BWFCRM_Fields::$contact_address_fields ) );
 
 			$query         = "SELECT COUNT(ID) FROM {$table} WHERE 1=1 AND vmode=1 AND slug NOT IN('$addressfield')";
-			$custom_fields = $wpdb->get_var( $query );
+			$custom_fields = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$column_field  = BWFCRM_Fields::$contact_columns;
 			if ( isset( $column_field['creation_date'] ) ) {
 				unset( $column_field['creation_date'] );
@@ -185,7 +196,7 @@ if ( ! class_exists( 'BWFAN_Model_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 			$ids   = implode( ',', $ids );
 			$query = "SELECT * From $table WHERE ID IN ($ids)";
 
-			return $wpdb->get_results( $query, ARRAY_A );
+			return $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 	}
 }

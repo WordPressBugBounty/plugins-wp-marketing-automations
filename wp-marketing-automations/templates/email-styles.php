@@ -37,7 +37,7 @@ ob_start();
     #body_content {
     background-color: <?php echo esc_attr( $body ); ?>;
     width: 100%;
-    max-width: <?php echo $max_width; ?>px;
+    max-width: <?php echo esc_attr( $max_width ); ?>px;
     direction: <?php echo is_rtl() ? 'rtl' : 'ltr'; ?>;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
@@ -93,7 +93,7 @@ ob_start();
     #body_content p {
     margin: 0 0 16px;
     line-height: 1.5;
-    font-size: <?php echo $font_size; ?>px;
+    font-size: <?php echo esc_attr( $font_size ); ?>px;
     }
 
     #body_content ul, #body_content ol {
@@ -110,7 +110,7 @@ ob_start();
     #body_content li {
     margin: 0 0 10px;
     display: list-item;
-    font-size: <?php echo $font_size; ?>px;
+    font-size: <?php echo esc_attr( $font_size ); ?>px;
     list-style: initial;
     }
 
@@ -194,7 +194,7 @@ ob_start();
 $default_css = ob_get_clean();
 
 if ( true === apply_filters( 'bwfan_display_email_default_css', true ) ) {
-	echo $default_css;
+	echo $default_css; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 }
 
 /** Without style tag */

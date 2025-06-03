@@ -51,20 +51,32 @@ class BWFAN_Api_Get_Export_Status extends BWFAN_API_Base {
 		}
 
 		$status_data = [
-			'status' => 3,
-			'msg'    => [
-				'Unable to find the export for user'
-			]
+			'status'     => 3,
+			'msg'        => [
+				__( 'Unable to find the export for user', 'wp-marketing-automations' )
+			],
+			'percentage' => 0
 		];
 
 		$status = get_user_meta( get_current_user_id(), 'bwfan_single_export_status', true );
-
 		if ( isset( $status[ $type ] ) ) {
 			$status_data = $status[ $type ];
+			if ( isset( $status_data['status'] ) && $status_data['status'] === 1 ) {
+				$status_data['percentage'] = $this->get_percentage( $status_data['export_id'] );
+			}
 		}
 		$this->response_code = 200;
 
 		return $this->success_response( $status_data );
+	}
+
+	private function get_percentage( $export_id ) {
+		$db_export_row = \BWFAN_Model_Import_Export::get( $export_id );
+		if ( empty( $db_export_row ) || empty( $db_export_row['offset'] ) || empty( $db_export_row['count'] ) ) {
+			return 0;
+		}
+
+		return round( absint( $db_export_row['offset'] ) / absint( $db_export_row['count'] ) * 100, 2 );
 	}
 
 }

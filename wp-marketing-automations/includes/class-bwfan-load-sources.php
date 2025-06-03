@@ -431,8 +431,15 @@ class BWFAN_Load_Sources {
 		return self::$goal_subgroup;
 	}
 
-	/** Return event data for event */
-	public static function get_api_event_list_data( $get_goal = false ) {
+	/**
+	 * Return event data for event
+	 *
+	 * @param bool $get_goal
+	 * @param string $selected_event
+	 *
+	 * @return array
+	 */
+	public static function get_api_event_list_data( $get_goal = false, $selected_event = '' ) {
 		$final_event_arr = [];
 		foreach ( self::$sources_events_obj as $event_arr ) {
 			foreach ( $event_arr as $key => $event_obj ) {
@@ -440,7 +447,7 @@ class BWFAN_Load_Sources {
 					continue;
 				}
 				try {
-					$data = $get_goal ? $event_obj->get_goal_data_for_api() : $event_obj->get_event_data_for_api();
+					$data = $get_goal ? $event_obj->get_goal_data_for_api() : $event_obj->get_event_data_for_api( $selected_event );
 				} catch ( Error $e ) {
 					continue;
 				}

@@ -63,7 +63,7 @@ class BWFAN_unsubscribe {
 			return;
 		}
 
-		$content  = sprintf( __( "Hi %s \n\nHelp us to improve your experience with us through better communication. Please adjust your preferences for email %s. \n\n%s.", 'wp-marketing-automations' ), '[bwfan_subscriber_name]', '[bwfan_subscriber_recipient]', '[bwfan_unsubscribe_button label="Update my preference"]' );
+		$content  = sprintf( __( "Hi %s \n\nHelp us to improve your experience with us through better communication. Please adjust your preferences for email %s. \n\n%s.", 'wp-marketing-automations' ), '[bwfan_subscriber_name]', '[bwfan_subscriber_recipient]', '[bwfan_unsubscribe_button label="Update my preference"]' ); // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment, WordPress.WP.I18n.UnorderedPlaceholdersText
 		$new_page = array(
 			'post_title'   => __( 'Let\'s Keep In Touch', 'wp-marketing-automations' ),
 			'post_content' => $content,
@@ -107,6 +107,8 @@ class BWFAN_unsubscribe {
 		if ( 'One-Click' === $one_click ) {
 			$this->one_click = 1;
 		}
+
+		add_filter( 'bwfan_public_scripts_include', '__return_true' );
 
 		/** Set no cache header */
 		BWFAN_Common::nocache_headers();
@@ -173,9 +175,9 @@ class BWFAN_unsubscribe {
 
 		$settings = BWFAN_Common::get_global_settings();
 
-		echo sprintf( "<h2>%s</h2>", __( 'Successfully Unsubscribed', 'wp-marketing-automations' ) );
+		echo sprintf( "<h2>%s</h2>", esc_html__( 'Successfully Unsubscribed', 'wp-marketing-automations' ) );
 		if ( isset( $settings['bwfan_unsubscribe_data_success'] ) && ! empty( $settings['bwfan_unsubscribe_data_success'] ) ) {
-			echo sprintf( "<p>%s</p>", $settings['bwfan_unsubscribe_data_success'] );
+			echo esc_html( sprintf( "<p>%s</p>", $settings['bwfan_unsubscribe_data_success'] ) );
 		}
 		exit;
 	}
@@ -205,22 +207,22 @@ class BWFAN_unsubscribe {
 		do_action( 'bwfan_print_custom_data', $this->contact );
 		$this->print_unsubscribe_lists();
 
-		echo '<a id="bwfan_unsubscribe" class="button-primary button" href="#">' . esc_html__( $attr['label'] ) . '</a>';
+		echo '<a id="bwfan_unsubscribe" class="button-primary button" href="#">' . esc_html( $attr['label'] ) . '</a>';
 		$aid = filter_input( INPUT_GET, 'automation_id', FILTER_SANITIZE_NUMBER_INT );
 		if ( ! empty( $aid ) ) {
-			echo '<input type="hidden" id="bwfan_automation_id" value="' . esc_attr__( $aid ) . '" name="automation_id">';
+			echo '<input type="hidden" id="bwfan_automation_id" value="' . esc_attr( $aid ) . '" name="automation_id">';
 		}
 
 		$bid = filter_input( INPUT_GET, 'bid', FILTER_SANITIZE_NUMBER_INT );
 		$bid = empty( $bid ) ? filter_input( INPUT_GET, 'broadcast_id', FILTER_SANITIZE_NUMBER_INT ) : $bid;
 		if ( ! empty( $bid ) ) {
-			echo '<input type="hidden" id="bwfan_broadcast_id" value="' . esc_attr__( $bid ) . '" name="broadcast_id">';
+			echo '<input type="hidden" id="bwfan_broadcast_id" value="' . esc_attr( $bid ) . '" name="broadcast_id">';
 		}
 
 		$fid = filter_input( INPUT_GET, 'fid', FILTER_SANITIZE_NUMBER_INT );
 		$fid = empty( $fid ) ? filter_input( INPUT_GET, 'form_feed_id', FILTER_SANITIZE_NUMBER_INT ) : $fid;
 		if ( ! empty( $fid ) ) {
-			echo '<input type="hidden" id="bwfan_form_feed_id" value="' . esc_attr__( $fid ) . '" name="form_feed_id">';
+			echo '<input type="hidden" id="bwfan_form_feed_id" value="' . esc_attr( $fid ) . '" name="form_feed_id">';
 		}
 
 		$uid = filter_input( INPUT_GET, 'uid' );
@@ -229,14 +231,14 @@ class BWFAN_unsubscribe {
 			$uid = $this->uid;
 		}
 		if ( ! empty( $uid ) ) {
-			echo '<input type="hidden" id="bwfan_form_uid_id" value="' . esc_attr__( $uid ) . '" name="uid">';
+			echo '<input type="hidden" id="bwfan_form_uid_id" value="' . esc_attr( $uid ) . '" name="uid">';
 		}
 
-		echo '<input type="hidden" id="bwfan_one_click" value="' . esc_attr__( $this->one_click ) . '" name="one_click">';
+		echo '<input type="hidden" id="bwfan_one_click" value="' . esc_attr( $this->one_click ) . '" name="one_click">';
 
 		$sid = filter_input( INPUT_GET, 'sid', FILTER_SANITIZE_NUMBER_INT );
 		if ( ! empty( $sid ) ) {
-			echo '<input type="hidden" id="bwfan_sid" value="' . esc_attr__( $sid ) . '">';
+			echo '<input type="hidden" id="bwfan_sid" value="' . esc_attr( $sid ) . '">';
 		}
 
 		echo '<input type="hidden" id="bwfan_unsubscribe_nonce" value="' . esc_attr( wp_create_nonce( 'bwfan-unsubscribe-nonce' ) ) . '" name="bwfan_unsubscribe_nonce">';
@@ -474,15 +476,15 @@ class BWFAN_unsubscribe {
                 <div class="bwfan-unsubscribe-single-list">
                     <div class="bwfan-unsubscribe-list-checkbox">
                         <input
-                            id="bwfan-list-<?php echo $list['ID']; ?>"
+                            id="bwfan-list-<?php echo esc_attr( $list['ID'] ); ?>"
                             type="checkbox"
-                            value="<?php echo $list['ID']; ?>"
+                            value="<?php echo esc_attr( $list['ID'] ); ?>"
 							<?php echo $is_checked ? 'checked="checked"' : ''; ?>
                         />
-                        <label for="bwfan-list-<?php echo $list['ID']; ?>"><?php echo $list['name']; ?></label>
+                        <label for="bwfan-list-<?php echo esc_attr( $list['ID'] ); ?>"><?php echo $list['name']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></label>
                     </div>
 					<?php if ( isset( $list['description'] ) ) : ?>
-                        <p class="bwfan-unsubscribe-list-description"><?php echo $list['description']; ?></p>
+                        <p class="bwfan-unsubscribe-list-description"><?php echo $list['description']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
 					<?php endif; ?>
                 </div>
 				<?php
@@ -491,11 +493,11 @@ class BWFAN_unsubscribe {
             <!-- Global Unsubscription option -->
             <div class="bwfan-unsubscribe-single-list bwfan-unsubscribe-from-all-lists">
                 <div class="bwfan-unsubscribe-list-checkbox">
-                    <input id="bwfan-list-unsubscribe-all" type="checkbox" value="unsubscribe_all" <?php echo $is_unsubscribed ? 'checked="checked"' : ''; ?> />
-                    <label for="bwfan-list-unsubscribe-all"><?php echo $label; ?></label>
+                    <input id="bwfan-list-unsubscribe-all" type="checkbox" value="unsubscribe_all" <?php echo esc_html( $is_unsubscribed ? 'checked="checked"' : '' ); ?> />
+                    <label for="bwfan-list-unsubscribe-all"><?php echo $label; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></label>
                 </div>
 				<?php if ( ! empty( $description ) ) : ?>
-                    <p class="bwfan-unsubscribe-list-description"><?php echo $description; ?></p>
+                    <p class="bwfan-unsubscribe-list-description"><?php echo $description; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
 				<?php endif; ?>
             </div>
         </div>
@@ -507,7 +509,7 @@ class BWFAN_unsubscribe {
 		global $wpdb;
 		$term    = isset( $_POST['search_term']['term'] ) ? sanitize_text_field( $_POST['search_term']['term'] ) : ''; // WordPress.CSRF.NonceVerification.NoNonceVerification
 		$v2      = isset( $_POST['fromApp'] ) && $_POST['fromApp'] ? true : false;
-		$results = $wpdb->get_results( $wpdb->prepare( "SELECT ID,post_title FROM {$wpdb->prefix}posts WHERE post_title LIKE %s and post_type = %s and post_status =%s", '%' . $term . '%', 'page', 'publish' ) );
+		$results = $wpdb->get_results( $wpdb->prepare( "SELECT ID,post_title FROM {$wpdb->prefix}posts WHERE post_title LIKE %s and post_type = %s and post_status =%s", '%' . $term . '%', 'page', 'publish' ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( empty( $results ) || ! is_array( $results ) ) {
 			wp_send_json( array(
 				'results' => [],
@@ -796,7 +798,7 @@ class BWFAN_unsubscribe {
 		$form_feed_id  = empty( $form_feed_id ) ? filter_input( INPUT_GET, 'form_feed_id', FILTER_SANITIZE_NUMBER_INT ) : $form_feed_id;
 		$sid           = empty( $sid ) ? filter_input( INPUT_GET, 'sid', FILTER_SANITIZE_NUMBER_INT ) : $sid;
 		$sid           = empty( $sid ) ? 0 : $sid;
-
+		$mode          = 0;
 		if ( false !== filter_var( $this->recipient, FILTER_VALIDATE_EMAIL ) ) {
 			$mode = 1;
 		} elseif ( is_numeric( $this->recipient ) ) {
@@ -808,8 +810,8 @@ class BWFAN_unsubscribe {
 		/**
 		 * Checking if recipient already added to unsubscribe table
 		 */
-		$where         = "WHERE `recipient` = '" . sanitize_text_field( $this->recipient ) . "' and `mode` = '" . $mode . "'";
-		$unsubscribers = $wpdb->get_var( "SELECT ID FROM {$wpdb->prefix}bwfan_message_unsubscribe $where ORDER BY ID DESC LIMIT 0,1 " );//phpcs:ignore WordPress.DB.PreparedSQL
+		$where         = $wpdb->prepare( "WHERE `recipient` = %s and `mode` = %d", sanitize_text_field( $this->recipient ), $mode );
+		$unsubscribers = $wpdb->get_var( "SELECT ID FROM {$wpdb->prefix}bwfan_message_unsubscribe $where ORDER BY ID DESC LIMIT 0,1 " ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( $unsubscribers > 0 ) {
 			$this->return_message( 6 );
 		}
@@ -875,8 +877,8 @@ class BWFAN_unsubscribe {
 			$this->return_message( 1 );
 		}
 
-		$where         = "WHERE `recipient` = '" . sanitize_text_field( $this->recipient ) . "' and `mode` = '" . $mode . "'";
-		$unsubscribers = $wpdb->get_results( "SELECT ID,recipient FROM {$wpdb->prefix}bwfan_message_unsubscribe $where ORDER BY ID DESC", ARRAY_A );//phpcs:ignore WordPress.DB.PreparedSQL
+		$where         = $wpdb->prepare( "WHERE `recipient` = %s and `mode` = %d", sanitize_text_field( $this->recipient ), $mode );
+		$unsubscribers = $wpdb->get_results( "SELECT ID,recipient FROM {$wpdb->prefix}bwfan_message_unsubscribe $where ORDER BY ID DESC", ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( ! empty( $unsubscribers ) ) {
 			foreach ( $unsubscribers as $unsubscriber ) {
 				$id = $unsubscriber['ID'];
@@ -1003,13 +1005,15 @@ class BWFAN_unsubscribe {
 	 * @return void
 	 */
 	protected function return_message( $type = 1 ) {
+		$page_exist = class_exists( 'BWFAN_Common' ) ? BWFAN_Common::is_unsubscribe_page_valid() : array();
+
 		if ( 1 === absint( $type ) ) {
 			wp_send_json( array(
 				'success' => 0,
 				'message' => __( 'Sorry! We are unable to update preferences as no contact found.', 'wp-marketing-automations' ),
 			) );
 		}
-		if ( in_array( intval( $type ), array( 2, 3, 4, 5, 6 ) ) ) {
+		if ( in_array( intval( $type ), array( 2, 3, 4, 5, 6 ), true ) && ( isset( $page_exist ) && $page_exist['status'] !== 3 ) ) {
 			$global_settings = $this->get_global_settings();
 			wp_send_json( array(
 				'success' => 1,

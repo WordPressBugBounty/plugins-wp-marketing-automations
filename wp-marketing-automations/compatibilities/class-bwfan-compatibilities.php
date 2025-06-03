@@ -35,6 +35,7 @@ class BWFAN_Compatibilities {
 			'plugins/class-bwfan-compatibility-with-wpml.php'                          => defined( 'ICL_SITEPRESS_VERSION' ),
 			'plugins/class-bwfan-compatibility-woocommerce.php'                        => function_exists( 'bwfan_is_woocommerce_active' ) && bwfan_is_woocommerce_active(),
 			'plugins/class-bwfan-wc-product-addon.php'                                 => defined( 'PEWC_PLUGIN_VERSION' ),
+			'plugins/class-bwfan-compatibility-with-gtranslate.php'                    => function_exists( 'bwfan_is_gtranslate_active' ) && bwfan_is_gtranslate_active(),
 
 			//rest
 			'rest/class-bwfan-compability-with-permatters.php'                         => defined( 'PERFMATTERS_VERSION' ),
@@ -46,6 +47,8 @@ class BWFAN_Compatibilities {
 			'rest/class-bwfan-compatibility-with-sg-cache.php'                         => function_exists( 'sg_cachepress_purge_cache' ),
 			'rest/class-bwfan-compatibility-with-wp-rest-authenticate.php'             => function_exists( 'mo_api_auth_activate_miniorange_api_authentication' ),
 			'rest/class-bwfan-compatibility-with-wp-rocket.php'                        => function_exists( 'rocket_clean_home' ),
+			'rest/class-bwfan-compatibility-with-image-optimisation.php'               => defined( 'IMAGE_OPTIMIZATION_VERSION' ),
+			'rest/class-bwfan-compatibility-with-atom-stock-manager.php'               => defined( 'ATUM_VERSION' ),
 
 			// other files
 			'class-bwfan-compatibility-with-wp-oauth.php'                              => ( defined( 'WPOAUTH_VERSION' ) && class_exists( 'WO_SERVER' ) ),

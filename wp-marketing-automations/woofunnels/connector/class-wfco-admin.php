@@ -133,40 +133,64 @@ if ( ! class_exists( 'WFCO_Admin' ) ) {
 
 		public static function get_error_message() {
 			$errors      = [];
-			$errors[100] = __( 'Connector not found', 'woofunnels' );
-			$errors[101] = __( 'FunnelKit Automations license is required in order to install a connector', 'woofunnels' );
-			$errors[102] = __( 'FunnelKit Automations license is invalid, kindly contact woofunnels team.', 'woofunnels' );
-			$errors[103] = __( 'FunnelKit Automations license is expired, kindly renew and activate it first.', 'woofunnels' );
+			$errors[100] = __( 'Connector not found', 'woofunnels' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			$errors[101] = __( 'FunnelKit Automations license is required in order to install a connector', 'woofunnels' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			$errors[102] = __( 'FunnelKit Automations license is invalid, kindly contact woofunnels team.', 'woofunnels' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			$errors[103] = __( 'FunnelKit Automations license is expired, kindly renew and activate it first.', 'woofunnels' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 
 			return $errors;
 		}
 
 		public static function js_text() {
 			$data = array(
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'text_copied'             => __( 'Text Copied', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'sync_title'              => __( 'Sync Connector', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'sync_text'               => __( 'All the data of this Connector will be Synced.', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'sync_wait'               => __( 'Please Wait...', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'sync_progress'           => __( 'Sync in progress...', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'sync_success_title'      => __( 'Connector Synced', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'sync_success_text'       => __( 'We have detected change in the connector during syncing. Please re-save the Automations.', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'oops_title'              => __( 'Oops', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'oops_text'               => __( 'There was some error. Please try again later.', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'delete_int_title'        => __( 'There was some error. Please try again later.', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'delete_int_text'         => __( 'There was some error. Please try again later.', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'update_int_prompt_title' => __( 'Connector Updated', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'update_int_prompt_text'  => __( 'We have detected change in the connector during updating. Please re-save the Automations.', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'delete_int_prompt_title' => __( 'Disconnecting Connector?', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'delete_int_prompt_text'  => __( 'All the action, tasks, logs of this connector will be deleted.', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'delete_int_wait_title'   => __( 'Please Wait...', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'delete_int_wait_text'    => __( 'Disconnecting the connector ...', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'delete_int_success'      => __( 'Connector Disconnected', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'update_btn'              => __( 'Update', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'save_progress'           => __( 'Saving in progress...', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'update_btn_process'      => __( 'Updating...', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'connect_btn_process'     => __( 'Connecting...', 'woofunnels' ),
-				'install_success_title'   => __( 'Connector Installed Successfully', 'woofunnels-autonami-automation' ),
-				'connect_success_title'   => __( 'Connected Successfully', 'woofunnels-autonami-automation' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				'install_success_title'   => __( 'Connector Installed Successfully', 'woofunnels' ),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				'connect_success_title'   => __( 'Connected Successfully', 'woofunnels' ),
 			);
 
 			return $data;
@@ -185,7 +209,7 @@ if ( ! class_exists( 'WFCO_Admin' ) ) {
 
 		public function tooltip( $text ) {
 			?>
-            <span class="wfco-help"><i class="icon"></i><div class="helpText"><?php echo $text; ?></div></span>
+			<span class="wfco-help"><i class="icon"></i><div class="helpText"><?php echo $text; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div></span>
 			<?php
 		}
 

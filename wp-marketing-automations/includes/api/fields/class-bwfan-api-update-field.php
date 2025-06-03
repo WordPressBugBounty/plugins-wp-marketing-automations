@@ -48,14 +48,18 @@ class BWFAN_API_Update_Field extends BWFAN_API_Base {
 		if ( in_array( sanitize_title( $slug ), BWFCRM_Fields::$reserved_keys, true ) ) {
 			$this->response_code = 400;
 
-			return $this->error_response( __( sanitize_title( $slug ) . ' is a reserved key', 'wp-marketing-automations' ) );
+			/* translators: 1: Field slug */
+
+			return $this->error_response( sprintf( __( '%1$s is a reserved key', 'wp-marketing-automations' ), sanitize_title( $slug ) ) );
 		}
 
 		$group = BWFCRM_Group::get_groupby_id( $group_id );
 		if ( $group_id > 0 && empty( $group ) ) {
 			$this->response_code = 400;
 
-			return $this->error_response( __( 'Field Group ID ' . $group_id . ' is mandatory', 'wp-marketing-automations' ) );
+			/* translators: 1: Group ID */
+
+			return $this->error_response( sprintf( __( 'Field Group ID %1$d is mandatory', 'wp-marketing-automations' ), $group_id ) );  // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
 		}
 
 		if ( ! isset( $this->args['group_id'] ) ) {

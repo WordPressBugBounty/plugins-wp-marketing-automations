@@ -43,7 +43,7 @@ class BWFAN_DB_Table_AbandonedCarts extends BWFAN_DB_Tables_Base {
 
 		return "CREATE TABLE {$wpdb->prefix}$this->table_name (
  		  `ID` bigint(20) unsigned NOT NULL auto_increment,	
-		  `email` varchar(32) NOT NULL,	  
+		  `email` varchar(100) NOT NULL,
 		  `status` int(1) NOT NULL default 0,
 		  `user_id` bigint(20) NOT NULL default 0,
 		  `last_modified` datetime NOT NULL,
@@ -67,7 +67,8 @@ class BWFAN_DB_Table_AbandonedCarts extends BWFAN_DB_Tables_Base {
 		  KEY `user_id` (`user_id`),
 		  KEY `email` (`email`),
 		  KEY `last_modified` (`last_modified`),
-		  KEY `token` (`token`)
+		  KEY `token` (`token`),
+		  KEY `cookie_key` (`cookie_key`)
 		) $collate;";
 	}
 }

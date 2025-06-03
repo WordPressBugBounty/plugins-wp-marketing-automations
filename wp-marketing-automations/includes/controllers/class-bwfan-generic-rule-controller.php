@@ -12,7 +12,7 @@ class BWFAN_Generic_Rule_Controller {
 
 	public function set_data( $data ) {
 		if ( empty( $data ) ) {
-			$data = array_merge( BWFAN_Merge_Tag_Loader::get_data(), BWFCRM_Core()->merge_tags->get_data() );
+			$data = array_merge( BWFAN_Merge_Tag_Loader::get_data() );
 			$data = [ 'global' => $data ];
 		}
 

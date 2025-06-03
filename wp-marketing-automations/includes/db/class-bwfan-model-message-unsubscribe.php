@@ -16,9 +16,9 @@ class BWFAN_Model_Message_Unsubscribe extends BWFAN_Model {
 			return '';
 		}
 		if ( true === $single_row ) {
-			return $wpdb->get_row( self::prepare_message_unsubscribe_sql( $where ) . ' LIMIT 0, 1', ARRAY_A ); //phpcs:ignore WordPress.DB.PreparedSQL
+			return $wpdb->get_row( self::prepare_message_unsubscribe_sql( $where ) . ' LIMIT 0, 1', ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		} else {
-			return $wpdb->get_results( self::prepare_message_unsubscribe_sql( $where ), ARRAY_A );
+			return $wpdb->get_results( self::prepare_message_unsubscribe_sql( $where ), ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 	}
 
@@ -87,7 +87,7 @@ class BWFAN_Model_Message_Unsubscribe extends BWFAN_Model {
 			}
 		}
 
-		return $wpdb->query( 'DELETE FROM ' . $table_name . " WHERE $where" ); // WPCS: unprepared SQL OK
+		return $wpdb->query( 'DELETE FROM ' . $table_name . " WHERE $where" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -117,7 +117,7 @@ class BWFAN_Model_Message_Unsubscribe extends BWFAN_Model {
 		$placeholders = implode( ',', $placeholders );
 		$table        = self::_table();
 		$sql          = $wpdb->prepare( "DELETE FROM $table WHERE `recipient` IN ($placeholders)", $where_args );
-		$wpdb->query( $sql );
+		$wpdb->query( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return true;
 	}

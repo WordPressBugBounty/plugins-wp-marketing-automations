@@ -14,7 +14,7 @@ class BWFAN_Model_Automations extends BWFAN_Model {
 			$sql    = $wpdb->prepare( "SELECT COUNT(*) FROM $table_name WHERE status = %d", $status ); // WPCS: unprepared SQL OK
 		}
 
-		return $wpdb->get_var( $sql ); // WPCS: unprepared SQL OK
+		return $wpdb->get_var( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -42,7 +42,7 @@ class BWFAN_Model_Automations extends BWFAN_Model {
 		global $wpdb;
 		$query = "SELECT MIN(id) FROM " . self::_table();
 
-		return $wpdb->get_var( $query );
+		return $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -52,7 +52,7 @@ class BWFAN_Model_Automations extends BWFAN_Model {
 		global $wpdb;
 		$table_name = self::_table();
 		$query      = $wpdb->prepare( "SELECT event FROM {$table_name} WHERE ID = %d", $automation_id );
-		$result     = $wpdb->get_row( $query, ARRAY_A );
+		$result     = $wpdb->get_row( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return isset( $result['event'] ) ? $result['event'] : '';
 	}
@@ -74,7 +74,7 @@ class BWFAN_Model_Automations extends BWFAN_Model {
 		$table = $wpdb->prefix . 'bwfan_contact_automations';
 
 		$query         = $wpdb->prepare( "SELECT count(*) as count FROM {$table} WHERE `contact_id` = %d AND `automation_id` = %d", $contact_id, $automation_id );
-		$running_count = $wpdb->get_var( $query );
+		$running_count = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return absint( $running_count );
 	}
@@ -95,7 +95,7 @@ class BWFAN_Model_Automations extends BWFAN_Model {
 			$base_query       = "SELECT COALESCE(a.`ID`,'') AS `aid`, COALESCE(a.`title`,'') AS `name`, a.`v`, a.event, SUM(c.`wctotal`) AS `total_revenue` FROM $automation_table AS a LEFT JOIN $conversion_table AS c ON c.`oid` = a.`ID` WHERE c.`otype` = 1 GROUP BY a.`ID` ORDER BY `total_revenue` DESC LIMIT 0,5";
 		}
 
-		return $wpdb->get_results( $base_query, ARRAY_A );
+		return $wpdb->get_results( $base_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -105,7 +105,7 @@ class BWFAN_Model_Automations extends BWFAN_Model {
 	 */
 	public static function get_last_abandoned_cart( $where = '' ) {
 		global $wpdb;
-		$results = $wpdb->get_results( "SELECT `last_modified`, `items`, `total` FROM {$wpdb->prefix}bwfan_abandonedcarts {$where} ORDER BY `last_modified` DESC LIMIT 0,1", ARRAY_A ); // WPCS: unprepared SQL OK
+		$results = $wpdb->get_results( "SELECT `last_modified`, `items`, `total` FROM {$wpdb->prefix}bwfan_abandonedcarts {$where} ORDER BY `last_modified` DESC LIMIT 0,1", ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return $results;
 	}
@@ -113,7 +113,7 @@ class BWFAN_Model_Automations extends BWFAN_Model {
 	public static function get_tasks_for_contact( $contact_id ) {
 		global $wpdb;
 		$scheduled_tasks           = array();
-		$get_contact_automation_id = $wpdb->get_col( "SELECT DISTINCT automation_id from {$wpdb->prefix}bwfan_contact_automations where contact_id='" . $contact_id . "'" );
+		$get_contact_automation_id = $wpdb->get_col( "SELECT DISTINCT automation_id from {$wpdb->prefix}bwfan_contact_automations where contact_id='" . $contact_id . "'" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		if ( empty( $get_contact_automation_id ) ) {
 			return $scheduled_tasks;
@@ -130,7 +130,7 @@ class BWFAN_Model_Automations extends BWFAN_Model {
 								WHERE t.automation_id IN ($placeholdersautomation)
 								ORDER BY t.e_date DESC
 								", $get_contact_automation_id );
-		$scheduled_tasks       = $wpdb->get_results( $scheduled_tasks_query, ARRAY_A );
+		$scheduled_tasks       = $wpdb->get_results( $scheduled_tasks_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return $scheduled_tasks;
 	}
@@ -141,7 +141,7 @@ class BWFAN_Model_Automations extends BWFAN_Model {
 
 		global $wpdb;
 
-		$get_contact_automation_id = $wpdb->get_col( "SELECT DISTINCT automation_id from {$wpdb->prefix}bwfan_contact_automations where contact_id='" . $contact_id . "'" );
+		$get_contact_automation_id = $wpdb->get_col( "SELECT DISTINCT automation_id from {$wpdb->prefix}bwfan_contact_automations where contact_id='" . $contact_id . "'" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( empty( $get_contact_automation_id ) ) {
 			return $contact_logs;
 		}
@@ -157,7 +157,7 @@ class BWFAN_Model_Automations extends BWFAN_Model {
 								WHERE l.automation_id IN ($placeholdersautomation)
 								ORDER BY l.e_date DESC
 								", $get_contact_automation_id );
-		$contact_logs       = $wpdb->get_results( $contact_logs_query, ARRAY_A );
+		$contact_logs       = $wpdb->get_results( $contact_logs_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return $contact_logs;
 	}

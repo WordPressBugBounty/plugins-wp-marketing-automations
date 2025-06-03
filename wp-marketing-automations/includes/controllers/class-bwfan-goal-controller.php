@@ -81,7 +81,7 @@ class BWFAN_Goal_Controller extends BWFAN_Base_Step_Controller {
 		$data  = array_merge( [ $contact_id ], $automations );
 		$query = $wpdb->prepare( "SELECT * FROM `{$wpdb->prefix}bwfan_automation_contact` WHERE `cid` = %d AND `aid` IN ($placeholder) AND `status` IN (1,4,6)", $data );
 
-		return $wpdb->get_results( $query, ARRAY_A );
+		return $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -117,10 +117,9 @@ class BWFAN_Goal_Controller extends BWFAN_Base_Step_Controller {
 		}
 
 		BWFAN_Common::log_l2_data( 'Trail id: ' . $trail_id, 'goal-check' );
-		$steps_trail = BWFAN_Model_Automation_Contact_Trail::get_trail( $trail_id );
 
 		/** Again Checking if the goal and it's step_id exists */
-		$goal_step_ids = $this->get_goal_step_ids( $this->automation_id, $event->get_slug(), $steps_trail );
+		$goal_step_ids = $this->get_goal_step_ids( $this->automation_id, $event->get_slug() );
 		if ( empty( $goal_step_ids ) ) {
 			BWFAN_Common::log_l2_data( 'no goal step ids found', 'goal-check' );
 
@@ -144,7 +143,8 @@ class BWFAN_Goal_Controller extends BWFAN_Base_Step_Controller {
 			return;
 		}
 
-		/** Validate found goals settings */
+		$steps_trail = BWFAN_Model_Automation_Contact_Trail::get_trail( $trail_id );
+		/** Validate found goal settings */
 		foreach ( $traversed_goal_node_ids as $node_id ) {
 			$step_id = array_search( $node_id, $this->goal_steps );
 			if ( empty( $step_id ) || 1 > intval( $step_id ) ) {
@@ -190,48 +190,19 @@ class BWFAN_Goal_Controller extends BWFAN_Base_Step_Controller {
 	 *
 	 * @return array|int
 	 */
-	public function get_goal_step_ids( $automation_id, $event_slug, $steps_trail ) {
+	public function get_goal_step_ids( $automation_id, $event_slug ) {
 		if ( empty( $automation_id ) || empty( $event_slug ) ) {
 			return 0;
 		}
 		global $wpdb;
 		$query = $wpdb->prepare( "SELECT `ID` FROM `{$wpdb->prefix}bwfan_automation_step` WHERE `aid` = %d AND `type` = 3 AND `status` IN (0, 1) AND `action` LIKE %s", $automation_id, "%{$event_slug}%" );
 
-		$step_ids = $wpdb->get_col( $query );
+		$step_ids = $wpdb->get_col( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( empty( $step_ids ) ) {
 			return [];
 		}
 
-		/** If no steps trail */
-		if ( empty( $steps_trail ) ) {
-			return $step_ids;
-		}
-
-		$processed_sids = array_column( $steps_trail, 'sid' );
-
-		/** Goal ids array 1 */
-		$goal_ids = array_diff( $step_ids, $processed_sids );
-
-		/** Filter step ids if contact already passed them and has status 'wait' */
-		$filtered = array_filter( $steps_trail, function ( $row ) use ( $step_ids ) {
-			if ( in_array( $row['sid'], $step_ids ) && 2 === absint( $row['status'] ) ) {
-				return true;
-			}
-
-			return false;
-		} );
-
-		/** If none present then no goal step ids */
-		if ( empty( $goal_ids ) && empty( $filtered ) ) {
-			return [];
-		}
-
-		if ( ! empty( $filtered ) && is_array( $filtered ) ) {
-			$filtered = array_column( $filtered, 'sid' );
-			$goal_ids = array_merge( $goal_ids, $filtered );
-		}
-
-		return $goal_ids;
+		return ! empty( $step_ids ) ? $step_ids : [];
 	}
 
 	/**
@@ -290,7 +261,7 @@ class BWFAN_Goal_Controller extends BWFAN_Base_Step_Controller {
 		/**  Update status and time   */
 		$data  = array_merge( [ 1, time() ], $filtered );
 		$query = $wpdb->prepare( "UPDATE `{$wpdb->prefix}bwfan_automation_contact_trail` SET `status` = %d, `c_time` = %d  WHERE `ID` IN ($placeholder)", $data );
-		$wpdb->query( $query );
+		$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		$this->update_status = true;
 	}
@@ -302,19 +273,21 @@ class BWFAN_Goal_Controller extends BWFAN_Base_Step_Controller {
 	 * @param array $steps_trail current contact steps trail
 	 * @param array $automation_contact automation contact row
 	 *
-	 * @return void
+	 * @return int|void
 	 */
 	public function maybe_add_goal_step_trail( $goal_step_id, $steps_trail, $automation_contact ) {
-		/** Filter steps with status 2 */
+		/** Filter steps if a goal step is already in wait */
 		$filtered = array_filter( $steps_trail, function ( $row ) use ( $goal_step_id ) {
-			return ( absint( $goal_step_id ) === absint( $row['sid'] ) );
+			$data = ! empty( $row['data'] ) ? json_decode( $row['data'], true ) : [];
+
+			return ( ! empty( $data ) && isset( $data['msg'] ) && 'wait' === $data['msg'] && $goal_step_id === intval( $row['sid'] ) );
 		} );
 
 		if ( is_array( $filtered ) && count( $filtered ) > 0 ) {
 			return;
 		}
 
-		/** Add goal step trail */
+		/** Add a goal step trail */
 		$arr = array(
 			'tid'    => $automation_contact['trail'],
 			'cid'    => $automation_contact['cid'],
@@ -324,5 +297,7 @@ class BWFAN_Goal_Controller extends BWFAN_Base_Step_Controller {
 			'status' => BWFAN_Automation_Controller::$STATUS_ACTIVE,
 		);
 		BWFAN_Model_Automation_Contact_Trail::insert( $arr );
+
+		return BWFAN_Model_Automation_Contact_Trail::insert_id();
 	}
 }

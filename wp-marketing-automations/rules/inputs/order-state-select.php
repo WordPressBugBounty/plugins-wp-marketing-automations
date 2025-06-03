@@ -24,7 +24,7 @@ class bwfan_Input_Order_State_Select {
 
 		?>
 
-        <select id="<?php echo esc_attr( $field['id'] ); ?>" name="<?php echo $field['name']; //phpcs:ignore WordPress.Security.EscapeOutput ?>[states][]" class="chosen_select <?php echo esc_attr( $field['class'] ); ?>" multiple="multiple" data-placeholder="<?php echo( isset( $field['placeholder'] ) ? esc_attr__( sanitize_text_field( $field['placeholder'] ) ) : esc_html( 'Search...', 'wp-marketing-automations' ) ); ?>">
+        <select id="<?php echo esc_attr( $field['id'] ); ?>" name="<?php echo $field['name']; //phpcs:ignore WordPress.Security.EscapeOutput ?>[states][]" class="chosen_select <?php echo esc_attr( $field['class'] ); ?>" multiple="multiple" data-placeholder="<?php echo( isset( $field['placeholder'] ) ? esc_attr( sanitize_text_field( $field['placeholder'] ) ) : esc_html__( 'Search...', 'wp-marketing-automations' ) ); ?>">
 			<?php
 			WC()->countries->country_dropdown_options( '', $chosen_states );
 			?>

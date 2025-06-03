@@ -45,6 +45,7 @@ class BWFAN_API_Create_Automation extends BWFAN_API_Base {
 			if ( intval( $automation_id ) > 0 ) {
 				global $wpdb;
 				$metatable = $wpdb->prefix . 'bwfan_automationmeta';
+				//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->query( "INSERT INTO $metatable ( bwfan_automation_id, meta_key, meta_value ) VALUES 
 					( $automation_id, 'steps', '' ),
 					( $automation_id, 'links', '' ),

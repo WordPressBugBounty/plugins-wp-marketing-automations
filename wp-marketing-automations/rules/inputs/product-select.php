@@ -24,7 +24,7 @@ class bwfan_Input_Product_Select {
 
 		?>
 
-        <select id="<?php echo esc_attr( $field['id'] ); ?>" name="<?php echo esc_attr( $field['name'] ); //phpcs:ignore WordPress.Security.EscapeOutput ?>[]" class="ajax_chosen_select_products" data-placeholder="<?php esc_html_e( 'Search for a product&hellip;', 'woocommerce' ); ?>">
+        <select id="<?php echo esc_attr( $field['id'] ); ?>" name="<?php echo esc_attr( $field['name'] ); //phpcs:ignore WordPress.Security.EscapeOutput ?>[]" class="ajax_chosen_select_products" data-placeholder="<?php esc_html_e( 'Search for a product&hellip;', 'woocommerce' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch ?>">
 			<?php
 			$current     = $value ? $value : array();
 			$product_ids = ! empty( $current ) ? array_map( 'absint', $current ) : null;

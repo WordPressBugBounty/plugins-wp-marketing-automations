@@ -9,13 +9,13 @@ if ( ! class_exists( 'BWFAN_Model_Conversions' ) && BWFAN_Common::is_pro_3_0() )
 			global $wpdb;
 			$table       = self::_table();
 			$query       = "SELECT bwc.* FROM $table as bwc JOIN {$wpdb->prefix}posts as p ON bwc.wcid=p.ID WHERE bwc.oid = $source_id AND bwc.otype=$source_type ORDER BY bwc.wcid DESC LIMIT $limit OFFSET $offset";
-			$conversions = $wpdb->get_results( $query, ARRAY_A );
+			$conversions = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( empty( $conversions ) ) {
 				return [ 'conversions' => array(), 'total' => 0 ];
 			}
 
 			$total_query = "SELECT COUNT(*) FROM $table as bwc JOIN {$wpdb->prefix}posts as p ON bwc.wcid=p.ID  WHERE bwc.oid = $source_id AND bwc.otype=$source_type";
-			$total       = absint( $wpdb->get_var( $total_query ) );
+			$total       = absint( $wpdb->get_var( $total_query ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			foreach ( $conversions as $key => $conv ) {
 				$order = wc_get_order( absint( $conv['wcid'] ) );
 
@@ -63,7 +63,7 @@ if ( ! class_exists( 'BWFAN_Model_Conversions' ) && BWFAN_Common::is_pro_3_0() )
 				$query           .= " AND trackid IN($engagements_ids)";
 			}
 
-			return $wpdb->get_results( $query, ARRAY_A );
+			return $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		public static function get_conversions_for_check_validity( $saved_last_conversion_id ) {
@@ -80,7 +80,7 @@ if ( ! class_exists( 'BWFAN_Model_Conversions' ) && BWFAN_Common::is_pro_3_0() )
 
 			$query = "SELECt ID,wcid FROM $table WHERE 1=1 $and ORDER BY ID DESC";
 
-			return $wpdb->get_results( $query, ARRAY_A );
+			return $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		public static function get_last_conversion_id() {
@@ -88,7 +88,7 @@ if ( ! class_exists( 'BWFAN_Model_Conversions' ) && BWFAN_Common::is_pro_3_0() )
 			$table = self::_table();
 			$query = "SELECT MAX(`ID`) FROM $table";
 
-			return $wpdb->get_var( $query );
+			return $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		public static function delete_conversions_by_track_id( $ids ) {
@@ -104,7 +104,7 @@ if ( ! class_exists( 'BWFAN_Model_Conversions' ) && BWFAN_Common::is_pro_3_0() )
 
 			$query = $wpdb->prepare( "DELETE FROM {$table} WHERE trackid IN ($placeholders)", $ids );
 
-			return $wpdb->query( $query ); //phpcs:ignore WordPress.DB.PreparedSQL
+			return $wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		public static function get_automation_revenue( $aid, $start_date, $end_date, $is_interval, $interval ) {
@@ -125,7 +125,7 @@ if ( ! class_exists( 'BWFAN_Model_Conversions' ) && BWFAN_Common::is_pro_3_0() )
 			}
 			$base_query = "SELECT  count(ID) as conversions, SUM(wctotal) as revenue $interval_query FROM `" . $table . "` WHERE 1=1 AND oid = $aid AND otype = 1 AND `" . $date_col . "` >= '" . $start_date . "' AND `" . $date_col . "` <= '" . $end_date . "'" . $group_by . " ORDER BY " . $order_by . " ASC";
 
-			return $wpdb->get_results( $base_query, ARRAY_A );
+			return $wpdb->get_results( $base_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 	}
 }

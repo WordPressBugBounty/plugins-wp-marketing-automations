@@ -31,15 +31,26 @@ class BWFAN_Automations {
 	/** return single automation or all automation json data
 	 *
 	 * @param null $automation_id
+	 * @param int $version
+	 * @param int $offset
+	 * @param int $limit
+	 * @param string $status
 	 *
 	 * @return false|mixed|string|void
 	 */
-	public static function get_json( $automation_id = null, $version = 1 ) {
+	public static function get_json( $automation_id = null, $version = 1, $offset = 0, $limit = 10, $status = '', $search = '' ) {
 		global $wpdb;
 		if ( empty( $automation_id ) ) {
 			$automation_table = $wpdb->prefix . 'bwfan_automations';
-			$query            = "SELECT ID FROM $automation_table WHERE v = $version";
-			$automation_id    = $wpdb->get_col( $query ); //phpcs:ignore WordPress.DB.PreparedSQL
+			$query            = $wpdb->prepare( "SELECT ID FROM $automation_table WHERE v = %d", $version );
+			if ( ! empty( $status ) ) {
+				$query .= $wpdb->prepare( " AND status = %d", intval( $status ) );
+			}
+			if ( ! empty( $search ) ) {
+				$query .= $wpdb->prepare( " AND title LIKE %s", '%' . esc_sql( $search ) . '%' );
+			}
+			$query         .= $wpdb->prepare( " ORDER BY ID DESC LIMIT %d OFFSET %d", $limit, $offset );
+			$automation_id    = $wpdb->get_col( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( empty( $automation_id ) ) {
 				return;
 			}
@@ -112,7 +123,7 @@ class BWFAN_Automations {
 		} else {
 			$query = $wpdb->prepare( "SELECT p.ID as id FROM {$wpdb->prefix}posts as p LEFT JOIN {$wpdb->prefix}postmeta as m ON p.ID = m.post_id WHERE p.post_type = %s AND p.post_status NOT IN $post_status AND m.meta_key = %s $where ORDER BY p.post_modified DESC LIMIT $offset,$limit", 'shop_order', '_bwfan_ab_cart_recovered_a_id' );
 		}
-		$recovered_carts = $wpdb->get_results( $query, ARRAY_A );//phpcs:ignore WordPress.DB.PreparedSQL
+		$recovered_carts = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( empty( $recovered_carts ) ) {
 			return array();
 		}
@@ -125,12 +136,12 @@ class BWFAN_Automations {
 
 		$found_posts['items'] = $items;
 		if ( BWF_WC_Compatibility::is_hpos_enabled() ) {
-			$found_posts['total_record'] = $wpdb->get_var( $wpdb->prepare( "SELECT count(p.id) as total FROM {$wpdb->prefix}wc_orders as p LEFT JOIN {$wpdb->prefix}wc_orders_meta as m ON p.id = m.order_id WHERE p.type = %s AND p.status NOT IN $post_status AND m.meta_key = %s $where ORDER BY p.date_updated_gmt DESC LIMIT $offset,$limit", 'shop_order', '_bwfan_ab_cart_recovered_a_id' ) );//phpcs:ignore WordPress.DB.PreparedSQL
+			$found_posts['total_record'] = $wpdb->get_var( $wpdb->prepare( "SELECT count(p.id) as total FROM {$wpdb->prefix}wc_orders as p LEFT JOIN {$wpdb->prefix}wc_orders_meta as m ON p.id = m.order_id WHERE p.type = %s AND p.status NOT IN $post_status AND m.meta_key = %s $where ORDER BY p.date_updated_gmt DESC LIMIT $offset,$limit", 'shop_order', '_bwfan_ab_cart_recovered_a_id' ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			return $found_posts;
 		}
 
-		$found_posts['total_record'] = $wpdb->get_var( $wpdb->prepare( "SELECT count(p.ID) as total FROM {$wpdb->prefix}posts as p LEFT JOIN {$wpdb->prefix}postmeta as m ON p.ID = m.post_id WHERE p.post_type = %s AND p.post_status NOT IN $post_status AND m.meta_key = %s $where ORDER BY p.post_modified DESC LIMIT $offset,$limit", 'shop_order', '_bwfan_ab_cart_recovered_a_id' ) );//phpcs:ignore WordPress.DB.PreparedSQL
+		$found_posts['total_record'] = $wpdb->get_var( $wpdb->prepare( "SELECT count(p.ID) as total FROM {$wpdb->prefix}posts as p LEFT JOIN {$wpdb->prefix}postmeta as m ON p.ID = m.post_id WHERE p.post_type = %s AND p.post_status NOT IN $post_status AND m.meta_key = %s $where ORDER BY p.post_modified DESC LIMIT $offset,$limit", 'shop_order', '_bwfan_ab_cart_recovered_a_id' ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return $found_posts;
 	}
@@ -146,7 +157,7 @@ class BWFAN_Automations {
 		$where = " WHERE abandon.status IN ($status)";
 
 		$query  = "SELECT abandon.email, abandon.checkout_data, abandon.total AS revenue, abandon.currency AS currency, COALESCE(con.id, 0) AS id, COALESCE(con.f_name, '') AS f_name, COALESCE(con.l_name, '') AS l_name,abandon.created_time AS created_on from $abandoned_table AS abandon LEFT JOIN $contact_table AS con ON abandon.email = con.email $where ORDER BY abandon.ID DESC LIMIT 5 OFFSET 0";
-		$result = $wpdb->get_results( $query, ARRAY_A );
+		$result = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return array_map( function ( $cart ) {
 			if ( empty( $cart['f_name'] ) || empty( $cart['l_name'] ) ) {
@@ -1022,6 +1033,7 @@ class BWFAN_Automations {
 		}
 		$data = array( 'benchmark' => json_encode( $benchmark_data ) );
 		global $wpdb;
+		//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->update( "{$wpdb->prefix}bwfan_automations", $data, [
 			'ID' => $automation_id
 		] );
@@ -1076,7 +1088,7 @@ class BWFAN_Automations {
 
 		$result = $core_cache_obj->get_cache( md5( $query ), 'fka-automations' );
 		if ( false === $result ) {
-			$result = $wpdb->get_results( $query, ARRAY_A );
+			$result = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$core_cache_obj->set_cache( md5( $query ), $result, 'fka-automations' );
 		}
 
@@ -1120,7 +1132,7 @@ class BWFAN_Automations {
 		$core_cache_obj       = WooFunnels_Cache::get_instance();
 		$migrated_automations = $core_cache_obj->get_cache( md5( $query ), 'fka-automations' );
 		if ( false === $migrated_automations ) {
-			$migrated_automations = $wpdb->get_col( $query );
+			$migrated_automations = $wpdb->get_col( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$core_cache_obj->set_cache( md5( $query ), $migrated_automations, 'fka-automations' );
 		}
 

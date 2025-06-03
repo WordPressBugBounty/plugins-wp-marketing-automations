@@ -77,20 +77,20 @@ class BWFAN_API_Email_Activity extends BWFAN_API_Base {
 				'type'  => 'sticky',
 				'rules' => [
 					[
-						'slug'          => 'source',
-						'title'         => __( 'Source', 'wp-marketing-automations' ),
-						'operators'     => $operators,
-						'op_label'      => __( 'Source', 'wp-marketing-automations' ),
-						'type'          => 'search',
-						'val_label'     => __( 'Source', 'wp-marketing-automations' ),
-						'required'      => [ 'rule' ],
-						'readable_text' => '{{rule /}} - {{value /}}',
-						'rule_dependent'=> true,
-						'api'           => [
+						'slug'           => 'source',
+						'title'          => __( 'Source', 'wp-marketing-automations' ),
+						'operators'      => $operators,
+						'op_label'       => __( 'Source', 'wp-marketing-automations' ),
+						'type'           => 'search',
+						'val_label'      => __( 'Source', 'wp-marketing-automations' ),
+						'required'       => [ 'rule' ],
+						'readable_text'  => '{{rule /}} - {{value /}}',
+						'rule_dependent' => true,
+						'api'            => [
 							1 => '/search/automations?search={{search}}&version=2',
 							2 => '/analytics/engagements/search?type=2&search={{search}}'
 						],
-						'data_toggler'  => [
+						'data_toggler'   => [
 							'operator' => '===',
 							'value'    => [ 1, 2, '1', '2' ]
 						],

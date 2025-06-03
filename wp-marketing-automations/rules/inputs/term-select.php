@@ -25,7 +25,7 @@ class bwfan_Input_Term_Select extends bwfan_Input_Text {
 		$args = array(
 			'name'             => $field['name'],
 			'id'               => $field['id'],
-			'show_option_none' => __( 'Select category' ),
+			'show_option_none' => __( 'Select category', 'wp-marketing-automations' ),
 			'show_count'       => 0,
 			'orderby'          => 'name',
 			'echo'             => 0,

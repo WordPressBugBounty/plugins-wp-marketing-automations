@@ -31,7 +31,7 @@ if ( empty( $groups ) ) {
 					$group_id = 'group' . $group_id;
 				}
 				?>
-                <div class="bwfan-rule-group-container" data-groupid="<?php esc_attr_e( $group_id ); ?>">
+                <div class="bwfan-rule-group-container" data-groupid="<?php echo esc_attr( $group_id ); ?>">
                     <div class="bwfan-rule-group-header">
 						<?php if ( 0 === $group_counter ) : ?>
                             <h4><?php esc_html_e( 'Initiate this automation when these conditions are matched:', 'wp-marketing-automations' ); ?></h4>
@@ -40,7 +40,7 @@ if ( empty( $groups ) ) {
 					<?php
 					if ( is_array( $group ) ) :
 						?>
-                        <table class="bwfan-rules" data-groupid="<?php esc_attr_e( $group_id ); ?>">
+                        <table class="bwfan-rules" data-groupid="<?php echo esc_attr( $group_id ); ?>">
                             <tbody>
 							<?php
 							foreach ( $group as $rule_id => $rule ) :
@@ -48,7 +48,7 @@ if ( empty( $groups ) ) {
 									$rule_id = 'rule' . $rule_id;
 								}
 								?>
-                            <tr data-ruleid="<?php esc_attr_e( $rule_id ); ?>" class="bwfan-rule">
+                            <tr data-ruleid="<?php echo esc_attr( $rule_id ); ?>" class="bwfan-rule">
                                 <td class="rule-type">
 									<?php
 									// allow custom location rules
@@ -61,7 +61,7 @@ if ( empty( $groups ) ) {
 										'class'      => 'rule_type',
 										'choices'    => $types,
 										'allow_null' => true,
-										'null_text'  => __( 'Select a rule', '' ),
+										'null_text'  => __( 'Select a rule', 'wp-marketing-automations' ),
 									);
 									bwfan_Input_Builder::create_input_field( $args, $rule['rule_type'] );
 									?>

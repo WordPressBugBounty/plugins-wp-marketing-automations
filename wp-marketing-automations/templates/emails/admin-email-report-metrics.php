@@ -56,7 +56,7 @@ defined( 'ABSPATH' ) || exit;
                                                                     foreach ( $tile as $inner_key => $col ) {
 	                                                                    $padding = ( 0 === $inner_key % 2 ) ? 'padding-right: 10px' : 'padding-left: 0';
                                                                         ?>
-                                                                        <td class="metric-cell" id="total-contacts" style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; line-height: 1.5; width: 50%; vertical-align: top; <?php echo $padding ?>"
+                                                                        <td class="metric-cell" id="total-contacts" style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; line-height: 1.5; width: 50%; vertical-align: top; <?php echo esc_html( $padding ) ?>"
                                                                             width="50%" valign="top">
                                                                             <table cellpadding="0" cellspacing="0" border="0"
                                                                                    style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; width: 100%;"
@@ -64,16 +64,16 @@ defined( 'ABSPATH' ) || exit;
                                                                                 <tbody>
                                                                                 <tr style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px;">
                                                                                     <td style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; line-height: 1.5; font-family: arial, helvetica, sans-serif; font-size: 16px; color: #000000; padding-bottom: 5px;" class="metric-label">
-                                                                                        <b><?php echo $col['text']; ?></b>
+                                                                                        <b><?php echo $col['text']; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></b>
                                                                                     </td>
                                                                                 </tr>
                                                                                 <tr style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px;">
                                                                                     <td style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; line-height: 1.5; font-family: arial, helvetica, sans-serif; font-size: 48px; font-weight: bold; color: #000000; padding-bottom: 5px;">
-                                                                                        <?php echo $col['count']; ?>
+                                                                                        <?php echo $col['count']; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	                                                                                    <?php if ( ! empty( $col['count_suffix'] ) ) {
 		                                                                                    ?>
                                                                                             <span style="font-size: 18px; font-weight: normal;">
-                                                                                                    <?php echo $col['count_suffix']; ?>
+                                                                                                    <?php echo $col['count_suffix']; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                                                                                                 </span>
 		                                                                                    <?php
 	                                                                                    } ?>
@@ -82,11 +82,11 @@ defined( 'ABSPATH' ) || exit;
                                                                                 <tr style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px;">
                                                                                     <td class="metric-delta" style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; line-height: 1.5;">
 	                                                                                    <?php $color = $col['percentage_change_positive'] ? '#089D61' : '#FF0000'; ?>
-                                                                                        <span style="font-family: arial, helvetica, sans-serif;color: <?php echo $color; ?>; font-size: 16px;">
-                                                                                            <?php echo $col['percentage_change']; ?>
+                                                                                        <span style="font-family: arial, helvetica, sans-serif;color: <?php echo esc_html( $color ); ?>; font-size: 16px;">
+                                                                                            <?php echo $col['percentage_change']; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                                                                                         </span>
                                                                                         <span style="font-family: arial, helvetica, sans-serif;color: #666666; font-size: 14px;">
-                                                                                        <?php echo $col['previous_text']; ?>
+                                                                                        <?php echo $col['previous_text']; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                                                                                     </span>
                                                                                     </td>
                                                                                 </tr>

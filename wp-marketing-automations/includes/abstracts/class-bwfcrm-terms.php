@@ -139,7 +139,7 @@ if ( ! class_exists( 'BWFCRM_Term' ) && BWFAN_Common::is_pro_3_0() ) {
 
 		public function save() {
 			if ( empty( $this->_name ) || empty( $this->_type ) ) {
-				return BWFAN_Common::crm_error( __( 'Required term data is missing.', 'wo-marketing-automations-crm' ) );
+				return BWFAN_Common::crm_error( __( 'Required term data is missing.', 'wp-marketing-automations' ) );
 			}
 
 			$term = array(

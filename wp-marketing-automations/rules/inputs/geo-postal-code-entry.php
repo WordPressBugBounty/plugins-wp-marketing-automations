@@ -30,7 +30,7 @@ class bwfan_Input_Geo_Postal_Code_Entry {
             </tr>
             <tr>
                 <td style="width:162px; vertical-align:top;">
-                    <input type="text" id="<?php echo esc_attr( $field['id'] ); ?>_qty" name="<?php echo $field['name']; //phpcs:ignore WordPress.Security.EscapeOutput ?>[qty]" value="<?php echo isset( $value['qty'] ) ? esc_attr__( sanitize_text_field( $value['qty'] ) ) : 1; ?>"/>
+                    <input type="text" id="<?php echo esc_attr( $field['id'] ); ?>_qty" name="<?php echo $field['name']; //phpcs:ignore WordPress.Security.EscapeOutput ?>[qty]" value="<?php echo isset( $value['qty'] ) ? esc_attr( sanitize_text_field( $value['qty'] ) ) : 1; ?>"/>
                 </td>
                 <td>
 					<?php echo '<textarea style="width:100%" rows="20" name="' . $field['name'] . '[codes]" type="text" id="' . esc_attr( $field['id'] ) . '" class="' . esc_attr( $field['class'] ) . '" placeholder="' . esc_attr( $field['placeholder'] ) . '">' . esc_textarea( $value['codes'] ) . '</textarea>'; //phpcs:ignore WordPress.Security.EscapeOutput ?>

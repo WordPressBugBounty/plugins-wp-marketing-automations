@@ -158,7 +158,7 @@ if ( ! class_exists( 'WooFunnels_AS_DS' ) ) {
 		public function add_cron_schedule( $schedules ) {
 			$schedules['bwf_every_minute'] = apply_filters( 'bwf_every_minute_cron', array(
 				'interval' => MINUTE_IN_SECONDS,
-				'display'  => __( 'Every minute', 'woofunnels' ),
+				'display'  => __( 'Every minute', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			) );
 
 			return $schedules;
@@ -311,6 +311,7 @@ if ( ! class_exists( 'WooFunnels_AS_DS' ) ) {
 			remove_all_filters( 'action_scheduler_timeout_period' );
 			remove_all_filters( 'action_scheduler_cleanup_batch_size' );
 			remove_all_filters( 'action_scheduler_maximum_execution_time_likely_to_be_exceeded' );
+			remove_all_filters( 'action_scheduler_failure_period' );
 
 			/** Adding all filters for Autonami Action Scheduler only */
 			add_filter( 'action_scheduler_queue_runner_time_limit', function () {
@@ -331,6 +332,9 @@ if ( ! class_exists( 'WooFunnels_AS_DS' ) ) {
 			add_filter( 'action_scheduler_maximum_execution_time_likely_to_be_exceeded', function ( $val, $ins, $processed_actions, $execution_time, $max_execution_time ) {
 				return ( $execution_time > $max_execution_time );
 			}, 998, 5 );
+			add_filter( 'action_scheduler_failure_period', function () {
+				return 180;
+			}, 999 );
 		}
 
 		/**
@@ -376,17 +380,17 @@ if ( ! class_exists( 'WooFunnels_AS_DS' ) ) {
  */
 function bwf_schedule_single_action( $timestamp, $hook, $args = array(), $group = '' ) {
 	if ( ! class_exists( 'BWF_AS_Actions_Crud' ) ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Method is called before plugins_loaded hook.', 'woofunnels' ), BWF_VERSION );
+		_doing_it_wrong( __FUNCTION__, __( 'Method is called before plugins_loaded hook.', 'woofunnels' ), BWF_VERSION ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.TextDomainMismatch
 
 		return false;
 	}
 	if ( ! class_exists( 'ActionScheduler' ) ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Action Scheduler class not found.', 'woofunnels' ), BWF_VERSION );
+		_doing_it_wrong( __FUNCTION__, __( 'Action Scheduler class not found.', 'woofunnels' ), BWF_VERSION ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.TextDomainMismatch
 
 		return false;
 	}
 	if ( empty( $hook ) ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Hook is a required entity.', 'woofunnels' ), BWF_VERSION );
+		_doing_it_wrong( __FUNCTION__, __( 'Hook is a required entity.', 'woofunnels' ), BWF_VERSION ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.TextDomainMismatch
 
 		return false;
 	}
@@ -423,17 +427,17 @@ function bwf_schedule_single_action( $timestamp, $hook, $args = array(), $group 
  */
 function bwf_schedule_recurring_action( $timestamp, $interval_in_seconds, $hook, $args = array(), $group = '' ) {
 	if ( ! class_exists( 'BWF_AS_Actions_Crud' ) ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Method is called before plugins_loaded hook.', 'woofunnels' ), BWF_VERSION );
+		_doing_it_wrong( __FUNCTION__, __( 'Method is called before plugins_loaded hook.', 'woofunnels' ), BWF_VERSION ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.TextDomainMismatch
 
 		return false;
 	}
 	if ( ! class_exists( 'ActionScheduler' ) ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Action Scheduler class not found.', 'woofunnels' ), BWF_VERSION );
+		_doing_it_wrong( __FUNCTION__, __( 'Action Scheduler class not found.', 'woofunnels' ), BWF_VERSION ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.TextDomainMismatch
 
 		return false;
 	}
 	if ( empty( $hook ) ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Hook is a required entity.', 'woofunnels' ), BWF_VERSION );
+		_doing_it_wrong( __FUNCTION__, __( 'Hook is a required entity.', 'woofunnels' ), BWF_VERSION ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.TextDomainMismatch
 
 		return false;
 	}
@@ -471,12 +475,12 @@ function bwf_schedule_recurring_action( $timestamp, $interval_in_seconds, $hook,
  */
 function bwf_unschedule_actions( $hook, $args = array(), $group = '' ) {
 	if ( ! class_exists( 'BWF_AS_Actions_Crud' ) ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Method is called before plugins_loaded hook.', 'woofunnels' ), BWF_VERSION );
+		_doing_it_wrong( __FUNCTION__, __( 'Method is called before plugins_loaded hook.', 'woofunnels' ), BWF_VERSION ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.TextDomainMismatch
 
 		return false;
 	}
 	if ( empty( $hook ) ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Hook is a required entity.', 'woofunnels' ), BWF_VERSION );
+		_doing_it_wrong( __FUNCTION__, __( 'Hook is a required entity.', 'woofunnels' ), BWF_VERSION ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.TextDomainMismatch
 
 		return false;
 	}
@@ -492,7 +496,7 @@ function bwf_unschedule_actions( $hook, $args = array(), $group = '' ) {
 
 	$action_ids = BWF_AS_Actions_Crud::find_actions( $arr );
 	if ( false === $action_ids ) {
-		_doing_it_wrong( __FUNCTION__, __( 'No actions found for data: ', 'woofunnels' ) . print_r( $arr, true ), BWF_VERSION );
+		_doing_it_wrong( __FUNCTION__, __( 'No actions found for data: ', 'woofunnels' ) . print_r( $arr, true ), BWF_VERSION ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.TextDomainMismatch
 	}
 
 	BWF_AS_Actions_Crud::delete_actions( $action_ids );
@@ -511,7 +515,7 @@ function bwf_unschedule_actions( $hook, $args = array(), $group = '' ) {
  */
 function bwf_has_action_scheduled( $hook, $args = array(), $group = '' ) {
 	if ( empty( $hook ) ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Hook is a required entity.', 'woofunnels' ), BWF_VERSION );
+		_doing_it_wrong( __FUNCTION__, __( 'Hook is a required entity.', 'woofunnels' ), BWF_VERSION ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.TextDomainMismatch
 
 		return false;
 	}
@@ -537,7 +541,8 @@ function bwf_has_action_scheduled( $hook, $args = array(), $group = '' ) {
 
 	$sql = $wpdb->prepare( $sql, $sql_params ); //phpcs:ignore WordPress.DB.PreparedSQL
 
-	$action_ids = $wpdb->get_var( $sql ); //phpcs:ignore WordPress.DB.PreparedSQL
+
+	$action_ids = $wpdb->get_var( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 	return ( intval( $action_ids ) > 0 );
 }
@@ -553,12 +558,12 @@ function bwf_has_action_scheduled( $hook, $args = array(), $group = '' ) {
  */
 function bwf_is_action_running( $hook, $args = array(), $group = '' ) {
 	if ( ! class_exists( 'BWF_AS_Actions_Crud' ) ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Method is called before plugins_loaded hook.', 'woofunnels' ), BWF_VERSION );
+		_doing_it_wrong( __FUNCTION__, __( 'Method is called before plugins_loaded hook.', 'woofunnels' ), BWF_VERSION ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.TextDomainMismatch
 
 		return false;
 	}
 	if ( empty( $hook ) ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Hook is a required entity.', 'woofunnels' ), BWF_VERSION );
+		_doing_it_wrong( __FUNCTION__, __( 'Hook is a required entity.', 'woofunnels' ), BWF_VERSION ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.TextDomainMismatch
 
 		return false;
 	}
@@ -590,12 +595,12 @@ function bwf_is_action_running( $hook, $args = array(), $group = '' ) {
  */
 function bwf_delete_action( $action_ids = [] ) {
 	if ( ! class_exists( 'BWF_AS_Actions_Crud' ) ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Method is called before plugins_loaded hook.', 'woofunnels' ), BWF_VERSION );
+		_doing_it_wrong( __FUNCTION__, __( 'Method is called before plugins_loaded hook.', 'woofunnels' ), BWF_VERSION ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.TextDomainMismatch
 
 		return false;
 	}
 	if ( empty( $action_ids ) ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Action ID is required.', 'woofunnels' ), BWF_VERSION );
+		_doing_it_wrong( __FUNCTION__, __( 'Action ID is required.', 'woofunnels' ), BWF_VERSION ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.TextDomainMismatch
 
 		return false;
 	}
@@ -621,12 +626,12 @@ function bwf_delete_action( $action_ids = [] ) {
  */
 function bwf_scheduled_action_count( $hook, $args = array(), $group = '', $status = '0', $recurring = 'all' ) {
 	if ( ! class_exists( 'BWF_AS_Actions_Crud' ) ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Method is called before plugins_loaded hook.', 'woofunnels' ), BWF_VERSION );
+		_doing_it_wrong( __FUNCTION__, __( 'Method is called before plugins_loaded hook.', 'woofunnels' ), BWF_VERSION ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.TextDomainMismatch
 
 		return false;
 	}
 	if ( empty( $hook ) ) {
-		_doing_it_wrong( __FUNCTION__, __( 'Hook is a required entity.', 'woofunnels' ), BWF_VERSION );
+		_doing_it_wrong( __FUNCTION__, __( 'Hook is a required entity.', 'woofunnels' ), BWF_VERSION ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.TextDomainMismatch
 
 		return false;
 	}
@@ -676,5 +681,5 @@ function bwf_delete_scheduled_recurring_action( $hook, $status, $exclude_id = ''
 		$args[] = $exclude_id;
 	}
 	$query = $wpdb->prepare( $query, $args );
-	$wpdb->query( $query );
+	$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 }

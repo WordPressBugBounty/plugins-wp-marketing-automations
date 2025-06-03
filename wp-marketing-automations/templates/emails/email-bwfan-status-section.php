@@ -21,14 +21,14 @@ defined( 'ABSPATH' ) || exit;
                             style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px;">
                         <td
                                 style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; font-size: 0px; border-collapse: separate; padding: 16px; mso-padding-alt: 16px;">
-                            <!--[if mso | IE]><table cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:separate" role="presentation"><tbody><tr><![endif]--><!--[if mso | IE]><td style="width: 470px;vertical-align: middle;border-radius: 8px 0px 0px 8px;background-color:<?php echo $background_color; ?> ;" valign="middle"><![endif]-->
+                            <!--[if mso | IE]><table cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:separate" role="presentation"><tbody><tr><![endif]--><!--[if mso | IE]><td style="width: 470px;vertical-align: middle;border-radius: 8px 0px 0px 8px;background-color:<?php echo esc_html( $background_color ); ?> ;" valign="middle"><![endif]-->
                             <div class="bwf-email-inner-column-wrapper bwf-email-inner-column-wrapper-083019f"
-                                 style="font-size: 0px; border-collapse: separate; display: table-cell; vertical-align: middle; border-radius: 8px 0px 0px 8px; background-color: <?php echo $background_color; ?>; mso-border-alt: none; width: 470px;">
+                                 style="font-size: 0px; border-collapse: separate; display: table-cell; vertical-align: middle; border-radius: 8px 0px 0px 8px; background-color: <?php echo esc_html( $background_color ); ?>; mso-border-alt: none; width: 470px;">
                                 <table cellpadding="0" cellspacing="0" border="0"
-                                       style="border-spacing: 0px; border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: <?php echo $background_color; ?>; border-radius: 8px 0px 0px 8px; width: 100%;"
+                                       style="border-spacing: 0px; border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: <?php echo esc_html( $background_color ); ?>; border-radius: 8px 0px 0px 8px; width: 100%;"
                                        role="presentation"
                                        class="bwf-email-inner-column bwf-email-inner-column-083019f" width="100%"
-                                       bgcolor="<?php echo $background_color; ?>">
+                                       bgcolor="<?php echo esc_html( $background_color ); ?>">
                                     <tbody>
                                     <tr
                                             style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px;">
@@ -51,7 +51,7 @@ defined( 'ABSPATH' ) || exit;
                                                                                         class="has-inline-color"><span
                                                                                             style="mso-line-height-alt: 130%; font-size: 14px;"
                                                                                             class="has-font-size">
-                                                                                        <?php echo $content; ?>
+                                                                                        <?php echo $content; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                                                                                     </span></span>
                                                             </p>
                                                         </div>
@@ -80,14 +80,14 @@ defined( 'ABSPATH' ) || exit;
                                     </tbody>
                                 </table>
                             </div>
-                            <!--[if mso | IE]></td><![endif]--><!--[if mso | IE]><td style="width: 169.01408450704227px;vertical-align: middle;border-radius: 0px 8px 8px 0px; background-color:<?php echo $background_color; ?> ;" valign="middle"><![endif]-->
+                            <!--[if mso | IE]></td><![endif]--><!--[if mso | IE]><td style="width: 169.01408450704227px;vertical-align: middle;border-radius: 0px 8px 8px 0px; background-color:<?php echo esc_html($background_color); ?> ;" valign="middle"><![endif]-->
                             <div class="bwf-email-inner-column-wrapper bwf-email-inner-column-wrapper-4f8575e"
-                                 style="font-size: 0px; border-collapse: separate; display: table-cell; vertical-align: middle; border-radius: 0px 8px 8px 0px; background-color: <?php echo $background_color; ?>; mso-border-alt: none; width: 169.01408450704227px;">
+                                 style="font-size: 0px; border-collapse: separate; display: table-cell; vertical-align: middle; border-radius: 0px 8px 8px 0px; background-color: <?php echo esc_html( $background_color ); ?>; mso-border-alt: none; width: 169.01408450704227px;">
                                 <table cellpadding="0" cellspacing="0" border="0"
-                                       style="border-spacing: 0px; border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: <?php echo $background_color; ?>; border-radius: 0px 8px 8px 0px; width: 100%;"
+                                       style="border-spacing: 0px; border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: <?php echo esc_html( $background_color ); ?>; border-radius: 0px 8px 8px 0px; width: 100%;"
                                        role="presentation"
                                        class="bwf-email-inner-column bwf-email-inner-column-4f8575e" width="100%"
-                                       bgcolor="<?php echo $background_color; ?>">
+                                       bgcolor="<?php echo esc_html($background_color); ?>">
                                     <tbody>
                                     <tr
                                             style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px;">
@@ -112,14 +112,14 @@ defined( 'ABSPATH' ) || exit;
                                                             <tr
                                                                     style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px;">
                                                                 <td class="bwfbe-btn-text-wrap"
-                                                                    style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; font-size: 16px; cursor: auto; border-style: none; background-color: <?php echo $button_color; ?>; font-size: 13px; border-radius: 8px 8px 8px 8px; mso-padding-alt: 10px 20px; mso-padding-alt: 8px 16px 8px 16px; text-align: center; line-height: 1.5;"
-                                                                    bgcolor="<?php echo $button_color; ?>"
+                                                                    style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; font-size: 16px; cursor: auto; border-style: none; background-color: <?php echo esc_html( $button_color ); ?>; font-size: 13px; border-radius: 8px 8px 8px 8px; mso-padding-alt: 10px 20px; mso-padding-alt: 8px 16px 8px 16px; text-align: center; line-height: 1.5;"
+                                                                    bgcolor="<?php echo esc_html( $button_color ); ?>"
                                                                     align="center">
-                                                                    <a href="<?php echo $link; ?>"
+                                                                    <a href="<?php echo esc_url( $link ); ?>"
                                                                        target="_blank"
                                                                        class="bwfbe-block-btn-content"
-                                                                       style="line-height: 1.5; text-decoration: none; padding: 10px 20px; padding: 8px 16px 8px 16px; mso-padding-alt: 0; background-color: <?php echo $button_color; ?>; font-size: 13px; font-family: arial,helvetica,sans-serif; display: inline-block; text-decoration: none; text-transform: none; color: <?php echo $button_text_color; ?>; border-radius: 8px 8px 8px 8px;">
-                                                                        <strong><?php echo $link_text; ?></strong>
+                                                                       style="line-height: 1.5; text-decoration: none; padding: 10px 20px; padding: 8px 16px 8px 16px; mso-padding-alt: 0; background-color: <?php echo esc_html( $button_color ); ?>; font-size: 13px; font-family: arial,helvetica,sans-serif; display: inline-block; text-decoration: none; text-transform: none; color: <?php echo esc_html( $button_text_color ); ?>; border-radius: 8px 8px 8px 8px;">
+                                                                        <strong><?php echo $link_text; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></strong>
                                                                     </a>
                                                                 </td>
                                                             </tr>

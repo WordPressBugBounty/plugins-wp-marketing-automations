@@ -93,7 +93,7 @@ class BWFAN_Subscribe_Link_Handler {
 
 		$settings = BWFAN_Common::get_global_settings();
 
-		echo isset( $settings['bwfan_confirmation_message'] ) && ! empty( $settings['bwfan_confirmation_message'] ) ? $settings['bwfan_confirmation_message'] : '';
+		echo isset( $settings['bwfan_confirmation_message'] ) && ! empty( $settings['bwfan_confirmation_message'] ) ? $settings['bwfan_confirmation_message'] : ''; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		exit;
 	}
 

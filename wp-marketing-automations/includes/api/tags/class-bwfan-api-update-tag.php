@@ -46,7 +46,8 @@ class BWFAN_API_Update_Tag extends BWFAN_API_Base {
 		$already_exists = BWFCRM_Tag::get_terms( BWFCRM_Term_Type::$TAG, [], $tag_name, 0, 0, ARRAY_A, 'exact' );
 		if ( ! empty( $already_exists ) ) {
 			$this->response_code = 404;
-			$response            = __( "Tag already exists with name: " . $tag_name, 'wp-marketing-automations' );
+			/* translators: 1: Tag name */
+			$response = sprintf( __( 'Tag already exists with name: %1$s', 'wp-marketing-automations' ), $tag_name );
 
 			return $this->error_response( $response );
 		}
@@ -55,7 +56,8 @@ class BWFAN_API_Update_Tag extends BWFAN_API_Base {
 		$check_tag = BWFCRM_Tag::get_terms( BWFCRM_Term_Type::$TAG, array( $tag_id ) );
 		if ( empty( $check_tag ) ) {
 			$this->response_code = 404;
-			$response            = __( "Tag doesn't exists with ID:" . $tag_id, 'wp-marketing-automations' );
+			/* translators: 1: Tag ID */
+			$response = sprintf( __( 'Tag doesn\'t exists with ID: %1$d', 'wp-marketing-automations' ), $tag_id );
 
 			return $this->error_response( $response );
 		}
@@ -78,7 +80,7 @@ class BWFAN_API_Update_Tag extends BWFAN_API_Base {
 
 		$update_tag = BWFAN_Model_Terms::update( $data, $where );
 		if ( 0 === $update_tag ) {
-			$response            = __( 'Unable to update tag with tag id ' . $tag_id, 'wp-marketing-automations' );
+			$response            = __( 'Unable to update tag with tag id ', 'wp-marketing-automations' ) . $tag_id;
 			$this->response_code = 400;
 
 			return $this->error_response( $response );

@@ -92,7 +92,8 @@ class BWFAN_Contact_Password_Setup_Link extends BWFAN_Merge_Tag {
 		}
 		/** Check if WooCommerce is active then redirect to my account page */
 		if ( bwfan_is_woocommerce_active() ) {
-			$lost_password_url = wc_get_account_endpoint_url( 'lost-password' );
+			$lost_password_url = 'publish' === get_post_status( wc_get_page_id( 'myaccount' ) ) ? wc_get_account_endpoint_url( 'lost-password' ) : '';
+
 			if ( ! empty( $lost_password_url ) ) {
 				return add_query_arg( array(
 					'action' => 'rp',
@@ -115,7 +116,48 @@ class BWFAN_Contact_Password_Setup_Link extends BWFAN_Merge_Tag {
 	 * @return string
 	 */
 	public function get_dummy_preview() {
-		return home_url();
+		$get_data = BWFAN_Merge_Tag_Loader::get_data();
+		/**  Check user ID  */
+		$user_id = self::get_preview_user_id( $get_data );
+		if ( empty( $user_id ) ) {
+			return home_url();
+		}
+		$link = $this->get_reset_link( $user_id );
+
+		return ! empty( $link ) ? $link : home_url();
+	}
+
+	/**
+	 * Retrieve the preview user ID based on provided data or current user session.
+	 *
+	 * @param array $get_data An array of data that may include 'contact_id' or 'test_email'.
+	 *
+	 * @return int|null The WordPress user ID if found, or null if no valid user ID is retrievable.
+	 */
+	public static function get_preview_user_id( $get_data ) {
+		/** if contact id is available */
+		if ( ! empty( $get_data['contact_id'] ) ) {
+			$contact = new WooFunnels_Contact( '', '', '', $get_data['contact_id'] );
+			if ( $contact->get_id() > 0 && $contact->get_wpid() > 0 ) {
+				return $contact->get_wpid();
+			}
+		}
+
+		/** if test email is available */
+		if ( ! empty( $get_data['test_email'] ) && is_email( $get_data['test_email'] ) ) {
+			$contact = new WooFunnels_Contact( '', $get_data['test_email'] );
+			if ( $contact->get_id() > 0 && $contact->get_wpid() > 0 ) {
+				return $contact->get_wpid();
+			}
+		}
+
+		/** if user is logged in */
+		$user = wp_get_current_user();
+		if ( $user instanceof WP_User && $user->ID > 0 ) {
+			return $user->ID;
+		}
+
+		return null;
 	}
 }
 

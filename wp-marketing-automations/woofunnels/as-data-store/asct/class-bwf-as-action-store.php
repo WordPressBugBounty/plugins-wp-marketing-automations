@@ -14,7 +14,7 @@ if ( ! class_exists( 'BWF_AS_Action_Store' ) ) {
 			$this->p_key        = BWF_AS_Actions_Crud::$primary_key;
 		}
 
-		public function save_action( ActionScheduler_Action $action, DateTime $date = null ) {
+		public function save_action( ActionScheduler_Action $action, ?DateTime $date = null ) {
 			/** Not scheduling any new action while processing our requests */
 		}
 
@@ -36,7 +36,7 @@ if ( ! class_exists( 'BWF_AS_Action_Store' ) ) {
 			 */
 			if ( true === BWF_AS::is_execution_started() ) {
 				/** Changing status to running i.e. 1 on action */
-				$wpdb->update( $this->action_table, [ 'status' => 1 ], [ $this->p_key => $action_id ], [ '%s' ], [ '%d' ] );
+				$wpdb->update( $this->action_table, [ 'status' => 1 ], [ $this->p_key => $action_id ], [ '%s' ], [ '%d' ] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			}
 
 			$data = $this->get_action_data( $action_id );
@@ -115,7 +115,7 @@ if ( ! class_exists( 'BWF_AS_Action_Store' ) ) {
 				$this->log( __FUNCTION__ . ' id ' . $action_id . ', recurring action already running count: ' . $count );
 
 				/** Changing status to failed i.e. 2 on action */
-				$wpdb->update( $this->action_table, [ 'status' => 2 ], [ $this->p_key => $action_id ], [ '%s' ], [ '%d' ] );
+				$wpdb->update( $this->action_table, [ 'status' => 2 ], [ $this->p_key => $action_id ], [ '%s' ], [ '%d' ] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 				/** Modify action object cache data status */
 				if ( isset( $this->bwf_action_data[ $action_id ] ) ) {
@@ -241,7 +241,7 @@ if ( ! class_exists( 'BWF_AS_Action_Store' ) ) {
 			/** Code will through in case of pending status i.e. 0 */
 			$sql = $this->get_query_actions_sql( $query, $query_type );
 
-			$value = ( 'count' === $query_type ) ? $wpdb->get_var( $sql ) : $wpdb->get_col( $sql ); //phpcs:ignore WordPress.DB.PreparedSQL
+			$value = ( 'count' === $query_type ) ? $wpdb->get_var( $sql ) : $wpdb->get_col( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 			if ( empty( $value ) ) {
 				return array();
 			}
@@ -265,7 +265,7 @@ if ( ! class_exists( 'BWF_AS_Action_Store' ) ) {
 		 */
 		protected function get_query_actions_sql( array $query, $select_or_count = 'select' ) {
 			if ( ! in_array( $select_or_count, array( 'select', 'count' ), true ) ) {
-				throw new InvalidArgumentException( __( 'Invalid value for select or count parameter. Cannot query actions.', 'action-scheduler' ) );
+				throw new InvalidArgumentException( esc_html__( 'Invalid value for select or count parameter. Cannot query actions.', 'action-scheduler' ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			}
 
 			$query = wp_parse_args( $query, [
@@ -428,7 +428,7 @@ if ( ! class_exists( 'BWF_AS_Action_Store' ) ) {
 
 			$record = BWF_AS_Actions_Crud::get_single_action( $action_id );
 			if ( empty( $record ) ) {
-				throw new InvalidArgumentException( sprintf( __( 'Unidentified action %s', 'action-scheduler' ), $action_id ) );
+				throw new InvalidArgumentException( esc_html( sprintf( __( 'Unidentified action %s', 'action-scheduler' ), $action_id ) ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch, WordPress.WP.I18n.MissingTranslatorsComment
 			}
 			if ( $this->verify_status( $record->status ) ) {
 				return as_get_datetime_object( $record->e_time );
@@ -441,7 +441,7 @@ if ( ! class_exists( 'BWF_AS_Action_Store' ) ) {
 		 *
 		 * @return ActionScheduler_ActionClaim
 		 */
-		public function stake_claim( $max_actions = 10, DateTime $before_date = null, $hooks = array(), $group = '' ) {
+		public function stake_claim( $max_actions = 10, ?DateTime $before_date = null, $hooks = array(), $group = '' ) {
 			$claim_id = $this->generate_claim_id();
 			$this->log( __FUNCTION__ . ' claim id: ' . $claim_id );
 			$this->claim_actions( $claim_id, $max_actions, $before_date, $hooks, $group );
@@ -459,6 +459,7 @@ if ( ! class_exists( 'BWF_AS_Action_Store' ) ) {
 
 			global $wpdb;
 			$now = as_get_datetime_object();
+			//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->insert( $this->claim_table, [
 				'date' => $now->format( 'Y-m-d H:i:s' ),
 			] );
@@ -477,7 +478,7 @@ if ( ! class_exists( 'BWF_AS_Action_Store' ) ) {
 		 * @throws RuntimeException
 		 *
 		 */
-		protected function claim_actions( $claim_id, $limit, DateTime $before_date = null, $hooks = array(), $group = '' ) {
+		protected function claim_actions( $claim_id, $limit, ?DateTime $before_date = null, $hooks = array(), $group = '' ) {
 			global $wpdb;
 
 			/** can't use $wpdb->update() because of the <= condition */
@@ -497,7 +498,7 @@ if ( ! class_exists( 'BWF_AS_Action_Store' ) ) {
 
 			$sql = $wpdb->prepare( "{$update} {$where} {$order}", $params ); //phpcs:ignore WordPress.DB.PreparedSQL
 
-			$action_ids = $wpdb->get_results( $sql, ARRAY_A ); //phpcs:ignore WordPress.DB.PreparedSQL
+			$action_ids = $wpdb->get_results( $sql, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 			if ( ! is_array( $action_ids ) || count( $action_ids ) == 0 ) {
 				return 0;
@@ -511,11 +512,11 @@ if ( ! class_exists( 'BWF_AS_Action_Store' ) ) {
 			$query  = "UPDATE {$this->action_table} SET `claim_id` = %d WHERE {$this->p_key} IN ({$format})";
 			$params = array( $claim_id );
 			$params = array_merge( $params, $action_ids );
-			$sql    = $wpdb->prepare( $query, $params ); //phpcs:ignore WordPress.DB.PreparedSQL
+			$sql    = $wpdb->prepare( $query, $params ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
-			$rows_affected = $wpdb->query( $sql ); //phpcs:ignore WordPress.DB.PreparedSQL
+			$rows_affected = $wpdb->query( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 			if ( $rows_affected === false ) {
-				throw new RuntimeException( __( 'Unable to claim actions. Database error.', 'action-scheduler' ) );
+				throw new RuntimeException( esc_html__( 'Unable to claim actions. Database error.', 'action-scheduler' ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			}
 
 			return (int) $rows_affected;
@@ -540,7 +541,7 @@ if ( ! class_exists( 'BWF_AS_Action_Store' ) ) {
 
 			$sql        = "SELECT `{$this->p_key}` FROM {$this->action_table} WHERE claim_id=%d ORDER BY e_time ASC";
 			$sql        = $wpdb->prepare( $sql, $claim_id ); //phpcs:ignore WordPress.DB.PreparedSQL
-			$action_ids = $wpdb->get_col( $sql ); //phpcs:ignore WordPress.DB.PreparedSQL
+			$action_ids = $wpdb->get_col( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 			$return = array_map( 'intval', $action_ids );
 			wp_cache_set( $cache_key, $return, __CLASS__, ( HOUR_IN_SECONDS / 4 ) );
@@ -561,7 +562,7 @@ if ( ! class_exists( 'BWF_AS_Action_Store' ) ) {
 			/** status 0 have actions which are executable */
 			$sql = "SELECT COUNT(DISTINCT claim_id) FROM {$this->action_table} WHERE claim_id != 0 AND status = 0";
 
-			return (int) $wpdb->get_var( $sql ); //phpcs:ignore WordPress.DB.PreparedSQL
+			return (int) $wpdb->get_var( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 		}
 
 		/**
@@ -588,9 +589,9 @@ if ( ! class_exists( 'BWF_AS_Action_Store' ) ) {
 			$this->log( __FUNCTION__ . ' id ' . $claim->get_id() );
 
 			global $wpdb;
-			$wpdb->update( $this->action_table, [ 'claim_id' => 0 ], [ 'claim_id' => $claim->get_id() ], [ '%d' ], [ '%d' ] );
+			$wpdb->update( $this->action_table, [ 'claim_id' => 0 ], [ 'claim_id' => $claim->get_id() ], [ '%d' ], [ '%d' ] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
-			$wpdb->delete( $this->claim_table, [ 'id' => $claim->get_id() ], [ '%d' ] );
+			$wpdb->delete( $this->claim_table, [ 'id' => $claim->get_id() ], [ '%d' ] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -606,7 +607,7 @@ if ( ! class_exists( 'BWF_AS_Action_Store' ) ) {
 			$this->log( __FUNCTION__ . ' id ' . $action_id );
 
 			global $wpdb;
-			$wpdb->update( $this->action_table, [ 'claim_id' => 0 ], [ $this->p_key => $action_id ], [ '%s' ], [ '%d' ] );
+			$wpdb->update( $this->action_table, [ 'claim_id' => 0 ], [ $this->p_key => $action_id ], [ '%s' ], [ '%d' ] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -673,7 +674,7 @@ if ( ! class_exists( 'BWF_AS_Action_Store' ) ) {
 
 			$status = BWF_AS_Actions_Crud::get_action_status( $action_id );
 			if ( null === $status ) {
-				throw new InvalidArgumentException( __( 'Invalid action ID. No status found.', 'action-scheduler' ) );
+				throw new InvalidArgumentException( esc_html__( 'Invalid action ID. No status found.', 'action-scheduler' ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			} else {
 				return $this->get_as_defined_status_val( $status );
 			}

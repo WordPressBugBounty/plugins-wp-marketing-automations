@@ -60,20 +60,20 @@ if ( ! class_exists( 'BWF_Model_Contact_Fields' ) && BWFAN_Common::is_pro_3_0() 
 		static function insert( $data ) {
 			global $wpdb;
 
-			$wpdb->insert( self::_table(), $data );
+			$wpdb->insert( self::_table(), $data ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		static function update( $data, $where ) {
 			global $wpdb;
 
-			return $wpdb->update( self::_table(), $data, $where );
+			return $wpdb->update( self::_table(), $data, $where ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		public static function get_contact_field_by_id( $contact_id ) {
 			global $wpdb;
 			$table = self::_table();
 			$query = "SELECT * from $table where cid = $contact_id LIMIT 0, 1";
-			$field = $wpdb->get_row( $query, ARRAY_A );
+			$field = $wpdb->get_row( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			return ! empty( $field ) ? $field : '';
 		}
@@ -84,7 +84,7 @@ if ( ! class_exists( 'BWF_Model_Contact_Fields' ) && BWFAN_Common::is_pro_3_0() 
 			$column = "f{$field_id}";
 			$query  = "SHOW COLUMNS FROM {$table} LIKE '" . esc_sql( $column ) . "'";
 
-			return $wpdb->get_row( $query, ARRAY_A );
+			return $wpdb->get_row( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		public static function add_column_field( $field_id, $searchable = 2 ) {
@@ -111,7 +111,7 @@ if ( ! class_exists( 'BWF_Model_Contact_Fields' ) && BWFAN_Common::is_pro_3_0() 
 			}
 
 			$query = "ALTER TABLE $table ADD $column $data_type{$length} $unsigned DEFAULT NULL $indexing";
-			$wpdb->query( $query );
+			$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			return empty( $wpdb->last_error ) ? true : $wpdb->last_error;
 		}
@@ -123,7 +123,7 @@ if ( ! class_exists( 'BWF_Model_Contact_Fields' ) && BWFAN_Common::is_pro_3_0() 
 
 			if ( ! empty( self::column_already_exists( $field_id ) ) ) {
 				$query = "ALTER TABLE $table DROP COLUMN $column";
-				$wpdb->query( $query );
+				$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			}
 		}
 
@@ -133,7 +133,7 @@ if ( ! class_exists( 'BWF_Model_Contact_Fields' ) && BWFAN_Common::is_pro_3_0() 
 
 			$query = "SELECT * FROM $table WHERE cid = $contact_id LIMIT 0, 1";
 
-			return $wpdb->get_row( $query, ARRAY_A );
+			return $wpdb->get_row( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		public static function update_contact_field_column_indexing( $field_id, $searchable = 1 ) {
@@ -156,9 +156,53 @@ if ( ! class_exists( 'BWF_Model_Contact_Fields' ) && BWFAN_Common::is_pro_3_0() 
 			}
 
 			$query = "ALTER TABLE $table $indexing";
-			$wpdb->query( $query );
+			$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			return empty( $wpdb->last_error ) ? true : false;
+		}
+
+
+		/**
+		 * Insert query with Ignore
+		 *
+		 * @param $data
+		 * @param $format
+		 *
+		 * @return bool|int|mysqli_result|null
+		 */
+		static function insert_ignore( $data, $format = null ) {
+			if ( ! is_array( $data ) || empty( $data ) ) {
+				return false;
+			}
+
+			$columns      = array_keys( $data );
+			$placeholders = is_null( $format ) ? array_fill( 0, count( $data ), '%s' ) : $format;
+			$table        = self::_table();
+			global $wpdb;
+
+			$sql = "INSERT IGNORE INTO `$table` (`" . implode( '`,`', $columns ) . "`) VALUES (" . implode( ',', $placeholders ) . ")";
+
+			//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$result = $wpdb->query( $wpdb->prepare( $sql, array_values( $data ) ) );
+			if ( ! empty( $result ) ) {
+				return $result;
+			}
+
+			/** If duplicate entry DB error come */
+			if ( 0 === $result ) {
+				$warnings = $wpdb->get_results( "SHOW WARNINGS", ARRAY_A );//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				if ( ! empty( $warnings ) ) {
+					foreach ( $warnings as $warning ) {
+						if ( empty( $warning['Message'] ) || false === strpos( $warning['message'], 'Duplicate entry' ) ) {
+							continue;
+						}
+						BWFAN_Common::log_test_data( 'WP db error in ' . $table . ' : ' . $warning['message'], 'fka-db-duplicate-error', true );
+						BWFAN_Common::log_test_data( $data, 'fka-db-duplicate-error', true );
+					}
+				}
+			}
+
+			return false;
 		}
 	}
 }

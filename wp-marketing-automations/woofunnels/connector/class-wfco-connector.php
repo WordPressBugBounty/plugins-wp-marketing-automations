@@ -175,10 +175,10 @@ if ( ! class_exists( 'BWF_CO' ) ) {
 
 		public function get_connector_messages( $key = 'connector_saved' ) {
 			$messages = array(
-				'connector_saved'            => __( 'Connector saved successfully', 'woofunnels' ),
-				'connector_synced'           => __( 'Connector synced successfully', 'woofunnels' ),
-				'connector_updated'          => __( 'Connector updated successfully', 'woofunnels' ),
-				'connector_settings_missing' => __( 'Connector settings missing', 'woofunnels' ),
+				'connector_saved'            => __( 'Connector saved successfully', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				'connector_synced'           => __( 'Connector synced successfully', 'woofunnels' ),  // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				'connector_updated'          => __( 'Connector updated successfully', 'woofunnels' ),  // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				'connector_settings_missing' => __( 'Connector settings missing', 'woofunnels' ),  // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			);
 
 			return ( isset( $messages[ $key ] ) ) ? $messages[ $key ] : '';
@@ -194,7 +194,7 @@ if ( ! class_exists( 'BWF_CO' ) ) {
 		protected function get_api_data( $data ) {
 			return array(
 				'status'  => 'failed',
-				'message' => __( 'Connector forgot to override the method - get_api_data.', 'woofunnels-core' ),
+				'message' => __( 'Connector forgot to override the method - get_api_data.', 'woofunnels' ),  // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			);
 		}
 

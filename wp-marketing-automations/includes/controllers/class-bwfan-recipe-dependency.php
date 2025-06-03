@@ -45,7 +45,7 @@ class BWFAN_Recipe_Dependency {
 		}
 
 		if ( isset( $version['lite'] ) && version_compare( BWFAN_VERSION, $version['lite'], "<" ) ) {
-			$this->err_msg = sprintf( __( 'FunnelKit Automations version should be greater than or equal to %s.', 'wp-marketing-automations' ), $version['lite'] );
+			$this->err_msg = sprintf( __( 'FunnelKit Automations version should be greater than or equal to %s.', 'wp-marketing-automations' ), $version['lite'] );  // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
 
 			return false;
 		}
@@ -61,7 +61,7 @@ class BWFAN_Recipe_Dependency {
 		}
 
 		if ( isset( $version['pro'] ) && version_compare( BWFAN_PRO_VERSION, $version['pro'], "<" ) ) {
-			$this->err_msg = sprintf( __( 'FunnelKit Automations Pro version should be greater than or equal to %s.', 'wp-marketing-automations' ), $version['pro'] );
+			$this->err_msg = sprintf( __( 'FunnelKit Automations Pro version should be greater than or equal to %s.', 'wp-marketing-automations' ), $version['pro'] );  // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
 
 			return false;
 		}

@@ -109,7 +109,7 @@ if ( ! class_exists( 'BWF_AS' ) ) {
 		 * @return bool
 		 */
 		public function memory_exceeded() {
-			$memory_limit   = $this->get_memory_limit() * 0.75;
+			$memory_limit   = $this->get_memory_limit() * 0.9;
 			$current_memory = memory_get_usage( true );
 
 			return ( $current_memory >= $memory_limit );

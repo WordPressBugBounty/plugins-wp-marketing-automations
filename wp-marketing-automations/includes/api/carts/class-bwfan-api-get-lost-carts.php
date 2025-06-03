@@ -65,17 +65,18 @@ class BWFAN_API_Get_Lost_Carts extends BWFAN_API_Base {
 			$diff          = BWFAN_Common::get_difference_string( $diff );
 			$currency_data = BWFAN_Recoverable_Carts::get_currency( $item );
 			$total         = ! is_null( $item->total ) ? $item->total : 0;
-
-			$result[] = [
+			$fee_data      = $this->get_formatted_fee_data( $item->fees );
+			$result[]      = [
 				'id'            => ! is_null( $item->ID ) ? $item->ID : 0,
 				'email'         => ! is_null( $item->email ) ? $item->email : '',
 				'phone'         => $this->get_phone( $item ),
-				'preview'       => $this->get_preview_data( $item ),
+				'preview'       => $this->get_preview_data( $item, $fee_data['total'] ),
 				'date'          => get_date_from_gmt( $item->last_modified ),
 				'created_on'    => get_date_from_gmt( $item->created_time ),
 				'status'        => ! is_null( $item->status ) ? $item->status : '',
 				'diffstring'    => $diff,
 				'items'         => $this->get_items( $item ),
+				'fees'          => ! empty( $fee_data['data'] ) ? $fee_data['data'] : [],
 				'total'         => $total,
 				'currency'      => $currency_data,
 				'buyer_name'    => $this->get_order_name( $item ),
@@ -89,6 +90,39 @@ class BWFAN_API_Get_Lost_Carts extends BWFAN_API_Base {
 		$this->count_data = [];
 
 		return $this->success_response( $result, __( 'Lost carts found', 'wp-marketing-automations' ) );
+	}
+
+	/**
+	 * Get formatted fee data
+	 *
+	 * @param $data
+	 *
+	 * @return array|string
+	 */
+	public function get_formatted_fee_data( $data ) {
+		$fee_data = [
+			'data'  => [],
+			'total' => 0,
+		];
+		$data     = maybe_unserialize( $data );
+		if ( empty( $data ) || ! is_array( $data ) ) {
+			return $fee_data;
+		}
+		foreach ( $data as $fee ) {
+			if ( ! isset( $fee->name ) || empty( $fee->total ) ) {
+				continue;
+			}
+
+			$amount = floatval( $fee->total );
+			if ( ! empty( $fee->tax ) ) {
+				$amount += floatval( $fee->tax );
+			}
+
+			$fee_data['data'][ ! empty( $fee->name ) ? $fee->name : __( 'Fee', 'wp-marketing-automations' ) ] = $amount;
+			$fee_data['total']                                                                                += $amount;
+		}
+
+		return $fee_data;
 	}
 
 	public function get_result_total_count() {
@@ -114,7 +148,7 @@ class BWFAN_API_Get_Lost_Carts extends BWFAN_API_Base {
 		return ( is_array( $checkout_data ) && isset( $checkout_data['fields'] ) && is_array( $checkout_data['fields'] ) && isset( $checkout_data['fields']['billing_phone'] ) && ! empty( $checkout_data['fields']['billing_phone'] ) ) ? $checkout_data['fields']['billing_phone'] : '';
 	}
 
-	public function get_preview_data( $item ) {
+	public function get_preview_data( $item, $fee_total = 0 ) {
 		$data          = array();
 		$billing       = array();
 		$shipping      = array();
@@ -170,7 +204,7 @@ class BWFAN_API_Get_Lost_Carts extends BWFAN_API_Base {
 				}
 			}
 		}
-		$product_total = 0;
+		$product_total = floatval( $fee_total );
 		if ( is_array( $products_data ) ) {
 			$hide_free_products = BWFAN_Common::hide_free_products_cart_order_items();
 			foreach ( $products_data as $product ) {
@@ -244,7 +278,7 @@ class BWFAN_API_Get_Lost_Carts extends BWFAN_API_Base {
 			if ( ! $value['data'] instanceof WC_Product ) {
 				continue;
 			}
-			$names[ $value['data']->get_id() ] = $value['data']->get_name();
+			$names[ $value['data']->get_id() ] = wp_strip_all_tags( $value['data']->get_name() );
 		}
 
 		return $names;
@@ -265,7 +299,7 @@ class BWFAN_API_Get_Lost_Carts extends BWFAN_API_Base {
 
 		if ( $obj->get_billing_first_name() || $obj->get_billing_last_name() ) {
 			/* translators: 1: first name 2: last name */
-			$buyer = trim( sprintf( _x( '%1$s %2$s', 'full name', 'woocommerce' ), $obj->get_billing_first_name(), $obj->get_billing_last_name() ) );
+			$buyer = trim( sprintf( _x( '%1$s %2$s', 'full name', 'woocommerce' ), $obj->get_billing_first_name(), $obj->get_billing_last_name() ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 		} elseif ( $obj->get_billing_company() ) {
 			$buyer = trim( $obj->get_billing_company() );
 		} elseif ( $obj->get_customer_id() ) {

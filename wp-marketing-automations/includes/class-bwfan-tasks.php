@@ -186,7 +186,7 @@ class BWFAN_Tasks {
 				BWFAN_Core()->logger->log( 'Connector settings has been deleted for the task. Task ID - ' . $task_id . ', Automation ID- ' . $task_details['automation_id'], $this->log_type );
 			}
 		} catch ( Error $e ) {
-			throw new Exception( "Error occurred with message {$e->getMessage()} for task id {$task_id}", 1 );
+			throw new Exception( esc_html( "Error occurred with message {$e->getMessage()} for task id {$task_id}" ), 1 );
 		}
 	}
 
@@ -640,7 +640,7 @@ class BWFAN_Tasks {
 
 		$sql_query = "Select meta_value FROM {$wpdb->bwfan_taskmeta} WHERE bwfan_task_id = %d AND meta_key = %s LIMIT 0,1";
 		$sql_query = $wpdb->prepare( $sql_query, $this->task_id, 't_track_id' ); // WPCS: unprepared SQL OK
-		$track_id  = $wpdb->get_var( $sql_query );
+		$track_id  = $wpdb->get_var( $sql_query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		if ( empty( $track_id ) ) {
 			return $restore_url;
@@ -870,7 +870,7 @@ class BWFAN_Tasks {
 		$params[]     = $per_page;
 		$params[]     = $offset;
 		$new_query    = $wpdb->prepare( "{$query_select} {$query_from} {$query_where} {$query_order} {$query_limit}", $params ); //phpcs:ignore WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
-		$active_tasks = $wpdb->get_results( $new_query, ARRAY_A ); // WPCS: unprepared SQL OK
+		$active_tasks = $wpdb->get_results( $new_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( $this->show_filtered_tasks_count ) {
 			$tasks_count  = 0;
 			$query_select = "SELECT COUNT($task_table.ID) as `count`";
@@ -881,7 +881,7 @@ class BWFAN_Tasks {
 			array_pop( $params );
 			array_pop( $params );
 			$new_query   = $wpdb->prepare( "{$query_select} {$query_from} {$query_where} {$query_order}", $params ); //phpcs:ignore WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
-			$count_tasks = $wpdb->get_results( $new_query, ARRAY_A ); // WPCS: unprepared SQL OK
+			$count_tasks = $wpdb->get_results( $new_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( is_array( $count_tasks ) && count( $count_tasks ) > 0 ) {
 				$tasks_count = $count_tasks[0]['count'];
 			}
@@ -1113,14 +1113,14 @@ class BWFAN_Tasks {
 		$params[]     = $limit;
 		$params[]     = $offset;
 		$new_query    = $wpdb->prepare( "{$query_select} {$query_from} {$query_where} {$query_order} {$query_limit}", $params ); //phpcs:ignore WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
-		$active_tasks = $wpdb->get_results( $new_query, ARRAY_A ); // WPCS: unprepared SQL OK
+		$active_tasks = $wpdb->get_results( $new_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( $this->show_filtered_tasks_count ) {
 			$query_select = "SELECT COUNT($task_table.ID) as `count`";
 			array_pop( $params );
 			array_pop( $params );
 			$new_query = $wpdb->prepare( "{$query_select} {$query_from} {$query_where} {$query_order}", $params ); //phpcs:ignore WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
 
-			$count_tasks = $wpdb->get_results( $new_query, ARRAY_A ); // WPCS: unprepared SQL OK
+			$count_tasks = $wpdb->get_results( $new_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( is_array( $count_tasks ) && count( $count_tasks ) > 0 ) {
 				$tasks_count = $count_tasks[0]['count'];
 			}

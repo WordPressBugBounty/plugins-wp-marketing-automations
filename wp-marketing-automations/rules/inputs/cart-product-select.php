@@ -37,10 +37,10 @@ class BWFAN_Input_Cart_Product_Select {
             </tr>
             <tr>
                 <td style="width:32px; vertical-align:top;">
-                    <input type="text" id="<?php echo esc_attr( $field['id'] ); ?>_qty" name="<?php echo $field['name']; //phpcs:ignore WordPress.Security.EscapeOutput ?>[qty]" value="<?php echo isset( $value['qty'] ) ? esc_attr__( sanitize_text_field( $value['qty'] ) ) : 1; ?>"/>
+                    <input type="text" id="<?php echo esc_attr( $field['id'] ); ?>_qty" name="<?php echo $field['name']; //phpcs:ignore WordPress.Security.EscapeOutput ?>[qty]" value="<?php echo isset( $value['qty'] ) ? esc_attr( sanitize_text_field( $value['qty'] ) ) : 1; ?>"/>
                 </td>
                 <td>
-                    <select <?php echo( $data_attr ); //phpcs:ignore WordPress.Security.EscapeOutput ?> id="<?php echo esc_attr( $field['id'] ); ?>" name="<?php echo $field['name']; //phpcs:ignore WordPress.Security.EscapeOutput ?>[products]" class="<?php echo $chosen_class; ?>" data-placeholder="<?php echo( isset( $field['placeholder'] ) ? esc_attr__( sanitize_text_field( $field['placeholder'] ) ) : esc_html( 'Search...', 'wp-marketing-automations' ) ); ?>">
+                    <select <?php echo( $data_attr ); //phpcs:ignore WordPress.Security.EscapeOutput ?> id="<?php echo esc_attr( $field['id'] ); ?>" name="<?php echo $field['name']; //phpcs:ignore WordPress.Security.EscapeOutput ?>[products]" class="<?php echo $chosen_class; ?>" data-placeholder="<?php echo( isset( $field['placeholder'] ) ? esc_attr( sanitize_text_field( $field['placeholder'] ) ) : esc_html__( 'Search...', 'wp-marketing-automations' ) ); ?>">
                         <option value=""><?php esc_html_e( 'Choose Product', 'wp-marketing-automations' ); ?></option>
 						<?php
 						$current     = isset( $value['products'] ) ? $value['products'] : array();

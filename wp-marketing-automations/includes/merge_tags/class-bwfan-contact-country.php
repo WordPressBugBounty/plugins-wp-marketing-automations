@@ -46,7 +46,7 @@ if ( ! bwfan_is_autonami_pro_active() || version_compare( BWFAN_PRO_VERSION, '2.
             <select id="" class="bwfan-input-wrapper bwfan-mb-15 bwfan_tag_select" style="padding-left:10px;" name="format" required>
 				<?php
 				foreach ( $templates as $slug => $name ) {
-					echo '<option value="' . esc_attr__( $slug ) . '">' . esc_html__( $name ) . '</option>';
+					echo '<option value="' . esc_attr( $slug ) . '">' . esc_html( $name ) . '</option>';
 				}
 				?>
             </select>
@@ -63,7 +63,7 @@ if ( ! bwfan_is_autonami_pro_active() || version_compare( BWFAN_PRO_VERSION, '2.
 		public function parse_shortcode( $attr ) {
 			$get_data = BWFAN_Merge_Tag_Loader::get_data();
 			if ( true === $get_data['is_preview'] ) {
-				return $this->parse_shortcode_output( $this->get_dummy_preview(), $attr );
+				return $this->parse_shortcode_output( $this->get_dummy_preview( $attr ), $attr );
 			}
 
 			$format = isset( $attr['format'] ) ? $attr['format'] : 'iso';
@@ -144,9 +144,11 @@ if ( ! bwfan_is_autonami_pro_active() || version_compare( BWFAN_PRO_VERSION, '2.
 		/**
 		 * Show dummy value of the current merge tag.
 		 *
+		 * @param $attr
+		 *
 		 * @return string
 		 */
-		public function get_dummy_preview() {
+		public function get_dummy_preview( $attr ) {
 			$contact = $this->get_contact_data();
 			$country = 'US';
 			/** check for contact instance and the contact id */
@@ -160,7 +162,7 @@ if ( ! bwfan_is_autonami_pro_active() || version_compare( BWFAN_PRO_VERSION, '2.
 			}
 
 			$country = $contact->get_country();
-			$format  = 'iso';
+			$format  = $attr['format'] ?? 'iso';
 
 			return $this->get_country_details( $country, $format );
 		}

@@ -422,16 +422,6 @@ if ( class_exists( 'WooCommerce' ) ) {
 
 class BWFAN_Rule_Country extends BWFAN_Rule_Base {
 
-	public function get_possible_rule_values() {
-		$countries_data = array();
-		/** get countries using get countries data from woofunnels core */
-		if ( function_exists( 'bwf_get_countries_data' ) ) {
-			$countries_data = bwf_get_countries_data();
-		}
-
-		return $countries_data;
-	}
-
 	public function get_condition_input_type() {
 		return 'Chosen_Select';
 	}
@@ -450,6 +440,16 @@ class BWFAN_Rule_Country extends BWFAN_Rule_Base {
 		} );
 
 		return $array;
+	}
+
+	public function get_possible_rule_values() {
+		$countries_data = array();
+		/** get countries using get countries data from woofunnels core */
+		if ( function_exists( 'bwf_get_countries_data' ) ) {
+			$countries_data = bwf_get_countries_data();
+		}
+
+		return $countries_data;
 	}
 
 	public function get_rule_type() {
@@ -493,6 +493,17 @@ class BWFAN_Rule_Country extends BWFAN_Rule_Base {
 		return $this->return_is_match( $result, $rule_data );
 	}
 
+	public function get_objects_country() {
+		if ( ! bwfan_is_woocommerce_active() ) {
+			return false;
+		}
+
+		$order   = BWFAN_Core()->rules->getRulesData( 'wc_order' );
+		$country = BWFAN_WooCommerce_Compatibility::get_billing_country_from_order( $order );
+
+		return empty( $country ) ? false : array( $country );
+	}
+
 	/** v2 Methods: END */
 
 	public function is_match( $rule_data ) {
@@ -517,17 +528,6 @@ class BWFAN_Rule_Country extends BWFAN_Rule_Base {
 		}
 
 		return $this->return_is_match( $result, $rule_data );
-	}
-
-	public function get_objects_country() {
-		if ( ! bwfan_is_woocommerce_active() ) {
-			return false;
-		}
-
-		$order   = BWFAN_Core()->rules->getRulesData( 'wc_order' );
-		$country = BWFAN_WooCommerce_Compatibility::get_billing_country_from_order( $order );
-
-		return empty( $country ) ? false : array( $country );
 	}
 
 	public function ui_view() {
@@ -643,6 +643,9 @@ class BWFAN_Rule_Custom_Field extends BWFAN_Rule_Base {
 		return $this->return_is_match( $result, $rule_data );
 	}
 
+	public function get_possible_value( $key ) {
+		return __return_empty_string();
+	}
 
 	public function is_match( $rule_data ) {
 		$type  = $rule_data['operator'];
@@ -666,10 +669,6 @@ class BWFAN_Rule_Custom_Field extends BWFAN_Rule_Base {
 		}
 
 		return $this->return_is_match( $result, $rule_data );
-	}
-
-	public function get_possible_value( $key ) {
-		return __return_empty_string();
 	}
 
 	public function ui_view() {

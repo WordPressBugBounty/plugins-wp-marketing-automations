@@ -5,7 +5,7 @@ class BWFAN_AS_V2_Action_Store extends ActionScheduler_Store {
 	public function init() {
 	}
 
-	public function save_action( ActionScheduler_Action $action, DateTime $date = null ) {
+	public function save_action( ActionScheduler_Action $action, ?DateTime $date = null ) {
 		/** Not scheduling any new action while processing our requests */
 	}
 
@@ -18,8 +18,7 @@ class BWFAN_AS_V2_Action_Store extends ActionScheduler_Store {
 		$data      = wp_cache_get( $cache_key, __FUNCTION__ );
 
 		if ( false === $data ) {
-			$query = $wpdb->prepare( "SELECT a.*, g.event AS `group` FROM {$wpdb->bwfan_automation_contact} a LEFT JOIN {$wpdb->bwfan_automations} g ON a.aid=g.ID WHERE a.ID=%d", $action_id );
-			$data  = $wpdb->get_row( $query ); // WPCS: unprepared SQL OK
+			$data = $wpdb->get_row( $wpdb->prepare( "SELECT a.*, g.event AS `group` FROM {$wpdb->bwfan_automation_contact} a LEFT JOIN {$wpdb->bwfan_automations} g ON a.aid=g.ID WHERE a.ID=%d", $action_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			wp_cache_set( $cache_key, $data, __FUNCTION__, ( 60 ) );
 		}
 
@@ -110,7 +109,7 @@ class BWFAN_AS_V2_Action_Store extends ActionScheduler_Store {
 		/** Code is not going to this level as when clean function ran we get only top 4 statuses */
 		$sql = $this->get_query_actions_sql( $query, $query_type );
 
-		return ( 'count' === $query_type ) ? $wpdb->get_var( $sql ) : $wpdb->get_col( $sql ); // WPCS: unprepared SQL OK
+		return ( 'count' === $query_type ) ? $wpdb->get_var( $sql ) : $wpdb->get_col( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -123,7 +122,7 @@ class BWFAN_AS_V2_Action_Store extends ActionScheduler_Store {
 	 */
 	protected function get_query_actions_sql( array $query, $select_or_count = 'select' ) {
 		if ( ! in_array( $select_or_count, array( 'select', 'count' ), true ) ) {
-			throw new InvalidArgumentException( __( 'Invalid value for select or count parameter. Cannot query actions.', 'action-scheduler' ) );
+			throw new InvalidArgumentException( esc_html__( 'Invalid value for select or count parameter. Cannot query actions.', 'action-scheduler' ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 		}
 
 		$query = wp_parse_args( $query, [
@@ -265,9 +264,9 @@ class BWFAN_AS_V2_Action_Store extends ActionScheduler_Store {
 	 */
 	protected function get_date_gmt( $action_id ) {
 		global $wpdb;
-		$record = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->bwfan_automation_contact} WHERE ID=%d", $action_id ) );
+		$record = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->bwfan_automation_contact} WHERE ID=%d", $action_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( empty( $record ) ) {
-			throw new InvalidArgumentException( sprintf( __( 'Unidentified action %s', 'action-scheduler' ), $action_id ) );
+			throw new InvalidArgumentException( esc_html( sprintf( __( 'Unidentified action %s', 'action-scheduler' ), $action_id ) ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch, WordPress.WP.I18n.MissingTranslatorsComment
 		}
 		if ( $this->verify_status( $record->status ) ) {
 			return as_get_datetime_object( $record->e_time );
@@ -282,7 +281,7 @@ class BWFAN_AS_V2_Action_Store extends ActionScheduler_Store {
 	 *
 	 * @return ActionScheduler_ActionClaim
 	 */
-	public function stake_claim( $max_actions = 10, DateTime $before_date = null, $hooks = array(), $group = '' ) {
+	public function stake_claim( $max_actions = 10, ?DateTime $before_date = null, $hooks = array(), $group = '' ) {
 		$this->log( __FUNCTION__ );
 		$claim_id = $this->generate_claim_id();
 		$this->claim_actions( $claim_id, $max_actions, $before_date, $hooks, $group );
@@ -300,6 +299,7 @@ class BWFAN_AS_V2_Action_Store extends ActionScheduler_Store {
 	protected function generate_claim_id() {
 		global $wpdb;
 		$now = as_get_datetime_object();
+		//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->insert( $wpdb->bwfan_automation_contact_claim, [
 			'created_at' => $now->format( 'Y-m-d H:i:s' ),
 		] );
@@ -316,7 +316,7 @@ class BWFAN_AS_V2_Action_Store extends ActionScheduler_Store {
 	 *
 	 * @return int The number of actions that were claimed
 	 */
-	protected function claim_actions( $claim_id, $limit, DateTime $before_date = null, $hooks = array(), $group = '' ) {
+	protected function claim_actions( $claim_id, $limit, ?DateTime $before_date = null, $hooks = array(), $group = '' ) {
 		global $wpdb;
 		$this->log( __FUNCTION__ );
 
@@ -331,7 +331,7 @@ class BWFAN_AS_V2_Action_Store extends ActionScheduler_Store {
 		$params[] = $limit;
 
 		$sql       = $wpdb->prepare( "{$update} {$where} {$order}", $params ); //phpcs:ignore WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
-		$claim_ids = $wpdb->get_results( $sql, ARRAY_A ); // WPCS: unprepared SQL OK
+		$claim_ids = $wpdb->get_results( $sql, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$this->log( count( $claim_ids ) . ' ids claimed' );
 		if ( ! is_array( $claim_ids ) || count( $claim_ids ) === 0 ) {
 			return 0;
@@ -346,9 +346,9 @@ class BWFAN_AS_V2_Action_Store extends ActionScheduler_Store {
 		$params = array_merge( $params, $claim_ids );
 		$sql    = $wpdb->prepare( $query, $params ); // WPCS: unprepared SQL OK
 
-		$rows_affected = $wpdb->query( $sql ); // WPCS: unprepared SQL OK
+		$rows_affected = $wpdb->query( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( false === $rows_affected ) {
-			throw new RuntimeException( __( 'Unable to claim actions. Database error.', 'action-scheduler' ) );
+			throw new RuntimeException( esc_html__( 'Unable to claim actions. Database error.', 'action-scheduler' ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 		}
 
 		return (int) $rows_affected;
@@ -376,7 +376,7 @@ class BWFAN_AS_V2_Action_Store extends ActionScheduler_Store {
 		$sql = "SELECT `ID` FROM {$wpdb->bwfan_automation_contact} WHERE `claim_id` = %d ORDER BY `e_time` ASC, `ID` DESC";
 		$sql = $wpdb->prepare( $sql, $claim_id ); // WPCS: unprepared SQL OK
 
-		$action_ids = $wpdb->get_col( $sql ); // WPCS: unprepared SQL OK
+		$action_ids = $wpdb->get_col( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$action_ids = array_map( 'intval', $action_ids );
 
 		$this->log( 'found ' . count( $action_ids ) . ' automation contacts (' . implode( ',', $action_ids ) . ') against claim id ' . $claim_id );
@@ -398,7 +398,7 @@ class BWFAN_AS_V2_Action_Store extends ActionScheduler_Store {
 		/** passing status 1 & 6 as those actions needs to execute */
 		$sql = "SELECT COUNT(DISTINCT claim_id) FROM {$wpdb->bwfan_automation_contact} WHERE claim_id != 0 AND status IN (1, 6)";
 
-		return (int) $wpdb->get_var( $sql ); // WPCS: unprepared SQL OK
+		return (int) $wpdb->get_var( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -416,7 +416,7 @@ class BWFAN_AS_V2_Action_Store extends ActionScheduler_Store {
 		$sql = "SELECT claim_id FROM {$wpdb->bwfan_automation_contact} WHERE ID=%d";
 		$sql = $wpdb->prepare( $sql, $action_id ); // WPCS: unprepared SQL OK
 
-		return (int) $wpdb->get_var( $sql ); // WPCS: unprepared SQL OK
+		return (int) $wpdb->get_var( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -428,12 +428,14 @@ class BWFAN_AS_V2_Action_Store extends ActionScheduler_Store {
 		$this->log( __FUNCTION__ . ' ' . $claim->get_id() );
 
 		global $wpdb;
+		//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->update( $wpdb->bwfan_automation_contact, [
 			'claim_id' => 0,
 		], [
 			'claim_id' => $claim->get_id(),
 		], [ '%d' ], [ '%d' ] );
 
+		//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->delete( $wpdb->bwfan_automation_contact_claim, [
 			'ID' => $claim->get_id(),
 		], [ '%d' ] );
@@ -450,6 +452,7 @@ class BWFAN_AS_V2_Action_Store extends ActionScheduler_Store {
 		$this->log( __FUNCTION__ );
 
 		global $wpdb;
+		//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->update( $wpdb->bwfan_automation_contact, [
 			'claim_id' => 0,
 		], [
@@ -501,9 +504,9 @@ class BWFAN_AS_V2_Action_Store extends ActionScheduler_Store {
 		global $wpdb;
 		$sql    = "SELECT status FROM {$wpdb->bwfan_automation_contact} WHERE ID=%d";
 		$sql    = $wpdb->prepare( $sql, $action_id ); // WPCS: unprepared SQL OK
-		$status = $wpdb->get_var( $sql ); // WPCS: unprepared SQL OK
+		$status = $wpdb->get_var( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( $status === null ) {
-			throw new InvalidArgumentException( __( 'Invalid action ID. No status found.', 'action-scheduler' ) );
+			throw new InvalidArgumentException( esc_html__( 'Invalid action ID. No status found.', 'action-scheduler' ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 		} else {
 			return $this->get_as_defined_status_val( $status );
 		}

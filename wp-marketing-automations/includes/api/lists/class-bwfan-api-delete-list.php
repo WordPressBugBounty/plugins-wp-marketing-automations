@@ -33,13 +33,13 @@ class BWFAN_Api_Delete_List extends BWFAN_API_Base {
 			return $this->error_response( $response );
 		}
 
-		/** @var checking if the provided id is list id or not $data */
-
+		/** checking if the provided id is list id or not $data */
 		$check_list = BWFCRM_Lists::get_terms( BWFCRM_Term_Type::$LIST, array( $list_id ) );
 
 		if ( empty( $check_list ) ) {
 			$this->response_code = 404;
-			$response            = __( "List not exist with ID #" . $list_id, 'wp-marketing-automations' );
+			/* translators: 1: List ID */
+			$response = sprintf( __( 'List not exist with ID #%1$d', 'wp-marketing-automations' ), $list_id );
 
 			return $this->error_response( $response );
 		}
@@ -48,8 +48,8 @@ class BWFAN_Api_Delete_List extends BWFAN_API_Base {
 
 		if ( false === $delete_list ) {
 			$this->response_code = 404;
-
-			$response = __( 'Unable to delete the list with ID #' . $list_id, 'wp-marketing-automations' );
+			/* translators: 1: List ID */
+			$response = sprintf( __( 'Unable to delete the list with ID #%1$d', 'wp-marketing-automations' ), $list_id );
 
 			return $this->error_response( $response );
 		}

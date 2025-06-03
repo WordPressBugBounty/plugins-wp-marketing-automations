@@ -3,14 +3,14 @@
  * Plugin Name: FunnelKit Automations
  * Plugin URI: https://funnelkit.com/wordpress-marketing-automation-autonami/
  * Description: Recover lost revenue with Abandoned Cart Recovery for WooCommerce. Increase retention with Post Purchase Follow-Up Emails. Send beautiful Newsletters.
- * Version: 3.5.3
+ * Version: 3.6.0
  * Author: FunnelKit
  * Author URI: https://funnelkit.com
  * License: GPLv3 or later
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain: wp-marketing-automations
  * Requires at least: 5.0
- * Tested up to: 6.7.2
+ * Tested up to: 6.8.1
  * WooFunnels: true
  *
  * FunnelKit Automations is free software.
@@ -179,12 +179,12 @@ final class BWFAN_Core {
 	 * Defining constants
 	 */
 	public function define_plugin_properties() {
-		define( 'BWFAN_VERSION', '3.5.3' );
-		define( 'BWFAN_MIN_PRO_VERSION', '3.5.1' );
+		define( 'BWFAN_VERSION', '3.6.0' );
+		define( 'BWFAN_MIN_PRO_VERSION', '3.6.0' );
 		define( 'BWFAN_MIN_WC_VERSION', '5.0' );
 		define( 'BWFAN_SLUG', 'bwfan' );
 		define( 'BWFAN_FULL_NAME', 'FunnelKit Automations' );
-		define( 'BWFAN_BWF_VERSION', '1.10.12.53' );
+		define( 'BWFAN_BWF_VERSION', '1.10.12.57' );
 		define( 'BWFAN_PLUGIN_FILE', __FILE__ );
 		define( 'BWFAN_PLUGIN_DIR', __DIR__ );
 		define( 'BWFAN_TEMPLATE_DIR', plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'templates' );
@@ -248,6 +248,9 @@ final class BWFAN_Core {
 		/** Initializing Action Schedule WooFunnels Custom Table */
 		add_action( 'action_scheduler_pre_init', array( $this, 'initiate_as_ct' ), 1 );
 
+		/** Loading API's */
+		add_action( 'rest_api_init', array( $this, 'bwfan_load_apis' ) );
+
 		/** Loading CLI */
 		if ( version_compare( PHP_VERSION, '5.3', '>' ) ) {
 			add_action( 'plugins_loaded', array( $this, 'load_cli' ), 20 );
@@ -296,7 +299,7 @@ final class BWFAN_Core {
         <div class="notice notice-warning" style="display: block!important;">
             <p>
 				<?php
-				echo __( '<strong>Warning! Old version of FunnelKit Automations Pro is detected.</strong> We strongly recommend to update the latest version of FunnelKit Automations Pro.', 'wp-marketing-automations' );
+				echo __( '<strong>Warning! Old version of FunnelKit Automations Pro is detected.</strong> We strongly recommend to update the latest version of FunnelKit Automations Pro.', 'wp-marketing-automations' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				?>
             </p>
         </div>
@@ -326,11 +329,18 @@ final class BWFAN_Core {
 		}
 
 		$this->register_abstract();
+
+		/**
+		 * Loads rule classes
+		 */
+		if ( bwfan_is_autonami_pro_active() ) {
+			require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-rules.php';
+			require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-rules-loader.php';
+		}
+
 		/**
 		 * Loads core classes
 		 */
-		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-rules.php';
-		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-rules-loader.php';
 		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-db.php';
 		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-db-update.php';
 		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-load-integrations.php';
@@ -343,7 +353,6 @@ final class BWFAN_Core {
 		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-tasks.php';
 		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-logs.php';
 		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-logger.php';
-		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-api-loader.php';
 		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-dashboards.php';
 		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-connectors.php';
 		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-load-custom-search.php';
@@ -360,10 +369,15 @@ final class BWFAN_Core {
 		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-dev-get-broadcast-timing.php';
 		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-dev-remove-cfields-duplicate-records.php';
 
-		/** Added export handler */
-		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-exporter-handler.php';
+		/** Load cart helper file */
+		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-recoverable-carts.php';
 
-		/** Load contact related classes */
+		if ( bwfan_is_autonami_pro_active() ) {
+			/** Added export handler */
+			require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-exporter-handler.php';
+		}
+
+		/** Load contact-related classes */
 		if ( BWFAN_Common::is_pro_3_0() ) {
 			require BWFAN_PLUGIN_DIR . '/includes/class-bwfcrm-contacts.php';
 			require BWFAN_PLUGIN_DIR . '/includes/class-bwfcrm-lists.php';
@@ -387,6 +401,28 @@ final class BWFAN_Core {
 
 		// After including class now initialize all class or functions
 		$this->register_classes();
+	}
+
+	/**
+	 * Load all the API classes
+	 *
+	 * @return void
+	 */
+	public function bwfan_load_apis() {
+		$rest_route = isset( $_GET['rest_route'] ) ? $_GET['rest_route'] : ''; // phpcs:ignore
+		if ( empty( $rest_route ) ) {
+			$rest_route = $_SERVER['REQUEST_URI']; // phpcs:ignore
+		}
+		if ( empty( $rest_route ) ) {
+			return;
+		}
+
+		if ( false === strpos( $rest_route, BWFAN_API_NAMESPACE ) ) {
+			return;
+		}
+		require_once BWFAN_PLUGIN_DIR . '/includes/class-bwfan-api-loader.php';
+
+		BWFAN_API_Loader::register_routes();
 	}
 
 	public function load_public() {
@@ -454,15 +490,14 @@ final class BWFAN_Core {
 	 * @param $plugin
 	 */
 	public function redirect_on_activation( $plugin ) {
-		if ( ! defined( 'WP_CLI' ) && bwfan_is_woocommerce_active() && class_exists( 'WooCommerce' ) ) {
-			if ( plugin_basename( __FILE__ ) === $plugin ) {
-
-				wp_safe_redirect( add_query_arg( array(
-					'page' => 'autonami',
-				), admin_url( 'admin.php' ) ) );
-				exit;
-			}
+		if ( defined( 'WP_CLI' ) || ( plugin_basename( __FILE__ ) !== $plugin ) ) {
+			return;
 		}
+
+		wp_safe_redirect( add_query_arg( array(
+			'page' => 'autonami',
+		), admin_url( 'admin.php' ) ) );
+		exit;
 	}
 
 	public function initiate_as_ct() {

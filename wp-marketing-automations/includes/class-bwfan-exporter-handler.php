@@ -95,7 +95,8 @@ class BWFAN_Exporter_Handler {
 			return null;
 		}
 		$exporter_class = $this->_exporter[ $type ] ?? '';
-		$exporter_obj   = class_exists( $exporter_class ) ? ( new $exporter_class ) : null;
+		$exporter_obj   = class_exists( $exporter_class ) ? ( new $exporter_class( $type ) ) : null;
+
 
 		return $exporter_obj instanceof Base ? $exporter_obj : null;
 	}
@@ -123,12 +124,19 @@ class BWFAN_Exporter_Handler {
 	/**
 	 * Start export process
 	 *
-	 * @param $type
-	 * @param $user_id
+	 * @param string $type
+	 * @param string $user_id
+	 * @param array  $extra_data
 	 *
 	 * @return array
 	 */
-	public function bwfan_start_export( $type, $user_id ) {
+	public function bwfan_start_export( $type = '', $user_id = '', $extra_data = [] ) {
+		if( empty( $type ) || empty( $user_id ) || ! bwfan_is_autonami_pro_active() ) {
+			return [
+				'status' => false,
+			];
+		}
+
 		// get export status for user
 		$user_data = get_user_meta( $user_id, 'bwfan_single_export_status', true );
 
@@ -136,11 +144,25 @@ class BWFAN_Exporter_Handler {
 			$user_data = [];
 		}
 
+		$export      = $this->get_exporter_by_type( $type );
 		$export_arr = [
 			'type'      => $type,
 			'user_id'   => $user_id,
-			'export_id' => 0
+			'export_id' => 0,
 		];
+		$export_data = [];
+		if(
+			(defined( 'BWFAN_PRO_VERSION' ) && version_compare( BWFAN_PRO_VERSION, '3.5.3', '>=' )) ||
+			$type === 'automation'
+		) {
+			$export_data = $export->insert_data_in_table( $extra_data );
+			if ( $export_data === 0 ) {
+				return [
+					'status' => false,
+				];
+			}
+			$export_arr['export_id'] = $export_data['id'];
+		}
 
 		// check if already running for user
 		if ( bwf_has_action_scheduled( self::$EXPORTER_HOOK, $export_arr ) ) {
@@ -149,16 +171,15 @@ class BWFAN_Exporter_Handler {
 			];
 		}
 
-		$export = $this->get_exporter_by_type( $type );
-		$export->maybe_insert_data_in_table();
-
 		// schedule export action
 		bwf_schedule_recurring_action( time(), 30, self::$EXPORTER_HOOK, $export_arr, 'woofunnels' );
 
 		// Added export action to user meta data
 		$user_data[ $type ] = [
-			'status' => 1,
-			'msg'    => []
+			'url'       => isset( $export_data['file'] ) ? $export_data['file'] : '',
+			'status'    => 1,
+			'msg'       => [],
+			'export_id' => isset( $export_data['id'] ) ? $export_data['id'] : 0,
 		];
 
 		// Update user meta data for export status
@@ -180,12 +201,17 @@ class BWFAN_Exporter_Handler {
 	public function bwfan_end_export( $type, $user_id ) {
 		// get export status for user
 		$user_data = get_user_meta( $user_id, 'bwfan_single_export_status', true );
-		if ( empty( $user_data ) ) {
-			$user_data = [];
+
+		if ( empty( $user_data ) || ! isset( $user_data[ $type ] ) ) {
+			return [ 'status' => true, 'data' => $user_data ];
 		}
+
+		$export_data = $user_data[ $type ];
+
 		$export_arr = [
-			'type'    => $type,
-			'user_id' => $user_id
+			'type'      => $type,
+			'user_id'   => $user_id,
+			'export_id' => isset($export_data['export_id']) ? $export_data['export_id'] : 0
 		];
 
 		// check if running for user so remove schedule action
@@ -193,13 +219,12 @@ class BWFAN_Exporter_Handler {
 			$this->unschedule_export_action( $export_arr );
 		}
 
-		if ( isset( $user_data[ $type ] ) ) {
-			$export_data = $user_data[ $type ];
-			if ( isset( $export_data['url'] ) && file_exists( $export_data['url'] ) ) {
-				unlink( $export_data['url'] );
-			}
-			unset( $user_data[ $type ] );
+
+		if ( isset( $export_data['url'] ) && is_file( $export_data['url'] ) ) {
+			unlink( $export_data['url'] );
 		}
+
+		unset( $user_data[ $type ] );
 		update_user_meta( $user_id, 'bwfan_single_export_status', $user_data );
 
 		return [ 'status' => true, 'data' => $user_data ];

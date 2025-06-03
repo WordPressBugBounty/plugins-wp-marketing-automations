@@ -50,7 +50,7 @@ class BWFAN_API_Contact_Status_Change extends BWFAN_API_Base {
 			case 'unverify':
 				$result = $contact->unverify();
 				if ( true === $result ) {
-					$message = __( 'Contact unverfied', 'wp-marketing-automations' );
+					$message = __( 'Contact unverified', 'wp-marketing-automations' );
 				}
 				break;
 			case 'bounced':

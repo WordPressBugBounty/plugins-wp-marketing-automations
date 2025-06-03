@@ -12,7 +12,7 @@ class bwfan_Input_Select {
 			'choices'       => array(),
 			'default_value' => '',
 			'class'         => '',
-			'null_text'     => __( '- Select -', '' ),
+			'null_text'     => __( '- Select -', 'wp-marketing-automations' ),
 			'disabled'      => false,
 		);
 	}

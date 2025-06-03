@@ -38,7 +38,9 @@ class BWFAN_API_Delete_Contact_Note extends BWFAN_API_Base {
 		if ( ! $contact instanceof BWFCRM_Contact || 0 === $contact->get_id() ) {
 			$this->response_code = 404;
 
-			return $this->error_response( __( 'No contact found with id #' . $contact_id, 'wp-marketing-automations' ) );
+			/* translators: 1: Contact ID */
+
+			return $this->error_response( sprintf( __( 'No contact found with given id #%1$d', 'wp-marketing-automations' ), $contact_id ) );
 		}
 		$note_id                    = intval( $this->get_sanitized_arg( 'note_id', 'key' ) );
 		$delete_contact_note_result = $contact->delete_notes( $note_id );
@@ -46,7 +48,9 @@ class BWFAN_API_Delete_Contact_Note extends BWFAN_API_Base {
 		if ( ! $delete_contact_note_result ) {
 			$this->response_code = 404;
 
-			return $this->error_response( __( 'Unable to delete the note for contact #' . $contact_id, 'wp-marketing-automations' ) );
+			/* translators: 1: Contact ID */
+
+			return $this->error_response( sprintf( __( 'Unable to delete the note for contact #%1$d', 'wp-marketing-automations' ), $contact_id ) );
 		}
 
 		$this->response_code = 200;

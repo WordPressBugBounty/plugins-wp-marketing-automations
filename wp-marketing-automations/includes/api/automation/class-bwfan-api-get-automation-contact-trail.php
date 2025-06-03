@@ -49,7 +49,7 @@ class BWFAN_API_Get_Automation_Contact_Trail extends BWFAN_API_Base {
 
 		/** Get trail data from DB */
 		$this->trail = BWFAN_Model_Automation_Contact_Trail::get_trail( $tid );
-		$this->trail = $this->maybe_alter_trail( $this->trail );
+		//$this->trail = $this->maybe_alter_trail( $this->trail );
 
 		/** Check for empty data */
 		if ( empty( $this->trail ) || ! is_array( $this->trail ) ) {
@@ -92,22 +92,22 @@ class BWFAN_API_Get_Automation_Contact_Trail extends BWFAN_API_Base {
 
 			/** Set new link data */
 			$trail_data[] = [
-				'id'           => $last_sid . '-' . $data['sid'],
+				'id'           => $last_sid . '-' . $data['sid'] . '-' . $data['ID'],
 				'source'       => $last_sid,
-				'target'       => $data['sid'],
+				'target'       => $data['sid'] . '-' . $data['ID'],
 				'sourceHandle' => '',
 				'animated'     => false,
 			];
 			/** Check if conditional or split node and set last step connecting */
 			switch ( $data['type'] ) {
 				case BWFAN_Automation_Controller::$TYPE_CONDITIONAL:
-					$last_sid = 1 === count( $tdata ) ? $data['sid'] : ( $data['sid'] . '-condi' );
+					$last_sid = 1 === count( $tdata ) ? $data['sid'] : ( $data['sid'] . '-condi-' . $data['ID'] );
 					break;
 				case BWFAN_Automation_Controller::$TYPE_SPLIT:
-					$last_sid = $data['sid'] . '-split';
+					$last_sid = $data['sid'] . '-split-' . $data['ID'];
 					break;
 				default:
-					$last_sid = $data['sid'];
+					$last_sid = $data['sid'] . '-' . $data['ID'];
 					break;
 			}
 		}
@@ -202,10 +202,10 @@ class BWFAN_API_Get_Automation_Contact_Trail extends BWFAN_API_Base {
 			case BWFAN_Automation_Controller::$TYPE_WAIT :
 				$type_data  = isset( $data['step_data'] ) ? json_decode( $data['step_data'], true ) : [];
 				$delay_data = isset( $type_data['sidebarData']['data'] ) ? $type_data['sidebarData']['data'] : [];
-
+				$res_msg    = ( empty( $res_msg ) && isset( $response['error_msg'] ) ) ? $this->get_trail_message( $response['error_msg'] ) : $res_msg;
 				$trail_data = [
 					[
-						'id'   => $data['sid'],
+						'id'   => $data['sid'] . '-' . $data['ID'],
 						'type' => 'wait',
 						'data' => [
 							'value'       => [
@@ -229,7 +229,7 @@ class BWFAN_API_Get_Automation_Contact_Trail extends BWFAN_API_Base {
 				if ( empty( $action_slug ) ) {
 					$trail_data = [
 						[
-							'id'   => $data['sid'],
+							'id'   => $data['sid'] . '-' . $data['ID'],
 							'type' => 'action',
 							'data' => [
 								'selected'    => '',
@@ -250,7 +250,7 @@ class BWFAN_API_Get_Automation_Contact_Trail extends BWFAN_API_Base {
 				if ( ! $action_obj instanceof BWFAN_Action ) {
 					$trail_data = [
 						[
-							'id'   => $data['sid'],
+							'id'   => $data['sid'] . '-' . $data['ID'],
 							'type' => 'action',
 							'data' => [
 								'selected'    => '',
@@ -272,7 +272,7 @@ class BWFAN_API_Get_Automation_Contact_Trail extends BWFAN_API_Base {
 				$action_name      = ! empty( $action_obj ) ? $action_obj->get_name() : '-';
 				$trail_data       = [
 					[
-						'id'   => $data['sid'],
+						'id'   => $data['sid'] . '-' . $data['ID'],
 						'type' => 'action',
 						'data' => [
 							'selected'    => $action_slug,
@@ -293,13 +293,13 @@ class BWFAN_API_Get_Automation_Contact_Trail extends BWFAN_API_Base {
 				$event_obj   = BWFAN_Core()->sources->get_event( $benchmark );
 				$event_name  = ! empty( $event_obj ) ? $event_obj->get_name() : '';
 				$source_slug = ! empty( $event_obj ) ? $event_obj->get_source() : '';
-
-				$source = ! empty( $source_slug ) ? BWFAN_Core()->sources->get_source( $source_slug ) : '';
+				$res_msg     = ( empty( $res_msg ) && isset( $response['error_msg'] ) ) ? $this->get_trail_message( $response['error_msg'] ) : $res_msg;
+				$source      = ! empty( $source_slug ) ? BWFAN_Core()->sources->get_source( $source_slug ) : '';
 				/** Get source name */
 				$source_name = ! empty( $source_slug ) ? $source->get_name() : '-';
 				$trail_data  = [
 					[
-						'id'   => $data['sid'],
+						'id'   => $data['sid'] . '-' . $data['ID'],
 						'type' => 'benchmark',
 						'data' => [
 							'benchmark'   => $benchmark,
@@ -320,7 +320,7 @@ class BWFAN_API_Get_Automation_Contact_Trail extends BWFAN_API_Base {
 				$direction          = isset( $conditional_result['msg'] ) && 1 === absint( $conditional_result['msg'] ) ? 'yes' : 'no';
 				$trail_data         = [
 					[
-						'id'   => $data['sid'],
+						'id'   => $data['sid'] . '-' . $data['ID'],
 						'type' => 'conditional',
 						'data' => [
 							'sidebarValues' => $sidebar_data,
@@ -334,7 +334,7 @@ class BWFAN_API_Get_Automation_Contact_Trail extends BWFAN_API_Base {
 				];
 				if ( 3 !== $status ) {
 					$trail_data[] = [
-						'id'   => $data['sid'] . '-condi',
+						'id'   => $data['sid'] . '-condi-' . $data['ID'],
 						'type' => 'yesNoNode',
 						'data' => [
 							'direction' => $direction,
@@ -343,9 +343,9 @@ class BWFAN_API_Get_Automation_Contact_Trail extends BWFAN_API_Base {
 						]
 					];
 					$trail_data[] = [
-						'id'           => $data['sid'] . '-condi-edge',
-						'source'       => $data['sid'],
-						'target'       => $data['sid'] . '-condi',
+						'id'           => $data['sid'] . '-condi-edge-' . $data['ID'],
+						'source'       => $data['sid'] . '-' . $data['ID'],
+						'target'       => $data['sid'] . '-condi-' . $data['ID'],
 						'sourceHandle' => '',
 						'animated'     => false,
 					];
@@ -355,7 +355,7 @@ class BWFAN_API_Get_Automation_Contact_Trail extends BWFAN_API_Base {
 			case BWFAN_Automation_Controller::$TYPE_EXIT :
 				$trail_data = [
 					[
-						'id'   => $data['sid'],
+						'id'   => $data['sid'] . '-' . $data['ID'],
 						'type' => 'exit',
 						'data' => [
 							'date'        => date( 'Y-m-d H:i:s', $time ),
@@ -369,7 +369,7 @@ class BWFAN_API_Get_Automation_Contact_Trail extends BWFAN_API_Base {
 			case BWFAN_Automation_Controller::$TYPE_JUMP :
 				$trail_data = [
 					[
-						'id'   => $data['sid'],
+						'id'   => $data['sid'] . '-' . $data['ID'],
 						'type' => 'jump',
 						'data' => [
 							'date'        => date( 'Y-m-d H:i:s', $time ),
@@ -388,7 +388,7 @@ class BWFAN_API_Get_Automation_Contact_Trail extends BWFAN_API_Base {
 				$path               = isset( $conditional_result['path'] ) ? $conditional_result['path'] : 0;
 				$trail_data         = [
 					[
-						'id'   => $data['sid'],
+						'id'   => $data['sid'] . '-' . $data['ID'],
 						'type' => 'split',
 						'data' => [
 							'sidebarValues' => $sidebar_data,
@@ -400,7 +400,7 @@ class BWFAN_API_Get_Automation_Contact_Trail extends BWFAN_API_Base {
 						],
 					],
 					[
-						'id'   => $data['sid'] . '-split',
+						'id'   => $data['sid'] . '-split-' . $data['ID'],
 						'type' => 'splitpath',
 						'data' => [
 							'path'   => $path,
@@ -410,8 +410,8 @@ class BWFAN_API_Get_Automation_Contact_Trail extends BWFAN_API_Base {
 					],
 					[
 						'id'           => $data['sid'] . '-split-edge',
-						'source'       => $data['sid'],
-						'target'       => $data['sid'] . '-split',
+						'source'       => $data['sid'] . '-' . $data['ID'],
+						'target'       => $data['sid'] . '-split-' . $data['ID'],
 						'sourceHandle' => '',
 						'animated'     => false,
 					]
@@ -420,7 +420,7 @@ class BWFAN_API_Get_Automation_Contact_Trail extends BWFAN_API_Base {
 			default:
 				$trail_data = [
 					[
-						'id'   => $data['sid'],
+						'id'   => $data['sid'] . '-' . $data['ID'],
 						'type' => 'unknown',
 						'data' => [
 							'date'        => date( 'Y-m-d H:i:s', $time ),

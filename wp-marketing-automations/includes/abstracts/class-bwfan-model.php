@@ -13,7 +13,7 @@ abstract class BWFAN_Model {
 
 		$query = self::_fetch_sql( $value );
 
-		return $wpdb->get_row( $query, ARRAY_A ); // WPCS: unprepared SQL OK
+		return $wpdb->get_row( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.PreparedSQL
 	}
 
 	private static function _fetch_sql( $value ) {
@@ -33,20 +33,20 @@ abstract class BWFAN_Model {
 
 	static function insert( $data ) {
 		global $wpdb;
-		$wpdb->insert( self::_table(), $data );
+		$wpdb->insert( self::_table(), $data ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.PreparedSQL
 	}
 
 	static function update( $data, $where ) {
 		global $wpdb;
 
-		return $wpdb->update( self::_table(), $data, $where );
+		return $wpdb->update( self::_table(), $data, $where ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.PreparedSQL
 	}
 
 	static function delete( $value ) {
 		global $wpdb;
 		$sql = sprintf( 'DELETE FROM %s WHERE %s = %%s', self::_table(), static::$primary_key );
 
-		return $wpdb->query( $wpdb->prepare( $sql, $value ) ); // WPCS: unprepared SQL OK
+		return $wpdb->query( $wpdb->prepare( $sql, $value ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	static function insert_id() {
@@ -87,7 +87,7 @@ abstract class BWFAN_Model {
 			}
 		}
 
-		return $wpdb->get_var( $sql ); // WPCS: unprepared SQL OK
+		return $wpdb->get_var( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.PreparedSQL
 	}
 
 	static function count( $data = array() ) {
@@ -106,7 +106,7 @@ abstract class BWFAN_Model {
 			}
 		}
 
-		return $wpdb->get_var( $sql ); // WPCS: unprepared SQL OK
+		return $wpdb->get_var( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.PreparedSQL
 	}
 
 	static function get_specific_rows( $where_key, $where_value, $offset = 0, $limit = 0 ) {
@@ -120,7 +120,7 @@ abstract class BWFAN_Model {
 
 		$query = "SELECT * FROM $table_name WHERE $where_key = '$where_value'$pagination";
 
-		return $wpdb->get_results( $query, ARRAY_A ); // WPCS: unprepared SQL OK
+		return $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.PreparedSQL
 	}
 
 	static function get_rows( $only_query = false, $automation_ids = array() ) {
@@ -130,28 +130,28 @@ abstract class BWFAN_Model {
 		$page_number    = 1;
 		$count_per_page = self::$count;
 		$next_offset    = ( $page_number - 1 ) * $count_per_page;
-		$sql_query      = $wpdb->prepare( "SELECT * FROM $table_name ORDER BY c_date DESC LIMIT %d OFFSET %d", $count_per_page, $next_offset ); // WPCS: unprepared SQL OK
+		$sql_query      = $wpdb->prepare( "SELECT * FROM $table_name ORDER BY c_date DESC LIMIT %d OFFSET %d", $count_per_page, $next_offset );
 
 		if ( isset( $_GET['paged'] ) && $_GET['paged'] > 1 ) { // WordPress.CSRF.NonceVerification.NoNonceVerification
 			$page_number = sanitize_text_field( $_GET['paged'] ); // WordPress.CSRF.NonceVerification.NoNonceVerification
 			$next_offset = ( $page_number - 1 ) * $count_per_page;
-			$sql_query   = $wpdb->prepare( "SELECT * FROM $table_name ORDER BY c_date DESC LIMIT %d OFFSET %d", $count_per_page, $next_offset ); // WPCS: unprepared SQL OK
+			$sql_query   = $wpdb->prepare( "SELECT * FROM $table_name ORDER BY c_date DESC LIMIT %d OFFSET %d", $count_per_page, $next_offset );
 		}
 
 		if ( isset( $_GET['status'] ) && 'all' !== $_GET['status'] ) { // WordPress.CSRF.NonceVerification.NoNonceVerification
 			$status    = sanitize_text_field( $_GET['status'] ); // WordPress.CSRF.NonceVerification.NoNonceVerification
 			$status    = ( 'active' === $status ) ? 1 : 2;
-			$sql_query = $wpdb->prepare( "SELECT * FROM $table_name WHERE status = %d ORDER BY c_date DESC LIMIT %d OFFSET %d", $status, $count_per_page, $next_offset ); // WPCS: unprepared SQL OK
+			$sql_query = $wpdb->prepare( "SELECT * FROM $table_name WHERE status = %d ORDER BY c_date DESC LIMIT %d OFFSET %d", $status, $count_per_page, $next_offset );
 		}
 
 		if ( ( isset( $_GET['paged'] ) && $_GET['paged'] > 0 ) && ( isset( $_GET['status'] ) && '' !== $_GET['status'] ) ) { // WordPress.CSRF.NonceVerification.NoNonceVerification
 			$page_number = sanitize_text_field( $_GET['paged'] ); // WordPress.CSRF.NonceVerification.NoNonceVerification
 			$next_offset = ( $page_number - 1 ) * $count_per_page;
 			$status      = sanitize_text_field( $_GET['status'] ); // WordPress.CSRF.NonceVerification.NoNonceVerification
-			$sql_query   = $wpdb->prepare( "SELECT * FROM $table_name WHERE status = %d ORDER BY c_date DESC LIMIT %d OFFSET %d", $status, $count_per_page, $next_offset ); // WPCS: unprepared SQL OK
+			$sql_query   = $wpdb->prepare( "SELECT * FROM $table_name WHERE status = %d ORDER BY c_date DESC LIMIT %d OFFSET %d", $status, $count_per_page, $next_offset );
 		}
 
-		$result = $wpdb->get_results( $sql_query, ARRAY_A ); // WPCS: unprepared SQL OK
+		$result = $wpdb->get_results( $sql_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return $result;
 	}
@@ -159,7 +159,7 @@ abstract class BWFAN_Model {
 	static function get_results( $query ) {
 		global $wpdb;
 		$query   = str_replace( '{table_name}', self::_table(), $query );
-		$results = $wpdb->get_results( $query, ARRAY_A ); // WPCS: unprepared SQL OK
+		$results = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return $results;
 	}
@@ -168,7 +168,7 @@ abstract class BWFAN_Model {
 		global $wpdb;
 		$query = str_replace( '{table_name}', self::_table(), $query );
 
-		return $wpdb->get_var( $query ); // WPCS: unprepared SQL OK
+		return $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	static function delete_multiple( $query ) {
@@ -178,7 +178,7 @@ abstract class BWFAN_Model {
 	static function query( $query ) {
 		global $wpdb;
 		$query = str_replace( '{table_name}', self::_table(), $query );
-		$wpdb->query( $query ); // WPCS: unprepared SQL OK
+		$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	static function update_multiple( $query ) {
@@ -211,6 +211,50 @@ abstract class BWFAN_Model {
 		$keys   = '(' . implode( ', ', $keys ) . ')';
 		$query  = 'INSERT INTO ' . self::_table() . ' ' . $keys . ' VALUES ' . $values;
 
-		return $wpdb->query( $wpdb->prepare( "$query ", $values ) );
+		return $wpdb->query( $wpdb->prepare( "$query ", $values ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+	}
+
+	/**
+	 * Insert query with Ignore
+	 *
+	 * @param $table
+	 * @param $data
+	 * @param $format
+	 *
+	 * @return bool|int|mysqli_result|null
+	 */
+	static function insert_ignore( $data, $format = null ) {
+		if ( empty( $data ) || ! is_array( $data ) ) {
+			return false;
+		}
+
+		$placeholders = is_null( $format ) ? array_fill( 0, count( $data ), '%s' ) : $format;
+		$columns      = array_keys( $data );
+		$table        = self::_table();
+		global $wpdb;
+
+		$sql = "INSERT IGNORE INTO `$table` (`" . implode( '`,`', $columns ) . "`) VALUES (" . implode( ',', $placeholders ) . ")";
+
+		//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$result = $wpdb->query( $wpdb->prepare( $sql, array_values( $data ) ) );
+		if ( ! empty( $result ) ) {
+			return $result;
+		}
+
+		/** If duplicate entry DB error come */
+		if ( 0 === $result ) {
+			$warnings = $wpdb->get_results( "SHOW WARNINGS", ARRAY_A );//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			if ( ! empty( $warnings ) ) {
+				foreach ( $warnings as $warning ) {
+					if ( empty( $warning['Message'] ) || false === strpos( $warning['message'], 'Duplicate entry' ) ) {
+						continue;
+					}
+					BWFAN_Common::log_test_data( 'WP db error in ' . $table . ' : ' . $warning['message'], 'fka-db-duplicate-error', true );
+					BWFAN_Common::log_test_data( $data, 'fka-db-duplicate-error', true );
+				}
+			}
+		}
+
+		return false;
 	}
 }

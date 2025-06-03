@@ -92,17 +92,19 @@ class BWFAN_One_Click_Unsubscribe_Link extends BWFAN_Merge_Tag {
 	 */
 	public function get_unsubscribe_page_url() {
 		$global_settings = BWFAN_Common::get_global_settings();
-		if ( ! isset( $global_settings['bwfan_unsubscribe_page'] ) || empty( $global_settings['bwfan_unsubscribe_page'] ) ) {
-			return '';
-		}
+		$page_exist      = class_exists( 'BWFAN_Common' ) ? BWFAN_Common::is_unsubscribe_page_valid() : array();
+		$page_url        = home_url( '/' );
 
-		$page      = absint( $global_settings['bwfan_unsubscribe_page'] );
-		$page_link = get_permalink( $page );
+		if ( isset( $page_exist ) && 1 === $page_exist['status'] ) {
+			// Return home URL as fallback when unsubscribe page is not set
+			$page     = absint( $global_settings['bwfan_unsubscribe_page'] );
+			$page_url = get_permalink( $page );
+		}
 
 		$unsubscribe_link = add_query_arg( array(
 			'bwfan-action'     => 'unsubscribe',
 			'List-Unsubscribe' => 'One-Click' // Adding the List-Unsubscribe parameter
-		), $page_link );
+		), $page_url );
 
 		return $unsubscribe_link;
 	}

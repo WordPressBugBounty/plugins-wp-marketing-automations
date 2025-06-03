@@ -41,7 +41,7 @@ if ( class_exists( 'BWFAN_Header' ) ) {
             <span class="bwfan_head_automation_state_on" <?php echo ( 'publish' !== $status ) ? ' style="display:none"' : ''; ?>><?php esc_html_e( 'Active', 'wp-marketing-automations' ); ?></span>
             <span class="bwfan_head_automation_state_off" <?php echo ( 'publish' === $status ) ? 'style="display:none"' : ''; ?>> <?php esc_html_e( 'Inactive', 'wp-marketing-automations' ); ?></span>
             <div class="automation_state_toggle bwfan_toggle_btn">
-                <input name="offer_state" id="state<?php echo esc_attr( $automation_id ); ?>" data-id="<?php echo esc_attr( $automation_id ); ?>" type="checkbox" class="bwfan-tgl bwfan-tgl-ios" <?php echo ( 'publish' === $status ) ? 'checked="checked"' : ''; ?> <?php echo esc_html__( BWFAN_Core()->automations->current_automation_sync_state ); ?> />
+                <input name="offer_state" id="state<?php echo esc_attr( $automation_id ); ?>" data-id="<?php echo esc_attr( $automation_id ); ?>" type="checkbox" class="bwfan-tgl bwfan-tgl-ios" <?php echo ( 'publish' === $status ) ? 'checked="checked"' : ''; ?> <?php echo esc_html( BWFAN_Core()->automations->current_automation_sync_state ); ?> />
                 <label for="state<?php echo esc_attr( $automation_id ); ?>" class="bwfan-tgl-btn bwfan-tgl-btn-small"></label>
             </div>
         </div>
@@ -49,14 +49,14 @@ if ( class_exists( 'BWFAN_Header' ) ) {
 	} else {
 		?>
         <div class="bwf-automation-migrated">
-			<?php _e( 'Migrated', 'wp-marketing-automations' ) ?>
+			<?php esc_html_e( 'Migrated', 'wp-marketing-automations' ) ?>
         </div>
 		<?php
 	}
 	$status = ob_get_clean();
 	$header_ins->set_level_2_right_html( $status );
 
-	echo $header_ins->render( $automation_migrated );
+	echo $header_ins->render( $automation_migrated ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 }
 ?>
 <style>
@@ -101,13 +101,13 @@ if ( class_exists( 'BWFAN_Header' ) ) {
                         </div>
                     </div>
                 </div>
-                <input type="hidden" name="_wpnonce" value="<?php esc_attr_e( wp_create_nonce( 'bwfan-action-admin' ) ); ?>"/>
+                <input type="hidden" name="_wpnonce" value="<?php echo esc_attr( wp_create_nonce( 'bwfan-action-admin' ) ); ?>"/>
             </div>
             <fieldset>
                 <div class="bwfan_form_submit">
                     <input type="hidden" name="automation_id" value="<?php echo esc_attr( $automation_id ); ?>">
-                    <input type="submit" class="bwfan-display-none" value="<?php _e( __( 'Update', 'wp-marketing-automations' ) ); ?>"/>
-                    <a href="javascript:void(0)" class="bwfan_update_form_submit bwfan_btn_blue"><?php _e( __( 'Update', 'wp-marketing-automations' ) ); ?></a>
+                    <input type="submit" class="bwfan-display-none" value="<?php esc_html_e( 'Update', 'wp-marketing-automations' ); ?>"/>
+                    <a href="javascript:void(0)" class="bwfan_update_form_submit bwfan_btn_blue"><?php esc_html_e( 'Update', 'wp-marketing-automations' ); ?></a>
                 </div>
                 <div class="bwfan_form_response">
                 </div>
@@ -289,7 +289,7 @@ echo '<script id="bwfanAutomationEvents">
 <div class="bwfan_izimodal_default" style="display: none" id="modal-autonami-event">
     <div class="bwfan-search-filter-modal-wrap">
         <div class="bwfan-modal-header bwfan_p15">
-            <div class="modal-header-title bwfan_heading_l bwfan_head_mr"><?php _e( 'Select an Event' ) ?></div>
+            <div class="modal-header-title bwfan_heading_l bwfan_head_mr"><?php esc_html_e( 'Select an Event', 'wp-marketing-automations' ) ?></div>
             <div class="modal-header-search">
                 <span class="dashicons dashicons-search modal-search-icon"></span>
                 <input type="search" id="modal-search-field" placeholder="Search Event">
@@ -313,8 +313,8 @@ echo '<script id="bwfanAutomationEvents">
 						}
 						?>
                         <label class="bwfan-widget-checkbox-wrap">
-                            <input type="radio" name="widget_filter" value="<?php echo $key ?>" class="bwfan-widget-filter ">
-                            <span class="bwfan-widget-checkbox-label"><?php echo $filter['label'] ?></span>
+                            <input type="radio" name="widget_filter" value="<?php echo esc_attr( $key ) ?>" class="bwfan-widget-filter ">
+                            <span class="bwfan-widget-checkbox-label"><?php echo $filter['label']; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
                         </label>
 						<?php
 					}
@@ -325,7 +325,7 @@ echo '<script id="bwfanAutomationEvents">
             </div>
         </div>
         <div class="bwfan-modal-footer bwfan_p15 bwfan_tr">
-            <button type="button" class="button button-primary fixed_button" id="bwf-modal-event-continue" disabled><?php _e( 'Continue' ) ?></button>
+            <button type="button" class="button button-primary fixed_button" id="bwf-modal-event-continue" disabled><?php esc_html_e( 'Continue', 'wp-marketing-automations' ) ?></button>
         </div>
     </div>
 </div>
@@ -333,7 +333,7 @@ echo '<script id="bwfanAutomationEvents">
 <div class="bwfan_izimodal_default" style="display: none" id="modal-autonami-event-action">
     <div class="bwfan-search-filter-modal-wrap">
         <div class="bwfan-modal-header bwfan_p15">
-            <div class="modal-header-title bwfan_heading_l bwfan_head_mr"><?php _e( 'Select an Action' ) ?></div>
+            <div class="modal-header-title bwfan_heading_l bwfan_head_mr"><?php esc_html_e( 'Select an Action', 'wp-marketing-automations' ) ?></div>
             <div class="modal-header-search">
                 <span class="dashicons dashicons-search modal-search-icon"></span>
                 <input type="search" id="modal-search-action-field" placeholder="Search Action">
@@ -357,8 +357,8 @@ echo '<script id="bwfanAutomationEvents">
 						}
 						?>
                         <label class="bwfan-widget-checkbox-wrap">
-                            <input type="radio" name="widget_filter" value="<?php echo $key ?>" class="bwfan-widget-filter ">
-                            <span class="bwfan-widget-checkbox-label"><?php echo $filter['label'] ?></span>
+                            <input type="radio" name="widget_filter" value="<?php echo esc_attr( $key ) ?>" class="bwfan-widget-filter ">
+                            <span class="bwfan-widget-checkbox-label"><?php echo $filter['label']; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
                         </label>
 						<?php
 					}
@@ -371,7 +371,7 @@ echo '<script id="bwfanAutomationEvents">
         <div class="bwfan-modal-footer bwfan_p15 bwfan_tr">
             <input type="hidden" name="selected_action_group_id"/>
             <input type="hidden" name="selected_action_action_id"/>
-            <button type="button" class="button button-primary fixed_button" id="bwf-modal-action-continue" disabled><?php _e( 'Continue' ) ?></button>
+            <button type="button" class="button button-primary fixed_button" id="bwf-modal-action-continue" disabled><?php esc_html_e( 'Continue', 'wp-marketing-automations' ) ?></button>
         </div>
     </div>
 </div>
@@ -379,7 +379,7 @@ echo '<script id="bwfanAutomationEvents">
 <div class="bwfan_izimodal_default" style="display: none" id="modal-autonami-template-selector">
     <div class="bwfan-search-filter-modal-wrap">
         <div class="bwfan-modal-header bwfan_p15">
-            <div class="modal-header-title bwfan_heading_l bwfan_head_mr"><?php _e( 'My Templates' ) ?></div>
+            <div class="modal-header-title bwfan_heading_l bwfan_head_mr"><?php esc_html_e( 'My Templates', 'wp-marketing-automations' ) ?></div>
             <div class="modal-header-search">
                 <span class="dashicons dashicons-search modal-search-icon"></span>
                 <input type="search" id="modal-search-template-field" placeholder="Search by name">
@@ -416,7 +416,7 @@ echo '<script id="bwfanAutomationEvents">
 <div class="bwfan_izimodal_default" style="display: none" id="modal-autonami-link-trigger-selector">
     <div class="bwfan-search-filter-modal-wrap">
         <div class="bwfan-modal-header bwfan_p15">
-            <div class="modal-header-title bwfan_heading_l bwfan_head_mr"><?php _e( 'Link Triggers' ) ?></div>
+            <div class="modal-header-title bwfan_heading_l bwfan_head_mr"><?php esc_html_e( 'Link Triggers', 'wp-marketing-automations' ) ?></div>
             <div class="modal-header-search">
                 <span class="dashicons dashicons-search modal-search-icon"></span>
                 <input type="search" id="modal-search-link-trigger-field" placeholder="Search by name">
@@ -432,7 +432,7 @@ echo '<script id="bwfanAutomationEvents">
 <div class="bwfan_izimodal_default" style="display: none" id="modal-autonami-migrator-modal">
     <div class="bwfan-search-filter-modal-wrap">
         <div class="bwfan-modal-header bwfan_p15">
-            <div class="modal-header-title bwfan_heading_l bwfan_head_mr"><?php _e( 'Migrate Automation' ) ?></div>
+            <div class="modal-header-title bwfan_heading_l bwfan_head_mr"><?php esc_html_e( 'Migrate Automation', 'wp-marketing-automations' ) ?></div>
             <div class="modal-header-search"></div>
             <span class="dashicons dashicons-no-alt bwfan_btn_close bwfan_modal_close" data-izimodal-close></span>
         </div>

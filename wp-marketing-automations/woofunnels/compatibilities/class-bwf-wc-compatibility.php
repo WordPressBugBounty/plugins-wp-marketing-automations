@@ -77,7 +77,7 @@ if ( ! class_exists( 'BWF_WC_Compatibility' ) ) :
 		 */
 		public static function woocommerce_get_formatted_product_name( $product ) {
 			if ( ! $product instanceof WC_Product ) {
-				return __( 'No title', 'woofunnels' );
+				return __( 'No title', 'woofunnels' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			}
 
 			return $product->get_formatted_name();
@@ -562,16 +562,18 @@ if ( ! class_exists( 'BWF_WC_Compatibility' ) ) :
 				return $meta_value;
 			}
 
+			global $wpdb;
 			if ( true === self::is_hpos_enabled() ) {
-				global $wpdb;
-				$meta_value = $wpdb->get_var( $wpdb->prepare( "SELECT `meta_value` FROM `{$wpdb->prefix}wc_orders_meta` WHERE `meta_key`=%s AND `order_id`=%d", $key, $order->get_id() ) );
+				$meta_value = $wpdb->get_var( $wpdb->prepare( "SELECT `meta_value` FROM `{$wpdb->prefix}wc_orders_meta` WHERE `meta_key`=%s AND `order_id`=%d", $key, $order->get_id() ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			} else {
+				$meta_value = $wpdb->get_var( $wpdb->prepare( "SELECT `meta_value` FROM {$wpdb->postmeta} WHERE `post_id` = %d AND `meta_key` = %s ORDER BY `post_id` DESC LIMIT 1", $order->get_id(), $key ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			}
 
 			if ( ! empty( $meta_value ) ) {
 				return maybe_unserialize( $meta_value );
 			}
 
-			return get_post_meta( $order->get_id(), $key, true );
+			return $meta_value;
 		}
 
 		/**

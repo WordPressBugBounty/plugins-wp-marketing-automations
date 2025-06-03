@@ -32,6 +32,12 @@ class BWFAN_API_Update_Automation_Step extends BWFAN_API_Base {
 		$automation_id = $this->get_sanitized_arg( 'automation_id', 'text_field' );
 		$step_id       = $this->get_sanitized_arg( 'step_id', 'text_field' );
 		$arg_data      = $this->args;
+
+		if ( isset( $arg_data['content'] ) ) {
+			$content  = BWFAN_Common::is_json( $arg_data['content'] ) ? json_decode( $arg_data['content'], true ) : [];
+			$arg_data = wp_parse_args( $content, $arg_data );
+		}
+
 		/** Initiate automation object */
 		$automation_obj = BWFAN_Automation_V2::get_instance( $automation_id );
 

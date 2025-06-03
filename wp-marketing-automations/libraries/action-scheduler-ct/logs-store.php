@@ -7,7 +7,7 @@
  */
 class BWFAN_AS_CT_Log_Store extends ActionScheduler_Logger {
 
-	public function log( $action_id, $message, DateTime $date = null ) {
+	public function log( $action_id, $message, ?DateTime $date = null ) {
 
 	}
 

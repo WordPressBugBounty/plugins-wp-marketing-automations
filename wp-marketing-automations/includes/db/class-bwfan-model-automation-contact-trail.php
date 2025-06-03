@@ -29,7 +29,7 @@ class BWFAN_Model_Automation_Contact_Trail extends BWFAN_Model {
 
 		$query = "SELECT `sid`, count(`sid`) as `count` FROM {$table_name} WHERE `sid` IN ($placeholder) AND `status` = %d $after_time_query GROUP BY `sid`";
 
-		return $wpdb->get_results( $wpdb->prepare( $query, $args ), ARRAY_A );
+		return $wpdb->get_results( $wpdb->prepare( $query, $args ), ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -59,7 +59,7 @@ class BWFAN_Model_Automation_Contact_Trail extends BWFAN_Model {
 		$table_name = self::_table();
 		$query      = $wpdb->prepare( "UPDATE {$table_name} SET `status`= 1 WHERE `tid` = %s AND `status` = 2", $trail_id );
 
-		$wpdb->query( $query );
+		$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -80,7 +80,7 @@ class BWFAN_Model_Automation_Contact_Trail extends BWFAN_Model {
 
 		$query = $wpdb->prepare( "SELECT * FROM {$table_name} WHERE `tid` = %s AND `sid` = %d ORDER BY ID DESC LIMIT 0,1", $trail_id, $step_id );
 
-		return $wpdb->get_row( $query, ARRAY_A );
+		return $wpdb->get_row( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -112,7 +112,7 @@ class BWFAN_Model_Automation_Contact_Trail extends BWFAN_Model {
 		}
 
 		$query     = $wpdb->prepare( "SELECT ct.ID, ct.cid, ct.aid, ct.data, ct.tid, ct.c_time, c.email, c.f_name, c.l_name, c.contact_no FROM {$table_name} as ct JOIN {$wpdb->prefix}bwf_contact AS c ON ct.cid = c.ID WHERE 1=1 AND ct.aid = %d AND ct.sid = %d AND ct.status = %d $path_query  ORDER BY ct.c_time DESC LIMIT %d OFFSET %d", $aid, $step_id, $status, $limit, $offset );
-		$contacts  = $wpdb->get_results( $query, ARRAY_A );
+		$contacts  = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$completed = 2 === $status ? false : true;
 
 		return [
@@ -140,7 +140,7 @@ class BWFAN_Model_Automation_Contact_Trail extends BWFAN_Model {
 			$query .= " AND `data` LIKE '$path' ";
 		}
 
-		return $wpdb->get_var( $query );
+		return $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -156,7 +156,7 @@ class BWFAN_Model_Automation_Contact_Trail extends BWFAN_Model {
 
 		$query = $wpdb->prepare( "SELECT tr.*, st.type, st.data AS step_data, st.action, st.status AS step_status FROM {$table_name} AS tr LEFT JOIN {$wpdb->prefix}bwfan_automation_step AS st ON tr.sid = st.ID  WHERE tid = %s ", $tid );
 
-		return $wpdb->get_results( $query, ARRAY_A );
+		return $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	public static function delete_automation_trail_by_id( $aid ) {
@@ -171,7 +171,7 @@ class BWFAN_Model_Automation_Contact_Trail extends BWFAN_Model {
 
 		$query = $wpdb->prepare( "DELETE FROM $table_name WHERE $where", $aid );
 
-		return $wpdb->query( $query );
+		return $wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	public static function delete_row_by_trail_by( $trail_id ) {
@@ -180,7 +180,7 @@ class BWFAN_Model_Automation_Contact_Trail extends BWFAN_Model {
 
 		$query = $wpdb->prepare( "DELETE FROM $table_name WHERE tid = %s", $trail_id );
 
-		return $wpdb->query( $query );
+		return $wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	public static function update_multiple_trail_status( $tids, $sid, $status = 1 ) {
@@ -202,7 +202,7 @@ class BWFAN_Model_Automation_Contact_Trail extends BWFAN_Model {
 
 		$query = $wpdb->prepare( $query, $args );
 
-		return $wpdb->query( $query );
+		return $wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -245,7 +245,7 @@ class BWFAN_Model_Automation_Contact_Trail extends BWFAN_Model {
 		$args               = array_merge( $sids, [ 1 ] );
 		$query              = $wpdb->prepare( "SELECT COUNT(ID) FROM {$table_name} WHERE `sid` IN ($placeholder) AND `status` = %d ", $args ); //phpcs:ignore WordPress.DB.PreparedSQL
 
-		return intval( $wpdb->get_var( $query ) );
+		return intval( $wpdb->get_var( $query ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -264,7 +264,7 @@ class BWFAN_Model_Automation_Contact_Trail extends BWFAN_Model {
 		$query = "SELECT count(`sid`) as `count` FROM {$table_name} WHERE `sid`= %d AND `data` LIKE '$path' GROUP BY `sid`";
 		$query = $wpdb->prepare( $query, $split_id );
 
-		return $wpdb->get_var( $query );
+		return $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 

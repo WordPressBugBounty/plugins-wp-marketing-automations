@@ -168,6 +168,7 @@ if ( ! class_exists( 'WP_Background_Process' ) ) {
 
 			$key = $this->identifier . '_batch_%';
 
+			//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$count = $wpdb->get_var( $wpdb->prepare( "
 			SELECT COUNT(*)
 			FROM {$table}
@@ -262,6 +263,7 @@ if ( ! class_exists( 'WP_Background_Process' ) ) {
 
 			$key = $this->identifier . '_batch_%';
 
+			//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$query = $wpdb->get_row( $wpdb->prepare( "
 			SELECT *
 			FROM {$table}
@@ -457,7 +459,7 @@ if ( ! class_exists( 'WP_Background_Process' ) ) {
 			// Adds every 5 minutes to the existing schedules.
 			$schedules[ $this->identifier . '_cron_interval' ] = array(
 				'interval' => MINUTE_IN_SECONDS * $interval,
-				'display'  => sprintf( __( 'Every %d Minutes' ), $interval ),
+				'display'  => sprintf( __( 'Every %d Minutes', 'woofunnels' ), $interval ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch, WordPress.WP.I18n.MissingTranslatorsComment
 			);
 
 			return $schedules;

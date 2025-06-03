@@ -52,7 +52,7 @@ class BWFAN_API_Get_All_Fields extends BWFAN_API_Base {
 		}, $all_fields );
 		$this->total_count = count( $all_fields );
 
-		return $this->success_response( $all_fields, __( empty( $all_fields ) ? 'No Fields found.' : 'Got all fields', 'wp-marketing-automations' ) );
+		return $this->success_response( $all_fields, empty( $all_fields ) ? __( 'No Fields found.', 'wp-marketing-automations' ) : __( 'Got all fields', 'wp-marketing-automations' ) );
 	}
 
 

@@ -15,7 +15,7 @@ abstract class BWFAN_DB_Tables_Base {
 	public function is_exists() {
 		global $wpdb;
 
-		return ! empty( $wpdb->query( "SHOW TABLES LIKE '{$wpdb->prefix}$this->table_name'" ) );
+		return ! empty( $wpdb->query( "SHOW TABLES LIKE '{$wpdb->prefix}$this->table_name'" ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -29,7 +29,7 @@ abstract class BWFAN_DB_Tables_Base {
 		/** Get defined columns */
 		$columns = $this->get_columns();
 		/** Get columns from db */
-		$db_columns = $wpdb->get_results( "DESCRIBE {$wpdb->prefix}$this->table_name", ARRAY_A );
+		$db_columns = $wpdb->get_results( "DESCRIBE {$wpdb->prefix}$this->table_name", ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		$result = array_diff( $columns, array_column( $db_columns, 'Field' ) );
 		sort( $result );

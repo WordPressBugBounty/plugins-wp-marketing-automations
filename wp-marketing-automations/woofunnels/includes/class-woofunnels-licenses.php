@@ -157,7 +157,7 @@ if ( ! class_exists( 'WooFunnels_Licenses' ) ) {
             <div class="bwf-notice notice error">
                 <p>
 					<?php
-					echo sprintf( __( '<strong>Invalid License Key: </strong> You are <i>not receiving</i> Latest Updates, New Features, Security Updates &amp; Bug Fixes for <strong>%1$s</strong>. <a href="%2$s">Click Here To Fix This</a>.', 'buildwoofunnels' ), implode( ', ', $plugins ), $this->license_url( $type ) );
+					echo sprintf( __( '<strong>Invalid License Key: </strong> You are <i>not receiving</i> Latest Updates, New Features, Security Updates &amp; Bug Fixes for <strong>%1$s</strong>. <a href="%2$s">Click Here To Fix This</a>.', 'buildwoofunnels' ), implode( ', ', $plugins ), $this->license_url( $type ) ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.MissingTranslatorsComment, WordPress.WP.I18n.TextDomainMismatch
 					?>
                 </p>
             </div>

@@ -55,7 +55,9 @@ class BWFAN_API_Import_Automations extends BWFAN_API_Base {
 		if ( is_array( $automation_id ) && isset( $automation_id['version'] ) ) {
 			$next_gen = ( 2 === absint( $version ) ) ? " Next Gen" : '';
 
-			return $this->error_response( __( 'You are trying to import an unsupported JSON format. Ensure that imported file belongs to Autonami' . $next_gen, 'wp-marketing-automations' ) );
+			/* translators: 1: Automation version */
+
+			return $this->error_response( sprintf( __( 'You are trying to import an unsupported JSON format. Ensure that imported file belongs to Autonami %1$s', 'wp-marketing-automations' ), $next_gen ) );
 		}
 
 		$this->response_code = 200;

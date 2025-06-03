@@ -38,7 +38,7 @@ class BWFAN_WooFunnels_Support {
             <button type="button" class="handlediv">
                 <span class="toggle-indicator"></span>
             </button>
-            <h3 class="hndle"><span><?php esc_html_e( 'Alert(s)', 'woofunnels-autonami-automation' ); ?></span></h3>
+            <h3 class="hndle"><span><?php esc_html_e( 'Alert(s)', 'wp-marketing-automations' ); ?></span></h3>
 			<?php
 			WooFunnels_Notifications::get_instance()->get_notification_html( $autonami_notifications );
 			?>
@@ -54,8 +54,8 @@ class BWFAN_WooFunnels_Support {
 			return;
 		}
 
-		add_menu_page( __( 'WooFunnels', 'woofunnels' ), __( 'WooFunnels', 'woofunnels' ), 'manage_options', 'woofunnels', array( $this, 'woofunnels_page' ), '', 59 );
-		add_submenu_page( 'woofunnels', __( 'Licenses', 'woofunnels' ), __( 'License', 'woofunnels' ), 'manage_options', 'woofunnels' );
+		add_menu_page( __( 'WooFunnels', 'wp-marketing-automations' ), __( 'WooFunnels', 'wp-marketing-automations' ), 'manage_options', 'woofunnels', array( $this, 'woofunnels_page' ), '', 59 );
+		add_submenu_page( 'woofunnels', __( 'Licenses', 'wp-marketing-automations' ), __( 'License', 'wp-marketing-automations' ), 'manage_options', 'woofunnels' );
 		WooFunnels_dashboard::$is_core_menu = true;
 	}
 

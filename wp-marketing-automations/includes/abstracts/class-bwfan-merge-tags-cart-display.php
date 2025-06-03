@@ -36,7 +36,7 @@ class BWFAN_Cart_Display extends BWFAN_Merge_Tag {
             <option value=""><?php esc_html_e( 'Select', 'wp-marketing-automations' ); ?></option>
 			<?php
 			foreach ( $templates as $slug => $name ) {
-				echo '<option value="' . esc_attr__( $slug ) . '">' . esc_html__( $name ) . '</option>';
+				echo '<option value="' . esc_attr( $slug ) . '">' . esc_html( $name ) . '</option>';
 			}
 			?>
         </select>

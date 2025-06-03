@@ -233,6 +233,16 @@ if ( ! function_exists( 'bwfan_is_weglot_active' ) ) {
 }
 
 /**
+ *
+ * gTranslate language plugin
+ */
+if ( ! function_exists( 'bwfan_is_gtranslate_active' ) ) {
+	function bwfan_is_gtranslate_active() {
+		return BWFAN_Plugin_Dependency::gtranslate_active_check();
+	}
+}
+
+/**
  *  XL Next move plugin Detection
  */
 if ( ! function_exists( 'bwfan_is_xl_nextmove_thankyou_active' ) ) {

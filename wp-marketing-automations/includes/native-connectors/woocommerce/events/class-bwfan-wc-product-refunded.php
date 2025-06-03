@@ -77,13 +77,17 @@ final class BWFAN_WC_Product_Refunded extends BWFAN_Event {
 		$data_to_send['global']['refund_id'] = $this->refund_id;
 
 		$this->order = wc_get_order( $this->order_id );
-
-		$data_to_send['global']['email'] = BWFAN_Common::get_email_from_order( $this->order_id, $this->order );
-		$data_to_send['global']['phone'] = BWFAN_Common::get_phone_from_order( $this->order_id, $this->order );
-		$user_id                         = BWFAN_Common::get_wp_user_id_from_order( $this->order_id, $this->order );
+		$user_id     = BWFAN_Common::get_wp_user_id_from_order( $this->order_id, $this->order );
 		if ( intval( $user_id ) > 0 ) {
 			$data_to_send['global']['user_id'] = $user_id;
 		}
+
+		$email = ! empty( $user_id ) ? BWFAN_Common::get_contact_email( $user_id ) : '';
+
+		/** Set billing email if email is empty */
+		$data_to_send['global']['email'] = ! empty( $email ) ? $email : BWFAN_Common::get_email_from_order( $this->order_id, $this->order );
+		$data_to_send['global']['phone'] = BWFAN_Common::get_phone_from_order( $this->order_id, $this->order );
+
 		$order_lang = BWFAN_Common::get_order_language( $this->order );
 
 		if ( ! empty( $order_lang ) ) {
@@ -126,7 +130,7 @@ final class BWFAN_WC_Product_Refunded extends BWFAN_Event {
 		<?php } ?>
         <li>
             <strong><?php esc_html_e( 'Email:', 'wp-marketing-automations' ); ?> </strong>
-			<?php esc_html_e( $global_data['email'] ); ?>
+			<?php echo esc_html( $global_data['email'] ); ?>
         </li>
 		<?php
 		return ob_get_clean();
@@ -192,14 +196,16 @@ final class BWFAN_WC_Product_Refunded extends BWFAN_Event {
 	 * @return array|null[]
 	 */
 	public function get_manually_added_contact_automation_data( $automation_data, $cid ) {
-		$contact = new BWFCRM_Contact( $cid );
-		if ( ! $contact->is_contact_exists() ) {
+		$contact = new WooFunnels_Contact( '', '', '', $cid );
+
+		/** Check if contact exists */
+		if ( ! $contact instanceof WooFunnels_Contact || empty( $contact->get_id() ) ) {
 			return [ 'status' => 0, 'type' => 'contact_not_found' ];
 		}
 
 		$refund = BWFAN_Common::fetch_last_refund_of_contact( $contact );
 		if ( empty( $refund ) || ! isset( $refund['refund_id'] ) ) {
-			return [ 'status' => 0, 'type' => '', 'message' => "Contact doesn't have any refunded order." ];
+			return [ 'status' => 0, 'type' => '', 'message' => __( "Contact doesn't have any refunded order.", 'wp-marketing-automations' ) ];
 		}
 
 		$this->order_id  = $refund['order_id'];

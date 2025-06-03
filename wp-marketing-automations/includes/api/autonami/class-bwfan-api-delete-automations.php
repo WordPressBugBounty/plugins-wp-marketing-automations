@@ -59,18 +59,18 @@ class BWFAN_API_Delete_Automations extends BWFAN_API_Base {
 			if ( 1 === intval( $data['v'] ) ) {
 				BWFAN_Core()->tasks->delete_tasks( array(), $ids );
 				BWFAN_Core()->logs->delete_logs( array(), $ids );
+
+				// Set status of logs to 0, so that run now option for those logs can be hide
+				BWFAN_Model_Logs::update( array(
+					'status' => 0,
+				), array(
+					'automation_id' => $automation_id,
+				) );
 			}
 
 			BWFAN_Core()->automations->set_automation_id( $automation_id );
 
 			do_action( 'bwfan_automation_deleted', $automation_id );
-
-			// Set status of logs to 0, so that run now option for those logs can be hide
-			BWFAN_Model_Logs::update( array(
-				'status' => 0,
-			), array(
-				'automation_id' => $automation_id,
-			) );
 		}
 
 		if ( ! empty( $not_deleted_automations ) ) {

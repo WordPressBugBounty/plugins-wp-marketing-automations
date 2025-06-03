@@ -45,7 +45,7 @@ if ( ! function_exists( 'bwf_create_update_contact_customer' ) ) {
 			}
 
 
-			$query_results = $wpdb->get_var( $query );
+			$query_results = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 
 			$get_threshold_order = $query_results;
@@ -69,7 +69,7 @@ if ( ! function_exists( 'bwf_create_update_contact_customer' ) ) {
                                 ORDER BY p.date_created_gmt DESC LIMIT 0, %d", 'shop_order', $numberposts );
 
 		}
-		$query_results = $wpdb->get_results( $query );
+		$query_results = $wpdb->get_results( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 
 		if ( empty( $query_results ) || ! is_array( $query_results ) ) {

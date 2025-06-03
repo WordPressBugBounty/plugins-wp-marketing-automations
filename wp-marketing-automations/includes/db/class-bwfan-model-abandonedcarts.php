@@ -15,7 +15,7 @@ class BWFAN_Model_Abandonedcarts extends BWFAN_Model {
 			$limit_string .= ',' . $per_page;
 		}
 
-		return $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}bwfan_abandonedcarts {$where} ORDER BY {$order_by} DESC {$limit_string}", $output ); // WPCS: unprepared SQL OK
+		return $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}bwfan_abandonedcarts {$where} ORDER BY {$order_by} DESC {$limit_string}", $output ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	public static function delete_abandoned_cart_row( $data ) {
@@ -43,7 +43,7 @@ class BWFAN_Model_Abandonedcarts extends BWFAN_Model {
 			}
 		}
 
-		return $wpdb->query( 'DELETE FROM ' . $table_name . " WHERE $where" ); // WPCS: unprepared SQL OK
+		return $wpdb->query( 'DELETE FROM ' . $table_name . " WHERE $where" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -61,7 +61,7 @@ class BWFAN_Model_Abandonedcarts extends BWFAN_Model {
 		if ( $abandoned_time > 0 ) {
 			$query .= $wpdb->prepare( " AND TIMESTAMPDIFF(MINUTE,last_modified,UTC_TIMESTAMP) >= %d", $abandoned_time );
 		}
-		$count = $wpdb->get_var( $query );
+		$count = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return ! empty( $count );
 	}
@@ -79,7 +79,7 @@ class BWFAN_Model_Abandonedcarts extends BWFAN_Model {
 		$query = "SELECT GROUP_CONCAT(`ID`) AS `pkey` FROM `{$wpdb->prefix}bwfan_abandonedcarts` WHERE `created_time` > %s AND (`status` = 0 OR `status` = 3) GROUP BY `email` HAVING COUNT(`email`) > 1";
 		$query = $wpdb->prepare( $query, $start_time );
 
-		$result = $wpdb->get_results( $query, ARRAY_A );
+		$result = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( empty( $result ) ) {
 			return [];
 		}

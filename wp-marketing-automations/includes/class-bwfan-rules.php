@@ -14,10 +14,9 @@ class BWFAN_Rules {
 	public $environments = [];
 
 	public function __construct() {
-		add_action( 'init', array( $this, 'load_rules_classes' ) );
 		add_filter( 'bwfan_rule_get_rule_types', array( $this, 'default_rule_types' ), 1 );
 		add_action( 'init', array( $this, 'maybe_save_rules' ) );
-		add_action( 'admin_head', array( $this, 'maybe_load_scripts_templates' ) );
+		add_action( 'bwfan_automation_v1_loaded', array( $this, 'maybe_load_scripts_templates' ) );
 	}
 
 	public static function get_instance() {
@@ -53,6 +52,7 @@ class BWFAN_Rules {
 	 * @return bool|mixed|void
 	 */
 	public function match_groups( $groups ) {
+		$this->load_rules_classes();
 		$this->is_executing_rule = true;
 
 		//allowing rules to get manipulated using external logic
@@ -206,39 +206,40 @@ class BWFAN_Rules {
 
 	public function load_rules_classes() {
 		//Include our default rule classes
-		include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/rules/base.php';
-		include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/rules/abstracts.php';
-		include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/rules/general.php';
-		include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/rules/users.php';
+		require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/rules/base.php';
+		require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/rules/abstracts.php';
+		require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/rules/general.php';
+		require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/rules/users.php';
 
 		if ( class_exists( 'WooCommerce' ) ) {
-			include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/rules/ab_cart.php';
-			include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/rules/order.php';
-			include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/rules/wc-customer.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/rules/ab_cart.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/rules/order.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/rules/wc-customer.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/rules/review.php';
 		}
 		if ( bwfan_is_cf7_active() ) {
-			include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/rules/cf7.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/rules/cf7.php';
 		}
 
 		do_action( 'bwfan_rules_included', $this );
 
 		if ( is_admin() || defined( 'DOING_AJAX' ) ) {
 			//Include the admin interface builder
-			include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/class-bwfan-input-builder.php';
-			include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/html-always.php';
-			include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/text.php';
-			include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/select.php';
-			include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/product-select.php';
-			include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/chosen-select.php';
-			include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/cart-category-select.php';
-			include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/cart-product-select.php';
-			include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/html-rule-is-renewal.php';
-			include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/html-rule-is-first-order.php';
-			include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/html-rule-is-guest.php';
-			include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/date.php';
-			include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/time.php';
-			include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/html-rule-is-upgrade.php';
-			include plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/html-rule-is-downgrade.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/class-bwfan-input-builder.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/html-always.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/text.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/select.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/product-select.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/chosen-select.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/cart-category-select.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/cart-product-select.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/html-rule-is-renewal.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/html-rule-is-first-order.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/html-rule-is-guest.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/date.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/time.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/html-rule-is-upgrade.php';
+			require_once plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'rules/inputs/html-rule-is-downgrade.php';
 
 			do_action( 'bwfan_rules_input_included', $this );
 		}

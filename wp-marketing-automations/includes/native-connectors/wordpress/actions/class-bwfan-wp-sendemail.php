@@ -421,11 +421,11 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 
 		$result = $this->send_email();
 		if ( true === $result ) {
-			return $this->success_message( __( 'Mail Sent Successfully!' ) );
+			return $this->success_message( __( 'Mail Sent Successfully!', 'wp-marketing-automations' ) );
 		}
 
 		if ( bwfan_is_autonami_pro_active() && BWFCRM_Core()->campaigns->maybe_daily_limit_reached() ) {
-			return $this->error_response( __( 'Daily Email Limit reached. Will retry after sometime' ) );
+			return $this->error_response( __( 'Daily Email Limit reached. Will retry after sometime', 'wp-marketing-automations' ) );
 		}
 
 		if ( is_array( $result ) && isset( $result['message'] ) ) {
@@ -515,7 +515,7 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 
 			return [
 				'status'  => BWFAN_Action::$RESPONSE_SKIPPED,
-				'message' => __( 'User(s) are already unsubscribed, with email(s): ' . $unsubscribed_emails, 'wp-marketing-automations' )
+				'message' => __( 'User(s) are already unsubscribed, with email(s):', 'wp-marketing-automations' ) . ' ' . $unsubscribed_emails,
 			];
 		}
 
@@ -588,8 +588,10 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 		$conversations = [];
 
 		do_action( 'bwfan_before_send_email', $this->data, $body );
-		/** this function will remove all wp_mail from_name and from_email filters  */
 
+		$headers = apply_filters( 'bwfan_email_headers', $headers );
+
+		/** this function will remove all wp_mail from_name and from_email filters  */
 		if ( ! isset( $global_settings['bwfan_email_service'] ) || 'wp' === $global_settings['bwfan_email_service'] ) {
 			foreach ( $emails as $email ) {
 				$this->data['email'] = $email;
@@ -787,7 +789,7 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 
 				return array(
 					'status'  => 4,
-					'message' => __( 'User(s) are already unsubscribed, with email(s): ' . $unsubscribed_emails, 'wp-marketing-automations' ),
+					'message' => __( 'User(s) are already unsubscribed, with email(s):', 'wp-marketing-automations' ) . ' ' . $unsubscribed_emails,
 				);
 			}
 			if ( 1 !== intval( $status ) ) {
@@ -877,6 +879,7 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 				'placeholder'           => __( 'Enter email', 'wp-marketing-automations' ),
 				'hint'                  => __( 'Use comma separated values to send email to multiple users.', 'wp-marketing-automations' ),
 				'required'              => true,
+				'formatType'            => 'mail',
 				'toggler'               => array(),
 				'automation_merge_tags' => true
 			],

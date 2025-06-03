@@ -23,7 +23,7 @@ if ( ! class_exists( 'WFCO_Model_ConnectorMeta' ) ) {
 
 			$sql_query = "SELECT * FROM $table WHERE connector_id =%d";
 			$sql_query = $wpdb->prepare( $sql_query, $id ); //phpcs:ignore WordPress.DB.PreparedSQL
-			$result    = $wpdb->get_results( $sql_query, ARRAY_A ); //phpcs:ignore WordPress.DB.PreparedSQL
+			$result    = $wpdb->get_results( $sql_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 			$meta      = [];
 
 			if ( is_array( $result ) && count( $result ) > 0 ) {

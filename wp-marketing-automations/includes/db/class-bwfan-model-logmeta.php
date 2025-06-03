@@ -17,7 +17,7 @@ class BWFAN_Model_Logmeta extends BWFAN_Model {
 			$sql_query              = $wpdb->prepare( $sql_query, $automation_ids ); // WPCS: unprepared SQL OK
 		}
 
-		$result = $wpdb->get_results( $sql_query, ARRAY_A ); // WPCS: unprepared SQL OK
+		$result = $wpdb->get_results( $sql_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return $result;
 	}
@@ -41,7 +41,7 @@ class BWFAN_Model_Logmeta extends BWFAN_Model {
 		$table     = self::_table();
 		$sql_query = "SELECT * FROM $table WHERE bwfan_log_id =%d";
 		$sql_query = $wpdb->prepare( $sql_query, $task_id ); // WPCS: unprepared SQL OK
-		$result    = $wpdb->get_results( $sql_query, ARRAY_A ); // WPCS: unprepared SQL OK
+		$result    = $wpdb->get_results( $sql_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$meta      = [];
 
 		if ( is_array( $result ) && count( $result ) > 0 ) {

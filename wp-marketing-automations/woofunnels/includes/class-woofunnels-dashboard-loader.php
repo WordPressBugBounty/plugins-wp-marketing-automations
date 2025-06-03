@@ -8,7 +8,7 @@
  */
 
 
-define( 'BWF_VERSION', '1.10.12.53' );
+define( 'BWF_VERSION', '1.10.12.57' );
 define( 'BWF_DB_VERSION', '1.0.5' );
 if ( ! class_exists( 'WooFunnels_Dashboard' ) ) {
 	#[AllowDynamicProperties]
@@ -37,7 +37,7 @@ if ( ! class_exists( 'WooFunnels_Dashboard' ) ) {
 			?>
             <div class="wrap">
                 <div class="icon32" id="icon-themes"><br></div>
-                <div class="woofunnels_dashboard_tab_content" id="<?php echo self::$selected; ?>">
+                <div class="woofunnels_dashboard_tab_content" id="<?php echo esc_attr( self::$selected ); ?>">
 					<?php include_once self::$loader_url . 'views/woofunnels-tabs-' . self::$selected . '.phtml'; ?>
                 </div>
             </div>
@@ -568,7 +568,7 @@ if ( ! class_exists( 'WooFunnels_Dashboard' ) ) {
 		 */
 		public static function need_license_message( $plugin_data, $r ) {
 			if ( empty( $r->package ) ) {
-				echo wp_kses_post( '<div class="woofunnels-updater-plugin-upgrade-notice">' . __( 'To enable this update please activate your FunnelKit license by visiting the Dashboard Page.', 'woofunnels' ) . '</div>' );
+				echo wp_kses_post( '<div class="woofunnels-updater-plugin-upgrade-notice">' . __( 'To enable this update please activate your FunnelKit license by visiting the Dashboard Page.', 'woofunnels' ) . '</div>' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			}
 		}
 
@@ -589,7 +589,7 @@ if ( ! class_exists( 'WooFunnels_Dashboard' ) ) {
 				'additional_tabs' => apply_filters( 'woofunnels_additional_tabs', array(
 					array(
 						'slug'  => 'tools',
-						'label' => __( 'Tools', 'woofunnels' ),
+						'label' => __( 'Tools', 'woofunnels' ),  // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					),
 				) ),
 				'licenses'        => $License->get_data(),
@@ -612,7 +612,7 @@ if ( ! class_exists( 'WooFunnels_Dashboard' ) ) {
 				'additional_tabs' => apply_filters( 'woofunnels_additional_tabs', array(
 					array(
 						'slug'  => 'tools',
-						'label' => __( 'Tools', 'woofunnels' ),
+						'label' => __( 'Tools', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					),
 				) ),
 
@@ -633,7 +633,7 @@ if ( ! class_exists( 'WooFunnels_Dashboard' ) ) {
 				'additional_tabs' => apply_filters( 'woofunnels_additional_tabs', array(
 					array(
 						'slug'  => 'tools',
-						'label' => __( 'Tools', 'woofunnels' ),
+						'label' => __( 'Tools', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					),
 				) ),
 				'email'           => get_bloginfo( 'admin_email' ),
@@ -654,7 +654,7 @@ if ( ! class_exists( 'WooFunnels_Dashboard' ) ) {
 				'additional_tabs' => apply_filters( 'woofunnels_additional_tabs', array(
 					array(
 						'slug'  => 'tools',
-						'label' => __( 'Tools', 'woofunnels' ),
+						'label' => __( 'Tools', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					),
 				) ),
 				'current_tab'     => self::$selected,
@@ -665,7 +665,7 @@ if ( ! class_exists( 'WooFunnels_Dashboard' ) ) {
 			if ( wp_verify_nonce( filter_input( INPUT_GET, '_nonce', FILTER_UNSAFE_RAW ), 'bwf_tools_action' ) && isset( $_GET['woofunnels_transient'] ) && ( 'clear' === sanitize_text_field( $_GET['woofunnels_transient'] ) ) ) {
 				$woofunnels_transient_obj = WooFunnels_Transient::get_instance();
 				$woofunnels_transient_obj->delete_force_transients();
-				$message = __( 'All Plugins transients cleared.', 'woofunnels' );
+				$message = __( 'All Plugins transients cleared.', 'woofunnels' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 
 				?>
                 <div class="notice notice-success is-dismissible">
@@ -682,11 +682,11 @@ if ( ! class_exists( 'WooFunnels_Dashboard' ) ) {
 				<?php do_action( 'woofunnels_tools_add_tables_row_start' ); ?>
                 <tr>
                     <th>
-                        <strong class="name"><?php esc_html_e( 'WooFunnels transients', 'woofunnels' ); ?></strong>
-                        <p class="description"><?php esc_html_e( 'This tool will clear all the WooFunnels plugins transients cache.', 'woofunnels' ); ?></p>
+                        <strong class="name"><?php esc_html_e( 'WooFunnels transients', 'woofunnels' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch ?></strong>
+                        <p class="description"><?php esc_html_e( 'This tool will clear all the WooFunnels plugins transients cache.', 'woofunnels' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch ?></p>
                     </th>
                     <td class="run-tool">
-                        <a href="<?php echo esc_url( $clear_transient_url ); ?>" class="button button-large"><?php esc_html_e( 'Clear transients', 'woofunnels' ); ?></a>
+                        <a href="<?php echo esc_url( $clear_transient_url ); ?>" class="button button-large"><?php esc_html_e( 'Clear transients', 'woofunnels' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch ?></a>
                     </td>
                 </tr>
 				<?php if ( true === $show_reset_tracking ) {
@@ -694,16 +694,16 @@ if ( ! class_exists( 'WooFunnels_Dashboard' ) ) {
 					$reset_tracking_url = admin_url( 'admin.php?page=woofunnels&tab=tools&woofunnels_tracking=reset&_nonce=' . $nonce );
 					$is_opted           = WooFunnels_OptIn_Manager::get_optIn_state();
 					if ( 'yes' === $is_opted ) {
-						$text_btn = __( 'Turn Off', 'woofunnels' );
+						$text_btn = __( 'Turn Off', 'woofunnels' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					} else {
 						$reset_tracking_url .= '&action=yes';
-						$text_btn           = __( 'Turn On', 'woofunnels' );
+						$text_btn           = __( 'Turn On', 'woofunnels' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					}
 					?>
                     <tr>
                         <th>
-                            <strong class="name"><?php esc_html_e( 'Usage Tracking', 'woofunnels' ); ?></strong>
-                            <p class="description"><?php esc_html_e( 'This action controls Usage Tracking', 'woofunnels' ); ?></p>
+                            <strong class="name"><?php esc_html_e( 'Usage Tracking', 'woofunnels' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch ?></strong>
+                            <p class="description"><?php esc_html_e( 'This action controls Usage Tracking', 'woofunnels' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch ?></p>
                         </th>
                         <td class="run-tool">
                             <a href="<?php echo esc_url( $reset_tracking_url ); ?>" class="button button-large"><?php echo esc_html( $text_btn ); ?></a>
@@ -719,7 +719,7 @@ if ( ! class_exists( 'WooFunnels_Dashboard' ) ) {
 		public static function add_logs_tabs( $tabs ) {
 			$tabs[] = array(
 				'slug'  => 'logs',
-				'label' => __( 'Logs', 'woofunnels' ),
+				'label' => __( 'Logs', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			);
 
 			return $tabs;
@@ -835,7 +835,7 @@ if ( ! class_exists( 'WooFunnels_Dashboard' ) ) {
                 }
             </style>
 			<?php
-			echo ob_get_clean();
+			echo ob_get_clean(); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 

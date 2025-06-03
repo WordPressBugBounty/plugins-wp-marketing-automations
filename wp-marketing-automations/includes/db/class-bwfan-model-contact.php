@@ -41,7 +41,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			$where = $id ? $wpdb->prepare( "AND id > %d", $id ) : '';
 			$query = 'SELECT MIN(id) from ' . self::_table() . ' WHERE 1=1 ' . $where;
 
-			return $wpdb->get_var( $query );
+			return $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		public static function get_contacts( $search = '', $limit = 25, $offset = 0, $normalized_filters = array(), $additional_info = array(), $filter_match = ' AND ' ) {
@@ -72,7 +72,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			$total_count = '';
 			if ( (bool) $grab_totals || (bool) $only_count ) {
 				/** Total Count (For Pagination) */
-				$total_count = $wpdb->get_var( $sql_queries['total'] );
+				$total_count = $wpdb->get_var( $sql_queries['total'] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				if ( (bool) $only_count ) {
 					return array(
 						'contacts' => array(),
@@ -82,7 +82,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			}
 
 			$time     = microtime( true );
-			$contacts = $wpdb->get_results( $sql_queries['base'], ARRAY_A );
+			$contacts = $wpdb->get_results( $sql_queries['base'], ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$time     = microtime( true ) - $time;
 			self::set_log( 'Time to execute the query: ' . $time . ' secs' );
 
@@ -92,7 +92,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			if ( empty( $contacts ) && ! empty( $wpdb->last_error ) ) {
 				BWFAN_Common::log_test_data( $wpdb->last_error, 'collation-issue', true );
 				BWFAN_Fix_Collation::maybe_fix_collation_issue();
-				$contacts = $wpdb->get_results( $sql_queries['base'], ARRAY_A );
+				$contacts = $wpdb->get_results( $sql_queries['base'], ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			}
 
 			if ( empty( $contacts ) ) {
@@ -657,12 +657,27 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 				$include_unsub_query_or = "OR EXISTS (SELECT 1 FROM {$wpdb->prefix}bwfan_message_unsubscribe AS unsub WHERE c.email = unsub.recipient )";
 			}
 
+			if ( 'between' === $filter_rule ) {
+				if ( is_array( $filter_value ) && 2 === count( $filter_value ) ) {
+					sort( $filter_value );
+					self::$filter_queries[] = "($filter_group_key.$filter_key >= '$filter_value[0]' AND $filter_group_key.$filter_key <= '$filter_value[1]')";
+				}
+
+				return;
+			}
+
 			switch ( $filter_rule ) {
 				case 'is':
-					$filter_rule = '=';
+					if ( ! is_array( $filter_value ) && strpos( $filter_value, ',' ) ) {
+						$filter_value = explode( ',', $filter_value );
+					}
+					$filter_rule = is_array( $filter_value ) ? 'IN' : '=';
 					break;
 				case 'is_not':
-					$filter_rule = '!=';
+					if ( ! is_array( $filter_value ) && strpos( $filter_value, ',' ) ) {
+						$filter_value = explode( ',', $filter_value );
+					}
+					$filter_rule = is_array( $filter_value ) ? 'NOT IN' : '!=';
 					break;
 				case 'more_than':
 					$filter_rule = '>';
@@ -703,6 +718,10 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			/** check for property in case value 0 and rule is not equal */
 			if ( 'is_not' === $filter['rule'] && 0 === absint( $filter_value ) ) {
 				$if_column_exists = '';
+			}
+
+			if ( is_array( $filter_value ) ) {
+				$filter_value = "('" . implode( "','", array_map( 'trim', $filter_value ) ) . "')";
 			}
 
 			if ( ! is_array( $filter_value ) ) {
@@ -822,7 +841,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 
 			global $wpdb;
 			$query               = "Select automation_id, time from {$wpdb->prefix}bwfan_contact_automations where contact_id ='" . $contact_id . "' ORDER BY time DESC";
-			$contact_automations = $wpdb->get_results( $query, ARRAY_A );
+			$contact_automations = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( empty( $contact_automations ) ) {
 				return array();
 			}
@@ -857,34 +876,34 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			$automation_complete_contact   = $wpdb->prefix . 'bwfan_automation_complete_contact';
 			$automation_contact_trail      = $wpdb->prefix . 'bwfan_automation_contact_trail';
 
-			$contact_email = $wpdb->get_col( $wpdb->prepare( "select email from {$contact_table} where id=%d", $contact_id ) );
-			$contact_phone = $wpdb->get_col( $wpdb->prepare( "select contact_no from {$contact_table} where id=%d", $contact_id ) );
+			$contact_email = $wpdb->get_col( $wpdb->prepare( "select email from {$contact_table} where id=%d", $contact_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$contact_phone = $wpdb->get_col( $wpdb->prepare( "select contact_no from {$contact_table} where id=%d", $contact_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
-			$delete_contact = $wpdb->delete( $contact_table, array( 'id' => $contact_id ) );
+			$delete_contact = $wpdb->delete( $contact_table, array( 'id' => $contact_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( ! $delete_contact ) {
 				/** If no contact then return false */
 				return false;
 			}
 
-			$wpdb->delete( $contact_meta_table, array( 'contact_id' => $contact_id ) );
-			$wpdb->delete( $contact_customer_table, array( 'cid' => $contact_id ) );
-			$wpdb->delete( $contact_fields_table, array( 'cid' => $contact_id ) );
-			$wpdb->delete( $contact_note_table, array( 'cid' => $contact_id ) );
+			$wpdb->delete( $contact_meta_table, array( 'contact_id' => $contact_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->delete( $contact_customer_table, array( 'cid' => $contact_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->delete( $contact_fields_table, array( 'cid' => $contact_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->delete( $contact_note_table, array( 'cid' => $contact_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			/** check if the automation run for v1 */
 			if ( BWFAN_Common::is_automation_v1_active() ) {
-				$wpdb->delete( $contact_automations_table, array( 'contact_id' => $contact_id ) );
+				$wpdb->delete( $contact_automations_table, array( 'contact_id' => $contact_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			}
 
-			$wpdb->delete( $contact_conversions_table, array( 'cid' => $contact_id ) );
+			$wpdb->delete( $contact_conversions_table, array( 'cid' => $contact_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			/** Delete complete and active Automation by contact id */
-			$wpdb->delete( $automation_contact, array( 'cid' => $contact_id ) );
-			$wpdb->delete( $automation_complete_contact, array( 'cid' => $contact_id ) );
-			$wpdb->delete( $automation_contact_trail, array( 'cid' => $contact_id ) );
+			$wpdb->delete( $automation_contact, array( 'cid' => $contact_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->delete( $automation_complete_contact, array( 'cid' => $contact_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->delete( $automation_contact_trail, array( 'cid' => $contact_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
-			$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}postmeta WHERE meta_key LIKE '_woofunnel_cid' AND meta_value = %d", $contact_id ) );
-			$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}postmeta WHERE meta_key LIKE '_woofunnel_custid' AND meta_value = %d", $contact_id ) );
+			$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}postmeta WHERE meta_key LIKE '_woofunnel_cid' AND meta_value = %d", $contact_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}postmeta WHERE meta_key LIKE '_woofunnel_custid' AND meta_value = %d", $contact_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			$engagement_meta_query = $wpdb->prepare( "DELETE $contact_engagement_meta_table
 				FROM $contact_engagement_meta_table
@@ -892,17 +911,17 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 				WHERE $contact_engagement_table.cid = %d", $contact_id );
 
 			/** delete from engagement meta and engagement table */
-			$wpdb->query( $engagement_meta_query );
-			$wpdb->delete( $contact_engagement_table, array( 'cid' => $contact_id ) );
+			$wpdb->query( $engagement_meta_query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->delete( $contact_engagement_table, array( 'cid' => $contact_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			/** delete from the unsubscribe table */
 
 			if ( is_array( $contact_email ) && ! empty( $contact_email[0] ) ) {
-				$wpdb->delete( $contact_unsubscribe_table, array( 'recipient' => $contact_email[0] ) );
+				$wpdb->delete( $contact_unsubscribe_table, array( 'recipient' => $contact_email[0] ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			}
 
 			if ( is_array( $contact_phone ) && ! empty( $contact_phone[0] ) ) {
-				$wpdb->delete( $contact_unsubscribe_table, array( 'recipient' => $contact_phone[0] ) );
+				$wpdb->delete( $contact_unsubscribe_table, array( 'recipient' => $contact_phone[0] ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			}
 
 			return true;
@@ -945,7 +964,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 									WHERE wc_stats.status = 'wc-completed' 
 									and pm.meta_key='_woofunnel_cid'
 									and pm.meta_value=%d", $contact_id );
-				$contact_orders_total_results = $wpdb->get_results( $contact_orders_total_query, ARRAY_A );
+				$contact_orders_total_results = $wpdb->get_results( $contact_orders_total_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			}
 
 			if ( empty( $contact_orders_total_results ) ) {
@@ -956,7 +975,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 									WHERE wc_stats.status = 'wc-completed' 
 									and pm.meta_key='_woofunnel_cid'
 									and pm.meta_value=%d", $contact_id );
-				$contact_orders_total_results = $wpdb->get_results( $contact_orders_total_query, ARRAY_A );
+				$contact_orders_total_results = $wpdb->get_results( $contact_orders_total_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			}
 
 			$aov_contact_order_total = 0;
@@ -985,7 +1004,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			$bump_query   = $wpdb->prepare( "SELECT bump.bid as 'object_id',
 						bump.total as 'total_revenue', 
 						'bump' as 'type' FROM {$wpdb->prefix}wfob_stats AS bump WHERE bump.cid='%d' AND bump.converted=1", $contact_id );
-			$bump_results = $wpdb->get_results( $bump_query, ARRAY_A );
+			$bump_results = $wpdb->get_results( $bump_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( empty( $bump_results ) ) {
 				return $bump_data;
 			}
@@ -1013,7 +1032,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 						   FROM {$wpdb->prefix}wfocu_event as event LEFT JOIN {$wpdb->prefix}wfocu_session as session 
 						   ON event.sess_id = session.id 
 						   WHERE (event.action_type_id = 4) AND session.cid='%d'", $contact_id );
-			$upstroke_result = $wpdb->get_results( $upstroke_query, ARRAY_A );
+			$upstroke_result = $wpdb->get_results( $upstroke_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( empty( $upstroke_result ) ) {
 				return $upstroke_data;
 			}
@@ -1047,7 +1066,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 				$where['cid'] = $contact_id;
 			}
 
-			$delete_contact_notes = $wpdb->delete( $contact_note_table, $where );
+			$delete_contact_notes = $wpdb->delete( $contact_note_table, $where ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( ! $delete_contact_notes ) {
 				return false;
 			}
@@ -1064,7 +1083,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			global $wpdb;
 
 			$query         = $wpdb->prepare( "SELECT  count(aero.wfacp_id) as total_orders, sum(aero.total_revenue) as 'total_revenue' FROM {$wpdb->prefix}bwf_contact AS contact JOIN {$wpdb->prefix}wfacp_stats AS aero ON contact.id=aero.cid WHERE aero.cid=%d ORDER BY aero.date DESC", $contact_id );
-			$checkout_data = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$checkout_data = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			$return = array();
 
@@ -1084,7 +1103,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			$optin_submission = 0;
 
 			$query      = $wpdb->prepare( "SELECT count(optin.id) as total_submission FROM {$wpdb->prefix}bwf_contact AS contact JOIN {$wpdb->prefix}bwf_optin_entries AS optin ON contact.id=optin.cid WHERE optin.cid=%d ORDER BY optin.date DESC", $contact_id );
-			$optin_data = $wpdb->get_results( $query, ARRAY_A );
+			$optin_data = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( ! isset( $optin_data[0]['total_submission'] ) || empty( $optin_data[0]['total_submission'] ) ) {
 				return $optin_submission;
 			}
@@ -1147,7 +1166,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			$join_wc_query  = $wc_get_data ? "LEFT JOIN $customer_table as wc ON c.id = wc.cid" : '';
 			$cart_join      = "LEFT JOIN $contact_table as c ON ab.email = c.email";
 			$base_query     = $wpdb->prepare( "SELECT $wp_wc_columns FROM $cart_table as ab $cart_join $join_wc_query WHERE 1=1 and ab.status IN (0,1,3,4) and c.id IS NOT NULL ORDER BY ab.last_modified DESC LIMIT %d,%d", $offset, $limit );
-			$contacts       = $wpdb->get_results( $base_query, ARRAY_A );
+			$contacts       = $wpdb->get_results( $base_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			if ( ! is_array( $contacts ) || 0 === count( $contacts ) ) {
 				return array(
@@ -1169,7 +1188,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			$table_name = self::_table();
 			$query      = "SELECT max(id) as last_id FROM $table_name";
 
-			return $wpdb->get_var( $query );
+			return $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		public static function set_log( $log ) {
@@ -1207,7 +1226,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			self::set_log( $sql_queries['base'] );
 
 			$time     = microtime( true );
-			$contacts = $wpdb->get_results( $sql_queries['base'], ARRAY_A );
+			$contacts = $wpdb->get_results( $sql_queries['base'], ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$time     = microtime( true ) - $time;
 			self::set_log( 'Time to execute the query: ' . $time . ' secs' );
 			self::log();
@@ -1216,14 +1235,14 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			if ( empty( $contacts ) && ! empty( $wpdb->last_error ) ) {
 				BWFAN_Common::log_test_data( $wpdb->last_error, 'collation-issue', true );
 				BWFAN_Fix_Collation::maybe_fix_collation_issue();
-				$contacts = $wpdb->get_results( $sql_queries['base'], ARRAY_A );
+				$contacts = $wpdb->get_results( $sql_queries['base'], ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			}
 
 			$contacts = self::prepared_data( $contacts, $sql_queries['needs_to_added'] );
 
 			return array(
 				'contacts' => $contacts,
-				'total'    => $wpdb->get_var( $sql_queries['total'] )
+				'total'    => $wpdb->get_var( $sql_queries['total'] ) //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			);
 		}
 
@@ -1305,7 +1324,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 
 						return ! $product->is_type( 'variable' ) ? array(
 							'id'   => $pid,
-							'name' => $product->get_name( 'edit' ),
+							'name' => wp_strip_all_tags( $product->get_name( 'edit' ) ),
 							'link' => get_edit_post_link( $pid ),
 						) : false;
 					}, array_unique( $purchased_products ) ) ) : [];
@@ -1320,7 +1339,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 
 						return $cat instanceof WP_Term ? array(
 							'id'   => $cat->term_id,
-							'name' => $cat->name,
+							'name' => wp_strip_all_tags( $cat->name ),
 							'link' => get_edit_term_link( $cat ),
 						) : false;
 					}, array_unique( $purchased_products_cats ) );
@@ -1335,7 +1354,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 
 						return $tag instanceof WP_Term ? array(
 							'id'   => $tag->term_id,
-							'name' => $tag->name,
+							'name' => wp_strip_all_tags( $tag->name ),
 							'link' => get_edit_term_link( $tag ),
 						) : false;
 					}, array_unique( $purchased_products_tags ) );
@@ -1670,7 +1689,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 		public static function save_last_modified( $cid ) {
 			global $wpdb;
 
-			return $wpdb->update( "{$wpdb->prefix}bwf_contact", [ 'last_modified' => current_time( 'mysql', 1 ) ], [ 'id' => $cid ] );
+			return $wpdb->update( "{$wpdb->prefix}bwf_contact", [ 'last_modified' => current_time( 'mysql', 1 ) ], [ 'id' => $cid ] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -1687,7 +1706,7 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 
 			$type = 'object' === $type ? OBJECT : ARRAY_A;
 
-			return $wpdb->get_row( $wpdb->prepare( $query, $id ), $type );
+			return $wpdb->get_row( $wpdb->prepare( $query, $id ), $type ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**

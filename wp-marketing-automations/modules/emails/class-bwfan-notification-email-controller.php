@@ -31,10 +31,10 @@ class BWFAN_Notification_Email_Controller {
 	 */
 	public function get_email_sections() {
 		$global_settings = BWFAN_Common::get_global_settings();
-
+		/* translators: 1: Dynamic From Date, 2: Dynamic to date */
 		$date_range = sprintf( __( '%1$s - %2$s', 'wp-marketing-automations' ), BWFAN_Notification_Email::format_date( $this->dates['from_date'] ), BWFAN_Notification_Email::format_date( $this->dates['to_date'] ) );
 		if ( 'daily' === $this->frequency ) {
-			$date_range = sprintf( __( '%s', 'wp-marketing-automations' ), BWFAN_Notification_Email::format_date( $this->dates['from_date'] ) );
+			$date_range = BWFAN_Notification_Email::format_date( $this->dates['from_date'] );
 		}
 
 		$upgrade_link = BWFAN_Common::get_fk_site_links();
@@ -91,7 +91,8 @@ class BWFAN_Notification_Email_Controller {
 				'type' => 'section_header',
 				'data' => array(
 					'title'    => __( 'Key Performance Metrics', 'wp-marketing-automations' ),
-					'subtitle' => sprintf( __( 'Change compared to previous %s', 'wp-marketing-automations' ), $this->get_frequency_string( $this->frequency ) ),
+					/* translators: 1: Dynamic Data */
+					'subtitle' => sprintf( __( 'Change compared to previous %1$s', 'wp-marketing-automations' ), $this->get_frequency_string( $this->frequency ) ),
 				),
 			),
 		);
@@ -122,9 +123,11 @@ class BWFAN_Notification_Email_Controller {
 		}
 
 		if ( $total_revenue > 10 ) {
-			$cta_content = sprintf( __( "Since installing %s you have captured additional revenue of %s.", 'wp-marketing-automations' ), '<strong>' . __( 'FunnelKit Automation', 'wp-marketing-automations' ) . '</strong>', '<strong>' . wc_price( $total_revenue ) . '</strong>' );
+			/* translators: 1: Dynamic Data, 2: Dynamic Revenue */
+			$cta_content = sprintf( __( 'Since installing %1$s you have captured additional revenue of %2$s.', 'wp-marketing-automations' ), '<strong>' . __( 'FunnelKit Automation', 'wp-marketing-automations' ) . '</strong>', '<strong>' . wc_price( $total_revenue ) . '</strong>' );
 			if ( false === bwfan_is_autonami_pro_active() ) {
-				$cta_content      = sprintf( __( "Since installing %s you have captured additional revenue of %s. Upgrade to Pro for even more revenue.", 'wp-marketing-automations' ), '<strong>' . __( 'FunnelKit Automation', 'wp-marketing-automations' ) . '</strong>', '<strong>' . wc_price( $total_revenue ) . '</strong>' );
+				/* translators: 1: Dynamic Data, 2: Dynamic Revenue */
+				$cta_content      = sprintf( __( 'Since installing %1$s you have captured additional revenue of %2$s. Upgrade to Pro for even more revenue.', 'wp-marketing-automations' ), '<strong>' . __( 'FunnelKit Automation', 'wp-marketing-automations' ) . '</strong>', '<strong>' . wc_price( $total_revenue ) . '</strong>' );
 				$cta_link         = add_query_arg( [
 					'utm_campaign' => 'FKA+Lite+Notification',
 					'utm_medium'   => 'Total+Revenue'
@@ -216,25 +219,25 @@ class BWFAN_Notification_Email_Controller {
 			}
 			switch ( $section['type'] ) {
 				case 'email_header':
-					echo BWFAN_Notification_Email::get_template_html( 'emails/email-header.php' );
+					echo BWFAN_Notification_Email::get_template_html( 'emails/email-header.php' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					break;
 				case 'highlight':
-					echo BWFAN_Notification_Email::get_template_html( 'emails/admin-email-report-highlight.php', $section['data'] );
+					echo BWFAN_Notification_Email::get_template_html( 'emails/admin-email-report-highlight.php', $section['data'] ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					break;
 				case 'metrics':
-					echo BWFAN_Notification_Email::get_template_html( 'emails/admin-email-report-metrics.php', $section['data'] );
+					echo BWFAN_Notification_Email::get_template_html( 'emails/admin-email-report-metrics.php', $section['data'] ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					break;
 				case 'section_header':
-					echo BWFAN_Notification_Email::get_template_html( 'emails/email-section-header.php', $section['data'] );
+					echo BWFAN_Notification_Email::get_template_html( 'emails/email-section-header.php', $section['data'] ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					break;
 				case 'todo_status':
-					echo BWFAN_Notification_Email::get_template_html( 'emails/admin-email-report-todo-status.php', $section['data'] );
+					echo BWFAN_Notification_Email::get_template_html( 'emails/admin-email-report-todo-status.php', $section['data'] ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					break;
 				case 'divider':
-					echo BWFAN_Notification_Email::get_template_html( 'emails/email-divider.php' );
+					echo BWFAN_Notification_Email::get_template_html( 'emails/email-divider.php' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					break;
 				case 'email_footer':
-					echo BWFAN_Notification_Email::get_template_html( 'emails/email-footer.php', $section['data'] );
+					echo BWFAN_Notification_Email::get_template_html( 'emails/email-footer.php', $section['data'] ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					break;
 				case 'dynamic':
 					if ( isset( $section['callback'] ) && is_callable( $section['callback'] ) ) {
@@ -243,12 +246,12 @@ class BWFAN_Notification_Email_Controller {
 					break;
 				case 'bwfan_status_section':
 					if ( ! empty( $section['data'] ) ) {
-						echo BWFAN_Notification_Email::get_template_html( 'emails/email-bwfan-status-section.php', $section['data'] );
+						echo BWFAN_Notification_Email::get_template_html( 'emails/email-bwfan-status-section.php', $section['data'] ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
 					break;
 				case 'bwfan_status_w_cta_section':
 					if ( ! empty( $section['data'] ) ) {
-						echo BWFAN_Notification_Email::get_template_html( 'emails/email-bwfan-status-w-btn-section.php', $section['data'] );
+						echo BWFAN_Notification_Email::get_template_html( 'emails/email-bwfan-status-w-btn-section.php', $section['data'] ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
 					break;
 				default:
@@ -292,7 +295,7 @@ class BWFAN_Notification_Email_Controller {
 
 		$table_name = $wpdb->prefix . 'bwfan_automations';
 
-		$results = $wpdb->get_col( $wpdb->prepare( "SELECT DISTINCT `event` FROM `$table_name` WHERE `v` = %d AND `status` = %d", 2, 1 ) );
+		$results = $wpdb->get_col( $wpdb->prepare( "SELECT DISTINCT `event` FROM `$table_name` WHERE `v` = %d AND `status` = %d", 2, 1 ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return $results;
 	}

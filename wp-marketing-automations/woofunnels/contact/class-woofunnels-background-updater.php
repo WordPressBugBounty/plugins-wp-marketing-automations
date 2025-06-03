@@ -53,7 +53,7 @@ if ( ! class_exists( 'WooFunnels_Background_Updater' ) ) {
 			$schedules[ $this->identifier . '_cron_interval' ] = array(
 				'interval' => MINUTE_IN_SECONDS * $interval,
 				/* translators: %d: interval */
-				'display'  => sprintf( __( 'Every %d minutes', 'woocommerce' ), $interval ),
+				'display'  => sprintf( __( 'Every %d minutes', 'woocommerce' ), $interval ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			);
 
 			return $schedules;
@@ -329,7 +329,7 @@ if ( ! class_exists( 'WooFunnels_Background_Updater' ) ) {
 		 * @return bool
 		 */
 		protected function memory_exceeded() {
-			$memory_limit   = $this->get_memory_limit() * 0.8; // 80% of max memory
+			$memory_limit   = $this->get_memory_limit() * 0.9; // 90% of max memory
 			$current_memory = memory_get_usage( true );
 			$return         = false;
 

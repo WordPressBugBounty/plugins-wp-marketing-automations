@@ -2,7 +2,7 @@
 $unique_slug = $this->get_slug();
 $wc_enabled  = apply_filters( 'bwfan_enable_wc_email_template', false );
 ?>
-    <script type="text/html" id="tmpl-action-<?php esc_html_e( $unique_slug ); ?>">
+    <script type="text/html" id="tmpl-action-<?php echo esc_html( $unique_slug ); ?>">
         <#
         selected_event_src = BWFAN_Auto.uiDataDetail.trigger.source;
         selected_event = BWFAN_Auto.uiDataDetail.trigger.event;
@@ -23,7 +23,8 @@ $wc_enabled  = apply_filters( 'bwfan_enable_wc_email_template', false );
         email_sub = 'We\'re still holding the cart for you';
         email_body = '<p>Hi {{cart_billing_first_name}},</p>' +
         "<p>I noticed that you were trying to purchase but could not complete the process.</p>" +
-        '<p>{{cart_items template="cart-table"}}</p>'+
+        '<p>{{cart_items
+            template = "cart-table"}}</p>'+
         '<p>We have reserved the cart for you, <a href="{{cart_recovery_link}}">Click here</a> to complete your purchase.</p>' +
         '<p>If you have any questions, feel free to get in touch with us.</p>' +
         '<p>Hit reply and I\'ll be happy to answer your questions.</p>' +
@@ -56,7 +57,7 @@ $wc_enabled  = apply_filters( 'bwfan_enable_wc_email_template', false );
         is_promotional = 'checked';
         }
         #>
-        <div data-element-type="bwfan-editor" data-temp="{{selected_template}}" class="bwfan-<?php esc_html_e( $unique_slug ); ?>">
+        <div data-element-type="bwfan-editor" data-temp="{{selected_template}}" class="bwfan-<?php echo esc_html( $unique_slug ); ?>">
             <label for="" class="bwfan-label-title">
 				<?php esc_html_e( 'Template', 'wp-marketing-automations' ); ?>
 				<?php
@@ -92,34 +93,34 @@ $wc_enabled  = apply_filters( 'bwfan_enable_wc_email_template', false );
 				<?php esc_html_e( 'To', 'wp-marketing-automations' ); ?>
 				<?php
 				$message = __( 'Receiver email address', 'wp-marketing-automations' );
-				echo $this->add_description( esc_html__( $message ), 'xl', 'right' ); //phpcs:ignore WordPress.Security.EscapeOutput
+				echo $this->add_description( esc_html( $message ), 'xl', 'right' ); //phpcs:ignore WordPress.Security.EscapeOutput
 				?>
 				<?php echo $this->inline_merge_tag_invoke(); //phpcs:ignore WordPress.Security.EscapeOutput ?>
             </label>
             <div class="bwfan-col-sm-12 bwfan-pl-0 bwfan-pr-0 bwfan-mb-15">
-                <input required type="text" class="bwfan-input-wrapper bwfan-field-<?php esc_html_e( $unique_slug ); ?>" name="bwfan[{{data.action_id}}][data][to]" placeholder="E.g. customer_email@gmail.com" value="{{to}}"/>
+                <input required type="text" class="bwfan-input-wrapper bwfan-field-<?php echo esc_html( $unique_slug ); ?>" name="bwfan[{{data.action_id}}][data][to]" placeholder="E.g. customer_email@gmail.com" value="{{to}}"/>
             </div>
             <label for="" class="bwfan-label-title">
 				<?php esc_html_e( 'Subject', 'wp-marketing-automations' ); ?>
 				<?php
 				$message = __( 'Email subject', 'wp-marketing-automations' );
-				echo $this->add_description( esc_html__( $message ), 'm', 'right' ); //phpcs:ignore WordPress.Security.EscapeOutput
+				echo $this->add_description( esc_html( $message ), 'm', 'right' ); //phpcs:ignore WordPress.Security.EscapeOutput
 				?>
 				<?php echo $this->inline_merge_tag_invoke(); //phpcs:ignore WordPress.Security.EscapeOutput ?>
             </label>
             <div class="bwfan-col-sm-12 bwfan-pl-0 bwfan-pr-0 bwfan-mb-15">
-                <input required type="text" id='bwfan_email_subject' class="bwfan-input-wrapper bwfan-field-<?php esc_html_e( $unique_slug ); ?>" name="bwfan[{{data.action_id}}][data][subject]" placeholder="Enter Subject" value="{{subject}}"/>
+                <input required type="text" id='bwfan_email_subject' class="bwfan-input-wrapper bwfan-field-<?php echo esc_html( $unique_slug ); ?>" name="bwfan[{{data.action_id}}][data][subject]" placeholder="Enter Subject" value="{{subject}}"/>
             </div>
             <label for="" class="bwfan-label-title">
 				<?php esc_html_e( 'Pre Header', 'wp-marketing-automations' ); ?>
 				<?php
 				$message = __( 'Email pre header', 'wp-marketing-automations' );
-				echo $this->add_description( esc_html__( $message ), 'm', 'right' ); //phpcs:ignore WordPress.Security.EscapeOutput
+				echo $this->add_description( esc_html( $message ), 'm', 'right' ); //phpcs:ignore WordPress.Security.EscapeOutput
 				?>
 				<?php echo $this->inline_merge_tag_invoke(); //phpcs:ignore WordPress.Security.EscapeOutput ?>
             </label>
             <div class="bwfan-col-sm-12 bwfan-pl-0 bwfan-pr-0 bwfan-mb-15">
-                <input required type="text" id='bwfan_email_preheader' class="bwfan-input-wrapper bwfan-field-<?php esc_html_e( $unique_slug ); ?>" name="bwfan[{{data.action_id}}][data][preheading]" placeholder="Enter Pre Heading" value="{{email_preheading}}"/>
+                <input required type="text" id='bwfan_email_preheader' class="bwfan-input-wrapper bwfan-field-<?php echo esc_html( $unique_slug ); ?>" name="bwfan[{{data.action_id}}][data][preheading]" placeholder="Enter Pre Heading" value="{{email_preheading}}"/>
             </div>
             <div class="bwfan_email_template {{show_email_heading}} bwfan_wc_email_heading">
                 <label for="" class="bwfan-label-title">
@@ -127,7 +128,7 @@ $wc_enabled  = apply_filters( 'bwfan_enable_wc_email_template', false );
 					<?php echo $this->inline_merge_tag_invoke(); //phpcs:ignore WordPress.Security.EscapeOutput ?>
                 </label>
                 <div class="bwfan-col-sm-12 bwfan-pl-0 bwfan-pr-0 bwfan-mb-15">
-                    <input type="text" id='bwfan_email_heading' class="bwfan-input-wrapper bwfan-field-<?php esc_html_e( $unique_slug ); ?>" name="bwfan[{{data.action_id}}][data][email_heading]" placeholder="Your Store Name" value="{{email_heading}}"/>
+                    <input type="text" id='bwfan_email_heading' class="bwfan-input-wrapper bwfan-field-<?php echo esc_html( $unique_slug ); ?>" name="bwfan[{{data.action_id}}][data][email_heading]" placeholder="Your Store Name" value="{{email_heading}}"/>
                 </div>
             </div>
             <div style="display: flex;
@@ -149,7 +150,7 @@ $wc_enabled  = apply_filters( 'bwfan_enable_wc_email_template', false );
 			<?php do_action( 'bwfan_action_send_email_editors' ); ?>
 
             <div class="bwfan_preview_email_container bwfan-mb-15">
-                <?php echo $this->save_email_option_template(); //phpcs:ignore WordPress.Security.EscapeOutput ?>
+				<?php echo $this->save_email_option_template(); //phpcs:ignore WordPress.Security.EscapeOutput ?>
                 <a href="javascript:void(0);" class="bwfan_preview_email"><?php esc_html_e( 'Generate Preview', 'wp-marketing-automations' ); ?></a>
             </div>
 
@@ -167,7 +168,7 @@ $wc_enabled  = apply_filters( 'bwfan_enable_wc_email_template', false );
 					<?php
 					esc_html_e( 'Mark as Promotional', 'wp-marketing-automations' );
 					$message = __( "Email marked as promotional will not be send to the unsubscribers.", 'wp-marketing-automations' );
-					echo $this->add_description( esc_html__( $message ), 'xl' ); //phpcs:ignore WordPress.Security.EscapeOutput
+					echo $this->add_description( esc_html( $message ), 'xl' ); //phpcs:ignore WordPress.Security.EscapeOutput
 					?>
                 </label>
             </div>

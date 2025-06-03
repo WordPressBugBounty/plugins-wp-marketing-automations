@@ -31,8 +31,6 @@ class BWFAN_API_Loader {
 	 * BWFAN_API_Loader constructor.
 	 */
 	public function __construct() {
-		self::load_api_supporter_classes();
-		add_action( 'rest_api_init', [ __CLASS__, 'register_routes' ] );
 	}
 
 	/**
@@ -102,6 +100,7 @@ class BWFAN_API_Loader {
 	}
 
 	public static function register_routes() {
+		self::load_api_supporter_classes();
 		self::load_api_classes();
 
 		foreach ( self::$registered_apis as $route => $registered_api ) {
@@ -122,7 +121,7 @@ class BWFAN_API_Loader {
 				);
 
 				if ( false === $api->public_api ) {
-					$route_args['permission_callback'] = [ __CLASS__, 'rest_permission_callback' ];
+					$route_args['permission_callback'] = [ $api, 'rest_permission_callback' ];
 				}
 
 				if ( is_array( $api->request_args ) && ! empty( $api->request_args ) ) {
@@ -139,24 +138,6 @@ class BWFAN_API_Loader {
 		}
 
 		do_action( 'bwfan_api_routes_registered', self::$registered_apis );
-	}
-
-	/** rest api permission callback
-	 * @return bool
-	 */
-	public static function rest_permission_callback( WP_REST_Request $request ) {
-		$query_params = $request->get_query_params();
-		if ( isset( $query_params['bwf-nonce'] ) && $query_params['bwf-nonce'] === get_option( 'bwfan_u_key', '' ) ) {
-			return true;
-		}
-		$permissions = BWFAN_Common::access_capabilities();
-		foreach ( $permissions as $permission ) {
-			if ( current_user_can( $permission ) ) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 }
 

@@ -42,7 +42,9 @@ class BWFAN_API_Get_Contact_Orders extends BWFAN_API_Base {
 		if ( ! $contact->is_contact_exists() ) {
 			$this->response_code = 404;
 
-			return $this->error_response( sprintf( __( 'No contact found with given id #%s', 'wp-marketing-automations' ), $contact_id ) );
+			/* translators: 1: Contact ID */
+
+			return $this->error_response( sprintf( __( 'No contact found with given id #%1$d', 'wp-marketing-automations' ), $contact_id ) );
 		}
 
 		$limit     = $this->get_sanitized_arg( 'limit', 'text_field' );
@@ -57,7 +59,9 @@ class BWFAN_API_Get_Contact_Orders extends BWFAN_API_Base {
 			];
 			$this->response_code = 200;
 
-			return $this->success_response( $response, __( 'No contact order found related with contact id :' . $contact_id, 'wp-marketing-automations' ) );
+			/* translators: 1: Contact ID */
+
+			return $this->success_response( $response, sprintf( __( 'No contact order found related with contact id : %1$d', 'wp-marketing-automations' ), $contact_id ) );
 		}
 
 		$response = [

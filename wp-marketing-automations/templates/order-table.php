@@ -55,9 +55,9 @@ if ( true === apply_filters( 'bwfan_remove_wc_template_filters', true ) ) {
 if ( $show_downloads ) {
 	$downloads = $this->order->get_downloadable_items();
 	$columns   = apply_filters( 'woocommerce_email_downloads_columns', array(
-		'download-product' => __( 'Product', 'woocommerce' ),
-		'download-expires' => __( 'Expires', 'woocommerce' ),
-		'download-file'    => __( 'Download', 'woocommerce' ),
+		'download-product' => __( 'Product', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+		'download-expires' => __( 'Expires', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+		'download-file'    => __( 'Download', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 	) );
 
 	wc_get_template( 'emails/email-downloads.php', array(

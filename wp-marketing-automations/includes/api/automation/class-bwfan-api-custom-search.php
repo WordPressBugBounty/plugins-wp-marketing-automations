@@ -23,7 +23,8 @@ class BWFAN_API_Get_Custom_Search extends BWFAN_API_Base {
 		$type = $this->get_sanitized_arg( 'type' );
 		// removed get_sanitized_arg function because that was merging two or more substrings and making one
 		// for example : xl autonami. with get_sanitized_arg, it is becoming xlautonami, which making issue in search
-		$search = isset( $this->args['search'] ) && ! empty( $this->args['search'] ) ? $this->args['search'] : '';
+		$search     = isset( $this->args['search'] ) && ! empty( $this->args['search'] ) ? $this->args['search'] : '';
+		$extra_data = $this->args;
 		if ( empty( $type ) ) {
 			return $this->error_response( __( 'Invalid or empty type', 'wp-marketing-automations' ), null, 400 );
 		}
@@ -32,7 +33,7 @@ class BWFAN_API_Get_Custom_Search extends BWFAN_API_Base {
 			return $this->error_response( __( 'Invalid or empty type', 'wp-marketing-automations' ), null, 400 );
 		}
 		$type    = BWFAN_Core()->custom_search->get_custom_search( $type );
-		$options = $type->get_options( $search );
+		$options = $type->get_options( $search, $extra_data );
 
 		return $this->success_response( $options );
 	}

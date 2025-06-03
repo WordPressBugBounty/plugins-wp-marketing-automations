@@ -18,7 +18,7 @@ if ( ! class_exists( 'WFCO_Model_Report_views' ) ) {
 				$sql    = $wpdb->prepare( "SELECT COUNT(*) FROM $table_name WHERE status = %d", $status ); //phpcs:ignore WordPress.DB.PreparedSQL
 			}
 
-			return $wpdb->get_var( $sql ); //phpcs:ignore WordPress.DB.PreparedSQL
+			return $wpdb->get_var( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 		}
 
 		private static function _table() {
@@ -57,14 +57,14 @@ if ( ! class_exists( 'WFCO_Model_Report_views' ) ) {
 			$where_string = implode( ' and ', $where );
 			$table        = self::_table();
 			$get_sql      = "SELECT * FROM $table WHERE {$where_string};";
-			$result       = $wpdb->get_results( $get_sql, ARRAY_A ); //phpcs:ignore WordPress.DB.PreparedSQL
+			$result       = $wpdb->get_results( $get_sql, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 			if ( ! empty( $result ) ) {
 				$primary_id = $result[0]['id'];
 				$sql        = "UPDATE $table set no_of_sessions=no_of_sessions+1 where id ='{$primary_id}';";
-				$wpdb->query( $sql ); //phpcs:ignore WordPress.DB.PreparedSQL
+				$wpdb->query( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 			} else {
-				$wpdb->insert( $table, $insert );
+				$wpdb->insert( $table, $insert ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 			}
 		}
 
@@ -92,7 +92,7 @@ if ( ! class_exists( 'WFCO_Model_Report_views' ) ) {
 			global $wpdb;
 			$table = self::_table();
 			$sql   = "select * from `{$table}` WHERE {$where_string};";
-			$data  = $wpdb->get_results( $sql, ARRAY_A ); //phpcs:ignore WordPress.DB.PreparedSQL
+			$data  = $wpdb->get_results( $sql, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 			return $data;
 		}

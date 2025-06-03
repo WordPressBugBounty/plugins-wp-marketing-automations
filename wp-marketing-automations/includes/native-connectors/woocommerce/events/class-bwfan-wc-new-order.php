@@ -133,7 +133,7 @@ final class BWFAN_WC_New_Order extends BWFAN_Event {
                 <label class="bwfan-label-title">End Automation</label>
                 <div>
                     <input type="checkbox" name="event_meta[terminate_on_order]" id="bwfan_end_automation" value="1" {{terminate_on_order}}/>
-                    <label for="bwfan_end_automation" class="bwfan-checkbox-label"><?php esc_html_e( 'End automation if customer places the order during the automation' ) ?></label>
+                    <label for="bwfan_end_automation" class="bwfan-checkbox-label"><?php esc_html_e( 'End automation if customer places the order during the automation', 'wp-marketing-automations' ) ?></label>
                 </div>
 
             </div>
@@ -232,9 +232,14 @@ final class BWFAN_WC_New_Order extends BWFAN_Event {
 		$data_to_send                       = [];
 		$data_to_send['global']['order_id'] = $this->order_id;
 		$this->order                        = wc_get_order( $this->order_id );
-		$data_to_send['global']['email']    = BWFAN_Common::get_email_from_order( $this->order_id, $this->order );
-		$data_to_send['global']['phone']    = BWFAN_Common::get_phone_from_order( $this->order_id, $this->order );
 		$user_id                            = BWFAN_Common::get_wp_user_id_from_order( $this->order_id, $this->order );
+
+		$email = ! empty( $user_id ) ? BWFAN_Common::get_contact_email( $user_id ) : '';
+
+		/** Set billing email if email is empty */
+		$data_to_send['global']['email'] = ! empty( $email ) ? $email : BWFAN_Common::get_email_from_order( $this->order_id, $this->order );
+		$data_to_send['global']['phone'] = BWFAN_Common::get_phone_from_order( $this->order_id, $this->order );
+
 		if ( intval( $user_id ) > 0 ) {
 			$data_to_send['global']['user_id'] = $user_id;
 		}
@@ -701,7 +706,7 @@ final class BWFAN_WC_New_Order extends BWFAN_Event {
 				'type'     => 'notice',
 				'class'    => '',
 				'status'   => 'warning',
-				'message'  => __('This is a Pro feature.','wp-marketing-automations' ),
+				'message'  => __( 'This is a Pro feature.', 'wp-marketing-automations' ),
 				'dismiss'  => false,
 				'required' => false,
 				'toggler'  => [
@@ -763,6 +768,7 @@ final class BWFAN_WC_New_Order extends BWFAN_Event {
 				'class'         => '',
 				'placeholder'   => '',
 				'required'      => false,
+				'hint'          => __( 'The goal will be met if at least one of the selected product is purchased.', 'wp-marketing-automations' ),
 				'toggler'       => [
 					'fields' => [
 						[
@@ -821,15 +827,17 @@ final class BWFAN_WC_New_Order extends BWFAN_Event {
 	 * @return array|null[]
 	 */
 	public function get_manually_added_contact_automation_data( $automation_data, $cid ) {
-		$contact = new BWFCRM_Contact( $cid );
-		if ( ! $contact->is_contact_exists() ) {
+		$contact = new WooFunnels_Contact( '', '', '', $cid );
+
+		/** Check if contact exists */
+		if ( ! $contact instanceof WooFunnels_Contact || empty( $contact->get_id() ) ) {
 			return [ 'status' => 0, 'type' => 'contact_not_found' ];
 		}
 
 		$order = BWFAN_Common::fetch_last_order_by_contact( $contact );
 
 		if ( empty( $order ) || ! $order[0] instanceof WC_Order ) {
-			return [ 'status' => 0, 'type' => '', 'message' => "Contact doesn't have any order." ];
+			return [ 'status' => 0, 'type' => '', 'message' => __( "Contact doesn't have any order.", 'wp-marketing-automations' ) ];
 		}
 
 		$this->order_id  = $order[0]->get_id();

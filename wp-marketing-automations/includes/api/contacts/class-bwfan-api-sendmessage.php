@@ -49,7 +49,9 @@ class BWFAN_API_SendMessage extends BWFAN_API_Base {
 		if ( ! $contact->is_contact_exists() ) {
 			$this->response_code = 400;
 
-			return $this->error_response( sprintf( __( 'No contact found with given id #%s', 'wp-marketing-automations' ), $contact_id ) );
+			/* translators: 1: Contact ID */
+
+			return $this->error_response( sprintf( __( 'No contact found with given id #%1$d', 'wp-marketing-automations' ), $contact_id ) );
 		}
 
 		/** Check if contacts status is bounced */
@@ -73,10 +75,12 @@ class BWFAN_API_SendMessage extends BWFAN_API_Base {
 
 		$author_id = get_current_user_id();
 
-		$mode = BWFAN_Email_Conversations::$MODE_EMAIL;
+		$mode                                = BWFAN_Email_Conversations::$MODE_EMAIL;
+		$this->conversation->engagement_type = BWFAN_Email_Conversations::$TYPE_EMAIL;
 		switch ( $type ) {
 			case 'sms':
-				$mode = BWFAN_Email_Conversations::$MODE_SMS;
+				$mode                                = BWFAN_Email_Conversations::$MODE_SMS;
+				$this->conversation->engagement_type = BWFAN_Email_Conversations::$TYPE_SMS;
 				break;
 			case 'whatsapp':
 				$mode = BWFAN_Email_Conversations::$MODE_WHATSAPP;
@@ -120,7 +124,11 @@ class BWFAN_API_SendMessage extends BWFAN_API_Base {
 			$message_obj = new BWFAN_Message();
 			$message_obj->set_message( 0, $conversation['conversation_id'], $title, $message );
 			$message_obj->set_data( $message_data );
-			$message_obj->save();
+			$messageid = $message_obj->save();
+			if ( $messageid && property_exists( BWFAN_Core()->conversation, 'template_id' ) ) {
+				/** Save the message id in conversation */
+				BWFAN_Core()->conversation->template_id = $messageid;
+			}
 		}
 
 		$conversation['template'] = $message;
@@ -207,7 +215,7 @@ class BWFAN_API_SendMessage extends BWFAN_API_Base {
 
 		$to = $contact->contact->get_email();
 		if ( ! is_email( $to ) ) {
-			$message = sprintf( __( 'No email found for this contact: %d', 'wp-marketing-automations' ), $contact_id );
+			$message = __( 'No email found for this contact: #', 'wp-marketing-automations' ) . $contact_id;
 			$this->conversation->fail_the_conversation( $conversation_id, $message );
 
 			return $message;
@@ -240,6 +248,8 @@ class BWFAN_API_SendMessage extends BWFAN_API_Base {
 			$headers[] = "List-Unsubscribe: <$unsubscribe_link>";
 			$headers[] = "List-Unsubscribe-Post: List-Unsubscribe=One-Click";
 		}
+
+		$headers = apply_filters( 'bwfan_email_headers', $headers );
 
 		BWFAN_Common::bwf_remove_filter_before_wp_mail();
 		$result = wp_mail( $to, $email_subject, $email_body, $headers );
@@ -276,7 +286,7 @@ class BWFAN_API_SendMessage extends BWFAN_API_Base {
 		$to = BWFAN_Common::get_contact_full_number( $contact->contact );
 
 		if ( empty( $to ) ) {
-			$message = sprintf( __( 'No phone number found for this contact: %d', 'wp-marketing-automations' ), $contact_id );
+			$message = __( 'No phone number found for this contact: #', 'wp-marketing-automations' ) . $contact_id;
 			$this->conversation->fail_the_conversation( $conversation_id, $message );
 
 			return $message;
@@ -319,7 +329,7 @@ class BWFAN_API_SendMessage extends BWFAN_API_Base {
 		$to = BWFAN_Common::get_contact_full_number( $contact->contact );
 
 		if ( empty( $to ) ) {
-			$message = sprintf( __( 'No phone number found for this contact: %d', 'wp-marketing-automations' ), $contact_id );
+			$message = __( 'No phone number found for this contact: #', 'wp-marketing-automations' ) . $contact_id;
 			$this->conversation->fail_the_conversation( $conversation_id, $message );
 
 			return $message;

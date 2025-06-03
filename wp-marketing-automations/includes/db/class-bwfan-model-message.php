@@ -11,7 +11,7 @@ if ( ! class_exists( 'BWFAN_Model_Message' ) && BWFAN_Common::is_pro_3_0() ) {
 
 			$sql = "SELECT * FROM {$table}";
 			if ( ! is_array( $args ) || empty( $args ) ) {
-				return $wpdb->get_results( $sql, ARRAY_A );
+				return $wpdb->get_results( $sql, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			}
 
 			$where_sql = ' WHERE 1=1';
@@ -43,7 +43,7 @@ if ( ! class_exists( 'BWFAN_Model_Message' ) && BWFAN_Common::is_pro_3_0() ) {
 //		$total_sql   = "SELECT count(*) FROM {$table}" . $where_sql;
 //		$grab_totals = isset( $args['grab_totals'] ) && ! empty( absint( $args['grab_totals'] ) );
 
-			return $wpdb->get_results( $sql, ARRAY_A );
+			return $wpdb->get_results( $sql, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		public static function get_message_by_track_id( $track_id ) {
@@ -54,12 +54,12 @@ if ( ! class_exists( 'BWFAN_Model_Message' ) && BWFAN_Common::is_pro_3_0() ) {
 				$placeholders = implode( ', ', $placeholders );
 				$sql          = "SELECT ID,sub as subject, body as template, data, track_id FROM {$table} WHERE track_id IN ($placeholders)";
 
-				return $wpdb->get_results( $wpdb->prepare( $sql, $track_id ), ARRAY_A );
+				return $wpdb->get_results( $wpdb->prepare( $sql, $track_id ), ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			}
 
 			$sql = "SELECT ID,sub as subject, body as template, data FROM {$table} WHERE track_id = %d LIMIT 0, 1";
 
-			return $wpdb->get_row( $wpdb->prepare( $sql, $track_id ), ARRAY_A );
+			return $wpdb->get_row( $wpdb->prepare( $sql, $track_id ), ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 	}
 }

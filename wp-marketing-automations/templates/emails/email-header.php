@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="x-apple-disable-message-reformatting">
     <!--[if !mso]><meta http-equiv="X-UA-Compatible" content="IE=edge"/><![endif]-->
-    <title><?php echo get_bloginfo( 'name', 'display' ); ?></title>
+    <title><?php echo get_bloginfo( 'name', 'display' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></title>
     <!--[if (gte mso 9)|(IE)]><style>
         ul li {
             mso-special-format: bullet;
@@ -72,7 +72,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                                                                     <td class="bwf-email-image_wrap"
                                                                         style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; width: 100%; text-align: left;"
                                                                         width="100%" align="left"><img
-                                                                                src="<?php echo BWFAN_PLUGIN_URL ?>/assets/img/logo.png"
+                                                                                src="<?php echo BWFAN_PLUGIN_URL; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>/assets/img/logo.png"
                                                                                 alt=" "
                                                                                 style="line-height: 100%; height: auto; display: block; text-decoration: none; max-width: 100%; font-size: 13px; border: 0; outline: none; box-sizing: border-box; width: 178px; margin-right: auto; margin-left: 0; pointer-events: none;"
                                                                                 width="178"></td>

@@ -97,9 +97,9 @@ if ( ! class_exists( 'BWF_Admin_Breadcrumbs' ) ) {
 
 				echo '<span>';
 				if ( $count !== $h && isset( $menu['link'] ) && ! empty( $menu['link'] ) ) {
-					echo '<a href="' . $menu['link'] . '">' . $menu['text'] . '</a>';
+					echo '<a href="' . esc_url($menu['link']) . '">' . $menu['text'] . '</a>';  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				} else {
-					echo $menu['text'];
+					echo $menu['text']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				}
 				echo '</span>';
 			}
@@ -233,7 +233,7 @@ if ( ! class_exists( 'BWF_Admin_Breadcrumbs' ) ) {
 					<?php
 					global $submenu;
 					if ( array_key_exists( 'bwf_dashboard', $submenu ) ) {
-						echo '<span><a href="' . admin_url( 'admin.php?page=bwf_dashboard' ) . '">FunnelKit</a></span> ';
+						echo '<span><a href="' . esc_url(admin_url( 'admin.php?page=bwf_dashboard' )) . '">FunnelKit</a></span> ';
 					}
 					if ( method_exists( 'BWF_Admin_Breadcrumbs', 'render_top_bar' ) ) {
 						BWF_Admin_Breadcrumbs::render_top_bar();

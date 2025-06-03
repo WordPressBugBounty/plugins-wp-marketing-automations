@@ -15,6 +15,8 @@ class BWFAN_Merge_Tag_Loader {
 	private static $instance = null;
 	private static $localize_tags_with_source = [];
 	private static $localize_tags = [];
+	/** @var bool */
+	public static $merge_tag_loaded = false;
 	private static $merge_tag_group = [];
 
 	private static $_registered_entity = array(
@@ -56,8 +58,18 @@ class BWFAN_Merge_Tag_Loader {
 	 * @access public
 	 */
 	public function __construct() {
-		add_action( 'init', [ $this, 'load_merge_tags' ], 8 );
-		add_action( 'init', [ $this, 'register_classes' ], 9 );
+		add_action( 'admin_init', array( $this, 'is_automation_ajax_call' ) );
+	}
+
+	/**
+	 * Check if the current request is an automation ajax call
+	 */
+	public function is_automation_ajax_call() {
+		if ( ! wp_doing_ajax() || empty( $_REQUEST['action'] ) || strpos( $_REQUEST['action'], 'bwfan_get_automation_' ) === false ) {
+			return;
+		}
+
+		$this->include_merge_tag_files();
 	}
 
 	/**
@@ -71,6 +83,11 @@ class BWFAN_Merge_Tag_Loader {
 		}
 
 		return self::$instance;
+	}
+
+	public function include_merge_tag_files() {
+		$this->load_merge_tags();
+		$this->register_classes();
 	}
 
 	/**
@@ -100,6 +117,9 @@ class BWFAN_Merge_Tag_Loader {
 		if ( ! is_array( $data ) ) {
 			return;
 		}
+		if ( ! self::$merge_tag_loaded ) {
+			self::$instance->include_merge_tag_files();
+		}
 		foreach ( $data as $key => $value ) {
 			self::$data[ $key ] = $value;
 		}
@@ -118,6 +138,11 @@ class BWFAN_Merge_Tag_Loader {
 	 * Include all the Merge Tags's files
 	 */
 	public static function load_merge_tags() {
+
+		if ( self::$merge_tag_loaded ) {
+			return;
+		}
+
 		$integration_dir = __DIR__ . '/merge_tags';
 		foreach ( glob( $integration_dir . '/class-*.php' ) as $_field_filename ) {
 			$file_data = pathinfo( $_field_filename );
@@ -127,6 +152,7 @@ class BWFAN_Merge_Tag_Loader {
 			require_once( $_field_filename );
 		}
 		do_action( 'bwfan_merge_tags_loaded' );
+		self::$merge_tag_loaded = true;
 
 	}
 
@@ -169,6 +195,10 @@ class BWFAN_Merge_Tag_Loader {
 	 * @return array
 	 */
 	public static function get_all_merge_tags() {
+		if ( ! self::$merge_tag_loaded ) {
+			self::$instance->include_merge_tag_files();
+		}
+
 		return self::$included_merge_tags;
 	}
 
@@ -189,6 +219,10 @@ class BWFAN_Merge_Tag_Loader {
 	 * @return mixed
 	 */
 	public static function get_registered_merge_tags() {
+		if ( ! self::$merge_tag_loaded ) {
+			self::$instance->include_merge_tag_files();
+		}
+
 		return self::$_registered_entity;
 	}
 
@@ -197,6 +231,9 @@ class BWFAN_Merge_Tag_Loader {
 	 * @return array
 	 */
 	public function get_localize_tags_with_source() {
+		if ( ! self::$merge_tag_loaded ) {
+			self::$instance->include_merge_tag_files();
+		}
 
 		return self::$localize_tags_with_source;
 	}
@@ -227,6 +264,9 @@ class BWFAN_Merge_Tag_Loader {
 	 * @return array
 	 */
 	public function get_localize_tags_with_group( $form_tags = false, $extra_group = [] ) {
+		if ( ! self::$merge_tag_loaded ) {
+			self::$instance->include_merge_tag_files();
+		}
 		$group_localize_tags = self::$localize_tags_with_group;
 
 		foreach ( $group_localize_tags as $key => $value ) {

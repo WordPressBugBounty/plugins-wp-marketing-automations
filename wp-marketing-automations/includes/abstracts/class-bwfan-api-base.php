@@ -46,6 +46,14 @@ abstract class BWFAN_API_Base {
 			$params         = array_replace( $query_params, $request_params );
 		}
 
+		if ( isset( $params['content'] ) && ! empty( $params['content'] ) && is_string( $params['content'] ) ) {
+			$replace_array = BWFAN_Common::get_mail_replace_string();
+			if ( ! empty( $replace_array ) ) {
+				$params['content'] = str_replace( array_values( $replace_array ), array_keys( $replace_array ), $params['content'] );
+
+			}
+		}
+
 		$params['files'] = $request->get_file_params();
 
 		$this->pagination->limit  = ! empty( $params['limit'] ) ? absint( $params['limit'] ) : $this->pagination->limit;
@@ -156,6 +164,22 @@ abstract class BWFAN_API_Base {
 		return array_map( $sanitize_method, $collection );
 	}
 
+	/**
+	 * rest api permission callback
+	 *
+	 * @return bool
+	 */
+	public function rest_permission_callback( WP_REST_Request $request ) {
+		$permissions = BWFAN_Common::access_capabilities();
+		foreach ( $permissions as $permission ) {
+			if ( current_user_can( $permission ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	abstract public function process_api_call();
 
 
@@ -175,9 +199,9 @@ abstract class BWFAN_API_Base {
 		if ( ! $contact->is_contact_exists() ) {
 			$this->response_code = 404;
 			if ( is_numeric( $id_or_email ) ) {
-				$response = __( 'Unable to get contact with contact ID : ' . $id_or_email, 'wp-marketing-automations' );
+				$response = __( 'Unable to get contact with contact ID : ', 'wp-marketing-automations' ) . $id_or_email;
 			} else {
-				$response = __( 'Contact not exists with email:' . $id_or_email, 'autonami-automation-crm' );
+				$response = __( 'Contact not exists with email: ', 'wp-marketing-automations' ) . $id_or_email;
 			}
 
 			return $this->error_response( $response );

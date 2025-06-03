@@ -40,7 +40,9 @@ class BWFAN_API_Remove_Lists extends BWFAN_API_Base {
 		if ( ! $contact->is_contact_exists() ) {
 			$this->response_code = 404;
 
-			return $this->error_response( sprintf( __( 'No contact found with given id #%s', 'wp-marketing-automations' ), $contact_id ) );
+			/* translators: 1: Contact ID */
+
+			return $this->error_response( sprintf( __( 'No contact found with given id #%1$d', 'wp-marketing-automations' ), $contact_id ) );
 		}
 
 		/** Check if provided lists ids are valid numbers */
@@ -66,7 +68,8 @@ class BWFAN_API_Remove_Lists extends BWFAN_API_Base {
 		$response = __( 'Lists Unassigned', 'wp-marketing-automations' );
 		if ( ! empty( $lists_not_removed ) ) {
 			$removed_lists_text = implode( ', ', $removed_lists );
-			$response           = sprintf( __( 'Some lists removed: %s', 'wp-marketing-automations' ), $removed_lists_text );
+			/* translators: 1: comma seperated list  */
+			$response = sprintf( __( 'Some lists removed: %1$s', 'wp-marketing-automations' ), $removed_lists_text );
 		}
 		$result['last_modified'] = $contact->contact->get_last_modified();
 

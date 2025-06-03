@@ -19,10 +19,10 @@ if ( ! is_array( $notifications_list ) || count( $notifications_list ) === 0 ) {
 				}
 
 				?>
-                <div class="<?php echo implode( ' ', $combined_class ); ?>" wf-noti-key="wf-<?php echo $key; ?>" wf-noti-group="<?php echo $nkey; ?>">
+                <div class="<?php echo esc_attr(implode( ' ', $combined_class )); ?>" wf-noti-key="wf-<?php echo esc_attr($key); ?>" wf-noti-group="<?php echo esc_attr($nkey); ?>">
                     <div class="wf_overlay_active "></div>
 					<?php
-					echo '<div class="wf_notification_html"><p>' . $value['html'] . '</p></div>';
+					echo '<div class="wf_notification_html"><p>' . $value['html'] . '</p></div>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 
 					if ( isset( $value['buttons'] ) && ( is_array( $value['buttons'] ) && count( $value['buttons'] ) > 0 ) ) {
@@ -40,7 +40,7 @@ if ( ! is_array( $notifications_list ) || count( $notifications_list ) === 0 ) {
 								continue;
 							}
 
-							printf( ' <a href="%s" target="%s" class="%s">%s</a>', isset( $btn_val['url'] ) ? $btn_val['url'] : '#', isset( $btn_val['target'] ) ? $btn_val['target'] : '_blank', implode( ' ', $btn_class ), $btn_val['name'] );
+							printf( ' <a href="%s" target="%s" class="%s">%s</a>', isset( $btn_val['url'] ) ? esc_url($btn_val['url']) : '#', isset( $btn_val['target'] ) ? esc_attr($btn_val['target']) : '_blank', implode( ' ', esc_attr($btn_class) ), esc_html($btn_val['name']) );
 						}
 
 						printf( '</div>' );
@@ -49,7 +49,7 @@ if ( ! is_array( $notifications_list ) || count( $notifications_list ) === 0 ) {
 					?>
                     <div class="wf_notice_dismiss_link_wrap">
                         <a class="notice-dismiss" href="javascript:void(0)">
-							<?php esc_html_e( 'Dismiss' ); ?>
+							<?php esc_html_e( 'Dismiss', 'woofunnels' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch ?>
                         </a>
                     </div>
                     <div class="clearfix"></div>

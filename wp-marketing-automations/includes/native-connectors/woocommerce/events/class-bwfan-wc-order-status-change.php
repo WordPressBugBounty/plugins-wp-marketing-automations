@@ -69,7 +69,7 @@ final class BWFAN_WC_Order_Status_Change extends BWFAN_Event {
 	 */
 	public function get_view( $db_eventmeta_saved_value ) {
 		?>
-        <script type="text/html" id="tmpl-event-<?php esc_attr_e( $this->get_slug() ); ?>">
+        <script type="text/html" id="tmpl-event-<?php echo esc_attr( $this->get_slug() ); ?>">
             <#
             is_validated = (_.has(data, 'eventSavedData') &&_.has(data.eventSavedData, 'validate_event')) ? 'checked' : '';
             selected_from_status = (_.has(data, 'eventSavedData') &&_.has(data.eventSavedData, 'from')) ? data.eventSavedData.from : '';
@@ -249,13 +249,17 @@ final class BWFAN_WC_Order_Status_Change extends BWFAN_Event {
 		$data_to_send['global']['from']     = isset( $event_data['from'] ) ? $event_data['from'] : '';
 		$data_to_send['global']['to']       = isset( $event_data['to'] ) ? $event_data['to'] : '';
 
-		$this->order                     = wc_get_order( $this->order_id );
-		$data_to_send['global']['email'] = BWFAN_Common::get_email_from_order( $this->order_id, $this->order );
-		$data_to_send['global']['phone'] = BWFAN_Common::get_phone_from_order( $this->order_id, $this->order );
-		$user_id                         = BWFAN_Common::get_wp_user_id_from_order( $this->order_id, $this->order );
+		$this->order = wc_get_order( $this->order_id );
+		$user_id     = BWFAN_Common::get_wp_user_id_from_order( $this->order_id, $this->order );
 		if ( intval( $user_id ) > 0 ) {
 			$data_to_send['global']['user_id'] = $user_id;
 		}
+
+		$email = ! empty( $user_id ) ? BWFAN_Common::get_contact_email( $user_id ) : '';
+
+		/** Set billing email if email is empty */
+		$data_to_send['global']['email'] = ! empty( $email ) ? $email : BWFAN_Common::get_email_from_order( $this->order_id, $this->order );
+		$data_to_send['global']['phone'] = BWFAN_Common::get_phone_from_order( $this->order_id, $this->order );
 
 		$order_lang = BWFAN_Common::get_order_language( $this->order );
 
@@ -286,15 +290,15 @@ final class BWFAN_WC_Order_Status_Change extends BWFAN_Event {
 		<?php } ?>
         <li>
             <strong><?php esc_html_e( 'Email:', 'wp-marketing-automations' ); ?> </strong>
-			<?php esc_html_e( $global_data['email'] ); ?>
+			<?php echo esc_html( $global_data['email'] ); ?>
         </li>
         <li>
             <strong><?php esc_html_e( 'From Status:', 'wp-marketing-automations' ); ?> </strong>
-			<?php esc_html_e( $global_data['from'] ); ?>
+			<?php echo esc_html( $global_data['from'] ); ?>
         </li>
         <li>
             <strong><?php esc_html_e( 'To Status:', 'wp-marketing-automations' ); ?> </strong>
-			<?php esc_html_e( $global_data['to'] ); ?>
+			<?php echo esc_html( $global_data['to'] ); ?>
         </li>
 		<?php
 		return ob_get_clean();

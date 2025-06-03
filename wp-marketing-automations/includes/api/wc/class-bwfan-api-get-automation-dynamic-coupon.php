@@ -48,7 +48,7 @@ class BWFAN_Api_Get_Automation_Dynamic_Coupons extends BWFAN_API_Base {
 
 		/** To get automation step with action create coupon and status is 1 */
 		$query   = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bwfan_automation_step WHERE `aid` = %d AND `action` LIKE '%wc_create_coupon%' AND `status` = '1'", intval( $automationId ) );
-		$results = $wpdb->get_results( $query, ARRAY_A );
+		$results = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		/** Check for empty step */
 		if ( empty( $results ) ) {

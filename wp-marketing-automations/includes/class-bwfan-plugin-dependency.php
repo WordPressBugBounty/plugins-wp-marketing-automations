@@ -347,6 +347,22 @@ class BWFAN_Plugin_Dependency {
 	}
 
 	/**
+	 * Checking if GTranslate language plugin is active
+	 * @return bool
+	 */
+	public static function gtranslate_active_check() {
+		if ( ! self::$active_plugins ) {
+			self::init();
+		}
+
+		if ( class_exists( 'GTranslate' ) ) {
+			return true;
+		}
+
+		return in_array( 'gtranslate/gtranslate.php', self::$active_plugins, true ) || array_key_exists( 'gtranslate/gtranslate.php', self::$active_plugins );
+	}
+
+	/**
 	 * Xl next move  plugin checking
 	 * @return bool
 	 */

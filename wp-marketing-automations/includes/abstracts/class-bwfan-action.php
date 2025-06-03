@@ -91,7 +91,7 @@ abstract class BWFAN_Action {
 		ob_start();
 		?>
         <div class="bwfan_tooltip" data-size="<?php echo esc_attr( $size ); ?>">
-            <span class="bwfan_tooltip_text" data-position="<?php echo esc_attr( $position ); ?>"><?php echo ( true === $esc ) ? esc_js( $desc ) : $desc; ?></span>
+            <span class="bwfan_tooltip_text" data-position="<?php echo esc_attr( $position ); ?>"><?php echo ( true === $esc ) ? esc_js( $desc ) : esc_js( $desc ); ?></span>
         </div>
 		<?php
 		$return = ob_get_clean();
@@ -211,7 +211,7 @@ abstract class BWFAN_Action {
 	 * @return array
 	 */
 	public function show_fields_error() {
-		$message = __( 'Required Field Missing', 'woofunnels' );
+		$message = __( 'Required Field Missing', 'wp-marketing-automations' );
 		$message .= ': ' . $this->missing_field;
 
 		return array(

@@ -530,6 +530,31 @@ class BWFAN_Rule_Product_Item_Type extends BWFAN_Rule_Base {
 		return $this->get_possible_rule_values( $term );
 	}
 
+	public function get_possible_rule_values( $term = '' ) {
+		$product_type = get_terms( 'product_type', array(
+			'hide_empty' => false,
+		) );
+
+		$result = [];
+		if ( $product_type && ! is_wp_error( $product_type ) ) {
+			foreach ( $product_type as $type ) {
+				$name = $type->name;
+				if ( 'grouped' === $name ) {
+					continue;
+				}
+				if ( ! empty( $term ) ) {
+					if ( stripos( $name, $term ) !== false ) {
+						$result[ $type->term_id ] = $name;
+					}
+					continue;
+				}
+				$result[ $type->term_id ] = $name;
+			}
+		}
+
+		return $result;
+	}
+
 	public function get_rule_type() {
 		return 'Search';
 	}
@@ -588,6 +613,23 @@ class BWFAN_Rule_Product_Item_Type extends BWFAN_Rule_Base {
 		return $this->return_is_match( $result, $rule_data );
 	}
 
+	public function get_product_types( $all_types, $order, $cart_item ) {
+		$product = BWFAN_WooCommerce_Compatibility::get_product_from_item( $order, $cart_item );
+		if ( ! $product instanceof WC_Product ) {
+			return $all_types;
+		}
+
+		$product_id    = $product->get_id();
+		$product_id    = ( $product->get_parent_id() ) ? $product->get_parent_id() : $product_id;
+		$product_types = wp_get_post_terms( $product_id, 'product_type', array(
+			'fields' => 'ids',
+		) );
+		$all_types     = array_merge( $all_types, $product_types );
+		$all_types     = array_filter( $all_types );
+
+		return $all_types;
+	}
+
 	/** v2 Methods: END */
 
 	public function get_condition_input_type() {
@@ -635,23 +677,6 @@ class BWFAN_Rule_Product_Item_Type extends BWFAN_Rule_Base {
 		return $this->return_is_match( $result, $rule_data );
 	}
 
-	public function get_product_types( $all_types, $order, $cart_item ) {
-		$product = BWFAN_WooCommerce_Compatibility::get_product_from_item( $order, $cart_item );
-		if ( ! $product instanceof WC_Product ) {
-			return $all_types;
-		}
-
-		$product_id    = $product->get_id();
-		$product_id    = ( $product->get_parent_id() ) ? $product->get_parent_id() : $product_id;
-		$product_types = wp_get_post_terms( $product_id, 'product_type', array(
-			'fields' => 'ids',
-		) );
-		$all_types     = array_merge( $all_types, $product_types );
-		$all_types     = array_filter( $all_types );
-
-		return $all_types;
-	}
-
 	public function ui_view() {
 		?>
         Product Type
@@ -676,31 +701,6 @@ class BWFAN_Rule_Product_Item_Type extends BWFAN_Rule_Base {
 
 	public function get_ui_preview_data() {
 		return $this->get_possible_rule_values();
-	}
-
-	public function get_possible_rule_values( $term = '' ) {
-		$product_type = get_terms( 'product_type', array(
-			'hide_empty' => false,
-		) );
-
-		$result = [];
-		if ( $product_type && ! is_wp_error( $product_type ) ) {
-			foreach ( $product_type as $type ) {
-				$name = $type->name;
-				if ( 'grouped' === $name ) {
-					continue;
-				}
-				if ( ! empty( $term ) ) {
-					if ( stripos( $name, $term ) !== false ) {
-						$result[ $type->term_id ] = $name;
-					}
-					continue;
-				}
-				$result[ $type->term_id ] = $name;
-			}
-		}
-
-		return $result;
 	}
 
 }
@@ -1153,6 +1153,31 @@ class BWFAN_Rule_Order_Item_Type extends BWFAN_Rule_Base {
 		return $this->get_possible_rule_values( $term );
 	}
 
+	public function get_possible_rule_values( $term = '' ) {
+		$order_type = get_terms( 'product_type', array(
+			'hide_empty' => false,
+		) );
+
+		$result = [];
+		if ( $order_type && ! is_wp_error( $order_type ) ) {
+			foreach ( $order_type as $type ) {
+				$name = $type->name;
+				if ( 'grouped' === $name ) {
+					continue;
+				}
+				if ( ! empty( $term ) ) {
+					if ( stripos( $name, $term ) !== false ) {
+						$result[ $type->term_id ] = $name;
+					}
+					continue;
+				}
+				$result[ $type->term_id ] = $name;
+			}
+		}
+
+		return $result;
+	}
+
 	public function get_rule_type() {
 		return 'Search';
 	}
@@ -1294,31 +1319,6 @@ class BWFAN_Rule_Order_Item_Type extends BWFAN_Rule_Base {
 
 	public function get_ui_preview_data() {
 		return $this->get_possible_rule_values();
-	}
-
-	public function get_possible_rule_values( $term = '' ) {
-		$order_type = get_terms( 'product_type', array(
-			'hide_empty' => false,
-		) );
-
-		$result = [];
-		if ( $order_type && ! is_wp_error( $order_type ) ) {
-			foreach ( $order_type as $type ) {
-				$name = $type->name;
-				if ( 'grouped' === $name ) {
-					continue;
-				}
-				if ( ! empty( $term ) ) {
-					if ( stripos( $name, $term ) !== false ) {
-						$result[ $type->term_id ] = $name;
-					}
-					continue;
-				}
-				$result[ $type->term_id ] = $name;
-			}
-		}
-
-		return $result;
 	}
 
 }
@@ -1470,19 +1470,19 @@ class BWFAN_Rule_Product_Item_Custom_Field extends BWFAN_Rule_Custom_Field {
 		return get_post_meta( $cart_item->get_product_id(), $key, true );
 	}
 
-	public function get_possible_rule_operators() {
-		return array(
-			'is'     => __( 'is', 'wp-marketing-automations' ),
-			'is_not' => __( 'is not', 'wp-marketing-automations' ),
-		);
-	}
-
 	public function ui_view() {
 		?>
         Product Custom Field
         '<%= condition['key'] %>' <% var ops = JSON.parse('<?php echo wp_json_encode( $this->get_possible_rule_operators() ); ?>'); %>
         <%= ops[operator] %> '<%= condition['value'] %>'
 		<?php
+	}
+
+	public function get_possible_rule_operators() {
+		return array(
+			'is'     => __( 'is', 'wp-marketing-automations' ),
+			'is_not' => __( 'is not', 'wp-marketing-automations' ),
+		);
 	}
 }
 
@@ -1491,6 +1491,18 @@ class BWFAN_Rule_Product_Item_SKU extends BWFAN_Rule_Base {
 	public function __construct() {
 		$this->v2 = true;
 		parent::__construct( 'product_item_sku' );
+	}
+
+	public function is_match_v2( $automation_data, $rule_data ) {
+		$all_skus = $this->get_product_skus( $automation_data );
+
+		foreach ( $all_skus as $product_sku ) {
+			if ( BWFAN_Common::validate_string( trim( $product_sku ), $rule_data['rule'], trim( $rule_data['data'] ) ) ) {
+				return $this->return_is_match( true, $rule_data );
+			}
+		}
+
+		return $this->return_is_match( false, $rule_data );
 	}
 
 	public function get_product_skus( $automation_data = [] ) {
@@ -1527,25 +1539,8 @@ class BWFAN_Rule_Product_Item_SKU extends BWFAN_Rule_Base {
 		return $skus;
 	}
 
-	public function is_match_v2( $automation_data, $rule_data ) {
-		$all_skus = $this->get_product_skus( $automation_data );
-
-		foreach ( $all_skus as $product_sku ) {
-			if ( BWFAN_Common::validate_string( trim( $product_sku ), $rule_data['rule'], trim( $rule_data['data'] ) ) ) {
-				return $this->return_is_match( true, $rule_data );
-			}
-		}
-
-		return $this->return_is_match( false, $rule_data );
-	}
-
-
 	public function get_condition_input_type() {
 		return 'Text';
-	}
-
-	public function get_possible_rule_operators() {
-		return $this->get_possible_string_rule_operators();
 	}
 
 	public function ui_view() {
@@ -1556,6 +1551,10 @@ class BWFAN_Rule_Product_Item_SKU extends BWFAN_Rule_Base {
         <%= ops[operator] %>
         '<%= condition %>'
 		<?php
+	}
+
+	public function get_possible_rule_operators() {
+		return $this->get_possible_string_rule_operators();
 	}
 }
 
@@ -1570,6 +1569,41 @@ class BWFAN_Rule_Order_Coupons extends BWFAN_Dynamic_Option_Base {
 
 	public function get_options( $term = '' ) {
 		return $this->get_search_results( $term, true );
+	}
+
+	public function get_search_results( $term, $v2 = false ) {
+		$array = array();
+		$args  = array(
+			'post_type'      => 'shop_coupon',
+			'posts_per_page' => 10,
+			'paged'          => 1,
+			's'              => $term ?? '',
+		);
+
+		$posts = get_posts( $args );
+		if ( $v2 ) {
+			if ( count( $posts ) > 0 ) {
+				foreach ( $posts as $post ) {
+					$array[ $post->ID ] = $post->post_title;
+				}
+			}
+
+			return $array;
+		}
+
+		if ( $posts && is_array( $posts ) && count( $posts ) > 0 ) {
+			foreach ( $posts as $post ) :
+				setup_postdata( $post );
+				$array[] = array(
+					'id'   => (string) $post->ID,
+					'text' => $post->post_title,
+				);
+			endforeach;
+		}
+
+		wp_send_json( array(
+			'results' => $array,
+		) );
 	}
 
 	public function get_rule_type() {
@@ -1607,7 +1641,7 @@ class BWFAN_Rule_Order_Coupons extends BWFAN_Dynamic_Option_Base {
 
 		$used_coupons_ids = [];
 		foreach ( $used_coupons as $coupon ) {
-			$used_coupons_ids[] = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_title = %s AND post_type = 'shop_coupon' AND post_status = 'publish' LIMIT 1;", $coupon ) );
+			$used_coupons_ids[] = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_title = %s AND post_type = 'shop_coupon' AND post_status = 'publish' LIMIT 1;", $coupon ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		$result = false;
@@ -1651,43 +1685,6 @@ class BWFAN_Rule_Order_Coupons extends BWFAN_Dynamic_Option_Base {
 		return 'coupon_rule';
 	}
 
-	public function get_search_results( $term, $v2 = false ) {
-		$array = array();
-		if ( isset( $term ) && '' !== $term ) {
-			$args = array(
-				'post_type'     => 'shop_coupon',
-				'post_per_page' => 2,
-				'paged'         => 1,
-				's'             => $term,
-			);
-
-			$posts = get_posts( $args );
-			if ( $v2 ) {
-				if ( count( $posts ) > 0 ) {
-					foreach ( $posts as $post ) {
-						$array[ $post->ID ] = $post->post_title;
-					}
-				}
-
-				return $array;
-			}
-
-			if ( $posts && is_array( $posts ) && count( $posts ) > 0 ) {
-				foreach ( $posts as $post ) :
-					setup_postdata( $post );
-					$array[] = array(
-						'id'   => (string) $post->ID,
-						'text' => $post->post_title,
-					);
-				endforeach;
-			}
-		}
-
-		wp_send_json( array(
-			'results' => $array,
-		) );
-	}
-
 	public function is_match( $rule_data ) {
 		global $wpdb;
 		$type  = $rule_data['operator'];
@@ -1706,7 +1703,7 @@ class BWFAN_Rule_Order_Coupons extends BWFAN_Dynamic_Option_Base {
 
 		$used_coupons_ids = [];
 		foreach ( $used_coupons as $coupon ) {
-			$used_coupons_ids[] = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_title = %s AND post_type = 'shop_coupon' AND post_status = 'publish' LIMIT 1;", $coupon ) );
+			$used_coupons_ids[] = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_title = %s AND post_type = 'shop_coupon' AND post_status = 'publish' LIMIT 1;", $coupon ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		$result = false;
@@ -1772,6 +1769,25 @@ class BWFAN_Rule_Order_Payment_Gateway extends BWFAN_Rule_Base {
 		return $this->get_possible_rule_values( $term );
 	}
 
+	/** v2 Methods: END */
+
+	public function get_possible_rule_values( $term = '' ) {
+		$result = array();
+		foreach ( WC()->payment_gateways()->payment_gateways() as $gateway ) {
+			if ( 'yes' === $gateway->enabled ) {
+				if ( ! empty( $term ) ) {
+					if ( stripos( $gateway->get_title(), $term ) !== false ) {
+						$result[ $gateway->id ] = $gateway->get_title();
+					}
+					continue;
+				}
+				$result[ $gateway->id ] = $gateway->get_title();
+			}
+		}
+
+		return $result;
+	}
+
 	public function get_rule_type() {
 		return 'Search';
 	}
@@ -1814,25 +1830,6 @@ class BWFAN_Rule_Order_Payment_Gateway extends BWFAN_Rule_Base {
 		}
 
 		return $this->return_is_match( $result, $rule_data );
-	}
-
-	/** v2 Methods: END */
-
-	public function get_possible_rule_values( $term = '' ) {
-		$result = array();
-		foreach ( WC()->payment_gateways()->payment_gateways() as $gateway ) {
-			if ( 'yes' === $gateway->enabled ) {
-				if ( ! empty( $term ) ) {
-					if ( stripos( $gateway->get_title(), $term ) !== false ) {
-						$result[ $gateway->id ] = $gateway->get_title();
-					}
-					continue;
-				}
-				$result[ $gateway->id ] = $gateway->get_title();
-			}
-		}
-
-		return $result;
 	}
 
 	public function get_condition_input_type() {
@@ -1936,6 +1933,26 @@ class BWFAN_Rule_Order_Shipping_Method extends BWFAN_Rule_Base {
 		return $this->get_possible_rule_values( $term );
 	}
 
+	/** v2 Methods: END */
+
+	public function get_possible_rule_values( $term = '' ) {
+		$result = array();
+
+		foreach ( WC()->shipping()->get_shipping_methods() as $method_id => $method ) {
+			// get_method_title() added in WC 2.6
+			$title = is_callable( array( $method, 'get_method_title' ) ) ? $method->get_method_title() : $method->get_title();
+			if ( ! empty( $term ) ) {
+				if ( stripos( $title, $term ) !== false ) {
+					$result[ $method_id ] = $title;
+				}
+				continue;
+			}
+			$result[ $method_id ] = $title;
+		}
+
+		return $result;
+	}
+
 	public function get_rule_type() {
 		return 'Search';
 	}
@@ -1992,26 +2009,6 @@ class BWFAN_Rule_Order_Shipping_Method extends BWFAN_Rule_Base {
 		}
 
 		return $this->return_is_match( $result, $rule_data );
-	}
-
-	/** v2 Methods: END */
-
-	public function get_possible_rule_values( $term = '' ) {
-		$result = array();
-
-		foreach ( WC()->shipping()->get_shipping_methods() as $method_id => $method ) {
-			// get_method_title() added in WC 2.6
-			$title = is_callable( array( $method, 'get_method_title' ) ) ? $method->get_method_title() : $method->get_title();
-			if ( ! empty( $term ) ) {
-				if ( stripos( $title, $term ) !== false ) {
-					$result[ $method_id ] = $title;
-				}
-				continue;
-			}
-			$result[ $method_id ] = $title;
-		}
-
-		return $result;
 	}
 
 	public function get_condition_input_type() {
@@ -2090,6 +2087,43 @@ class BWFAN_Rule_Order_Shipping_Method_Zone extends BWFAN_Rule_Base {
 		return $this->get_possible_rule_values( $term );
 	}
 
+	/** v2 Methods: END */
+
+	public function get_possible_rule_values( $term = '' ) {
+		$result = array();
+		$zones  = WC_Shipping_Zones::get_zones();
+
+		if ( empty( $zones ) || ! is_array( $zones ) ) {
+			return $result;
+		}
+
+		foreach ( $zones as $zone ) {
+			$zone_obj     = new WC_Shipping_Zone( $zone['id'] );
+			$zone_name    = ! empty( $zone_obj->get_zone_name() ) ? $zone_obj->get_zone_name() : '';
+			$zone_methods = $zone_obj->get_shipping_methods();
+
+			if ( empty( $zone_methods ) || ! is_array( $zone_methods ) ) {
+				continue;
+			}
+
+			foreach ( $zone_methods as $method_id => $method ) {
+				/** Check if the shipping method is enabled */
+				if ( ! $method->is_enabled() ) {
+					continue;
+				}
+
+				$method_title = $method->get_title();
+
+				if ( ! empty( $term ) && stripos( $method_title, $term ) === false ) {
+					continue;
+				}
+				$result[ $method_id ] = sprintf( '%s ( %s )', $method_title, $zone_name );
+			}
+		}
+
+		return $result;
+	}
+
 	public function get_rule_type() {
 		return 'Search';
 	}
@@ -2145,43 +2179,6 @@ class BWFAN_Rule_Order_Shipping_Method_Zone extends BWFAN_Rule_Base {
 		}
 
 		return $this->return_is_match( $result, $rule_data );
-	}
-
-	/** v2 Methods: END */
-
-	public function get_possible_rule_values( $term = '' ) {
-		$result = array();
-		$zones  = WC_Shipping_Zones::get_zones();
-
-		if ( empty( $zones ) || ! is_array( $zones ) ) {
-			return $result;
-		}
-
-		foreach ( $zones as $zone ) {
-			$zone_obj     = new WC_Shipping_Zone( $zone['id'] );
-			$zone_name    = ! empty( $zone_obj->get_zone_name() ) ? $zone_obj->get_zone_name() : '';
-			$zone_methods = $zone_obj->get_shipping_methods();
-
-			if ( empty( $zone_methods ) || ! is_array( $zone_methods ) ) {
-				continue;
-			}
-
-			foreach ( $zone_methods as $method_id => $method ) {
-				/** Check if the shipping method is enabled */
-				if ( ! $method->is_enabled() ) {
-					continue;
-				}
-
-				$method_title = $method->get_title();
-
-				if ( ! empty( $term ) && stripos( $method_title, $term ) === false ) {
-					continue;
-				}
-				$result[ $method_id ] = sprintf( '%s ( %s )', $method_title, $zone_name );
-			}
-		}
-
-		return $result;
 	}
 
 	public function get_condition_input_type() {
@@ -2561,10 +2558,6 @@ class BWFAN_Rule_Order_Status_Change extends BWFAN_Rule_Base {
 		return $this->get_possible_rule_values( $term );
 	}
 
-	public function get_rule_type() {
-		return 'Search';
-	}
-
 	/** v2 Methods: END */
 
 	public function get_possible_rule_values( $term = '' ) {
@@ -2580,6 +2573,10 @@ class BWFAN_Rule_Order_Status_Change extends BWFAN_Rule_Base {
 		}
 
 		return $result;
+	}
+
+	public function get_rule_type() {
+		return 'Search';
 	}
 
 	public function get_condition_input_type() {
@@ -2665,112 +2662,6 @@ class BWFAN_Rule_Order_Status_Change extends BWFAN_Rule_Base {
 
 }
 
-class BWFAN_Rule_Comment_Count extends BWFAN_Rule_Base {
-
-	public function __construct() {
-		$this->v2 = true;
-		parent::__construct( 'comment_count' );
-	}
-
-	/** v2 Methods: START */
-
-	public function get_rule_type() {
-		return 'Number';
-	}
-
-	public function is_match_v2( $automation_data, $rule_data ) {
-		if ( ! isset( $automation_data['global'] ) || ! is_array( $automation_data['global'] ) ) {
-			return $this->return_is_match( false, $rule_data );
-		}
-
-		$comment_id = isset( $automation_data['global']['comment_id'] ) ? $automation_data['global']['comment_id'] : 0;
-		$rating     = $comment_id > 0 ? get_comment_meta( $comment_id, 'rating', true ) : 0;
-		$count      = absint( $rating );
-
-		$operator = $rule_data['rule'];
-		$value    = absint( $rule_data['data'] );
-
-		switch ( $operator ) {
-			case '==':
-				$result = $count === $value;
-				break;
-			case '!=':
-				$result = $count !== $value;
-				break;
-			case '>':
-				$result = $count > $value;
-				break;
-			case '<':
-				$result = $count < $value;
-				break;
-			case '>=':
-				$result = $count >= $value;
-				break;
-			case '<=':
-				$result = $count <= $value;
-				break;
-			default:
-				$result = false;
-				break;
-		}
-
-		return $this->return_is_match( $result, $rule_data );
-	}
-
-	/** v2 Methods: END */
-
-	public function get_condition_input_type() {
-		return 'Text';
-	}
-
-	public function is_match( $rule_data ) {
-		$comment_details      = BWFAN_Core()->rules->getRulesData( 'wc_comment' );
-		$comment_rating_count = $comment_details['rating_number'];
-		$count                = absint( $comment_rating_count );
-		$value                = absint( $rule_data['condition'] );
-
-		switch ( $rule_data['operator'] ) {
-			case '==':
-				$result = $count === $value;
-				break;
-			case '!=':
-				$result = $count !== $value;
-				break;
-			case '>':
-				$result = $count > $value;
-				break;
-			case '<':
-				$result = $count < $value;
-				break;
-			case '>=':
-				$result = $count >= $value;
-				break;
-			case '<=':
-				$result = $count <= $value;
-				break;
-			default:
-				$result = false;
-				break;
-		}
-
-		return $this->return_is_match( $result, $rule_data );
-	}
-
-	public function ui_view() {
-		esc_html_e( 'Review Rating count', 'wp-marketing-automations' );
-		?>
-        <% var ops = JSON.parse('<?php echo wp_json_encode( $this->get_possible_rule_operators() ); ?>'); %>
-
-        <%= ops[operator] %>
-        <%= condition %>
-		<?php
-	}
-
-	public function get_possible_rule_operators() {
-		return $this->get_possible_number_rule_operators();
-	}
-}
-
 class BWFAN_Rule_Order_Status extends BWFAN_Rule_Base {
 	public $supports = array( 'order' );
 
@@ -2784,10 +2675,6 @@ class BWFAN_Rule_Order_Status extends BWFAN_Rule_Base {
 
 	public function get_options( $term = '' ) {
 		return $this->get_possible_rule_values( $term );
-	}
-
-	public function get_rule_type() {
-		return 'Search';
 	}
 
 	/** v2 Methods: END */
@@ -2805,6 +2692,10 @@ class BWFAN_Rule_Order_Status extends BWFAN_Rule_Base {
 		}
 
 		return $result;
+	}
+
+	public function get_rule_type() {
+		return 'Search';
 	}
 
 	public function get_condition_input_type() {
@@ -2862,16 +2753,16 @@ class BWFAN_Rule_Order_Has_Coupon extends BWFAN_Rule_Base {
 		parent::__construct( 'order_has_coupon' );
 	}
 
+	/** v2 Methods: START */
+	public function get_options( $term = '' ) {
+		return $this->get_possible_rule_values();
+	}
+
 	public function get_possible_rule_values() {
 		return array(
 			'yes' => __( 'Yes', 'wp-marketing-automations' ),
 			'no'  => __( 'No', 'wp-marketing-automations' ),
 		);
-	}
-
-	/** v2 Methods: START */
-	public function get_options( $term = '' ) {
-		return $this->get_possible_rule_values();
 	}
 
 	public function get_rule_type() {

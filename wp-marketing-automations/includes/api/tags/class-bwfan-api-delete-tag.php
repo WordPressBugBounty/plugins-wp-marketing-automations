@@ -35,7 +35,8 @@ class BWFAN_API_Delete_Tag extends BWFAN_API_Base {
 		$check_tag = BWFCRM_Tag::get_terms( BWFCRM_Term_Type::$TAG, array( $tag_id ) );
 		if ( empty( $check_tag ) ) {
 			$this->response_code = 404;
-			$response            = __( "Tag not exist with given ID #" . $tag_id, 'wp-marketing-automations' );
+			/* translators: 1: Tag ID */
+			$response = sprintf( __( 'Tag not exist with given ID #%1$d', 'wp-marketing-automations' ), $tag_id );
 
 			return $this->error_response( $response );
 		}

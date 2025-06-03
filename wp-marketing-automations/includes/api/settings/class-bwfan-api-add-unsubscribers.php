@@ -55,7 +55,7 @@ class BWFAN_API_Add_Unsubscribers extends BWFAN_API_Base {
 		if ( ! empty( $already_unsubscribe ) && is_array( $already_unsubscribe ) ) {
 			$message = implode( ',', $already_unsubscribe );
 
-			return $this->error_response( __( 'Recipient already unsubscribe : ' . $message, 'wp-marketing-automations' ) );
+			return $this->error_response( __( 'Recipient already unsubscribe : ', 'wp-marketing-automations' ) . $message );
 		}
 
 		$this->response_code = 200;

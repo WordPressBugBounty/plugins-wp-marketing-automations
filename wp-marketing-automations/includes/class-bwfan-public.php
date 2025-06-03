@@ -34,18 +34,30 @@ class BWFAN_Public {
 		return self::$ins;
 	}
 
+	/**
+	 * Check is unsubscribe page
+	 *
+	 * @param $settings
+	 *
+	 * @return bool
+	 */
+	public function is_unsubscribe_page( $settings = [] ) {
+		if ( empty( $settings['bwfan_unsubscribe_page'] ) ) {
+			return false;
+		}
+
+		return is_page( intval( $settings['bwfan_unsubscribe_page'] ) );
+	}
+
 	public function enqueue_assets() {
-		$setting_data           = BWFAN_Common::get_global_settings();
-		$unsubscribe_page_check = false;
-		if ( isset( $setting_data['bwfan_unsubscribe_page'] ) && ! empty( $setting_data['bwfan_unsubscribe_page'] ) ) {
-			$unsubscribe_page_check = is_page( absint( $setting_data['bwfan_unsubscribe_page'] ) );
-		}
+		$setting_data = BWFAN_Common::get_global_settings();
 
-		if ( ( false === bwfan_is_woocommerce_active() || ! is_checkout() ) && ! $unsubscribe_page_check ) {
-			return;
-		}
+		$should_include_scripts = ( bwfan_is_woocommerce_active() && is_checkout() ) || // Checkout page for abandoned cart & dob field
+		                          ( bwfan_is_woocommerce_active() && is_account_page() && ! empty( $setting_data['bwfan_dob_field_my_account'] ) ) || // My account page for DOB field
+		                          $this->is_unsubscribe_page( $setting_data ) || // Unsubscribe page
+		                          ( function_exists( 'WFOPP_Core' ) && WFOPP_Core()->optin_pages->is_wfop_page() ) || apply_filters( 'bwfan_public_scripts_include', false );
 
-		if ( false === apply_filters( 'bwfan_public_scripts_include', true ) ) {
+		if ( ! $should_include_scripts ) {
 			return;
 		}
 
@@ -102,12 +114,7 @@ class BWFAN_Public {
 
 		$data = apply_filters( 'bwfan_external_checkout_custom_data', $data );
 
-		/**
-		 * Bind on checkout page and when woocommerce active
-		 */
-		if ( bwfan_is_woocommerce_active() && is_checkout() ) {
-			wp_enqueue_style( 'bwfan-public', BWFAN_PLUGIN_URL . '/assets/css/bwfan-public.min.css', array(), BWFAN_VERSION_DEV );
-		}
+		wp_enqueue_style( 'bwfan-public', BWFAN_PLUGIN_URL . '/assets/css/bwfan-public.min.css', array(), BWFAN_VERSION_DEV );
 
 		wp_enqueue_script( 'bwfan-public', BWFAN_PLUGIN_URL . '/assets/js/bwfan-public.js', array( 'jquery' ), BWFAN_VERSION_DEV, true );
 		wp_localize_script( 'bwfan-public', 'bwfanParamspublic', $data );

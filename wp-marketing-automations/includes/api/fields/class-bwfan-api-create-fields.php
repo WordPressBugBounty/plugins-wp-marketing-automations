@@ -45,7 +45,9 @@ class BWFAN_API_Create_Fields extends BWFAN_API_Base {
 		if ( in_array( sanitize_title( $field['name'] ), BWFCRM_Fields::$reserved_keys, true ) ) {
 			$this->response_code = 400;
 
-			return $this->error_response( __( sanitize_title( $field['name'] ) . ' is a reserved key', 'wp-marketing-automations' ) );
+			/* translators: 1: Field name */
+
+			return $this->error_response( sprintf( __( '%1$s is a reserved key', 'wp-marketing-automations' ), sanitize_title( $field['name'] ) ) );
 		}
 
 		/**
@@ -55,13 +57,15 @@ class BWFAN_API_Create_Fields extends BWFAN_API_Base {
 		if ( $group_id > 0 && empty( $group ) ) {
 			$this->response_code = 400;
 
-			return $this->error_response( __( 'Field Group ID ' . $group_id . ' is mandatory', 'wp-marketing-automations' ) );
+			/* translators: 1: Group ID */
+
+			return $this->error_response( sprintf( __( 'Group with id %1$d not found', 'wp-marketing-automations' ), $group_id ) );  // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
 		}
 
 		if ( empty( $field['type'] ) ) {
 			$this->response_code = 400;
 
-			return $this->error_response( __( 'Field type is mandatory', ' wp-marketing-automations' ) );
+			return $this->error_response( __( 'Field type is mandatory', 'wp-marketing-automations' ) );
 		}
 		$field_name = $field['name'];
 		$type       = $field['type'];
@@ -75,7 +79,7 @@ class BWFAN_API_Create_Fields extends BWFAN_API_Base {
 		$options = ! empty( $options ) && is_array( $options ) ? $options : [];
 
 		$placeholder = isset( $field['placeholder'] ) ? $field['placeholder'] : '';
-		$field = BWFCRM_Fields::add_field( $field_name, $type, $options, $placeholder, $mode, $vmode, $search, $group_id );
+		$field       = BWFCRM_Fields::add_field( $field_name, $type, $options, $placeholder, $mode, $vmode, $search, $group_id );
 		if ( is_wp_error( $field ) ) {
 			return $this->error_response( '', $field, $field->get_error_code() );
 		}
@@ -83,7 +87,9 @@ class BWFAN_API_Create_Fields extends BWFAN_API_Base {
 		if ( isset( $field['err_msg'] ) ) {
 			$this->response_code = 400;
 
-			return $this->error_response( __( 'Cannot create a field. Error: ' . $field['err_msg'] . '. Contact Funnelkit support.', ' wp-marketing-automations' ) );
+			/* translators: 1: Error message */
+
+			return $this->error_response( sprintf( __( 'Cannot create a field. Error: %1$s. Contact Funnelkit support.', 'wp-marketing-automations' ), $field['err_msg'] ) );  // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
 		}
 
 		$field['merge_tag'] = BWFAN_Core()->merge_tags->get_field_tag( $field['slug'] );

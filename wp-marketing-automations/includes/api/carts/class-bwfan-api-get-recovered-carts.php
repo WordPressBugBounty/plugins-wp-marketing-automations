@@ -137,7 +137,7 @@ class BWFAN_API_Get_Recovered_Carts extends BWFAN_API_Base {
 				$product_id = $value->get_variation_id();
 			}
 
-			$names[ $product_id ] = $product_name;
+			$names[ $product_id ] = wp_strip_all_tags( $product_name );
 		}
 
 		return $names;
@@ -152,18 +152,9 @@ class BWFAN_API_Get_Recovered_Carts extends BWFAN_API_Base {
 	public function get_name( $contact_id, $order_id ) {
 		$data = array( 'f_name' => '', 'l_name' => '' );
 		if ( ! empty( $contact_id ) ) {
-			if ( class_exists( 'BWFCRM_Contact' ) ) {
-				$contact        = new BWFCRM_Contact( $contact_id );
-				$contact_array  = $contact->get_array();
-				$data['f_name'] = $contact_array['f_name'];
-				$data['l_name'] = $contact_array['l_name'];
-
-				return $data;
-			}
-
-			$contact_array  = ( new WooFunnels_Contact( null, null ) )->get_contact_by_contact_id( $contact_id );
-			$data['f_name'] = $contact_array->f_name;
-			$data['l_name'] = $contact_array->l_name;
+			$contact_array  = new WooFunnels_Contact( '', '', '', $contact_id );
+			$data['f_name'] = $contact_array->get_f_name();
+			$data['l_name'] = $contact_array->get_l_name();
 
 			return $data;
 		}

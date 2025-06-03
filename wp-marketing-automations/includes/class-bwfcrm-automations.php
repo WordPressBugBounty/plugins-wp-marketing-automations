@@ -262,7 +262,7 @@ if ( ! class_exists( 'BWFCRM_Automations' ) && BWFAN_Common::is_pro_3_0() ) {
 
 			if ( $obj->get_billing_first_name() || $obj->get_billing_last_name() ) {
 				/* translators: 1: first name 2: last name */
-				$buyer = trim( sprintf( _x( '%1$s %2$s', 'full name', 'woocommerce' ), $obj->get_billing_first_name(), $obj->get_billing_last_name() ) );
+				$buyer = trim( sprintf( _x( '%1$s %2$s', 'full name', 'woocommerce' ), $obj->get_billing_first_name(), $obj->get_billing_last_name() ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			} elseif ( $obj->get_billing_company() ) {
 				$buyer = trim( $obj->get_billing_company() );
 			} elseif ( $obj->get_customer_id() ) {
@@ -333,7 +333,7 @@ if ( ! class_exists( 'BWFCRM_Automations' ) && BWFAN_Common::is_pro_3_0() ) {
 			}
 			$post_status         .= "'')";
 			$prepare_query       = $wpdb->prepare( "SELECT p.ID FROM {$wpdb->prefix}posts p, {$wpdb->prefix}postmeta m1, {$wpdb->prefix}postmeta m2 WHERE p.ID = m1.post_id and p.ID = m2.post_id AND m2.meta_key = '%s' AND p.post_type = '%s' AND p.post_status NOT IN $post_status $where ORDER BY p.post_modified DESC", '_bwfan_ab_cart_recovered_a_id', 'shop_order' );
-			$recovered_carts_ids = $wpdb->get_results( $prepare_query, ARRAY_A );//phpcs:ignore WordPress.DB.PreparedSQL
+			$recovered_carts_ids = $wpdb->get_results( $prepare_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			if ( empty( $recovered_carts_ids ) ) {
 				return array();
@@ -413,7 +413,7 @@ if ( ! class_exists( 'BWFCRM_Automations' ) && BWFAN_Common::is_pro_3_0() ) {
 			}
 			$post_status     .= "'')";
 			$query           = $wpdb->prepare( "SELECT p.ID as id FROM {$wpdb->prefix}posts as p LEFT JOIN {$wpdb->prefix}postmeta as m ON p.ID = m.post_id WHERE p.post_type = %s AND p.post_status NOT IN $post_status AND m.meta_key = %s $where ORDER BY p.post_modified DESC LIMIT $offset,$limit", 'shop_order', '_bwfan_ab_cart_recovered_a_id' );
-			$recovered_carts = $wpdb->get_results( $query, ARRAY_A );//phpcs:ignore WordPress.DB.PreparedSQL
+			$recovered_carts = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( empty( $recovered_carts ) ) {
 				return array();
 			}
@@ -430,7 +430,7 @@ if ( ! class_exists( 'BWFCRM_Automations' ) && BWFAN_Common::is_pro_3_0() ) {
 			}
 
 			$found_posts['items']        = $items;
-			$found_posts['total_record'] = $wpdb->get_var( $wpdb->prepare( "SELECT count(p.ID) as total FROM {$wpdb->prefix}posts as p LEFT JOIN {$wpdb->prefix}postmeta as m ON p.ID = m.post_id WHERE p.post_type = %s AND p.post_status NOT IN $post_status AND m.meta_key = %s $where ORDER BY p.post_modified DESC LIMIT $offset,$limit", 'shop_order', '_bwfan_ab_cart_recovered_a_id' ) );//phpcs:ignore WordPress.DB.PreparedSQL
+			$found_posts['total_record'] = $wpdb->get_var( $wpdb->prepare( "SELECT count(p.ID) as total FROM {$wpdb->prefix}posts as p LEFT JOIN {$wpdb->prefix}postmeta as m ON p.ID = m.post_id WHERE p.post_type = %s AND p.post_status NOT IN $post_status AND m.meta_key = %s $where ORDER BY p.post_modified DESC LIMIT $offset,$limit", 'shop_order', '_bwfan_ab_cart_recovered_a_id' ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			return $found_posts;
 		}

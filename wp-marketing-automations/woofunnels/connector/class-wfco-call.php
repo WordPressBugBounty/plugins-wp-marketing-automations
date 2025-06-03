@@ -22,7 +22,7 @@ if ( ! class_exists( 'WFCO_Call' ) ) {
 		}
 
 		public function get_random_api_error() {
-			return __( 'Api Error: No response from API', ' woofunnels' );
+			return __( 'Api Error: No response from API', 'woofunnels' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 		}
 
 		public function process() {
@@ -92,7 +92,7 @@ if ( ! class_exists( 'WFCO_Call' ) ) {
 		public function make_wp_requests( $url, $params = array(), $headers = array(), $req_method = 1 ) {
 			$body = array(
 				'response' => 500,
-				'body'     => array( __( 'CURL Error', 'woofunnels' ) ),
+				'body'     => array( __( 'CURL Error', 'woofunnels' ) ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			);
 
 			// $req_method

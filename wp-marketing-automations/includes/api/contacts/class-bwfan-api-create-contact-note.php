@@ -43,7 +43,9 @@ class BWFAN_API_Create_Contact_Note extends BWFAN_API_Base {
 		if ( ! $contact->is_contact_exists() ) {
 			$this->response_code = 404;
 
-			return $this->error_response( __( 'No contact found with given id #' . $contact_id, 'wp-marketing-automations' ) );
+			/* translators: 1: Contact ID */
+
+			return $this->error_response( sprintf( __( 'No contact found with given id #%1$d', 'wp-marketing-automations' ), $contact_id ) );
 		}
 
 		$note_added = $contact->add_note_to_contact( $notes );

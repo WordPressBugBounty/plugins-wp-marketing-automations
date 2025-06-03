@@ -345,17 +345,11 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 				$contact_array['unsubscribed']     = true;
 			}
 
+			/** Get Contact Engagement data */
 			if ( false === $slim_data ) {
-				$last_email_open_sent = $this->get_last_email_open_sent();
-				if ( ! empty( $last_email_open_sent ) ) {
-					$contact_array['last_email_sent'] = $last_email_open_sent['last_email_sent'];
-					$contact_array['last_email_open'] = $last_email_open_sent['last_open'];
-					$contact_array['last_sms_sent']   = $last_email_open_sent['last_sms_sent'];
-					$contact_array['last_click']      = $last_email_open_sent['last_click'];
-				}
-			}
-
-			if ( false === $slim_data ) {
+				$contact_array['last_sent']  = $this->get_field_by_slug( 'last-sent' );
+				$contact_array['last_open']  = $this->get_field_by_slug( 'last-open' );
+				$contact_array['last_click'] = $this->get_field_by_slug( 'last-click' );
 				$contact_array['last_login'] = $this->get_field_by_slug( 'last-login' );
 
 				/** Get User Roles */
@@ -475,7 +469,7 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 
 				return $product instanceof WC_Product && ! $product->is_type( 'variable' ) ? array(
 					'id'   => $product->is_type( 'variation' ) ? $product->get_parent_id() : $product->get_id(),
-					'name' => $product->get_name( 'edit' ),
+					'name' => wp_strip_all_tags( $product->get_name( 'edit' ) ),
 				) : false;
 			}, array_unique( $this->customer->get_purchased_products() ) );
 			$purchased_products            = array_values( array_filter( $purchased_products ) );
@@ -487,7 +481,7 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 
 				return $cat instanceof WP_Term ? array(
 					'id'   => $cat->term_id,
-					'name' => $cat->name,
+					'name' => wp_strip_all_tags( $cat->name ),
 				) : false;
 			}, array_unique( $this->customer->get_purchased_products_cats() ) );
 			$purchased_products_cats            = array_values( array_filter( $purchased_products_cats ) );
@@ -499,7 +493,7 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 
 				return $tag instanceof WP_Term ? array(
 					'id'   => $tag->term_id,
-					'name' => $tag->name,
+					'name' => wp_strip_all_tags( $tag->name ),
 				) : false;
 			}, array_unique( $this->customer->get_purchased_products_tags() ) );
 			$purchased_products_tags            = array_values( array_filter( $purchased_products_tags ) );
@@ -1230,7 +1224,7 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 				return false;
 			}
 
-			$this->contact->save();
+			$this->save();
 			if ( true === $result['fields_changed'] ) {
 				$this->save_fields();
 			}
@@ -1399,7 +1393,7 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 
 			if ( empty( $contact_field ) || ! is_array( $contact_field ) ) {
 				$data = array_replace( array( 'cid' => $contact_id ), $field_array );
-				BWF_Model_Contact_Fields::insert( $data );
+				BWF_Model_Contact_Fields::insert_ignore( $data );
 
 				return;
 			}
@@ -1542,7 +1536,7 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 				$query            = "SELECT ot.id FROM {$order_table} AS ot JOIN {$order_meta_table} AS otm ON ot.id = otm.order_id WHERE otm.meta_key = '_woofunnel_cid' AND ot.type = 'shop_order' AND otm.meta_value = %d ORDER BY ot.id DESC $limit_query";
 			}
 
-			$contact_orders = $wpdb->get_col( $wpdb->prepare( $query, $this->get_id() ) );
+			$contact_orders = $wpdb->get_col( $wpdb->prepare( $query, $this->get_id() ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			if ( empty( $contact_orders ) ) {
 				return array();
@@ -2050,18 +2044,20 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			$email_subject = BWFAN_Core()->conversation->prepare_email_subject( $note_data['title'], array() );
 
 			try {
-				$email_body = BWFAN_Core()->conversation->prepare_email_body( $conversation['conversation_id'], $note_data['cid'], $conversation['hash_code'], 'rich', $message, array() );
+				BWFAN_Core()->conversation->engagement_type = BWFAN_Email_Conversations::$TYPE_NOTE;
+				$email_body                                 = BWFAN_Core()->conversation->prepare_email_body( $conversation['conversation_id'], $note_data['cid'], $conversation['hash_code'], 'rich', $message );
 			} catch ( Error $e ) {
 				BWFAN_Core()->conversation->fail_the_conversation( $conversation_id, $e->getMessage() );
 
 				return false;
 			}
 
+			$headers = apply_filters( 'bwfan_email_headers', $headers );
+
 			/** Removed wp mail filters */
 			BWFAN_Common::bwf_remove_filter_before_wp_mail();
 
 			$send_email = wp_mail( $email, $email_subject, $email_body, $headers );
-
 			if ( ! $send_email ) {
 				BWFAN_Core()->conversation->fail_the_conversation( $conversation_id, __( 'Email not sent', 'wp-marketing-automations' ) );
 
@@ -2073,7 +2069,6 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			BWFAN_Conversation::save_last_sent_engagement( $data );
 
 			return BWFAN_Core()->conversation->update_conversation_status( $conversation_id, BWFAN_Email_Conversations::$STATUS_SEND );
-
 		}
 
 		/** getting mail error while sending email
@@ -2100,14 +2095,13 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 		}
 
 		public function check_contact_unsubscribed( $single_row = true ) {
-			$email        = $this->contact->get_email();
-			$contact_no   = $this->contact->get_contact_no();
-			$data         = array(
+			$email      = $this->contact->get_email();
+			$contact_no = $this->contact->get_contact_no();
+			$data       = array(
 				'recipient' => array( $email, $contact_no ),
 			);
-			$unsbuscribed = BWFAN_Model_Message_Unsubscribe::get_message_unsubscribe_row( $data, $single_row );
 
-			return $unsbuscribed;
+			return BWFAN_Model_Message_Unsubscribe::get_message_unsubscribe_row( $data, $single_row );
 		}
 
 		/**
@@ -2314,23 +2308,9 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			$this->set_field_by_slug( 'dob', $value );
 		}
 
-		public function get_last_email_open_sent() {
-			$contact_id      = $this->contact->get_id();
-			$last_email_sent = BWFAN_Model_Engagement_Tracking::get_last_engagement_sent_time( $contact_id );
-			$last_sms_sent   = BWFAN_Model_Engagement_Tracking::get_last_engagement_sent_time( $contact_id, 2 );
-			$last_open_click = BWFAN_Model_Engagement_Tracking::get_last_email_open_time( $contact_id );
-
-			return array(
-				'last_email_sent' => ! empty( $last_email_sent ) ? get_date_from_gmt( $last_email_sent ) : '',
-				'last_open'       => $last_open_click['last_open_time'],
-				'last_click'      => $last_open_click['last_click_time'],
-				'last_sms_sent'   => $last_sms_sent,
-			);
-		}
-
 		public function get_display_status() {
 			if ( ! $this->is_contact_exists() ) {
-				return BWFAN_Common::crm_error( __( 'Contact not valid' ), 'wp-marketing-automations' );
+				return BWFAN_Common::crm_error( __( 'Contact not valid', 'wp-marketing-automations' ) );
 			}
 
 			$status                 = absint( $this->contact->get_status() );
@@ -2783,7 +2763,7 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 				$this->contact->save_meta();
 
 				return [
-					'message' => __( "Status change to bounce as contact already soft bounce $count.", "wp-marketing-automations" )
+					'message' => __( "Status change to bounce as contact already soft bounce", "wp-marketing-automations" ) . " $count",
 				];
 			}
 

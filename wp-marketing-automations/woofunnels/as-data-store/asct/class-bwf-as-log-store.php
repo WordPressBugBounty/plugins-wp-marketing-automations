@@ -8,7 +8,7 @@ if ( ! class_exists( 'BWF_AS_Log_Store' ) ) {
 	#[AllowDynamicProperties]
 	class BWF_AS_Log_Store extends ActionScheduler_Logger {
 
-		public function log( $action_id, $message, DateTime $date = null ) {
+		public function log( $action_id, $message, ?DateTime $date = null ) {
 			return;
 		}
 

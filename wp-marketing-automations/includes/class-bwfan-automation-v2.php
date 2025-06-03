@@ -99,8 +99,11 @@ class BWFAN_Automation_V2 {
 		if ( ! empty( $this->error ) ) {
 			$response['message'] = $this->error;
 		} else {
+
+			$selected_event = isset( $this->automation_data['event'] ) ? $this->automation_data['event'] : '';
+
 			$data = [
-				'eventsList'      => $this->get_event_list(),
+				'eventsList'      => $this->get_event_list( false, $selected_event ),
 				'actionsList'     => $this->get_action_list(),
 				'goals'           => $this->get_event_list( true ),
 				'data'            => $this->automation_data,
@@ -132,7 +135,15 @@ class BWFAN_Automation_V2 {
 				$automation_meta['event_meta'] = BWFAN_Common::fetch_updated_data( $automation_meta['event_meta'] );
 			}
 
-			$data['meta'] = $automation_meta;
+			// Check for event metadata
+			if ( ! empty( $selected_event ) && ! empty( $automation_meta ) && ! empty( $automation_meta['event_meta'] ) ) {
+				$event_obj = BWFAN_Core()->sources->get_event( $selected_event );
+				if ( ! is_null( $event_obj ) && method_exists( $event_obj, 'validate_event_meta_data' ) ){
+					$automation_meta['event_meta'] = $event_obj->validate_event_meta_data( $automation_meta['event_meta'] );
+				}
+			}
+
+			$data['meta'] = array_filter( $automation_meta );
 
 			$response['status']  = true;
 			$response['message'] = 'Successfully fetched automation';
@@ -146,17 +157,19 @@ class BWFAN_Automation_V2 {
 	 * Returns event data
 	 *
 	 * @param bool $get_goals
+	 * @param string $selected_event
 	 *
 	 * @return array[]
 	 */
-	public function get_event_list( $get_goals = false ) {
+	public function get_event_list( $get_goals = false, $selected_event = '' ) {
 		$eventList = [
 			'group'    => BWFAN_Core()->sources->get_event_groups(),
 			'list'     => [],
 			'subgroup' => [],
 		];
 
-		$eventList['list']     = BWFAN_Load_Sources::get_api_event_list_data( $get_goals );
+		$eventList['list'] = BWFAN_Load_Sources::get_api_event_list_data( $get_goals, $selected_event );
+
 		$eventList['subgroup'] = $get_goals ? BWFAN_Load_Sources::get_goal_subgroup() : BWFAN_Core()->sources->get_event_subgroups();
 
 		$eventList['subgroup_priority'] = BWFAN_Core()->sources->get_event_subgroup_priority();
@@ -389,12 +402,25 @@ class BWFAN_Automation_V2 {
 	/**
 	 * Get Automation meta data
 	 */
-	public function get_automation_meta_data() {
+	public function get_automation_meta_data( $fetch_all = false ) {
 		if ( empty( $this->automation_meta_data ) ) {
 			$this->fetch_automation_metadata();
 		}
+		$meta_val = $this->automation_meta_data;
 
-		return $this->automation_meta_data;
+		if ( $fetch_all ) {
+			return $meta_val;
+		}
+		if ( ! empty( $meta_val ) ) {
+			// Remove values where key has restore_point in it
+			foreach ( $meta_val as $key => $value ) {
+				if ( strpos( $key, 'restore_point_' ) !== false ) {
+					unset( $meta_val[ $key ] );
+				}
+			}
+		}
+
+		return $meta_val;
 	}
 
 	/**
@@ -413,11 +439,11 @@ class BWFAN_Automation_V2 {
 	 *
 	 * @return array
 	 */
-	public function get_automation_steps( $steps = [] ) {
+	public function get_automation_steps( $steps = [], $get_deleted = false ) {
 		$automation_steps = array();
 		if ( ! empty( $steps ) ) {
 			/** Get all steps for the automation */
-			$feted_data = BWFAN_Model_Automation_Step::get_all_automation_steps( $this->automation_id );
+			$feted_data = BWFAN_Model_Automation_Step::get_all_automation_steps( $this->automation_id, 0, 0, '', 'DESC', 'ID', [], false, $get_deleted );
 
 			/** Set var for orphan step */
 			$all_automation_steps = [];
@@ -602,6 +628,22 @@ class BWFAN_Automation_V2 {
 	}
 
 	/**
+	 * Check if two arrays are same
+	 *
+	 * @return bool
+	 */
+	public static function check_array_same( $array1, $array2 ) {
+		if ( ! is_array( $array1 ) || ! is_array( $array2 ) ) {
+			return false;
+		}
+		ksort( $array1 );
+		ksort( $array2 );
+
+		return $array1 == $array2;
+	}
+
+
+	/**
 	 * Update Automation meta data
 	 *
 	 * @param $meta
@@ -612,18 +654,18 @@ class BWFAN_Automation_V2 {
 	 * @return false
 	 */
 	public function update_automation_meta_data( $meta, $steps, $links, $count ) {
-		$response        = false;
-		$meta_data_arr   = [];
-		$step_link_data  = $this->get_step_iteration_array( $steps, $links );
+		$response       = false;
+		$meta_data_arr  = [];
+		$step_link_data = $this->get_step_iteration_array( $steps, $links );
 
 		$iteration_array = $step_link_data['iteration_array'];
 		$steps           = $step_link_data['steps'];
 		$links           = $step_link_data['links'];
 
+		$meta_data = $this->get_automation_meta_data();
 		/** Update Automation meta data */
 		if ( ! empty( $meta ) ) {
-			$meta_data = $this->get_automation_meta_data();
-			$new_val   = [];
+			$new_val = [];
 			foreach ( $meta as $key => $value ) {
 				if ( is_array( $value ) ) {
 					$value = maybe_serialize( $value );
@@ -640,9 +682,17 @@ class BWFAN_Automation_V2 {
 			}
 		}
 
+		$set_restore_point = false;
+		$restore_data      = [];
+
 		/** Set step data */
 		if ( ! empty( $steps ) ) {
-			$meta_data_arr['steps'] = maybe_serialize( $this->format_step_save_data( $steps ) );
+			$steps_data             = $this->format_step_save_data( $steps );
+			$meta_data_arr['steps'] = maybe_serialize( $steps_data );
+			if ( ! self::check_array_same( $steps_data, $meta_data['steps'] ) ) {
+				$set_restore_point = true;
+			}
+			$restore_data['steps'] = $steps_data;
 		}
 
 		/** Set link data */
@@ -655,6 +705,20 @@ class BWFAN_Automation_V2 {
 				$meta_data_arr['step_iteration_array'] = maybe_serialize( $iteration_array );
 
 			}
+
+			if ( ! self::check_array_same( $links, $meta_data['links'] ) ) {
+				$set_restore_point = true;
+			}
+			$restore_data['links'] = $links;
+		}
+
+		/** Set the restore point if step or link data is changed */
+		if ( $set_restore_point ) {
+			$restore_data['updated_at'] = current_time( 'timestamp', 1 );
+			$restore_data['updated_by'] = get_current_user_id();
+			$restore_data['count']      = $count;
+			$restore_data['event']      = $this->automation_data['event'] ?? '';
+			$this->set_automation_restore_point( $restore_data );;
 		}
 
 		/** Save merger points of split and conditional step */
@@ -697,6 +761,46 @@ class BWFAN_Automation_V2 {
 		}
 
 		return BWFAN_Model_Automationmeta::update_automation_meta_values( $this->automation_id, $meta_data_arr );
+	}
+
+	/**
+	 * Set automation restore point
+	 *
+	 * @param $data
+	 *
+	 * @return bool
+	 */
+	public function set_automation_restore_point( $data = [] ) {
+		$meta_data               = $this->get_automation_meta_data();
+		$restore_point_timestamp = $data['updated_at'];
+		$restore_point           = $meta_data['restore_points'] ?? [];
+		$meta_data_array         = [];
+
+		/** Save restore point data */
+		$meta_key = 'restore_point_' . $restore_point_timestamp;
+		BWFAN_Model_Automationmeta::insert_automation_meta_data( $this->automation_id, [ $meta_key => maybe_serialize( $data ) ] );
+
+		/** Save restore reference time */
+		$restore_point[] = $restore_point_timestamp;
+		if ( 1 === count( $restore_point ) ) {
+			/** First restore point */
+			BWFAN_Model_Automationmeta::insert_automation_meta_data( $this->automation_id, [ 'restore_points' => maybe_serialize( $restore_point ) ] );
+
+			return false;
+		}
+
+		if ( count( $restore_point ) > 20 ) {
+			/** Remove the oldest timestamp (index 0) and delete the corresponding row */
+			$removed_timestamp = array_shift( $restore_point );  // Remove the oldest timestamp
+
+			/** Delete the corresponding row from the database */
+			BWFAN_Model_Automationmeta::delete_automation_meta( $this->automation_id, 'restore_point_' . $removed_timestamp );
+		}
+
+		/** Save restore reference in the meta */
+		$meta_data_array['restore_points'] = maybe_serialize( $restore_point );
+
+		return BWFAN_Model_Automationmeta::update_automation_meta_values( $this->automation_id, $meta_data_array );
 	}
 
 	/**
@@ -757,12 +861,12 @@ class BWFAN_Automation_V2 {
 	/**
 	 * Get Iteration array
 	 *
-	 * @param $steps
-	 * @param $links
+	 * @param array $steps
+	 * @param array $links
 	 *
 	 * @return array
 	 */
-	public function get_step_iteration_array( $steps, $links ) {
+	public function get_step_iteration_array( $steps = [], $links = [] ) {
 		$automationSteps = [];
 		foreach ( $steps as $step ) {
 			if ( empty( $step['id'] ) ) {
@@ -775,7 +879,7 @@ class BWFAN_Automation_V2 {
 			$automationSteps[ $step['id'] ] = $step;
 		}
 
-		$link_data = [];
+		$link_data      = [];
 		$filtered_links = [];
 		foreach ( $links as $link ) {
 			if ( empty( $link ) ) {
@@ -783,7 +887,7 @@ class BWFAN_Automation_V2 {
 			}
 			$source = $link['source'] != 'start' ? $automationSteps[ $link['source'] ]['stepId'] : $link['source'];
 			$target = $link['target'] != 'end' ? $automationSteps[ $link['target'] ]['stepId'] : $link['target'];
-			if( empty($source) || empty($target) || ( ! isset( $automationSteps[ $link['source'] ] ) && ! isset( $automationSteps[$link['target']] ) ) ) {
+			if ( empty( $source ) || empty( $target ) || ( ! isset( $automationSteps[ $link['source'] ] ) && ! isset( $automationSteps[ $link['target'] ] ) ) ) {
 				continue;
 			}
 			if ( $automationSteps[ $link['target'] ]['type'] == 'yesNoNode' ) {

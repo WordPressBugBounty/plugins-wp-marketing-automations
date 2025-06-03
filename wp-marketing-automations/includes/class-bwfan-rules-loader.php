@@ -27,11 +27,10 @@ class BWFAN_Rules_Loader extends BWFAN_Rules {
 		parent::__construct();
 		add_filter( 'bwfan_rule_get_rule_types', array( $this, 'default_rule_types' ), 10 );
 
-		add_filter( 'bwfan_admin_builder_localized_data', array( $this, 'add_rule_groups_to_js' ) );
-		add_filter( 'bwfan_admin_builder_localized_data', array( $this, 'add_rules_to_js' ) );
-		add_filter( 'bwfan_admin_builder_localized_data', array( $this, 'add_rules_ui_prev_data' ) );
+		add_filter( 'bwfan_admin_builder_localized_data', array( $this, 'add_rule_groups_to_js' ), 10 );
+		add_filter( 'bwfan_admin_builder_localized_data', array( $this, 'add_rules_to_js' ), 11 );
+		add_filter( 'bwfan_admin_builder_localized_data', array( $this, 'add_rules_ui_prev_data' ), 12 );
 		add_action( 'bwfan_automation_data_set_automation', array( $this, 'maybe_set_rules_ajax_select_names' ) );
-		add_action( 'init', array( $this, 'maybe_initiate_all_rules' ) );
 		add_filter( 'bwfan_modify_rule_class', [ $this, 'append_pruduct_taxonomy_rules' ], 10, 2 );
 	}
 
@@ -54,6 +53,8 @@ class BWFAN_Rules_Loader extends BWFAN_Rules {
 	}
 
 	public function get_all_groups() {
+		$this->load_rules_classes();
+
 		return apply_filters( 'bwfan_rules_groups', array(
 			'wc_items'            => array(
 				'title' => __( 'Product', 'wp-marketing-automations' ),
@@ -154,7 +155,8 @@ class BWFAN_Rules_Loader extends BWFAN_Rules {
 				'users_user' => __( 'User', 'wp-marketing-automations' ),
 			),
 			'wc_comment'          => array(
-				'comment_count' => __( 'Review Rating Count', 'wp-marketing-automations' ),
+				'comment_count'         => __( 'Review Rating Count', 'wp-marketing-automations' ),
+				'comment_products_cats' => __( 'Reviewed Product Categories', 'wp-marketing-automations' ),
 			),
 			'ab_cart'             => array(
 				'cart_total'               => __( 'Cart Total', 'wp-marketing-automations' ),
@@ -456,6 +458,9 @@ class BWFAN_Rules_Loader extends BWFAN_Rules {
 	}
 
 	public function get_rule_search_suggestions( $term = '', $rule = 'cart_category' ) {
+		// Load all the rules classes
+		$this->load_rules_classes();
+
 		$rule = $this->woocommerce_bwfan_rule_get_rule_object( $rule );
 
 		return $rule->get_options( $term );

@@ -75,7 +75,7 @@ class BWFAN_AS_V2_CLI extends WP_CLI_Command {
 	 * @param int $total
 	 */
 	protected function print_total_tasks( $total ) {
-		WP_CLI::log( sprintf( /* translators: %d refers to how many scheduled tasks were found to run */ _n( 'Found %d scheduled task', 'Found %d scheduled tasks', $total, 'action-scheduler' ), number_format_i18n( $total ) ) );
+		WP_CLI::log( sprintf( /* translators: %d refers to how many scheduled tasks were found to run */ _n( 'Found %d scheduled task', 'Found %d scheduled tasks', $total, 'action-scheduler' ), number_format_i18n( $total ) ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 	}
 
 	/**
@@ -86,7 +86,7 @@ class BWFAN_AS_V2_CLI extends WP_CLI_Command {
 	 * @throws ExitException
 	 */
 	protected function print_error( Exception $e ) {
-		WP_CLI::error( sprintf( /* translators: %s refers to the exception error message. */ __( 'There was an error running the action scheduler: %s', 'action-scheduler' ), $e->getMessage() ) );
+		WP_CLI::error( sprintf( /* translators: %s refers to the exception error message. */ __( 'There was an error running the action scheduler: %s', 'action-scheduler' ), $e->getMessage() ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 	}
 
 	/**
@@ -95,6 +95,6 @@ class BWFAN_AS_V2_CLI extends WP_CLI_Command {
 	 * @param int $tasks_completed
 	 */
 	protected function print_success( $tasks_completed ) {
-		WP_CLI::success( sprintf( /* translators: %d refers to the total number of tasks completed */ _n( '%d scheduled task completed.', '%d scheduled tasks completed.', $tasks_completed, 'action-scheduler' ), number_format_i18n( $tasks_completed ) ) );
+		WP_CLI::success( sprintf( /* translators: %d refers to the total number of tasks completed */ _n( '%d scheduled task completed.', '%d scheduled tasks completed.', $tasks_completed, 'action-scheduler' ), number_format_i18n( $tasks_completed ) ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 	}
 }

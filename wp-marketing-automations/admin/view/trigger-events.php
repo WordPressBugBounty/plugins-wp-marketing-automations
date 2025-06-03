@@ -16,7 +16,7 @@ $is_edit        = ( '' !== $db_saved_value ) ? 'yes' : 'no';
 $parent_trigger = $parent_source;
 
 ?>
-    <div id="bwfan_events_output_div" data-parent-trigger="<?php esc_attr_e( $parent_trigger ); ?>" data-is-edit="<?php esc_attr_e( $is_edit ); ?>" data-db-eventmeta-value='<?php echo wp_json_encode( $db_eventmeta_saved_value ); ?>' data-db-value='<?php esc_attr_e( $db_saved_value ); ?>' data-repeator-count="<?php esc_attr_e( $repeater_count ); ?>"></div>
+    <div id="bwfan_events_output_div" data-parent-trigger="<?php echo esc_attr( $parent_trigger ); ?>" data-is-edit="<?php echo esc_attr( $is_edit ); ?>" data-db-eventmeta-value='<?php echo wp_json_encode( $db_eventmeta_saved_value ); ?>' data-db-value='<?php echo esc_attr( $db_saved_value ); ?>' data-repeator-count="<?php echo esc_attr( $repeater_count ); ?>"></div>
 
     <script type="text/html" id="tmpl-single-source">
         <div class="bwfan-form-inner clearfix bwfan-mb-0 bwfan-b-0 bwfan-p-0 bwfan-mt-0">

@@ -44,8 +44,7 @@ if ( is_array( $products ) ) :
 
 						if ( false !== $cart ) {
 							$cartItemLinkEnabled = apply_filters( 'bwfan_block_editor_enable_cart_item_link', true );
-							$suffix              = get_option( 'woocommerce_price_display_suffix' );
-							$tax_display         = get_option( 'woocommerce_tax_display_cart' );
+							$suffix              = BWFAN_Common::get_wc_tax_label_if_displayed();
 							foreach ( $cart as $item ) {
 								$product = isset( $item['data'] ) ? $item['data'] : '';
 								if ( empty( $product ) || ! $product instanceof WC_Product ) {
@@ -59,7 +58,7 @@ if ( is_array( $products ) ) :
 										<?php if ( true === $cartItemLinkEnabled ) :
 											$cartItemLink = BWFAN_Common::decode_merge_tags( apply_filters( 'bwfan_block_editor_alter_cart_item_link', '{{cart_recovery_link}}' ) );
 											?>
-                                            <a href="<?php echo $cartItemLink; ?>" target="_blank">
+                                            <a href="<?php echo esc_url( $cartItemLink ); ?>" target="_blank">
 												<?php echo wp_kses_post( BWFAN_Common::get_product_image( $product, 'shop_catalog', false, 200 ) ); ?>
                                             </a>
 										<?php else : ?>
@@ -68,13 +67,17 @@ if ( is_array( $products ) ) :
 									<?php endif; ?>
                                     <h4 style="vertical-align:middle;"><?php echo wp_kses_post( BWFAN_Common::get_name( $product ) ); ?></h4>
                                     <p class="price" style="vertical-align:middle;">
-                                        <strong>
-											<?php
-											echo BWFAN_Common::price( $line_total, $currency ); //phpcs:ignore WordPress.Security.EscapeOutput
-											?>
-                                        </strong>
-										<?php if ( $suffix && wc_tax_enabled() ): ?>
-                                            <small><?php echo $suffix; ?></small>
+										<?php if( false === BWFAN_Merge_Tag_Loader::get_data( 'is_preview' ) ): ?>
+											<strong>
+												<?php
+												echo BWFAN_Common::price( $line_total, $currency ); //phpcs:ignore WordPress.Security.EscapeOutput
+												?>
+											</strong>
+											<?php if ( $suffix && wc_tax_enabled() ): ?>
+												<small><?php echo $suffix; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></small>
+											<?php endif; ?>
+										<?php else: ?>
+											<strong><?php echo $price; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></strong>
 										<?php endif; ?>
                                     </p>
                                 </div>

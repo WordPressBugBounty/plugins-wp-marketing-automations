@@ -45,7 +45,8 @@ class BWFAN_API_Get_Contact_Conversation extends BWFAN_API_Base {
 
 		$this->contact = new BWFCRM_Contact( absint( $id ) );
 		if ( ! $this->contact instanceof BWFCRM_Contact || ! $this->contact->is_contact_exists() ) {
-			return $this->error_response( __( 'No contact found with given ID #' . $id, 'wp-marketing-automations' ), null, 500 );
+			/* translators: 1: Contact ID */
+			return $this->error_response( sprintf( __( 'No contact found with given id #%1$d', 'wp-marketing-automations' ), $id ), null, 500 );
 		}
 
 		$conversation = $this->contact->get_conversation_email( $engagement_id );

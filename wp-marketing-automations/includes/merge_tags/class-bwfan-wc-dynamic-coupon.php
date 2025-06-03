@@ -86,7 +86,7 @@ class BWFAN_WC_Dynamic_Coupon extends BWFAN_Merge_Tag {
 
 		/** To get automation step with action create coupon and stataus is 1 */
 		$query   = "SELECT * FROM {$wpdb->prefix}bwfan_automation_step WHERE `aid` = {$automationId} AND `action` LIKE '%wc_create_coupon%' AND `status` = '1'";
-		$results = $wpdb->get_results( $query, ARRAY_A );
+		$results = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		/** Check for empty step */
 		if ( empty( $results ) ) {

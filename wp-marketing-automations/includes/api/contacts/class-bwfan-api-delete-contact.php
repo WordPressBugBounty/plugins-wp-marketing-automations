@@ -37,7 +37,9 @@ class BWFAN_API_Delete_Contact extends BWFAN_API_Base {
 		if ( ! $contact instanceof BWFCRM_Contact || 0 === $contact->get_id() ) {
 			$this->response_code = 404;
 
-			return $this->error_response( __( 'No contact found with given contact id: ' . $contact_id, 'wp-marketing-automations' ) );
+			/* translators: 1: Contact ID */
+
+			return $this->error_response( sprintf( __( 'No contact found with given id #%1$d', 'wp-marketing-automations' ), $contact_id ) );
 		}
 
 		$delete_contact_result = BWFCRM_Model_Contact::delete_contact( $contact_id );

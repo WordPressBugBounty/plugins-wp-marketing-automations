@@ -19,7 +19,7 @@ if ( ! class_exists( 'BWF_AS_Actions_Crud' ) ) {
 			$sql   = "SELECT {$return_vars} FROM {$table} WHERE {$p_key}=%d";
 			$sql   = $wpdb->prepare( $sql, $action_id ); //phpcs:ignore WordPress.DB.PreparedSQL
 
-			$status = $wpdb->get_results( $sql, ARRAY_A ); //phpcs:ignore WordPress.DB.PreparedSQL
+			$status = $wpdb->get_results( $sql, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 			$return = new stdClass();
 			if ( is_array( $status ) && count( $status ) > 0 && isset( $status[0] ) && is_array( $status[0] ) && count( $status[0] ) > 0 ) {
@@ -99,7 +99,7 @@ if ( ! class_exists( 'BWF_AS_Actions_Crud' ) ) {
 
 			$sql = $wpdb->prepare( $sql, $sql_params ); //phpcs:ignore WordPress.DB.PreparedSQL
 
-			$action_ids = $wpdb->get_results( $sql, ARRAY_A ); //phpcs:ignore WordPress.DB.PreparedSQL
+			$action_ids = $wpdb->get_results( $sql, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 			if ( is_array( $action_ids ) && count( $action_ids ) > 0 ) {
 				$action_ids = array_column( $action_ids, 'id' );
 
@@ -115,14 +115,14 @@ if ( ! class_exists( 'BWF_AS_Actions_Crud' ) ) {
 			$p_key  = self::$primary_key;
 			$sql    = "SELECT `status` FROM {$table} WHERE {$p_key}=%d";
 			$sql    = $wpdb->prepare( $sql, $action_id ); //phpcs:ignore WordPress.DB.PreparedSQL
-			$status = $wpdb->get_var( $sql ); //phpcs:ignore WordPress.DB.PreparedSQL
+			$status = $wpdb->get_var( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 			return $status;
 		}
 
 		public static function insert( $data ) {
 			global $wpdb;
-			$wpdb->insert( self::_table(), $data );
+			$wpdb->insert( self::_table(), $data ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		}
 
 		public static function delete( $value ) {
@@ -131,7 +131,7 @@ if ( ! class_exists( 'BWF_AS_Actions_Crud' ) ) {
 				return;
 			}
 
-			$resp = $wpdb->delete( self::_table(), array( static::$primary_key => $value ), array( '%d' ) );
+			$resp = $wpdb->delete( self::_table(), array( static::$primary_key => $value ), array( '%d' ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			return $resp;
 		}
@@ -152,7 +152,7 @@ if ( ! class_exists( 'BWF_AS_Actions_Crud' ) ) {
 			$query  = "DELETE FROM {$table} WHERE {$p_key} IN ({$format})";
 			$sql    = $wpdb->prepare( $query, $action_ids ); //phpcs:ignore WordPress.DB.PreparedSQL
 
-			$rows_affected = $wpdb->query( $sql ); //phpcs:ignore WordPress.DB.PreparedSQL
+			$rows_affected = $wpdb->query( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 			return $rows_affected;
 		}
@@ -160,7 +160,7 @@ if ( ! class_exists( 'BWF_AS_Actions_Crud' ) ) {
 		public static function query( $query ) {
 			global $wpdb;
 			$query   = str_replace( '{table_name}', self::_table(), $query );
-			$results = $wpdb->query( $query ); //phpcs:ignore WordPress.DB.PreparedSQL
+			$results = $wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 			return $results;
 		}
@@ -174,7 +174,7 @@ if ( ! class_exists( 'BWF_AS_Actions_Crud' ) ) {
 		public static function get_results( $query ) {
 			global $wpdb;
 			$query   = str_replace( '{table_name}', self::_table(), $query );
-			$results = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.PreparedSQL
+			$results = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 			return $results;
 		}

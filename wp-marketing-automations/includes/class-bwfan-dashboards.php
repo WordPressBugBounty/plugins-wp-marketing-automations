@@ -53,7 +53,7 @@ class BWFAN_Dashboards {
 
 		$base_query = "SELECT  count(id) as contact_counts" . $interval_query . "  FROM `" . $table . "` WHERE 1=1 " . $where . "" . $group_by . " ORDER BY " . $order_by . " ASC";
 
-		return $wpdb->get_var( $base_query );
+		return $wpdb->get_var( $base_query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -263,13 +263,13 @@ class BWFAN_Dashboards {
 
 		$query  = "SELECT count(`ID`) FROM `" . $table . "` WHERE 1 = 1 " . $where . " AND `mode` = 1 AND `c_status` = 2 " . $interval_query;
 		$query  .= ( ! empty( $group_by ) ) ? " " . $group_by . " ORDER BY " . $order_by . " ASC" : '';
-		$result = $wpdb->get_var( $query );
+		$result = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		$arr[0]['email_sents'] = $result;
 
 		$query  = "SELECT count(`ID`) FROM `" . $table . "` WHERE 1 = 1 " . $where . " AND `mode` = 2 AND `c_status` = 2 " . $interval_query;
 		$query  .= ( ! empty( $group_by ) ) ? " " . $group_by . " ORDER BY " . $order_by . " ASC" : '';
-		$result = $wpdb->get_var( $query );
+		$result = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		$arr[0]['sms_sent'] = $result;
 
@@ -306,7 +306,7 @@ class BWFAN_Dashboards {
 
 		$base_query = "SELECT  sum( open ) as email_open" . $interval_query . "  FROM `" . $table . "` WHERE 1 = 1 " . $where . " and c_status = 2 " . $group_by . " ORDER BY " . $order_by . " ASC";
 
-		return $wpdb->get_results( $base_query, ARRAY_A );
+		return $wpdb->get_results( $base_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -340,7 +340,7 @@ class BWFAN_Dashboards {
 
 		$base_query = "SELECT  sum( click ) as email_click" . $interval_query . "  FROM `" . $table . "` WHERE 1 = 1 " . $where . " and c_status = 2 " . $group_by . " ORDER BY " . $order_by . " ASC";
 
-		return $wpdb->get_results( $base_query, ARRAY_A );
+		return $wpdb->get_results( $base_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -374,7 +374,7 @@ class BWFAN_Dashboards {
 
 		$base_query = "SELECT  count( c.id ) as total_orders, sum( c.wctotal ) as total_revenue " . $interval_query . "  FROM  $table as c WHERE 1 = 1 " . $where . " and c.wcid != 0 " . $group_by . " ORDER BY " . $order_by . " ASC";
 
-		return $wpdb->get_results( $base_query, ARRAY_A );
+		return $wpdb->get_results( $base_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -543,7 +543,7 @@ class BWFAN_Dashboards {
 
 		$base_query = "SELECT  COUNT( ID ) as unsubs_count" . $interval_query . "  FROM `" . $table . "` WHERE 1 = 1 and `" . $date_col . "` >= '" . $start_date . "' and `" . $date_col . "` <= '" . $end_date . "'" . $group_by . " ORDER BY " . $order_by . " ASC";
 
-		return $wpdb->get_results( $base_query, ARRAY_A );
+		return $wpdb->get_results( $base_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -558,7 +558,7 @@ class BWFAN_Dashboards {
 
 		$base_query = "SELECT day, (SUM(open)/count(ID)) as mean, SUM(open) as open, count(ID) as total from $table_name where DATE(created_at) >= '" . $start_date . "' and DATE(created_at) <= '" . $end_date . "' AND day!=0 GROUP BY day ";
 
-		return $wpdb->get_results( $base_query, ARRAY_A );
+		return $wpdb->get_results( $base_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -572,7 +572,7 @@ class BWFAN_Dashboards {
 		$table_name = $wpdb->prefix . 'bwfan_engagement_tracking';
 		$base_query = "SELECT hour, (SUM(open)/count(ID)) as mean, SUM(open) as open, count(ID) as total from $table_name where DATE(created_at) >= '" . $start_date . "' and DATE(created_at) <= '" . $end_date . "' GROUP BY hour ";
 
-		return $wpdb->get_results( $base_query, ARRAY_A );
+		return $wpdb->get_results( $base_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	public static function get_recent_contacts() {
@@ -582,7 +582,7 @@ class BWFAN_Dashboards {
 
 		$query = "SELECT `ID`, `f_name`, `l_name`, `email`, `contact_no`, `creation_date` FROM $table_name WHERE $where ORDER BY `creation_date` DESC LIMIT 0,9";
 
-		return $wpdb->get_results( $query, ARRAY_A );
+		return $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 
@@ -594,7 +594,7 @@ class BWFAN_Dashboards {
 
 		$query = "SELECT sub.recipient as email, COALESCE(con.id, 0) as ID, COALESCE(con.f_name, '') as f_name, COALESCE(con.l_name, '') as l_name, sub.c_date AS creation_date from $unsubscribe_table as sub LEFT JOIN $contact_table as con ON sub.recipient = con.email ORDER BY sub.ID DESC LIMIT 0,9";
 
-		return $wpdb->get_results( $query, ARRAY_A );
+		return $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -641,6 +641,6 @@ class BWFAN_Dashboards {
 
 		$query = "SELECT con.cid AS ID, c.email,c.f_name,c.l_name,con.date AS creation_date FROM {$wpdb->prefix}bwfan_conversions AS con JOIN {$wpdb->prefix}bwf_contact AS c ON con.cid = c.id ORDER BY con.ID DESC LIMIT 0, 9";
 
-		return $wpdb->get_results( $query, ARRAY_A );
+		return $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 }

@@ -2,7 +2,7 @@
 /**
  * Test Mail API file
  *
- * @package BWFCRM_API_Base
+ * @package BWFAN_API_Base
  */
 
 /**

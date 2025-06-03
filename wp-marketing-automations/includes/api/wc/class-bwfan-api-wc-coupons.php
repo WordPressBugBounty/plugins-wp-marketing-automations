@@ -86,7 +86,7 @@ class BWFAN_Api_Get_WC_Coupons extends BWFAN_API_Base {
 				$expiry = $now_datetime->getTimestamp() > $expiry_datetime->getTimestamp();
 			}
 			$coupon_data[] = [
-				'key'     => $coupon_post->post_name,
+				'key'     => $coupon_post->post_title,
 				'value'   => $coupon_post->ID,
 				'expired' => $expiry,
 			];

@@ -95,7 +95,7 @@ abstract class BWFCRM_Base_React_Page {
 		$this->page_data['first_link_trigger_id'] = $first_link_trigger_id;
 		$this->page_data['first_bulk_action_id']  = $first_bulk_action_id;
 		$this->page_data['first_audience_id']     = $first_audience_id;
-		$this->page_data['bwfan_nonce']           = get_option( 'bwfan_u_key', '' );
+		$this->page_data['bwfan_nonce']           = get_option( 'bwfan_unique_secret', '' );
 		$this->page_data['wp_version']            = get_bloginfo( 'version' );
 		$this->page_data['is_rtl']                = is_rtl();
 
@@ -205,11 +205,11 @@ abstract class BWFCRM_Base_React_Page {
 		$this->page_data['bwf_acc_link'] = BWFAN_Common::get_fk_site_links();
 
 		/** User export data */
-		$export_user_data = get_user_meta( get_current_user_id(), 'bwfan_single_export_status', true );
-		if ( empty( $export_user_data ) ) {
-			$export_user_data = [];
+		$export_user_data = [];
+		if ( bwfan_is_autonami_pro_active() ) {
+			$export_user_data = get_user_meta( get_current_user_id(), 'bwfan_single_export_status', true );
 		}
-		$this->page_data['export_data']                     = $export_user_data;
+		$this->page_data['export_data']                     = ! empty( $export_user_data ) ? $export_user_data : [];
 		$this->page_data['bwf_global_block_editor_setting'] = BWFAN_Common::get_block_editor_settings();
 
 		$this->page_data['block_app_env'] = defined( 'BWFCRM_EDITOR_ENVIRONMENT' ) ? BWFCRM_EDITOR_ENVIRONMENT : 2;
@@ -235,6 +235,14 @@ abstract class BWFCRM_Base_React_Page {
 		$menu_data                                       = BWFAN_Common::get_user_menu_access();
 		$this->page_data['is_settings_enabled']          = empty( $menu_data ) || in_array( 'settings', $menu_data, true );
 		$this->page_data['older_visual_builder']         = bwf_options_get( 'fk_legacy_builder', '', 1 );
+		$this->page_data['bwf_mail_replace_str']         = BWFAN_Common::get_mail_replace_string();
+
+		// Add check for unsubscribed page validation
+		$unsubscribe_page = class_exists( 'BWFAN_Common' ) ? BWFAN_Common::is_unsubscribe_page_valid() : array();
+		if ( ! empty( $unsubscribe_page['status'] ) && 1 !== absint( $unsubscribe_page['status'] ) ) {
+			$this->page_data['unsubscribe_page_data'] = $unsubscribe_page;
+		}
+
 		do_action( 'bwfan_admin_view_localize_data', $this );
 	}
 

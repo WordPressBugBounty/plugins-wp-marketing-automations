@@ -92,7 +92,7 @@ abstract class BWFAN_Source {
 	 * to avoid unserialize of the current class
 	 */
 	public function __wakeup() {
-		throw new ErrorException( __( 'BWFAN_Core cannot be converted to string', 'wp-marketing-automations' ) );
+		throw new ErrorException( esc_html__( 'BWFAN_Core cannot be converted to string', 'wp-marketing-automations' ) );
 
 	}
 
@@ -100,7 +100,7 @@ abstract class BWFAN_Source {
 	 * to avoid serialize of the current class
 	 */
 	public function __sleep() {
-		throw new ErrorException( __( 'BWFAN_Core can`t converted to string', 'wp-marketing-automations' ) );
+		throw new ErrorException( esc_html__( 'BWFAN_Core can`t converted to string', 'wp-marketing-automations' ) );
 	}
 
 	/**

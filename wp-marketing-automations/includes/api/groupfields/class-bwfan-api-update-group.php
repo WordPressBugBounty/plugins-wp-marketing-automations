@@ -62,7 +62,9 @@ class BWFAN_Api_Update_Group extends BWFAN_API_Base {
 
 			$this->response_code = 400;
 
-			return $this->error_response( __( 'Unable to update group with group id ' . $group_id, 'wp-marketing-automations' ) );
+			/* translators: 1: Group ID */
+
+			return $this->error_response( sprintf( __( 'Unable to update group with group id %1$d', 'wp-marketing-automations' ), $group_id ) );
 		}
 		$group  = BWFCRM_Group::get_groupby_id( $group_id );
 		$fields = BWFCRM_Fields::get_group_fields( $group_id );

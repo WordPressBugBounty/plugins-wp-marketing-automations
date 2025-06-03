@@ -36,10 +36,7 @@ class BWFAN_Abandoned_Cart {
 		add_action( 'wc_ajax_bwfan_delete_abandoned_cart', [ $this, 'delete_abandoned_cart' ] );
 		add_action( 'bwfan_remove_abandoned_data_from_table', [ $this, 'remove_abandoned_data_from_table' ] );
 
-		if ( is_admin() ) {
-			return;
-		}
-		if ( false === BWFAN_Common::is_cart_abandonment_active() ) {
+		if ( is_admin() || false === BWFAN_Common::is_cart_abandonment_active() ) {
 			return;
 		}
 
@@ -77,6 +74,8 @@ class BWFAN_Abandoned_Cart {
 		// prefill the checkout fields after the cart is restored
 		add_filter( 'woocommerce_billing_fields', [ $this, 'prefill_billing_fields' ], 20 );
 		add_filter( 'woocommerce_shipping_fields', [ $this, 'prefill_shipping_fields' ], 20 );
+		add_filter( 'woocommerce_ship_to_different_address_checked', [ $this, 'wc_check_different_shipping' ], 20 );
+		add_filter( 'wfacp_ship_to_different_address_checked', [ $this, 'wfacp_check_different_shipping' ], 20 );
 
 		add_action( 'bwfanac_checkout_data', [ $this, 'set_data_for_js' ], 10, 3 );
 		add_action( 'bwfanac_cart_details', [ $this, 'remove_data_js' ] );
@@ -93,6 +92,52 @@ class BWFAN_Abandoned_Cart {
 		add_action( 'woocommerce_remove_cart_item', [ $this, 'remove_session' ], 99 );
 
 		add_action( 'shutdown', [ $this, 'add_to_cart' ] );
+	}
+
+	/**
+	 * Check if "billing same as shipping" is enabled in the restored cart
+	 *
+	 * @param bool $checked The current checkbox state
+	 *
+	 * @return bool
+	 */
+	public function wc_check_different_shipping( $checked ) {
+		$data = WC()->session->get( 'restored_cart_details' );
+		if ( ! is_array( $data ) || 0 === count( $data ) ) {
+			return $checked;
+		}
+		$checkout_data = $this->get_checkout_data( $data );
+
+		if ( isset( $checkout_data['fields'] ) && isset( $checkout_data['fields']['ship_to_different_address'] ) ) {
+			return $checkout_data['fields']['ship_to_different_address'];
+		}
+
+		return '';
+	}
+
+	/**
+	 * Advanced checkbox state detection for AeroCheckout pages
+	 *
+	 * @param bool $checked The current checkbox state
+	 *
+	 * @return mixed
+	 */
+	public function wfacp_check_different_shipping( $checked ) {
+		$data = WC()->session->get( 'restored_cart_details' );
+		if ( ! is_array( $data ) || 0 === count( $data ) ) {
+			return $checked;
+		}
+		$checkout_data = $this->get_checkout_data( $data );
+
+		if ( isset( $checkout_data['fields'] ) && isset( $checkout_data['fields']['billing_same_as_shipping'] ) ) {
+			return $checkout_data['fields']['billing_same_as_shipping'];
+		}
+
+		if ( isset( $checkout_data['fields'] ) && isset( $checkout_data['fields']['shipping_same_as_billing'] ) ) {
+			return $checkout_data['fields']['shipping_same_as_billing'];
+		}
+
+		return null;
 	}
 
 	public function disable_geolocation_recovery() {
@@ -276,7 +321,7 @@ class BWFAN_Abandoned_Cart {
 	}
 
 	public function get_cart_by_multiple_key( $where ) {
-		$query        = "SELECT * FROM {table_name} WHERE $where";
+		$query        = "SELECT * FROM {table_name} WHERE $where AND status != 2";
 		$cart_details = BWFAN_Model_Abandonedcarts::get_results( $query );
 		if ( ! is_array( $cart_details ) || 0 === count( $cart_details ) ) {
 			return false;
@@ -576,6 +621,13 @@ class BWFAN_Abandoned_Cart {
 			}
 		}
 
+		/** Restore fees */
+		if ( isset( $cart_details['fees'] ) && is_array( $cart_details['fees'] ) && count( $cart_details['fees'] ) > 0 ) {
+			foreach ( $cart_details['fees'] as $fee ) {
+				WC()->cart->add_fee( $fee['name'], $fee['amount'], $fee['taxable'], $fee['tax_class'] );
+			}
+		}
+
 		/** Clear show notices for added coupons or products */
 		if ( ! is_null( WC()->session ) ) {
 			WC()->session->set( 'wc_notices', array() );
@@ -812,13 +864,11 @@ class BWFAN_Abandoned_Cart {
 	}
 
 	public function woocommerce_add_to_cart( $cart_item_key ) {
-		$user_id = WC()->session->get( 'bwfan_user_validated' );
-		if ( is_null( $user_id ) ) {
-			$user_id = $this->validate_user( $cart_item_key );
-			WC()->session->set( 'bwfan_user_validated', $user_id );
-		}
+		$cookie_key    = BWFAN_Common::get_cookie( 'bwfan_visitor' );
+		$cookie_uid    = BWFAN_Common::get_cookie( '_fk_contact_uid' );
+		$is_cookie_set = ! empty( $cookie_key ) ? $cookie_key : $cookie_uid;
 
-		if ( empty( $user_id ) ) {
+		if ( empty( $is_cookie_set ) ) {
 			return;
 		}
 
@@ -840,7 +890,6 @@ class BWFAN_Abandoned_Cart {
 		$session_data[ $cart_item_key ] = $item_price;
 		WC()->session->set( 'bwfan_add_to_cart', $session_data );
 
-		$this->user_id       = empty( $this->user_id ) ? $user_id : $this->user_id;
 		$this->added_to_cart = true;
 	}
 
@@ -945,6 +994,13 @@ class BWFAN_Abandoned_Cart {
 			}
 		}
 
+		if ( isset( $data['fields']['shipping_phone'] ) && ! empty( $data['fields']['shipping_phone'] ) ) {
+			$country = isset( $data['fields']['shipping_country'] ) ? $data['fields']['shipping_country'] : '';
+			if ( ! empty( $country ) ) {
+				$data['fields']['shipping_phone'] = BWFAN_Phone_Numbers::add_country_code( $data['fields']['shipping_phone'], $country );
+			}
+		}
+
 		if ( ! empty( $exclude_checkout_fields ) ) {
 			foreach ( $exclude_checkout_fields as $field ) {
 				unset( $data['fields'][ $field ] );
@@ -985,15 +1041,17 @@ class BWFAN_Abandoned_Cart {
 			$data['lang'] = $TRP_LANGUAGE;
 		} elseif ( function_exists( 'bwfan_is_weglot_active' ) && bwfan_is_weglot_active() ) {
 			$data['lang'] = weglot_get_current_language();
+		} elseif ( function_exists( 'bwfan_is_gtranslate_active' ) && bwfan_is_gtranslate_active() ) {
+			$data['lang'] = BWFAN_Compatibility_With_GTRANSLATE::get_gtranslate_language();
 		}
 
 		$abandoned_cart_id = $this->process_abandoned_cart( $email, $data );
 
 		if ( 0 === absint( $abandoned_cart_id ) ) {
 			wp_send_json( array(
-				'success' => false,
-				'id'      => 0,
-				'message' => esc_html__( 'Unable to create cart for this email `' . $email . '`.', 'wp-marketing-automations' ),
+				'success'                                    => false,
+				'id'                                         => 0,
+				/* translators: 1: Dynamic Data */ 'message' => esc_html( sprintf( __( 'Unable to create cart for this email `%1$s`.', 'wp-marketing-automations' ), $email ) ),
 			) );
 		}
 
@@ -1019,35 +1077,38 @@ class BWFAN_Abandoned_Cart {
 
 	public static function get_woocommerce_default_checkout_nice_names() {
 		return apply_filters( 'bwfan_ab_default_checkout_nice_names', array(
-			'billing_first_name' => __( 'First Name', 'woocommerce' ),
-			'billing_last_name'  => __( 'Last Name', 'woocommerce' ),
-			'billing_company'    => __( 'Company', 'woocommerce' ),
-			'billing_address_1'  => __( 'Address 1', 'woocommerce' ),
-			'billing_address_2'  => __( 'Address 2', 'woocommerce' ),
-			'billing_city'       => __( 'City', 'woocommerce' ),
-			'billing_postcode'   => __( 'Postal/Zip Code', 'woocommerce' ),
-			'billing_state'      => __( 'State', 'woocommerce' ),
-			'billing_country'    => __( 'Country', 'woocommerce' ),
-			'billing_phone'      => __( 'Phone Number', 'woocommerce' ),
-			'billing_email'      => __( 'Email Address', 'woocommerce' ),
+			'billing_first_name' => __( 'First Name', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'billing_last_name'  => __( 'Last Name', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'billing_company'    => __( 'Company', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'billing_address_1'  => __( 'Address 1', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'billing_address_2'  => __( 'Address 2', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'billing_city'       => __( 'City', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'billing_postcode'   => __( 'Postal/Zip Code', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'billing_state'      => __( 'State', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'billing_country'    => __( 'Country', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'billing_phone'      => __( 'Phone Number', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'billing_email'      => __( 'Email Address', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 
-			'shipping_first_name' => __( 'First Name', 'woocommerce' ),
-			'shipping_last_name'  => __( 'Last Name', 'woocommerce' ),
-			'shipping_company'    => __( 'Company', 'woocommerce' ),
-			'shipping_address_1'  => __( 'Address 1', 'woocommerce' ),
-			'shipping_address_2'  => __( 'Address 2', 'woocommerce' ),
-			'shipping_city'       => __( 'City', 'woocommerce' ),
-			'shipping_postcode'   => __( 'Postal/Zip Code', 'woocommerce' ),
-			'shipping_state'      => __( 'State', 'woocommerce' ),
-			'shipping_country'    => __( 'Country', 'woocommerce' ),
-			'shipping_phone'      => __( 'Phone', 'woocommerce' ),
+			'shipping_first_name' => __( 'First Name', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'shipping_last_name'  => __( 'Last Name', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'shipping_company'    => __( 'Company', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'shipping_address_1'  => __( 'Address 1', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'shipping_address_2'  => __( 'Address 2', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'shipping_city'       => __( 'City', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'shipping_postcode'   => __( 'Postal/Zip Code', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'shipping_state'      => __( 'State', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'shipping_country'    => __( 'Country', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'shipping_phone'      => __( 'Phone Number', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 
-			'last_edit_field'      => __( 'Checkout Form Last Edit Field', 'wp-marketing-automations' ),
-			'current_step'         => __( 'Checkout Form Current Step', 'wp-marketing-automations' ),
-			'aerocheckout_page_id' => __( 'Checkout Page ID', 'wp-marketing-automations' ),
-			'current_page_id'      => __( 'WordPress Page ID', 'wp-marketing-automations' ),
-			'wfacp_source'         => __( 'Checkout Page Source', 'wp-marketing-automations' ),
-			'payment_method'       => __( 'Payment Method', 'wp-marketing-automations' ),
+			'last_edit_field'           => __( 'Checkout Form Last Edit Field', 'wp-marketing-automations' ),
+			'current_step'              => __( 'Checkout Form Current Step', 'wp-marketing-automations' ),
+			'aerocheckout_page_id'      => __( 'Checkout Page ID', 'wp-marketing-automations' ),
+			'current_page_id'           => __( 'WordPress Page ID', 'wp-marketing-automations' ),
+			'wfacp_source'              => __( 'Checkout Page Source', 'wp-marketing-automations' ),
+			'payment_method'            => __( 'Payment Method', 'wp-marketing-automations' ),
+			'ship_to_different_address' => __( 'Ship to a different address', 'wp-marketing-automations' ),
+			'shipping_same_as_billing'  => __( 'Shipping same as billing address', 'wp-marketing-automations' ),
+			'billing_same_as_shipping'  => __( 'Billing same as shipping address', 'wp-marketing-automations' ),
 		) );
 	}
 
@@ -1089,9 +1150,6 @@ class BWFAN_Abandoned_Cart {
 				$cart_details['email'] = ( ! is_null( $email ) ) ? $email : $cart_details['email'];
 				if ( is_array( $checkout_fields_data ) && count( $checkout_fields_data ) > 0 ) {
 					$cart_details['checkout_data'] = $checkout_fields_data;
-				}
-				if ( 2 === intval( $cart_details['status'] ) ) {
-					$cart_details['status'] = 0;
 				}
 
 				$this->update_abandoned_cart( $cart_details );
@@ -1148,9 +1206,6 @@ class BWFAN_Abandoned_Cart {
 		if ( is_array( $checkout_fields_data ) && count( $checkout_fields_data ) > 0 ) {
 			$cart_details['checkout_data'] = $checkout_fields_data;
 		}
-		if ( 2 === intval( $cart_details['status'] ) ) {
-			$cart_details['status'] = 0;
-		}
 
 		$this->update_abandoned_cart( $cart_details );
 
@@ -1168,7 +1223,7 @@ class BWFAN_Abandoned_Cart {
 	 */
 	public function get_cart_by_key( $key, $value, $value_type ) {
 		global $wpdb;
-		$query        = $wpdb->prepare( "SELECT * FROM {table_name} WHERE {$key} LIKE {$value_type} ORDER BY `ID` DESC LIMIT 0,1", $value ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders
+		$query        = $wpdb->prepare( "SELECT * FROM {table_name} WHERE {$key} LIKE {$value_type} AND status != 2 ORDER BY `ID` DESC LIMIT 0,1", $value );
 		$cart_details = BWFAN_Model_Abandonedcarts::get_results( $query );
 
 		return ( is_array( $cart_details ) && count( $cart_details ) > 0 ) ? $cart_details[0] : false;
@@ -1265,11 +1320,18 @@ class BWFAN_Abandoned_Cart {
 			];
 		}
 
-		$this->coupon_data          = $coupon_data;
-		$this->fees                 = WC()->cart->get_fees();
+		$this->coupon_data = $coupon_data;
+
+		$fee = '';
+		// Check for fees data in the cart
+		if ( WC()->cart->get_fee_total() ) {
+			WC()->cart->calculate_fees();
+			WC()->cart->calculate_totals();
+			$fee = WC()->cart->get_fees();
+		}
 		$data['items']              = maybe_serialize( $this->items );
 		$data['coupons']            = empty( $coupon_data ) ? '' : maybe_serialize( $coupon_data );
-		$data['fees']               = empty( $this->fees ) ? '' : maybe_serialize( $this->fees );
+		$data['fees']               = empty( $fee ) ? '' : maybe_serialize( $fee );
 		$data['shipping_tax_total'] = WC()->cart->shipping_tax_total;
 		$data['shipping_total']     = WC()->cart->shipping_total;
 		$data['currency']           = get_woocommerce_currency();
@@ -1354,7 +1416,7 @@ class BWFAN_Abandoned_Cart {
 		}
 		$post_status         .= "'')";
 		$prepare_query       = $wpdb->prepare( "SELECT p.ID FROM {$wpdb->prefix}posts p, {$wpdb->prefix}postmeta m1, {$wpdb->prefix}postmeta m2 WHERE p.ID = m1.post_id and p.ID = m2.post_id AND m2.meta_key = '%s' AND p.post_type = '%s' AND p.post_status NOT IN $post_status $where ORDER BY p.post_modified DESC", '_bwfan_ab_cart_recovered_a_id', 'shop_order' );
-		$recovered_carts_ids = $wpdb->get_results( $prepare_query, ARRAY_A );//phpcs:ignore WordPress.DB.PreparedSQL
+		$recovered_carts_ids = $wpdb->get_results( $prepare_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		if ( empty( $recovered_carts_ids ) ) {
 			return array();
@@ -1486,6 +1548,13 @@ class BWFAN_Abandoned_Cart {
 			}
 		}
 
+		if ( isset( $data['fields']['shipping_phone'] ) && ! empty( $data['fields']['shipping_phone'] ) ) {
+			$country = isset( $data['fields']['shipping_country'] ) ? $data['fields']['shipping_country'] : '';
+			if ( ! empty( $country ) ) {
+				$data['fields']['shipping_phone'] = BWFAN_Phone_Numbers::add_country_code( $data['fields']['shipping_phone'], $country );
+			}
+		}
+
 		if ( ! empty( $exclude_checkout_fields ) ) {
 			foreach ( $exclude_checkout_fields as $field ) {
 				unset( $data['fields'][ $field ] );
@@ -1526,6 +1595,8 @@ class BWFAN_Abandoned_Cart {
 			$data['lang'] = $TRP_LANGUAGE;
 		} elseif ( function_exists( 'bwfan_is_weglot_active' ) && bwfan_is_weglot_active() ) {
 			$data['lang'] = weglot_get_current_language();
+		} elseif ( function_exists( 'bwfan_is_gtranslate_active' ) && bwfan_is_gtranslate_active() ) {
+			$data['lang'] = BWFAN_Compatibility_With_GTRANSLATE::get_gtranslate_language();
 		}
 
 		$abandoned_cart_id = $this->process_abandoned_cart( $email, $data );
@@ -1616,60 +1687,12 @@ class BWFAN_Abandoned_Cart {
 		$token_value   = ! empty( $token_value ) ? json_decode( $token_value, true ) : [];
 		$token_value[] = $pushengage_token;
 		if ( empty( $field_values ) || ! is_array( $field_values ) ) {
-			BWF_Model_Contact_Fields::insert( array( 'cid' => $contact_id, $field_id => json_encode( $token_value ) ) );
+			BWF_Model_Contact_Fields::insert_ignore( array( 'cid' => $contact_id, $field_id => json_encode( $token_value ) ) );
 
 			return;
 		}
 
 		BWF_Model_Contact_Fields::update( [ $field_id => json_encode( $token_value ) ], [ 'cid' => $contact_id ] );
-	}
-
-	/**
-	 * check settings and user logged in and
-	 *
-	 * @param $cart_item_key
-	 *
-	 * @return false|int
-	 */
-	public function validate_user( $cart_item_key ) {
-		$user          = wp_get_current_user();
-		$this->user_id = ( $user instanceof WP_User ) ? $user->ID : 0;
-		if ( empty( $this->user_id ) || is_null( WC()->cart ) || WC()->cart->is_empty() ) {
-			return false;
-		}
-
-		$global_settings = BWFAN_Common::get_global_settings();
-		if ( 0 === absint( $global_settings['bwfan_ab_track_on_add_to_cart'] ) ) {
-			return false;
-		}
-
-		if ( 0 !== absint( $global_settings['bwfan_ab_exclude_users_cart_tracking'] ) ) {
-			/** Check excluded emails or user roles */
-			if ( isset( $global_settings['bwfan_ab_exclude_emails'] ) && ! empty( $global_settings['bwfan_ab_exclude_emails'] ) ) {
-				$global_settings['bwfan_ab_exclude_emails'] = str_replace( ' ', '', $global_settings['bwfan_ab_exclude_emails'] );
-				$exclude_emails                             = [];
-				if ( strpos( $global_settings['bwfan_ab_exclude_emails'], ',' ) ) {
-					$exclude_emails = explode( ',', $global_settings['bwfan_ab_exclude_emails'] );
-				}
-
-				if ( empty( $exclude_emails ) ) {
-					$exclude_emails = preg_split( '/$\R?^/m', $global_settings['bwfan_ab_exclude_emails'] );
-				}
-
-				if ( in_array( $user->user_email, $exclude_emails, true ) ) {
-					return false;
-				}
-			}
-			if ( isset( $global_settings['bwfan_ab_exclude_roles'] ) && ! empty( $global_settings['bwfan_ab_exclude_roles'] ) ) {
-				$exclude_roles = array_intersect( (array) $user->roles, $global_settings['bwfan_ab_exclude_roles'] );
-
-				if ( ! empty( $exclude_roles ) ) {
-					return false;
-				}
-			}
-		}
-
-		return $this->user_id;
 	}
 
 	/**
@@ -1689,19 +1712,113 @@ class BWFAN_Abandoned_Cart {
 			];
 		}
 
-		$url             = rest_url( '/autonami/v1/wc-add-to-cart' );
+		$url = rest_url( '/autonami/v1/wc-add-to-cart' );
+		global $cookie_set;
+		$cookie_set = false;
+		$this->set_session_cookies();
 		$tracking_cookie = BWFAN_Common::get_cookie( 'bwfan_visitor' );
 		$tracking_cookie = empty( $tracking_cookie ) ? WC()->session->get( 'bwfan_visitor' ) : $tracking_cookie;
-		$body_data       = array(
-			'id'            => $this->user_id,
+
+		$body_data = array(
+			'id'            => get_current_user_id(),
 			'coupon_data'   => maybe_serialize( $coupon_data ),
 			'items'         => maybe_serialize( WC()->cart->get_cart() ),
 			'fees'          => maybe_serialize( WC()->cart->get_fees() ),
 			'unique_key'    => get_option( 'bwfan_u_key', false ),
-			'bwfan_visitor' => $tracking_cookie
+			'bwfan_visitor' => $tracking_cookie,
+			'fk_uid'        => BWFAN_Common::get_cookie( '_fk_contact_uid' ),
 		);
-		$args            = bwf_get_remote_rest_args( $body_data );
+		$args      = bwf_get_remote_rest_args( $body_data );
 		wp_remote_post( $url, $args );
+	}
+
+	/**
+	 * Remove duplicate carts
+	 *
+	 * @param $carts
+	 *
+	 * @return array|mixed|void
+	 */
+	public static function remove_duplicate_cart( $carts ) {
+		if ( empty( $carts ) && ! is_array( $carts ) ) {
+			return;
+		}
+		$unique_carts    = [];
+		$emails          = [];
+		$duplicate_carts = [];
+		foreach ( $carts as $cart ) {
+			if ( in_array( $cart['email'], $emails, true ) ) {
+				$duplicate_carts[] = $cart;
+				continue;
+			}
+			$emails[]       = $cart['email'];
+			$unique_carts[] = $cart;
+		}
+
+		if ( empty( $duplicate_carts ) ) {
+			return $carts;
+		}
+
+		$p_keys = array_column( $duplicate_carts, 'ID' );
+		$emails = array_column( $duplicate_carts, 'email' );
+
+		self::remove_duplicate_contact( $emails );
+
+		$id_placeholders = array_fill( 0, count( $p_keys ), '%d' );
+		$id_placeholders = implode( ', ', $id_placeholders );
+
+		BWFAN_Common::log_test_data( [
+			'p_keys' => implode( ',', $p_keys ),
+			'emails' => implode( ',', $emails ),
+		], 'fka-duplicate-cart-captured', true );
+
+		global $wpdb;
+		$query = $wpdb->prepare( "DELETE FROM {$wpdb->prefix}bwfan_abandonedcarts  WHERE `ID` IN ($id_placeholders)", $p_keys );
+		$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+
+		return $unique_carts;
+	}
+
+	/**
+	 * Remove duplicate contact
+	 *
+	 * @param $emails
+	 *
+	 * @return void
+	 */
+	public static function remove_duplicate_contact( $emails ) {
+		global $wpdb;
+		$email_placeholders = array_fill( 0, count( $emails ), '%s' );
+		$email_placeholders = implode( ', ', $email_placeholders );
+		$query              = "SELECT `email`, GROUP_CONCAT(`id`) AS `pkey` FROM `{$wpdb->prefix}bwf_contact` WHERE `email` IN ($email_placeholders) GROUP BY `email` HAVING COUNT(`email`) > 1";
+		$query              = $wpdb->prepare( $query, $emails );
+		$results            = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		if ( empty( $results ) ) {
+			return;
+		}
+		$to_be_deleted = [];
+		foreach ( $results as $result ) {
+			if ( empty( $result['pkey'] ) ) {
+				continue;
+			}
+			$p_keys = explode( ',', $result['pkey'] );
+			array_shift( $p_keys );
+			if ( ! is_array( $p_keys ) || empty( $p_keys ) ) {
+				continue;
+			}
+			$to_be_deleted = array_merge( $to_be_deleted, $p_keys );
+		}
+
+		if ( empty( $to_be_deleted ) ) {
+			return;
+		}
+
+		$id_placeholders = array_fill( 0, count( $to_be_deleted ), '%d' );
+		$id_placeholders = implode( ', ', $id_placeholders );
+
+		global $wpdb;
+		$query = $wpdb->prepare( "DELETE FROM {$wpdb->prefix}bwf_contact  WHERE `id` IN ($id_placeholders)", $to_be_deleted );
+		$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 }
 

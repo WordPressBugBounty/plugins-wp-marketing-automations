@@ -15,7 +15,7 @@ if ( ! isset( $_GET['edit'] ) ) { // WordPress.CSRF.NonceVerification.NoNonceVer
 			foreach ( $all_automations as $automationid => $automation_name ) {
 				$selected = ( $automation_id === $automationid ) ? 'selected' : '';
 
-				echo '<option value="' . esc_attr__( $automationid ) . '" ' . esc_attr__( $selected ) . '>' . esc_html( $automation_name ) . '</option>';
+				echo '<option value="' . esc_attr( $automationid ) . '" ' . esc_attr( $selected ) . '>' . esc_html( $automation_name ) . '</option>';
 			}
 			?>
         </select>
@@ -30,7 +30,7 @@ if ( ! isset( $_GET['edit'] ) ) { // WordPress.CSRF.NonceVerification.NoNonceVer
 		foreach ( $all_actions as $action_slug => $action_name ) {
 			$selected = ( $log_action === $action_slug ) ? 'selected' : '';
 
-			echo '<option value="' . esc_attr__( $action_slug ) . '" ' . esc_attr__( $selected ) . '>' . esc_html( $action_name ) . '</option>';
+			echo '<option value="' . esc_attr( $action_slug ) . '" ' . esc_attr( $selected ) . '>' . esc_html( $action_name ) . '</option>';
 		}
 		?>
     </select>

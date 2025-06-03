@@ -38,10 +38,10 @@ class BWFAN_API_Carts_View_Tasks extends BWFAN_API_Base {
 		if ( 'recovered' === $type ) {
 			if ( BWF_WC_Compatibility::is_hpos_enabled() ) {
 				$query    = $wpdb->prepare( "SELECT `order_id` FROM {$wpdb->prefix}wc_orders_meta WHERE `meta_key` = %s AND `meta_value`= %d", '_bwfan_recovered_ab_id', $abandoned_id );
-				$order_id = $wpdb->get_var( $query );
+				$order_id = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			} else {
 				$query    = $wpdb->prepare( "SELECT `post_id` FROM {$wpdb->prefix}postmeta WHERE `meta_key` = %s AND `meta_value`= %d", '_bwfan_recovered_ab_id', $abandoned_id );
-				$order_id = $wpdb->get_var( $query );
+				$order_id = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			}
 			if ( empty( $order_id ) ) {
 				return $this->error_response( __( 'Abandoned cart data is missing', 'wp-marketing-automations' ) );
@@ -88,10 +88,10 @@ class BWFAN_API_Carts_View_Tasks extends BWFAN_API_Base {
 		$table2 = $wpdb->prefix . 'bwfan_automation_complete_contact';
 
 		$query1  = "SELECT * FROM $table1 WHERE `event` LIKE 'ab_cart_abandoned' AND `data` LIKE '%cart_abandoned_id\":\"{$abandoned_id}\"%' AND data LIKE '%email\":\"{$cart_email}\"%'";
-		$result1 = $wpdb->get_results( $query1, ARRAY_A );
+		$result1 = $wpdb->get_results( $query1, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		$query2  = "SELECT * FROM $table2 WHERE `event` LIKE 'ab_cart_abandoned' AND `data` LIKE '%cart_abandoned_id\":\"{$abandoned_id}\"%' AND data LIKE '%email\":\"{$cart_email}\"%'";
-		$result2 = $wpdb->get_results( $query2, ARRAY_A );
+		$result2 = $wpdb->get_results( $query2, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		if ( ! empty( $result1 ) ) {
 			foreach ( $result1 as $a_contact ) {

@@ -24,7 +24,7 @@ if ( ! function_exists( 'bwf_options_get' ) ) {
 		$column = empty( $column ) ? 'value' : $column;
 		$query  = "SELECT `{$column}` FROM {$wpdb->prefix}bwf_options WHERE `key` = %s";
 
-		$value = $wpdb->get_var( $wpdb->prepare( $query, $key ) );
+		$value = $wpdb->get_var( $wpdb->prepare( $query, $key ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( is_null( $value ) ) {
 			return ! is_null( $default ) ? $default : '';
 		}
@@ -59,14 +59,14 @@ if ( ! function_exists( 'bwf_options_update' ) ) {
 				'value' => $value
 			];
 
-			return $wpdb->insert( "{$wpdb->prefix}bwf_options", $data );
+			return $wpdb->insert( "{$wpdb->prefix}bwf_options", $data ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		}
 
 		$data = [
 			'value' => $value
 		];
 
-		return $wpdb->update( $wpdb->prefix . 'bwf_options', $data, array( 'id' => $p_key ) );
+		return $wpdb->update( $wpdb->prefix . 'bwf_options', $data, array( 'id' => $p_key ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 }
 
@@ -90,7 +90,7 @@ if ( ! function_exists( 'bwf_options_delete' ) ) {
 			return 0;
 		}
 
-		return $wpdb->delete( $wpdb->prefix . 'bwf_options', [ 'id' => $p_key ], [ '%d' ] );
+		return $wpdb->delete( $wpdb->prefix . 'bwf_options', [ 'id' => $p_key ], [ '%d' ] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 }
 

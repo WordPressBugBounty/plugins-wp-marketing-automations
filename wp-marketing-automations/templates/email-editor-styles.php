@@ -74,7 +74,7 @@ ob_start();
     .bwfan-email-table-wrap p {
     margin: 0 0 16px;
     line-height: 1.5;
-    font-size: <?php echo $font_size; ?>px;
+    font-size: <?php echo absint( $font_size ); ?>px;
     }
 
     .bwfan-email-table-wrap ul {
@@ -90,7 +90,7 @@ ob_start();
     .bwfan-email-table-wrap li {
     margin: 0 0 10px;
     display: list-item;
-    font-size: <?php echo $font_size; ?>px;
+    font-size: <?php echo absint( $font_size ); ?>px;
     }
 
     .bwfan-email-table-wrap a {
@@ -162,7 +162,7 @@ ob_start();
 $default_css = ob_get_clean();
 
 if ( true === apply_filters( 'bwfan_display_email_default_css', true ) ) {
-	echo $default_css;
+	echo $default_css; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 }
 
 /** Without style tag */

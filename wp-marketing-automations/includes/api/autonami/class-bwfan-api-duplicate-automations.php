@@ -39,7 +39,9 @@ class BWFAN_API_Duplicate_Automation extends BWFAN_API_Base {
 		if ( empty( $id ) ) {
 			$this->response_code = 400;
 
-			return $this->error_response( __( 'Unable to create Duplicate automation for id: ' . $automation_id, 'wp-marketing-automations' ) );
+			/* translators: 1: Automation ID */
+
+			return $this->error_response( sprintf( __( 'Unable to create Duplicate automation for id: %1$d', 'wp-marketing-automations' ), $automation_id ) );
 		}
 
 		$automation_data = BWFAN_Model_Automations::get( $id );

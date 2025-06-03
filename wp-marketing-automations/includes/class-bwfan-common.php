@@ -251,6 +251,11 @@ class BWFAN_Common {
 				return self::get_midnight_store_time();
 			} );
 		}
+
+		/** Add contact if not created */
+		add_action( 'user_register', [ __CLASS__, 'bwfan_register_user' ], 10, 1 );
+
+		add_action( 'bwfan_store_template_links', [ __CLASS__, 'bwfan_store_template_links' ] );
 	}
 
 	public static function display_marketing_optin_checkbox() {
@@ -360,12 +365,12 @@ class BWFAN_Common {
 			'bwfan_ab_exclude_roles'                       => array(),
 			'bwfan_ab_init_wait_time'                      => 15,
 			'bwfan_disable_abandonment_days'               => 15,
-			'bwfan_ab_track_on_add_to_cart'                => 0,
 			'bwfan_ab_email_consent'                       => 0,
 			'bwfan_ab_mark_lost_cart'                      => 15,
 			'bwfan_order_tracking_conversion'              => 15,
 			'bwfan_ab_restore_cart_message_success'        => '',
 			'bwfan_ab_restore_cart_message_failure'        => __( 'Your cart could not be restored, it may have expired.', 'wp-marketing-automations' ),
+			// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch, WordPress.WP.I18n.MissingTranslatorsComment
 			'bwfan_ab_email_consent_message'               => sprintf( __( 'Your email and cart are saved so we can send you email reminders about this order. %s', 'wp-marketing-automations' ), '{{no_thanks label="' . __( 'No Thanks', 'wp-marketing-automations' ) . '"}}' ),
 			'bwfan_user_consent'                           => 0,
 			'bwfan_user_consent_message'                   => __( 'Keep me up to date on news and exclusive offers.', 'wp-marketing-automations' ),
@@ -1223,14 +1228,14 @@ class BWFAN_Common {
 	public static function get_parsed_time( $wp_date_format, $logs ) {
 		$logs_temp = array();
 
-		$logs_temp[ date( 'Y-m-d H:i:s' ) ] = __( 'Error in generating logs', 'wp-marketing-automations' );
+		$logs_temp[ date( 'Y-m-d H:i:s' ) ] = __( 'Error in generating logs', 'wp-marketing-automations' ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions
 		if ( ! is_array( $logs ) || count( $logs ) === 0 ) {
 			return array_reverse( $logs_temp, true );
 		}
 
 		$logs_temp = array();
 		foreach ( $logs as $timestamp => $message ) {
-			$time = get_date_from_gmt( date( 'Y-m-d H:i:s', $timestamp ), $wp_date_format );
+			$time = get_date_from_gmt( date( 'Y-m-d H:i:s', $timestamp ), $wp_date_format ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions
 			if ( empty( $message ) ) {
 				$message = __( 'No response from API', 'wp-marketing-automations' );
 			} else {
@@ -1264,9 +1269,9 @@ class BWFAN_Common {
 			$cdt               = self::$date_format . ' ' . self::$time_format;
 			$ct                = self::$time_format;
 			$cd                = self::$date_format;
-			$current_date_time = get_date_from_gmt( date( 'Y-m-d H:i:s' ), $cdt );
-			$current_time      = get_date_from_gmt( date( 'H:i:s' ), $ct );
-			$current_date      = get_date_from_gmt( date( 'Y-m-d' ), $cd );
+			$current_date_time = get_date_from_gmt( date( 'Y-m-d H:i:s' ), $cdt ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions
+			$current_time      = get_date_from_gmt( date( 'H:i:s' ), $ct ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions
+			$current_date      = get_date_from_gmt( date( 'Y-m-d' ), $cd ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions
 		}
 		$default_merge_tags = array(
 			'admin_email'       => array( __( 'Admin email', 'wp-marketing-automations' ), self::$admin_email ),
@@ -1383,14 +1388,14 @@ class BWFAN_Common {
 
 		if ( BWF_WC_Compatibility::is_hpos_enabled() ) {
 			$query = $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}wc_orders as orders LEFT JOIN {$wpdb->prefix}wc_orders_meta AS meta ON orders.id = meta.order_id WHERE meta.meta_key= '_customer_user' AND orders.type IN (%s) AND orders.status NOT IN (%s) AND meta.meta_value= %d", $order_count, $trashed_statuses, $user_id );
-			$count = $wpdb->get_var( $query );//phpcs:ignore WordPress.DB.PreparedSQL
+			$count = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 			return empty( $wpdb->last_error ) && ! empty( $count ) ? intval( $count ) : 0;
 		}
 
 		$query = $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->posts as posts LEFT JOIN {$wpdb->postmeta} AS meta ON posts.ID = meta.post_id WHERE   meta.meta_key= '_customer_user' AND posts.post_type IN (%s) AND posts.post_status NOT IN (%s) AND meta.meta_value= %d", $order_count, $trashed_statuses, $user_id );
 
-		$count = $wpdb->get_var( $query );//phpcs:ignore WordPress.DB.PreparedSQL
+		$count = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 		if ( ! empty( $wpdb->last_error ) ) {
 			return 0;
@@ -1936,9 +1941,9 @@ class BWFAN_Common {
 		$query = $wpdb->prepare( "SELECT DISTINCT posts.ID FROM {$wpdb->posts} AS posts LEFT JOIN {$wpdb->wc_product_meta_lookup} AS wc_product_meta_lookup ON posts.ID = wc_product_meta_lookup.product_id WHERE (posts.post_title LIKE %s OR wc_product_meta_lookup.sku LIKE %s OR posts.ID LIKE %s) AND posts.post_status IN ('" . implode( "','", $post_statuses ) . "') AND posts.post_type IN ('" . implode( "','", $product_type ) . "') ORDER BY posts.post_parent ASC, posts.post_title ASC", $like_term, $like_term, $like_term ); //phpcs:ignore WordPress.DB.PreparedSQL,WordPress.DB.PreparedSQLPlaceholders
 		if ( ! empty( $limit ) ) {
 			$query .= " LIMIT %d, %d ";
-			$query = $wpdb->prepare( $query, $offset, $limit );
+			$query = $wpdb->prepare( $query, $offset, $limit );// phpcs:ignore WordPress.DB.PreparedSQL
 		}
-		$product_ids = $wpdb->get_col( $query );
+		$product_ids = $wpdb->get_col( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 		if ( is_numeric( $term ) ) {
 			$post_id   = absint( $term );
@@ -2116,7 +2121,7 @@ class BWFAN_Common {
 			$timestamp = time();
 		}
 
-		return get_date_from_gmt( date( 'Y-m-d H:i:s', $timestamp ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) );
+		return get_date_from_gmt( date( 'Y-m-d H:i:s', $timestamp ), get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions
 	}
 
 	/**
@@ -2185,7 +2190,7 @@ class BWFAN_Common {
 				$params[] = $task_status;
 			}
 			$parsed_query     = $wpdb->prepare( $query, $params ); // phpcs:ignore WordPress.DB.PreparedSQL
-			$distinct_actions = $wpdb->get_results( $parsed_query, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL
+			$distinct_actions = $wpdb->get_results( $parsed_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 			if ( is_array( $distinct_actions ) && count( $distinct_actions ) > 0 ) {
 				foreach ( $distinct_actions as $values ) {
 					$filtered_table_actions[ $values['actions'] ] = $values['actions'];
@@ -2245,7 +2250,7 @@ class BWFAN_Common {
 		$query                 .= ' AND am.`meta_key` = %s';
 		$params[]              = 'title';
 		$parsed_query          = $wpdb->prepare( $query, $params ); // phpcs:ignore WordPress.DB.PreparedSQL
-		$all_automations       = $wpdb->get_results( $parsed_query, ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL
+		$all_automations       = $wpdb->get_results( $parsed_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 		if ( false === is_array( $all_automations ) || 0 === count( $all_automations ) ) {
 			return $result;
@@ -2297,21 +2302,22 @@ class BWFAN_Common {
 	 * @return mixed
 	 */
 	public static function make_custom_events_time( $schedules ) {
+		/** Don't add localization due to load textdomain error */
 		$schedules['bwfan_once_in_day']         = array(
 			'interval' => 86400,
-			'display'  => __( 'Once in a day', 'wp-marketing-automations' ),
+			'display'  => 'Once in a day',
 		);
 		$schedules['bwfan_once_in_two_minutes'] = array(
 			'interval' => 120,
-			'display'  => __( 'Once in 2 minutes', 'wp-marketing-automations' ),
+			'display'  => 'Once in 2 minutes',
 		);
 		$schedules['bwfan_every_minute']        = array(
 			'interval' => 60,
-			'display'  => __( 'Every minute', 'wp-marketing-automations' ),
+			'display'  => 'Every minute',
 		);
 		$schedules['bwfan_once_in_week']        = array(
 			'interval' => 604800,
-			'display'  => __( 'Once in a week', 'wp-marketing-automations' ),
+			'display'  => 'Once in a week',
 		);
 
 		return $schedules;
@@ -2510,7 +2516,6 @@ class BWFAN_Common {
 		/** Capture Async: Form Submission */
 		if ( isset( $post_parameters['is_form_submission'] ) && 1 === absint( $post_parameters['is_form_submission'] ) && bwfan_is_autonami_pro_active() ) {
 			try {
-				BWFCRM_Core()->merge_tags->load_merge_tags();
 				BWFCRM_Core()->forms->capture_async_form_submission();
 			} catch ( Error $e ) {
 				BWFAN_Common::log_test_data( $event->get_slug() . ' : Capture Async: Form Submission try catch failed. Error: ' . $e->getMessage(), 'extend_async_capture' );
@@ -2556,7 +2561,7 @@ class BWFAN_Common {
 		}
 		if ( is_array( $data ) ) {
 			BWFAN_Core()->logger->log( self::$dynamic_str, $file );
-			BWFAN_Core()->logger->log( print_r( $data, true ), $file );
+			BWFAN_Core()->logger->log( print_r( $data, true ), $file ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
 
 			return;
 		}
@@ -2577,7 +2582,7 @@ class BWFAN_Common {
 			add_filter( 'bwfan_before_making_logs', '__return_true' );
 		}
 		if ( is_array( $data ) ) {
-			BWFAN_Core()->logger->log( print_r( $data, true ), $file );
+			BWFAN_Core()->logger->log( print_r( $data, true ), $file ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
 
 			return;
 		}
@@ -2630,7 +2635,7 @@ class BWFAN_Common {
 			return;
 		}
 
-		$v = ( isset( $_SERVER['REQUEST_URI'] ) && strpos( $_SERVER['REQUEST_URI'], 'autonami/v1/worker' ) !== false ) ? 1 : 2;
+		$v = ( isset( $_SERVER['REQUEST_URI'] ) && strpos( $_SERVER['REQUEST_URI'], 'autonami/v1/worker' ) !== false ) ? 1 : 2;// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 
 		self::event_advanced_logs( "V{$v} worker callback received" );
 
@@ -2696,10 +2701,13 @@ class BWFAN_Common {
 		remove_all_filters( 'action_scheduler_timeout_period' );
 		remove_all_filters( 'action_scheduler_cleanup_batch_size' );
 		remove_all_filters( 'action_scheduler_maximum_execution_time_likely_to_be_exceeded' );
+		remove_all_filters( 'action_scheduler_failure_period' );
 
 		/** Adding all filters for Autonami Action Scheduler only */
 		add_filter( 'action_scheduler_queue_runner_time_limit', function () {
-			return apply_filters( 'bwfan_as_per_call_time', 30 );
+			$as_per_call_time = apply_filters( 'bwfan_as_per_call_time', 30 );
+
+			return intval( $as_per_call_time ) > 50 ? 50 : $as_per_call_time;
 		}, 999 );
 		add_filter( 'action_scheduler_queue_runner_batch_size', function () {
 			return apply_filters( 'bwfan_as_per_call_batch_size', 30 );
@@ -2716,6 +2724,9 @@ class BWFAN_Common {
 		add_filter( 'action_scheduler_maximum_execution_time_likely_to_be_exceeded', function ( $val, $ins, $processed_actions, $execution_time, $max_execution_time ) {
 			return ( $execution_time > $max_execution_time );
 		}, 99999, 5 );
+		add_filter( 'action_scheduler_failure_period', function () {
+			return 180;
+		}, 999 );
 	}
 
 	/**
@@ -2866,7 +2877,7 @@ class BWFAN_Common {
 		$resp        = array();
 		$resp['msg'] = 'success';
 
-		if ( isset( $_GET['debug'] ) && 'yes' === $_GET['debug'] ) {
+		if ( isset( $_GET['debug'] ) && 'yes' === $_GET['debug'] ) { // phpcs:ignore WordPress.Security.NonceVerification
 			$resp['msg'] = 'connection established';
 			wp_send_json( $resp );
 		}
@@ -2950,13 +2961,17 @@ class BWFAN_Common {
 	 */
 	public static function get_link_options_for_tasks() {
 		$scheduled_count = BWFAN_Core()->tasks->fetch_tasks_count( 0, 0 );
-		$scheduled       = sprintf( __( 'Scheduled (%d)', 'wp-marketing-automations' ), $scheduled_count );
+		/* translators: %d is the number of scheduled tasks */
+		$scheduled = sprintf( __( 'Scheduled (%d)', 'wp-marketing-automations' ), $scheduled_count );
 
-		$paused_count          = BWFAN_Core()->tasks->fetch_tasks_count( 0, 1 );
-		$paused                = sprintf( __( 'Paused (%d)', 'wp-marketing-automations' ), $paused_count );
-		$completed_count       = BWFAN_Core()->logs->fetch_logs_count( 1 );
-		$completed             = sprintf( __( 'Completed (%d)', 'wp-marketing-automations' ), $completed_count );
-		$failed_count          = BWFAN_Core()->logs->fetch_logs_count( 0 );
+		$paused_count = BWFAN_Core()->tasks->fetch_tasks_count( 0, 1 );
+		/* translators: %d is the number of paused tasks */
+		$paused          = sprintf( __( 'Paused (%d)', 'wp-marketing-automations' ), $paused_count );
+		$completed_count = BWFAN_Core()->logs->fetch_logs_count( 1 );
+		/* translators: %d is the number of completed tasks */
+		$completed    = sprintf( __( 'Completed (%d)', 'wp-marketing-automations' ), $completed_count );
+		$failed_count = BWFAN_Core()->logs->fetch_logs_count( 0 );
+		/* translators: %d is the number of failed tasks */
 		$failed                = sprintf( __( 'Failed (%d)', 'wp-marketing-automations' ), $failed_count );
 		$get_campaign_statuses = apply_filters( 'bwfan_admin_trigger_nav', array(
 			't_0' => $scheduled,
@@ -3178,7 +3193,7 @@ class BWFAN_Common {
 			return;
 		}
 
-		$date = date( 'Y-m-d' );
+		$date = date( 'Y-m-d' ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions
 		/**
 		 * All calculations are done via this row and the stats displayed are fetched from this row only.
 		 */
@@ -3209,24 +3224,29 @@ class BWFAN_Common {
 		if ( false === $unique_key || ! isset( $post_parameters['unique_key'] ) || $post_parameters['unique_key'] !== $unique_key ) {
 			return;
 		}
-
-		$abandoned_obj = BWFAN_Abandoned_Cart::get_instance();
 		$user_id       = $post_parameters['id'];
-		$user_data     = get_userdata( $user_id );
-		$email         = $user_data->user_email;
-		$coupon_data   = $post_parameters['coupon_data'];
-		$items         = $post_parameters['items'];
-		$fees          = $post_parameters['fees'];
-		$cart_details  = $abandoned_obj->get_cart_by_key( 'email', $email, '%s' );
+		$email         = '';
+		$abandoned_obj = BWFAN_Abandoned_Cart::get_instance();
+		if ( ! empty( $post_parameters['fk_uid'] ) ) {
+			$uid     = $post_parameters['fk_uid'];
+			$contact = new WooFunnels_Contact( '', '', '', '', $uid );
+			$email   = $contact->get_email();
+			$user_id = $contact->get_wpid();
+		}
+		$coupon_data  = $post_parameters['coupon_data'];
+		$items        = $post_parameters['items'];
+		$fees         = $post_parameters['fees'];
+		$cart_details = $abandoned_obj->get_cart_by_key( 'cookie_key', $post_parameters['bwfan_visitor'], '%s' );
+		$cart_details = empty( $cart_details ) ? $abandoned_obj->get_cart_by_key( 'email', $email, '%s' ) : $cart_details;
 
-		if ( false === $cart_details ) {
+		if ( ! empty( $email ) && false === $cart_details ) {
 			self::create_abandoned_cart( array(
 				'user_id'    => $user_id,
 				'email'      => $email,
 				'coupons'    => $coupon_data,
 				'items'      => $items,
 				'fees'       => $fees,
-				'cookie_key' => $post_parameters['bwfan_visitor'],
+				'cookie_key' => $post_parameters['bwfan_visitor'] ?? '',
 			) );
 
 			return;
@@ -3279,6 +3299,7 @@ class BWFAN_Common {
 			),
 		);
 
+
 		$data['status']        = 0;
 		$data['created_time']  = current_time( 'mysql', 1 );
 		$data['last_modified'] = current_time( 'mysql', 1 );
@@ -3290,24 +3311,8 @@ class BWFAN_Common {
 		BWFAN_Model_Abandonedcarts::insert( $data );
 	}
 
-	public static function create_token( $length = 25, $case_sensitive = true, $more_numbers = false ) {
-		$chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-
-		if ( $case_sensitive ) {
-			$chars .= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-		}
-		if ( $more_numbers ) {
-			$chars .= '01234567890123456789';
-		}
-
-		$password     = '';
-		$chars_length = strlen( $chars );
-
-		for ( $i = 0; $i < $length; $i ++ ) {
-			$password .= substr( $chars, wp_rand( 0, $chars_length - 1 ), 1 );
-		}
-
-		return $password;
+	public static function create_token( $length = 25 ) {
+		return wp_generate_password( $length, false );
 	}
 
 	private static function get_abandoned_totals( $data ) {
@@ -3359,36 +3364,36 @@ class BWFAN_Common {
 		self::$time_periods = array(
 			array(
 				'seconds' => YEAR_IN_SECONDS,
-				'names'   => _n_noop( '%s year', '%s years', 'action-scheduler' ),
+				'names'   => _n_noop( '%s year', '%s years', 'wp-marketing-automations' ), // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
 			),
 			array(
 				'seconds' => MONTH_IN_SECONDS,
-				'names'   => _n_noop( '%s month', '%s months', 'action-scheduler' ),
+				'names'   => _n_noop( '%s month', '%s months', 'wp-marketing-automations' ), // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
 			),
 			array(
 				'seconds' => WEEK_IN_SECONDS,
-				'names'   => _n_noop( '%s week', '%s weeks', 'action-scheduler' ),
+				'names'   => _n_noop( '%s week', '%s weeks', 'wp-marketing-automations' ), // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
 			),
 			array(
 				'seconds' => DAY_IN_SECONDS,
-				'names'   => _n_noop( '%s day', '%s days', 'action-scheduler' ),
+				'names'   => _n_noop( '%s day', '%s days', 'wp-marketing-automations' ), // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
 			),
 			array(
 				'seconds' => HOUR_IN_SECONDS,
-				'names'   => _n_noop( '%s hour', '%s hours', 'action-scheduler' ),
+				'names'   => _n_noop( '%s hour', '%s hours', 'wp-marketing-automations' ), // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
 			),
 			array(
 				'seconds' => MINUTE_IN_SECONDS,
-				'names'   => _n_noop( '%s minute', '%s minutes', 'action-scheduler' ),
+				'names'   => _n_noop( '%s minute', '%s minutes', 'wp-marketing-automations' ), // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
 			),
 			array(
 				'seconds' => 1,
-				'names'   => _n_noop( '%s second', '%s seconds', 'action-scheduler' ),
+				'names'   => _n_noop( '%s second', '%s seconds', 'wp-marketing-automations' ), // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
 			),
 		);
 
 		if ( $interval <= 0 ) {
-			return __( 'Now!', 'action-scheduler' );
+			return __( 'Now!', 'wp-marketing-automations' );
 		}
 
 		$output = '';
@@ -3400,7 +3405,7 @@ class BWFAN_Common {
 				if ( ! empty( $output ) ) {
 					$output .= ' ';
 				}
-				$output            .= sprintf( _n( self::$time_periods[ $time_period_index ]['names'][0], self::$time_periods[ $time_period_index ]['names'][1], $periods_in_interval, 'action-scheduler' ), $periods_in_interval );
+				$output            .= sprintf( _n( self::$time_periods[ $time_period_index ]['names'][0], self::$time_periods[ $time_period_index ]['names'][1], $periods_in_interval, 'wp-marketing-automations' ), $periods_in_interval ); //phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralPlural, WordPress.WP.I18n.NonSingularStringLiteralSingle
 				$seconds_remaining -= $periods_in_interval * self::$time_periods[ $time_period_index ]['seconds'];
 				$periods_included ++;
 			}
@@ -3436,7 +3441,7 @@ class BWFAN_Common {
 	 * @return false|int
 	 */
 	public static function get_nearest_date( $actual_timestamp, $days_selected ) {
-		$date_object = new DateTime( date( ( 'Y-m-d H:i:s' ), $actual_timestamp ) );
+		$date_object = new DateTime( date( ( 'Y-m-d H:i:s' ), $actual_timestamp ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions
 
 		for ( $h = 0; $h < 7; $h ++ ) {
 			if ( in_array( $date_object->format( "N" ), $days_selected ) ) {
@@ -3478,7 +3483,7 @@ class BWFAN_Common {
 		$stringPlaceholders     = array_fill( 0, $automationCount, '%s' );
 		$placeholdersautomation = implode( ', ', $stringPlaceholders );
 		$sql_query              = "Update {table_name} Set status = $status WHERE ID IN ($placeholdersautomation)";
-		$sql_query              = $wpdb->prepare( $sql_query, $ids ); // WPCS: unprepared SQL OK
+		$sql_query              = $wpdb->prepare( $sql_query, $ids );// phpcs:ignore WordPress.DB.PreparedSQL
 
 		BWFAN_Model_Abandonedcarts::get_results( $sql_query );
 	}
@@ -3558,7 +3563,7 @@ class BWFAN_Common {
 		$stringPlaceholders     = array_fill( 0, $automationCount, '%s' );
 		$placeholdersautomation = implode( ', ', $stringPlaceholders );
 		$sql_query              = "Delete FROM {table_name} WHERE ID IN ($placeholdersautomation)";
-		$sql_query              = $wpdb->prepare( $sql_query, $abandoned_cart_ids ); // WPCS: unprepared SQL OK
+		$sql_query              = $wpdb->prepare( $sql_query, $abandoned_cart_ids );// phpcs:ignore WordPress.DB.PreparedSQL
 
 		BWFAN_Model_Abandonedcarts::delete_multiple( $sql_query );
 	}
@@ -3593,8 +3598,8 @@ class BWFAN_Common {
 		do {
 			/** Get carts to mark lost carts */
 			$query = "SELECT ID, email FROM {$wpdb->prefix}bwfan_abandonedcarts WHERE TIMESTAMPDIFF(MINUTE,last_modified,UTC_TIMESTAMP) > %d AND `status` !=  %d LIMIT %d";
-			$query = $wpdb->prepare( $query, $abandoned_time_in_days, 2, 10 );
-			$carts = $wpdb->get_results( $query, ARRAY_A );
+			$query = $wpdb->prepare( $query, $abandoned_time_in_days, 2, 10 );// phpcs:ignore WordPress.DB.PreparedSQL
+			$carts = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 			/** Un-schedule the action if no cart found */
 			if ( empty( $carts ) ) {
@@ -3610,7 +3615,7 @@ class BWFAN_Common {
 			$stringPlaceholders = array_fill( 0, count( $ids ), '%d' );
 			$placeholder        = implode( ', ', $stringPlaceholders );
 			/** Changing status recoverable into lost cart */
-			$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}bwfan_abandonedcarts SET `status` = 2 WHERE ID IN ( $placeholder )", $ids ) );
+			$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}bwfan_abandonedcarts SET `status` = 2 WHERE ID IN ( $placeholder )", $ids ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL,  WordPress.DB.PreparedSQLPlaceholders
 		} while ( ( time() - $start_time ) > 10 );
 	}
 
@@ -3697,7 +3702,7 @@ class BWFAN_Common {
 				AND m3.meta_value <>''
 				", '_is_bwfan_coupon', 1, 'date_expires', $coupon_time_in_days, 'date_expires' );
 
-		$coupons = $wpdb->get_results( $query ); //phpcs:ignore WordPress.DB.PreparedSQL
+		$coupons = $wpdb->get_results( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 		if ( empty( $coupons ) ) {
 			return;
 		}
@@ -3726,9 +3731,9 @@ class BWFAN_Common {
 		}
 
 		foreach ( $winback_automations as $automation_id ) {
-			$query = $wpdb->prepare( "SELECT t.ID FROM $task_table_name AS t JOIN $task_meta_table_name AS tm ON t.ID=tm.bwfan_task_id WHERE t.automation_id = %d AND tm.meta_key='integration_data' AND tm.meta_value LIKE %s", $automation_id, '%' . $email . '%' );
+			$query = $wpdb->prepare( "SELECT t.ID FROM $task_table_name AS t JOIN $task_meta_table_name AS tm ON t.ID=tm.bwfan_task_id WHERE t.automation_id = %d AND tm.meta_key='integration_data' AND tm.meta_value LIKE %s", $automation_id, '%' . $email . '%' );// phpcs:ignore WordPress.DB.PreparedSQL,  WordPress.DB.PreparedSQLPlaceholders
 
-			$tasks_results[ $automation_id ] = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.PreparedSQL
+			$tasks_results[ $automation_id ] = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 		}
 
 		return $tasks_results;
@@ -3753,9 +3758,9 @@ class BWFAN_Common {
 		}
 
 		foreach ( $winback_automations as $automation_id ) {
-			$query = $wpdb->prepare( "SELECT t.ID FROM $task_table_name AS t JOIN $task_meta_table_name AS tm ON t.ID=tm.bwfan_task_id WHERE t.automation_id = %d AND tm.meta_key='integration_data' AND tm.meta_value LIKE %s", $automation_id, '%' . $phone . '%' );
+			$query = $wpdb->prepare( "SELECT t.ID FROM $task_table_name AS t JOIN $task_meta_table_name AS tm ON t.ID=tm.bwfan_task_id WHERE t.automation_id = %d AND tm.meta_key='integration_data' AND tm.meta_value LIKE %s", $automation_id, '%' . $phone . '%' );// phpcs:ignore WordPress.DB.PreparedSQL,  WordPress.DB.PreparedSQLPlaceholders
 
-			$tasks_results[ $automation_id ] = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.PreparedSQL
+			$tasks_results[ $automation_id ] = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 		}
 
 		return $tasks_results;
@@ -3856,6 +3861,11 @@ class BWFAN_Common {
 			$url      = str_replace( $site_url, $site_url . '/' . $language_code, $url );
 		}
 
+		/** For GTranslate */ //
+		if ( function_exists( 'bwfan_is_gtranslate_active' ) && bwfan_is_gtranslate_active() && ! empty( $lang ) ) {
+			$url = class_exists( 'BWFAN_Compatibility_With_GTRANSLATE' ) ? BWFAN_Compatibility_With_GTRANSLATE::get_translated_domain_url( $url, $lang ) : $url;
+		}
+
 		return $url;
 	}
 
@@ -3881,7 +3891,7 @@ class BWFAN_Common {
 		}
 		global $wpdb;
 		$abandoned_table = $wpdb->prefix . 'bwfan_abandonedcarts';
-		$abandoned_data  = $wpdb->get_results( "select ID,last_modified from $abandoned_table where status in(1,2) and email='" . $email . "' order by last_modified limit 0,3", ARRAY_A );
+		$abandoned_data  = $wpdb->get_results( "select ID,last_modified from $abandoned_table where status in(1,2) and email='" . $email . "' order by last_modified limit 0,3", ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
 
 		return $abandoned_data;
 	}
@@ -4268,7 +4278,7 @@ class BWFAN_Common {
 	public static function add_schedules( $schedules ) {
 		$schedules['fka_eight_hours'] = [
 			'interval' => 28800,
-			'display'  => __( 'Every Eight hours', 'wp-marketing-automations' )
+			'display'  => 'Every Eight hours'
 		];
 
 		return $schedules;
@@ -4495,10 +4505,10 @@ class BWFAN_Common {
 
 		if ( ! empty( $limit ) ) {
 			$query .= " LIMIT %d, %d";
-			$query = $wpdb->prepare( $query, $offset, $limit );
+			$query = $wpdb->prepare( $query, $offset, $limit );// phpcs:ignore WordPress.DB.PreparedSQL
 		}
 
-		return ! empty( $query ) ? $wpdb->get_results( $query, ARRAY_A ) : [];;
+		return ! empty( $query ) ? $wpdb->get_results( $query, ARRAY_A ) : []; //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 	}
 
 	/**
@@ -4520,9 +4530,9 @@ class BWFAN_Common {
 		$query = "SELECT ID as id, title FROM {$wpdb->prefix}bwfan_automations $where ORDER BY title ASC";
 		if ( ! empty( $limit ) ) {
 			$query .= " LIMIT %d, %d";
-			$query = $wpdb->prepare( $query, $offset, $limit );
+			$query = $wpdb->prepare( $query, $offset, $limit );// phpcs:ignore WordPress.DB.PreparedSQL
 		}
-		$automations = $wpdb->get_results( $query, ARRAY_A );
+		$automations = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 		/** Search automations by title form automation meta table */
 		if ( ! empty( $search ) ) {
@@ -4531,10 +4541,10 @@ class BWFAN_Common {
 		$meta_query = "SELECT am.bwfan_automation_id AS id,am.meta_value AS title FROM {$wpdb->prefix}bwfan_automationmeta AS am $where GROUP BY am.bwfan_automation_id ORDER BY am.meta_value ASC";
 		if ( ! empty( $limit ) ) {
 			$meta_query .= " LIMIT %d, %d";
-			$meta_query = $wpdb->prepare( $meta_query, $offset, $limit );
+			$meta_query = $wpdb->prepare( $meta_query, $offset, $limit );// phpcs:ignore WordPress.DB.PreparedSQL
 		}
 
-		$automation_meta = $wpdb->get_results( $meta_query, ARRAY_A );
+		$automation_meta = $wpdb->get_results( $meta_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 		return array_merge( $automations, $automation_meta );
 	}
@@ -4544,16 +4554,21 @@ class BWFAN_Common {
 	 * @param $offset
 	 * @param $limit
 	 */
-	public static function get_unsubscribers( $search, $offset, $limit ) {
+	public static function get_unsubscribers( $search = '', $offset = 0, $limit = 25 ) {
 		global $wpdb;
 		$where = '';
+		$args  = [];
 		/** Check for search unsubscriber */
 		if ( ! empty( $search ) ) {
-			$where = $wpdb->prepare( " WHERE `recipient` LIKE %s ", '%' . $search . '%' );
+			$where             = $wpdb->prepare( " WHERE `recipient` LIKE %s ", '%' . $search . '%' );
+			$args['recipient'] = array(
+				'operator' => '%s',
+				'value'    => "%" . $search . "%",
+			);
 		}
 
 		/** Query to fetch unsubscribers data from DB */
-		$unsubscribers = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}bwfan_message_unsubscribe $where ORDER BY ID DESC LIMIT $offset,$limit " );//phpcs:ignore WordPress.DB.PreparedSQL
+		$unsubscribers = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}bwfan_message_unsubscribe $where ORDER BY ID DESC LIMIT %d, %d ", $offset, $limit ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 		if ( empty( $unsubscribers ) ) {
 			return array();
 		}
@@ -4582,14 +4597,16 @@ class BWFAN_Common {
 			$items[] = array(
 				'id'              => $unsubscriber->ID,
 				'recipient'       => $unsubscriber->recipient,
-				'date'            => date( self::get_date_format(), strtotime( $unsubscriber->c_date ) ),
+				'date'            => date( self::get_date_format(), strtotime( $unsubscriber->c_date ) ),// phpcs:ignore WordPress.DateTime.RestrictedFunctions
 				'automation_id'   => $oid,
 				'automation_name' => empty( $oname ) && empty( $otype ) ? '-' : ( empty( $oname ) ? $otype : "$otype: $oname" ),
 				'source_type'     => $c_type,
 			);
 		}
 
-		$found_posts['found_posts'] = BWFAN_Model_Message_Unsubscribe::count_rows();
+		$count = BWFAN_Model_Message_Unsubscribe::count( $args );
+
+		$found_posts['found_posts'] = empty( $count ) ? 0 : absint( $count );
 		$found_posts['items']       = $items;
 
 		return $found_posts;
@@ -4629,6 +4646,7 @@ class BWFAN_Common {
 
 				break;
 			case 'delete_completed_tasks':
+				//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$logs = $wpdb->get_results( $wpdb->prepare( "
 									SELECT ID
 									FROM {$wpdb->prefix}bwfan_logs
@@ -4647,6 +4665,7 @@ class BWFAN_Common {
 
 				break;
 			case 'delete_failed_tasks':
+				//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$logs = $wpdb->get_results( $wpdb->prepare( "
 									SELECT ID
 									FROM {$wpdb->prefix}bwfan_logs
@@ -4697,6 +4716,7 @@ class BWFAN_Common {
 
 				break;
 			case 'delete_lost_carts':
+				//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->query( $wpdb->prepare( "
 									DELETE
 									FROM {$wpdb->prefix}bwfan_abandonedcarts
@@ -4717,7 +4737,7 @@ class BWFAN_Common {
 				global $wpdb;
 
 				$query  = $wpdb->prepare( "SELECT ID FROM {$wpdb->prefix}bwfan_engagement_trackingmeta WHERE `meta_key` = %s LIMIT 1", 'merge_tags' );
-				$row_id = $wpdb->get_var( $query );
+				$row_id = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 				if ( empty( $row_id ) ) {
 					$result['msg'] = __( 'No optimization is needed for the Engagement Tracking meta table', 'wp-marketing-automations' );
@@ -4891,6 +4911,7 @@ class BWFAN_Common {
 				'required'    => false,
 				'wrap_before' => '<h3>' . __( 'Footer', 'wp-marketing-automations' ) . '</h3>',
 				'toggler'     => array(),
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch, WordPress.WP.I18n.MissingTranslatorsComment, WordPress.WP.I18n.UnorderedPlaceholdersText
 				'hint'        => sprintf( __( 'Anti-spam laws require you to put a physical address and an unsubscribe link at the bottom of every email. Use dynamic tags %s for Business Name, %s for Business Address and %s for Unsubscribe page link', 'wp-marketing-automations' ), '<b>{{business_name}}</b>', '<b>{{business_address}}</b>', '<b>{{unsubscribe_link}}</b>' ),
 			),
 		);
@@ -5146,7 +5167,7 @@ class BWFAN_Common {
 					}
 					$checkout_consent_fields[] = array(
 						'id'       => 'bwfan_user_consent_message_' . $lang_slug,
-						'label'    => __( 'Text (' . $lang_name . ')', 'wp-marketing-automations' ),
+						'label'    => sprintf( __( 'Text (%s)', 'wp-marketing-automations' ), $lang_name ),  // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
 						'type'     => 'textarea',
 						'class'    => '',
 						'required' => false,
@@ -5166,7 +5187,7 @@ class BWFAN_Common {
 						'type'     => 'textarea',
 						'class'    => 'bwfan_ab_email_consent_message',
 						'required' => false,
-						'hint'     => __( "( $lang_name ) Use merge tag {{no_thanks label='No Thanks'}} to let users opt out of cart tracking.", 'wp-marketing-automations' ),
+						'hint'     => '( ' . $lang_name . ' ) ' . __( "Use merge tag {{no_thanks label='No Thanks'}} to let users opt out of cart tracking.", 'wp-marketing-automations' ),
 						'toggler'  => array(
 							'fields'   => array(
 								array(
@@ -5198,6 +5219,53 @@ class BWFAN_Common {
 				'hint'        => __( 'Optimizing WordPress by cleaning up engagement tracking meta records.', 'wp-marketing-automations' ),
 				'required'    => false,
 				'toggler'     => array(),
+			);
+		}
+
+		$twilio_webhook_log_data = [];
+		if ( class_exists( 'BWFCO_Twilio' ) && BWFAN_Core()->connectors->is_connected( 'bwfco_twilio' ) ) {
+			$twilio_webhook_log_data = array(
+				'id'            => 'bwfan_twilio_webhook_received_logging',
+				'type'          => 'checkbox',
+				'label'         => ' ',
+				'checkboxlabel' => __( 'Enable Logs for Twilio SMS Received event automation', 'wp-marketing-automations' ),
+				'hint'          => __( "It logs the received data on a 'Twilio SMS Received' automation. Logs are captured in file named <i>fka-twilio-sms-webhooks-xxx</i>", 'wp-marketing-automations' ),
+				'class'         => 'bwfan_make_logs',
+				'required'      => false,
+				'wrap_before'   => '',
+				'isProField'    => true,
+				'toggler'       => array(
+					'fields' => array(
+						array(
+							'id'    => 'bwfan_advance_logs',
+							'value' => true,
+						),
+					),
+				),
+			);
+		}
+
+		$short_url_log_data = [];
+
+		if ( ! empty( self::get_shortener_services() ) ) {
+			$short_url_log_data = array(
+				'id'            => 'bwfan_short_url_response_log',
+				'type'          => 'checkbox',
+				'label'         => ' ',
+				'checkboxlabel' => __( 'Enable Logs for Shortener URL Service', 'wp-marketing-automations' ),
+				'hint'          => __( "It logs the received data on a 'URL Shortening' operation. Logs are captured in a file named <i>fka-short-url-response-xxx</i>", 'wp-marketing-automations' ),
+				'class'         => 'bwfan_make_logs',
+				'required'      => false,
+				'wrap_before'   => '',
+				'isProField'    => true,
+				'toggler'       => array(
+					'fields' => array(
+						array(
+							'id'    => 'bwfan_advance_logs',
+							'value' => true,
+						),
+					),
+				),
 			);
 		}
 
@@ -5402,24 +5470,6 @@ class BWFAN_Common {
 										),
 									),
 									'relation' => 'AND',
-								),
-							),
-							array(
-								'id'            => 'bwfan_ab_track_on_add_to_cart',
-								'label'         => __( 'Track on Add to Cart', 'wp-marketing-automations' ),
-								'type'          => 'checkbox',
-								'checkboxlabel' => __( 'Track carts when a product is added to the cart for logged-in users', 'wp-marketing-automations' ),
-								'class'         => 'bwfan_ab_track_on_add_to_cart',
-								'required'      => false,
-								'wrap_before'   => '<h3>' . __( 'User', 'wp-marketing-automations' ) . '</h3>',
-								'toggler'       => array(
-									'fields'   => array(
-										array(
-											'id'    => 'bwfan_ab_enable',
-											'value' => true,
-										),
-									),
-									'relation' => 'OR',
 								),
 							),
 							array(
@@ -5771,7 +5821,7 @@ class BWFAN_Common {
 								'label'         => __( 'Sandbox Mode', 'wp-marketing-automations' ),
 								'type'          => 'checkbox',
 								'checkboxlabel' => __( 'Enable Sandbox Mode', 'wp-marketing-automations' ),
-								'hint'          => __( "When sandbox mode is enabled, Automations won't create new tasks, and existing tasks won't run", 'wp-marketing-automations' ),
+								'hint'          => __( "Automations and Broadcasts will not run or trigger for any contacts while this mode is active.", 'wp-marketing-automations' ),
 								'class'         => 'bwfan_sandbox_mode',
 								'required'      => false,
 								'wrap_before'   => '',
@@ -5902,7 +5952,7 @@ class BWFAN_Common {
 								'type'          => 'checkbox',
 								'label'         => ' ',
 								'checkboxlabel' => __( 'Enable Logs for Bulk Actions', 'wp-marketing-automations' ),
-								'hint'          => __( "It logs step by step execution in Bulk Action. Logs are captured in file named <i>fka-bulk-action-xxx</i>", "wp-marketing-automatoins" ),
+								'hint'          => __( "It logs step by step execution in Bulk Action. Logs are captured in file named <i>fka-bulk-action-xxx</i>", "wp-marketing-automations" ),
 								'class'         => 'bwfan_make_logs',
 								'required'      => false,
 								'wrap_before'   => '',
@@ -5921,7 +5971,7 @@ class BWFAN_Common {
 								'type'          => 'checkbox',
 								'label'         => ' ',
 								'checkboxlabel' => __( 'Enable Logs for Contact Export Process', 'wp-marketing-automations' ),
-								'hint'          => __( "It logs step by step execution in Contact Export. Logs are captured in file named <i>fka-contact-export-xxx</i>", 'wp-marketing-automatons' ),
+								'hint'          => __( "It logs step by step execution in Contact Export. Logs are captured in file named <i>fka-contact-export-xxx</i>", 'wp-marketing-automations' ),
 								'class'         => 'bwfan_make_logs',
 								'required'      => false,
 								'wrap_before'   => '',
@@ -5940,7 +5990,7 @@ class BWFAN_Common {
 								'type'          => 'checkbox',
 								'label'         => ' ',
 								'checkboxlabel' => __( 'Enable Logs for Contact Query', 'wp-marketing-automations' ),
-								'hint'          => __( "It logs the contact fetching query and time spent in fetching the data. Logs are captured in file named <i>fka-contacts-query-xxx</i>", 'wp-marketing-automatons' ),
+								'hint'          => __( "It logs the contact fetching query and time spent in fetching the data. Logs are captured in file named <i>fka-contacts-query-xxx</i>", 'wp-marketing-automations' ),
 								'class'         => 'bwfan_make_logs',
 								'required'      => false,
 								'wrap_before'   => '',
@@ -5959,7 +6009,7 @@ class BWFAN_Common {
 								'type'          => 'checkbox',
 								'label'         => ' ',
 								'checkboxlabel' => __( 'Enable Logs for Email Bounce Webhook', 'wp-marketing-automations' ),
-								'hint'          => __( "It logs the received data from email service provider related to bounce and complaint. Logs are captured in file named <i>fka-email-webhook-request-xxx</i>", 'wp-marketing-automatons' ),
+								'hint'          => __( "It logs the received data from email service provider related to bounce and complaint. Logs are captured in file named <i>fka-email-webhook-request-xxx</i>", 'wp-marketing-automations' ),
 								'class'         => 'bwfan_make_logs',
 								'required'      => false,
 								'wrap_before'   => '',
@@ -5978,7 +6028,7 @@ class BWFAN_Common {
 								'type'          => 'checkbox',
 								'label'         => ' ',
 								'checkboxlabel' => __( 'Enable Logs for Webhook Received event automation', 'wp-marketing-automations' ),
-								'hint'          => __( "It logs the received data on a 'Webhook Received' automation. Logs are captured in file named <i>fka-webhook-logs-xxx</i>", 'wp-marketing-automatons' ),
+								'hint'          => __( "It logs the received data on a 'Webhook Received' automation. Logs are captured in file named <i>fka-webhook-logs-xxx</i>", 'wp-marketing-automations' ),
 								'class'         => 'bwfan_make_logs',
 								'required'      => false,
 								'wrap_before'   => '',
@@ -5992,6 +6042,8 @@ class BWFAN_Common {
 									),
 								),
 							),
+							$twilio_webhook_log_data,
+							$short_url_log_data
 						),
 					),
 					array(
@@ -6244,7 +6296,8 @@ class BWFAN_Common {
 				'id'        => 'bwfan_email_webhook_' . $slug,
 				'type'      => 'copier',
 				'class'     => 'bwfan_email_webhook',
-				'hint'      => __( "Paste this URL into your {$webhook['name']}'s Webhook settings to enable Bounce Handling", 'wp-marketing-automations' ),
+				// phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment
+				'hint'      => sprintf( __( "Paste this URL into your %s's Webhook settings to enable Bounce Handling", 'wp-marketing-automations' ), $webhook['name'] ),
 				'required'  => false,
 				'copy_text' => $webhook['link'],
 				'toggler'   => array(
@@ -6461,7 +6514,7 @@ class BWFAN_Common {
 					),
 					array(
 						'id'           => 'redirect_button',
-						'label'        => __( 'Click to configure Whatsapp Connector', 'wp-marketing-automations-connectors' ),
+						'label'        => __( 'Click to configure Whatsapp Connector', 'wp-marketing-automations' ),
 						'type'         => 'redirect_button',
 						'redirect_url' => ( 'admin.php?page=autonami&path=/connectors' ),
 						'class'        => '',
@@ -6495,7 +6548,7 @@ class BWFAN_Common {
 
 //		$html .= __( 'Use shortcodes <b>[wfan_contact_name]</b> for contact\'s name', 'wp-marketing-automations' ) . ', ' . __( '<b>[wfan_contact_firstname]</b> for contact\'s first name', 'wp-marketing-automations' ) . ', ' . __( '<b>[wfan_contact_lastname]</b> for contact\'s last name', 'wp-marketing-automations' ) . ', ' . __( '<b>[wfan_contact_email]</b> for contact\'s email', 'wp-marketing-automations' ) . ' and ' . __( '<b>[wfan_unsubscribe_button label=\'Update my preference\']</b> for the unsubscribe button.', 'wp-marketing-automations' );
 
-		$html .= sprintf( __( "Use shortcodes %s for contact's name, %s for contact's first name, %s for contact's last name', %s for contact's email and %s for the unsubscribe button.", 'wp-marketing-automations' ), '<b>[wfan_contact_name]</b>', '<b>[wfan_contact_firstname]</b>', '<b>[wfan_contact_lastname]</b>', '<b>[wfan_contact_email]</b>', "<b>[wfan_unsubscribe_button label='" . __( 'Update my preference', 'wp-marketing-automations' ) . "']</b>" );
+		$html .= sprintf( __( "Use shortcodes %s for contact's name, %s for contact's first name, %s for contact's last name', %s for contact's email and %s for the unsubscribe button.", 'wp-marketing-automations' ), '<b>[wfan_contact_name]</b>', '<b>[wfan_contact_firstname]</b>', '<b>[wfan_contact_lastname]</b>', '<b>[wfan_contact_email]</b>', "<b>[wfan_unsubscribe_button label='" . __( 'Update my preference', 'wp-marketing-automations' ) . "']</b>" );  // phpcs:ignore WordPress.WP.I18n.MissingTranslatorsComment, WordPress.WP.I18n.UnorderedPlaceholdersText
 
 		return $html;
 	}
@@ -6518,7 +6571,15 @@ class BWFAN_Common {
 		if ( ! $post instanceof WP_Post ) {
 			return [
 				'status'  => 3,
-				'message' => __( 'Page not exists.', 'wp-marketing-automations' ),
+				'message' => __( 'Unsubscribe Page Not Found.', 'wp-marketing-automations' ),
+			];
+		}
+
+		// Checking if page is not publish
+		if ( 'publish' !== $post->post_status ) {
+			return [
+				'status'  => 3,
+				'message' => __( 'The unsubscribe page must be published and accessible to all users.', 'wp-marketing-automations' ),
 			];
 		}
 
@@ -6669,7 +6730,7 @@ class BWFAN_Common {
 		global $wpdb;
 		$result                  = true;
 		$not_created_tables      = array();
-		$mytables                = $wpdb->get_results( 'SHOW TABLES', ARRAY_A );
+		$mytables                = $wpdb->get_results( 'SHOW TABLES', ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$tables_array            = empty( $mytables ) ? [] : array_column( $mytables, 'Tables_in_' . $wpdb->dbname );
 		$automations_table_array = self::get_tables_array();
 
@@ -6982,14 +7043,14 @@ class BWFAN_Common {
 		if ( $only_count === false ) {
 			$all_automations = self::get_db_cache_data( implode( ' ', $base_query ) );
 			if ( false === $all_automations ) {
-				$all_automations = $wpdb->get_results( implode( ' ', $base_query ), ARRAY_A );
+				$all_automations = $wpdb->get_results( implode( ' ', $base_query ), ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 				self::set_db_cache_data( implode( ' ', $base_query ), $all_automations );
 			}
 		}
 
 		$overall_total = self::get_db_cache_data( implode( ' ', $count_query ) );
 		if ( false === $overall_total ) {
-			$overall_total = $wpdb->get_var( implode( ' ', $count_query ) );
+			$overall_total = $wpdb->get_var( implode( ' ', $count_query ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 			self::set_db_cache_data( implode( ' ', $count_query ), $overall_total );
 		}
 
@@ -7013,15 +7074,19 @@ class BWFAN_Common {
 		$automation_ids = array_map( function ( $all_automation ) {
 			return isset( $all_automation['ID'] ) ? absint( $all_automation['ID'] ) : false;
 		}, $all_automations );
-		$ids            = implode( ',', array_filter( $automation_ids ) );
+
+		$automation_ids     = array_filter( $automation_ids, 'intval' );
+		$stringPlaceholders = array_fill( 0, count( $automation_ids ), '%d' );
+		$stringPlaceholders = implode( ', ', $stringPlaceholders );
+
 
 		/** Get all automation revenue total if pro active */
 		$conversion_data = array();
-		$query           = "SELECT bwc.oid, count(bwc.ID) as conversions, SUM(bwc.wctotal) as revenue FROM {$wpdb->prefix}bwfan_conversions as bwc JOIN {$wpdb->prefix}posts as p ON bwc.wcid=p.ID WHERE bwc.oid IN ($ids) AND bwc.otype=1 GROUP BY bwc.oid";
+		$query           = $wpdb->prepare( "SELECT bwc.oid, count(bwc.ID) as conversions, SUM(bwc.wctotal) as revenue FROM {$wpdb->prefix}bwfan_conversions as bwc JOIN {$wpdb->prefix}posts as p ON bwc.wcid=p.ID WHERE bwc.oid IN ( $stringPlaceholders ) AND bwc.otype=1 GROUP BY bwc.oid", $automation_ids );// phpcs:ignore WordPress.DB.PreparedSQL,  WordPress.DB.PreparedSQLPlaceholders
 
 		$conversions = self::get_db_cache_data( $query );
 		if ( false === $conversions ) {
-			$conversions = $wpdb->get_results( $query, ARRAY_A );
+			$conversions = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 			self::set_db_cache_data( $query, $conversions );
 		}
 
@@ -7631,12 +7696,7 @@ class BWFAN_Common {
 
 		$order_statuses = implode( "','", array_map( 'esc_sql', array_keys( wc_get_order_statuses() ) ) );
 		if ( BWF_WC_Compatibility::is_hpos_enabled() ) {
-			$last_order = $wpdb->get_var( "SELECT `id`
-            FROM {$wpdb->prefix}wc_orders
-            WHERE `billing_email` = '" . $email . "'
-            AND   `type` = 'shop_order'
-            AND   `status` IN ( '" . $order_statuses . "' )
-            ORDER BY `id` DESC LIMIT 0,1" );
+			$last_order = $wpdb->get_var( "SELECT `id` FROM {$wpdb->prefix}wc_orders WHERE `billing_email` = '" . $email . "' AND   `type` = 'shop_order' AND   `status` IN ( '" . $order_statuses . "' ) ORDER BY `id` DESC LIMIT 0,1" );// phpcs:ignore WordPress.DB.PreparedSQL,  WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			if ( $last_order && $last_order > 0 ) {
 				return wc_get_order( intval( $last_order ) );
@@ -7645,14 +7705,7 @@ class BWFAN_Common {
 			return false;
 		}
 
-		$last_order = $wpdb->get_var( "SELECT posts.ID
-            FROM $wpdb->posts AS posts
-            LEFT JOIN {$wpdb->postmeta} AS meta on posts.ID = meta.post_id
-            WHERE meta.meta_key = '_billing_email'
-            AND   meta.meta_value = '" . $email . "'
-            AND   posts.post_type = 'shop_order'
-            AND   posts.post_status IN ( '" . $order_statuses . "' )
-            ORDER BY posts.ID DESC LIMIT 0,1" );
+		$last_order = $wpdb->get_var( "SELECT posts.ID FROM $wpdb->posts AS posts LEFT JOIN {$wpdb->postmeta} AS meta on posts.ID = meta.post_id WHERE meta.meta_key = '_billing_email' AND   meta.meta_value = '" . $email . "' AND   posts.post_type = 'shop_order' AND   posts.post_status IN ( '" . $order_statuses . "' ) ORDER BY posts.ID DESC LIMIT 0,1" );// phpcs:ignore WordPress.DB.PreparedSQL,  WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		if ( ! $last_order ) {
 			return false;
@@ -7739,8 +7792,8 @@ class BWFAN_Common {
 			$placeholders = array_fill( 0, count( $list ), '%s' );
 			$placeholders = implode( ', ', $placeholders );
 
-			$query  = $wpdb->prepare( "SELECT `{$p_key}`, `hook` FROM $table WHERE `hook` IN ($placeholders) AND `status` IN (0,1)", $list );
-			$result = $wpdb->get_results( $query, ARRAY_A );
+			$query  = $wpdb->prepare( "SELECT `{$p_key}`, `hook` FROM $table WHERE `hook` IN ($placeholders) AND `status` IN (0,1)", $list );// phpcs:ignore WordPress.DB.PreparedSQL,  WordPress.DB.PreparedSQLPlaceholders
+			$result = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 			if ( is_array( $result ) && count( $result ) > 0 ) {
 				foreach ( $result as $val ) {
 					self::$recurring_actions_db[ $val['hook'] ] = true;
@@ -7881,6 +7934,7 @@ class BWFAN_Common {
 				$header[] = "List-Unsubscribe-Post: List-Unsubscribe=One-Click";
 			}
 
+			$header  = apply_filters( 'bwfan_email_headers', $header );
 			$subject = __( 'TEST: ', 'wp-marketing-automations' ) . $subject;
 
 			$res = wp_mail( $email, $subject, $body, $header );
@@ -7986,7 +8040,7 @@ class BWFAN_Common {
 	}
 
 	public static function decode_merge_tags( $string, $is_crm = false ) {
-		if ( trim( $string ) === '' ) {
+		if ( ! is_string( $string ) || trim( $string ) === '' ) {
 			return '';
 		}
 		// Check if the body is excluded from decoding the merge tags
@@ -8118,7 +8172,7 @@ class BWFAN_Common {
 		$results = BWFAN_Model_Automation_Step::get_step_by_trail( $trail );
 		if ( ! empty( $results ) ) {
 			$results = array_map( function ( $data ) {
-				$data['run_time'] = date( 'Y-m-d H:i:s', $data['run_time'] );
+				$data['run_time'] = date( 'Y-m-d H:i:s', $data['run_time'] ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions
 				$action           = ! empty( $data['action'] ) ? json_decode( $data['action'], true ) : [];
 				$nice_name        = '';
 				if ( 2 === absint( $data['type'] ) ) {
@@ -8322,7 +8376,7 @@ class BWFAN_Common {
 				'trail'  => $automation_contact['trail'],
 			];
 
-			BWFAN_Model_Automation_Complete_Contact::insert( $data );
+			BWFAN_Model_Automation_Complete_Contact::insert_ignore( $data );
 
 			/** Update status as success for any step trail where status was waiting */
 			BWFAN_Model_Automation_Contact_Trail::update_all_step_trail_status_complete( $automation_contact['trail'] );
@@ -8405,11 +8459,17 @@ class BWFAN_Common {
 
 			/** Get first 20 automation contacts */
 			$automation_contacts = ( count( $automation_contacts ) > $batch_size ) ? array_slice( $automation_contacts, 0, $batch_size ) : $automation_contacts;
-			$selected_ids        = implode( ', ', $automation_contacts );
+
+			$automation_contacts = array_filter( $automation_contacts, 'intval' );
+			$stringPlaceholders  = array_fill( 0, count( $automation_contacts ), '%d' );
+			$stringPlaceholders  = implode( ', ', $stringPlaceholders );
 
 			global $wpdb;
-			$query  = " SELECT `ID`,`trail` FROM {$wpdb->prefix}bwfan_automation_contact WHERE `last` = $sid AND `ID` IN ($selected_ids) AND (`status` = 1 OR `status` = 4) ";
-			$result = $wpdb->get_results( $query, ARRAY_A );
+			$query  = $wpdb->prepare( "SELECT `ID`,`trail` FROM {$wpdb->prefix}bwfan_automation_contact WHERE `last` = %d AND `ID` IN ( $stringPlaceholders ) AND (`status` = 1 OR `status` = 4) ", [
+				$sid,
+				...$automation_contacts
+			] );// phpcs:ignore WordPress.DB.PreparedSQL,  WordPress.DB.PreparedSQLPlaceholders
+			$result = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 			if ( empty( $result ) ) {
 				$updated_automations = array_diff( $updated_automations, $automation_contacts );
 				sort( $updated_automations );
@@ -8459,7 +8519,7 @@ class BWFAN_Common {
 
 		global $wpdb;
 		$query       = " SELECT `cid`, GROUP_CONCAT(`aid`) AS `aid` FROM `{$wpdb->prefix}bwfan_automation_complete_contact` WHERE `ID` <= {$max_count} GROUP BY `cid` ORDER BY `cid` ASC LIMIT {$processed},20";
-		$automations = $wpdb->get_results( $query, ARRAY_A );
+		$automations = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 		if ( empty( $automations ) ) {
 			delete_option( 'bwfan_max_automation_completed' );
 			delete_option( 'bwfan_automation_completed_processed' );
@@ -8529,7 +8589,7 @@ class BWFAN_Common {
 
 		global $wpdb;
 		$query       = "SELECT `cid`, GROUP_CONCAT(`aid`) AS `aid` FROM `{$wpdb->prefix}bwfan_automation_contact` WHERE `ID` <= {$max_count} GROUP BY `cid` ORDER BY `cid` ASC LIMIT {$processed},20";
-		$automations = $wpdb->get_results( $query, ARRAY_A );
+		$automations = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 		if ( empty( $automations ) ) {
 			delete_option( 'bwfan_max_active_automation' );
@@ -8686,18 +8746,19 @@ class BWFAN_Common {
 				return;
 			}
 
-			$selected_ids = implode( ', ', $a_cids );
-
+			$a_cids             = array_filter( $a_cids, 'intval' );
+			$stringPlaceholders = array_fill( 0, count( $a_cids ), '%d' );
+			$stringPlaceholders = implode( ', ', $stringPlaceholders );
 			global $wpdb;
 			if ( 'delete_complete' === $action || 'completed' === $status ) {
-				$query = " SELECT `ID`,`cid`,`aid`,`trail`,`event`,`data` FROM {$wpdb->prefix}bwfan_automation_complete_contact WHERE `ID` IN ($selected_ids) ";
+				$query = $wpdb->prepare( " SELECT `ID`,`cid`,`aid`,`trail`,`event`,`data` FROM {$wpdb->prefix}bwfan_automation_complete_contact WHERE `ID` IN ( $stringPlaceholders ) ", $a_cids );// phpcs:ignore WordPress.DB.PreparedSQL,  WordPress.DB.PreparedSQLPlaceholders
 			} else {
-				$query = " SELECT `ID`,`cid`,`aid`,`trail` FROM {$wpdb->prefix}bwfan_automation_contact WHERE `ID` IN ($selected_ids)";
+				$query = $wpdb->prepare( " SELECT `ID`,`cid`,`aid`,`trail` FROM {$wpdb->prefix}bwfan_automation_contact WHERE `ID` IN ( $stringPlaceholders )", $a_cids );// phpcs:ignore WordPress.DB.PreparedSQL,  WordPress.DB.PreparedSQLPlaceholders
 			}
 
 			try {
 				BWFAN_Common::log_test_data( $option_key . ' - ' . $query, __FUNCTION__ );
-				$result = $wpdb->get_results( $query, ARRAY_A );
+				$result = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 			} catch ( Error $e ) {
 				delete_option( $option_key );
 
@@ -8778,13 +8839,23 @@ class BWFAN_Common {
 		if ( 'delete_complete' === $action ) {
 			$table_name = "{$wpdb->prefix}bwfan_automation_complete_contact";
 		}
-		$ids   = implode( "', '", $ids );
-		$query = "DELETE FROM $table_name WHERE ID IN ('$ids')";
-		$wpdb->query( $query );
+		if ( ! empty( $ids ) ) {
+			$ids                = array_filter( $ids, 'intval' );
+			$stringPlaceholders = array_fill( 0, count( $ids ), '%d' );
+			$stringPlaceholders = implode( ', ', $stringPlaceholders );
 
-		$trails = implode( "', '", $trails );
-		$query  = "DELETE FROM {$wpdb->prefix}bwfan_automation_contact_trail WHERE tid IN ('$trails')";
-		$wpdb->query( $query );
+			$query = $wpdb->prepare( "DELETE FROM {$table_name} WHERE `ID` IN ( $stringPlaceholders )", $ids );// phpcs:ignore WordPress.DB.PreparedSQL,  WordPress.DB.PreparedSQLPlaceholders
+			$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
+		}
+
+		if ( ! empty( $trails ) ) {
+			$trails      = array_filter( $trails );
+			$placeholder = array_fill( 0, count( $trails ), '%s' );
+			$placeholder = implode( ', ', $placeholder );
+
+			$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}bwfan_automation_contact_trail WHERE tid IN ( $placeholder )", $trails ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
+		}
+
 
 		if ( ! class_exists( 'BWFCRM_Contact' ) ) {
 			/** Works with pro version only */
@@ -8877,16 +8948,17 @@ class BWFAN_Common {
 
 			/** Get first 20 ids */
 			$ids          = ( count( $ids ) > $batch_size ) ? array_slice( $ids, 0, $batch_size ) : $ids;
+			$ids          = array_filter( $ids, 'intval' );
 			$selected_ids = implode( ', ', $ids );
 
+			$stringPlaceholders = array_fill( 0, count( $ids ), '%d' );
+			$stringPlaceholders = implode( ', ', $stringPlaceholders );
 			global $wpdb;
 
-			$e_time = '';
-			$status = 0;
 			switch ( true ) {
 				case ( 'tag' === $type || 'list' === $type || 'audience' === $type ):
-					$query = "DELETE FROM {$wpdb->prefix}bwfan_terms WHERE `ID` IN ($selected_ids)";
-					$wpdb->query( $query );
+					$query = "DELETE FROM {$wpdb->prefix}bwfan_terms WHERE `ID` IN ( $stringPlaceholders )";
+					$wpdb->query( $wpdb->prepare( $query, $ids ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 					break;
 				case ( 'automation_v1' === $type || 'automation_v2' === $type ):
 					BWFAN_Core()->automations->delete_automation( $ids );
@@ -8899,8 +8971,8 @@ class BWFAN_Common {
 					}
 					break;
 				case ( 'broadcast' === $type ):
-					$query = "DELETE FROM {$wpdb->prefix}bwfan_broadcast WHERE `id` IN ($selected_ids)";
-					$wpdb->query( $query );
+					$query = "DELETE FROM {$wpdb->prefix}bwfan_broadcast WHERE `id` IN ( $stringPlaceholders )";
+					$wpdb->query( $wpdb->prepare( $query, $ids ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 					/** Remove parent from child broadcasts */
 					if ( bwfan_is_autonami_pro_active() && method_exists( 'BWFAN_Model_Broadcast', 'remove_parent_from_child' ) ) {
 						BWFAN_Model_Broadcast::remove_parent_from_child( $ids );
@@ -8910,20 +8982,20 @@ class BWFAN_Common {
 					BWFAN_Model_Templates::bwf_delete_template( $ids );
 					break;
 				case ( 'form' === $type ):
-					$query = "DELETE FROM {$wpdb->prefix}bwfan_form_feeds WHERE `ID` IN ($selected_ids)";
-					$wpdb->query( $query );
+					$query = "DELETE FROM {$wpdb->prefix}bwfan_form_feeds WHERE `ID` IN ( $stringPlaceholders )";
+					$wpdb->query( $wpdb->prepare( $query, $ids ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 					break;
 				case ( 'cart' === $type ):
 					if ( 'recovered' === $cart_type ) {
 						BWFAN_Recoverable_Carts::delete_recovered_carts( $selected_ids );
 					} else {
-						$query = "DELETE FROM {$wpdb->prefix}bwfan_abandonedcarts WHERE `ID` IN ($selected_ids)";
-						$wpdb->query( $query );
+						$query = "DELETE FROM {$wpdb->prefix}bwfan_abandonedcarts WHERE `ID` IN ($stringPlaceholders )";
+						$wpdb->query( $wpdb->prepare( $query, $ids ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 					}
 					break;
 				case ( 'recovered-cart' === $type ):
-					$query = "DELETE FROM {$wpdb->prefix}postmeta WHERE (`meta_key` = '_bwfan_recovered_ab_id' OR `meta_key` = '_bwfan_ab_cart_recovered_a_id') AND `post_id` IN ($selected_ids)";
-					$wpdb->query( $query );
+					$query = "DELETE FROM {$wpdb->prefix}postmeta WHERE (`meta_key` = '_bwfan_recovered_ab_id' OR `meta_key` = '_bwfan_ab_cart_recovered_a_id') AND `post_id` IN ( $stringPlaceholders )";
+					$wpdb->query( $wpdb->prepare( $query, $ids ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 					break;
 			}
 
@@ -8962,6 +9034,7 @@ class BWFAN_Common {
 	 */
 	public static function delete_expired_dynamic_coupons() {
 		global $wpdb;
+		//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$coupons = $wpdb->get_results( $wpdb->prepare( "
                                                 SELECT m1.post_id as id
                                                 FROM {$wpdb->prefix}postmeta as m1
@@ -9490,7 +9563,7 @@ class BWFAN_Common {
 
 		global $wpdb;
 		$query = "SELECT am.meta_value, a.ID FROM `{$wpdb->prefix}bwfan_automationmeta` AS am JOIN `{$wpdb->prefix}bwfan_automations` AS a ON am.bwfan_automation_id = a.ID WHERE a.ID >= %d AND am.meta_key = %s AND a.v = %d LIMIT 20";
-		$rows  = $wpdb->get_results( $wpdb->prepare( $query, $offset_id, 'steps', 2 ), ARRAY_A );
+		$rows  = $wpdb->get_results( $wpdb->prepare( $query, $offset_id, 'steps', 2 ), ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 		if ( empty( $rows ) ) {
 			delete_option( $key );
 			bwf_unschedule_actions( 'bwfan_update_meta_automations_v2' );
@@ -9648,7 +9721,7 @@ class BWFAN_Common {
 	 * @return array|stdClass|WC_Order[]
 	 */
 	public static function fetch_last_order_by_contact( $contact ) {
-		if ( ! $contact instanceof BWFCRM_Contact ) {
+		if ( ! $contact instanceof WooFunnels_Contact ) {
 			return [];
 		}
 
@@ -9667,7 +9740,7 @@ class BWFAN_Common {
 	 * @return array|object|stdClass|null
 	 */
 	public static function fetch_last_refund_of_contact( $contact ) {
-		if ( ! $contact instanceof BWFCRM_Contact ) {
+		if ( ! $contact instanceof WooFunnels_Contact ) {
 			return [];
 		}
 
@@ -9686,11 +9759,11 @@ class BWFAN_Common {
 		$orders_ids = implode( ',', $orders_ids );
 
 		if ( BWF_WC_Compatibility::is_hpos_enabled() ) {
-			$query  = $wpdb->prepare( "SELECT `id` AS refund_id, `parent_order_id` AS order_id FROM {$wpdb->prefix}wc_orders  WHERE type = %s AND status = %s AND `parent_order_id` IN ($orders_ids) ORDER BY id DESC LIMIT 1", 'shop_order_refund', 'wc-completed' );
-			$refund = $wpdb->get_row( $query, ARRAY_A );//phpcs:ignore WordPress.DB.PreparedSQL
+			$query  = $wpdb->prepare( "SELECT `id` AS refund_id, `parent_order_id` AS order_id FROM {$wpdb->prefix}wc_orders  WHERE type = %s AND status = %s AND `parent_order_id` IN ($orders_ids) ORDER BY id DESC LIMIT 1", 'shop_order_refund', 'wc-completed' );// phpcs:ignore WordPress.DB.PreparedSQL,  WordPress.DB.PreparedSQLPlaceholders
+			$refund = $wpdb->get_row( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 		} else {
-			$query  = $wpdb->prepare( "SELECT `ID` AS refund_id, `post_parent` AS order_id FROM {$wpdb->prefix}posts WHERE `post_type` = %s AND `post_status` = %s AND `post_parent` IN ($orders_ids) ORDER BY `ID` DESC LIMIT 1", 'shop_order', 'publish' );
-			$refund = $wpdb->get_row( $query, ARRAY_A );//phpcs:ignore WordPress.DB.PreparedSQL
+			$query  = $wpdb->prepare( "SELECT `ID` AS refund_id, `post_parent` AS order_id FROM {$wpdb->prefix}posts WHERE `post_type` = %s AND `post_status` = %s AND `post_parent` IN ($orders_ids) ORDER BY `ID` DESC LIMIT 1", 'shop_order', 'publish' );// phpcs:ignore WordPress.DB.PreparedSQL,  WordPress.DB.PreparedSQLPlaceholders
+			$refund = $wpdb->get_row( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 		}
 
 		return $refund;
@@ -9768,6 +9841,7 @@ class BWFAN_Common {
 		if ( ( $type !== 'block' && $type !== 5 ) || strpos( $body, 'bwfan_email_block_visibility' ) === false ) {
 			return $body;
 		}
+		BWFAN_Core()->rules->load_rules_classes();
 		$body = str_replace( "<bwfan_email_block_visibility", "[bwfbe_email_block_visibility", $body );
 		$body = str_replace( 'data-bwf-visibility="true">', "]", $body );
 
@@ -9813,7 +9887,7 @@ class BWFAN_Common {
 	public static function get_store_aov() {
 		global $wpdb;
 		$sql    = "SELECT count(`order_id`) as `orders`, SUM(`total_sales`) as `total` FROM {$wpdb->prefix}wc_order_stats WHERE `status` NOT IN('wc-failed', 'wc-pending', 'wc-cancelled', 'wc-refunded') ";
-		$result = $wpdb->get_results( $sql, ARRAY_A );
+		$result = $wpdb->get_results( $sql, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 		$aov    = 0;
 		if ( isset( $result[0]['orders'] ) && ! empty( $result[0]['orders'] ) && isset( $result[0]['total'] ) && ! empty( $result[0]['total'] ) ) {
 			$aov = ( floatval( $result[0]['total'] ) / absint( $result[0]['orders'] ) );
@@ -9858,7 +9932,7 @@ class BWFAN_Common {
 		$start_time = time();
 		do {
 			$query = "SELECT ct.ID FROM `{$wpdb->prefix}bwfan_automation_contact_trail` AS ct JOIN `{$wpdb->prefix}bwfan_automation_complete_contact` AS cc ON ct.tid = cc.trail WHERE ct.status = 2 LIMIT 0,20";
-			$ids   = $wpdb->get_col( $query );
+			$ids   = $wpdb->get_col( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 			if ( empty( $ids ) ) {
 				bwf_unschedule_actions( 'bwfan_update_contact_trail' );
 
@@ -9866,7 +9940,7 @@ class BWFAN_Common {
 			}
 			$ids   = implode( ',', $ids );
 			$query = "UPDATE `{$wpdb->prefix}bwfan_automation_contact_trail` SET `status` = 1, `data` = NULL WHERE ID IN ($ids);";
-			$wpdb->query( $query );
+			$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 		} while ( ( time() - $start_time ) < 10 );
 	}
 
@@ -9902,6 +9976,7 @@ class BWFAN_Common {
 	 * @return void
 	 */
 	public static function nocache_headers() {
+		do_action( 'litespeed_control_set_nocache', 'fkautomations' );
 		if ( headers_sent() ) {
 			return;
 		}
@@ -9999,7 +10074,7 @@ class BWFAN_Common {
 	 *
 	 * @return string|null
 	 */
-	public static function get_email_from_order( $order_id = '', $order = null ) {
+	public static function get_email_from_order( $order_id = '', ?WC_Order $order = null ) {
 		if ( empty( $order_id ) && ! $order instanceof WC_Order ) {
 			return '';
 		}
@@ -10019,7 +10094,7 @@ class BWFAN_Common {
 	 *
 	 * @return mixed|string|null
 	 */
-	public static function get_phone_from_order( $order_id = '', $order = null ) {
+	public static function get_phone_from_order( $order_id = '', ?WC_Order $order = null ) {
 		if ( empty( $order_id ) && ! $order instanceof WC_Order ) {
 			return '';
 		}
@@ -10056,12 +10131,12 @@ class BWFAN_Common {
 	/**
 	 * Get WP user id from order
 	 *
-	 * @param $order_id
+	 * @param string $order_id
 	 * @param $order
 	 *
 	 * @return int|string
 	 */
-	public static function get_wp_user_id_from_order( $order_id = '', $order = null ) {
+	public static function get_wp_user_id_from_order( $order_id = '', ?WC_Order $order = null ) {
 		if ( empty( $order_id ) && ! $order instanceof WC_Order ) {
 			return '';
 		}
@@ -10093,7 +10168,7 @@ class BWFAN_Common {
 			$table = "{$wpdb->prefix}postmeta";
 			$query = " SELECT `meta_id`,`meta_value` FROM {$table} WHERE `post_id` = %d AND `meta_key` = %s  ";
 		}
-		$row = $wpdb->get_row( $wpdb->prepare( $query, $order_id, $meta_key ), ARRAY_A );
+		$row = $wpdb->get_row( $wpdb->prepare( $query, $order_id, $meta_key ), ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 		/** If no data found */
 		if ( empty( $row ) ) {
@@ -10107,7 +10182,7 @@ class BWFAN_Common {
 			} else {
 				$data['post_id'] = $order_id;
 			}
-			$wpdb->insert( $table, $data );
+			$wpdb->insert( $table, $data ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 
 			return;
 		}
@@ -10120,7 +10195,7 @@ class BWFAN_Common {
 		/** update meta value */
 		$column = ( $hpos_enabled ) ? 'id' : 'meta_id';
 
-		$wpdb->update( $table, [ 'meta_value' => $meta_value ], [ $column => $row[ $column ] ] );
+		$wpdb->update( $table, [ 'meta_value' => $meta_value ], [ $column => $row[ $column ] ] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -10196,7 +10271,7 @@ class BWFAN_Common {
 		global $wpdb;
 		$query = $wpdb->prepare( "SELECT `ID` FROM {$wpdb->prefix}bwfan_automations WHERE ID = %d AND `benchmark` LIKE %s", $aid, '%"wc_new_order"%' );
 
-		return ( ! empty( $wpdb->get_var( $query ) ) );
+		return ( ! empty( $wpdb->get_var( $query ) ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 	}
 
 	/**
@@ -10225,9 +10300,9 @@ class BWFAN_Common {
 		$placeholders_hooks = implode( ', ', $placeholders );
 
 		$query = "SELECT `hook`, count(`id`) as `count` FROM `{$wpdb->prefix}bwf_actions` WHERE `hook` IN ($placeholders_hooks) AND `status` = 0 GROUP BY `hook`;";
-		$query = $wpdb->prepare( $query, $hooks ); // WPCS: unprepared SQL OK
+		$query = $wpdb->prepare( $query, $hooks );// phpcs:ignore WordPress.DB.PreparedSQL
 
-		$result = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$result = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 		if ( empty( $result ) ) {
 			return;
 		}
@@ -10244,9 +10319,8 @@ class BWFAN_Common {
 		$placeholders       = array_fill( 0, count( $hooks ), '%s' );
 		$placeholders_hooks = implode( ', ', $placeholders );
 
-		$query = "DELETE FROM `{$wpdb->prefix}bwf_actions` WHERE `hook` IN ($placeholders_hooks) AND `status` = 0";
-		$query = $wpdb->prepare( $query, $hooks ); // WPCS: unprepared SQL OK
-		$wpdb->query( $query ); // WPCS: unprepared SQL OK
+		$query = $wpdb->prepare( "DELETE FROM `{$wpdb->prefix}bwf_actions` WHERE `hook` IN ($placeholders_hooks) AND `status` = 0", $hooks ); // phpcs:ignore WordPress.DB.PreparedSQL,  WordPress.DB.PreparedSQLPlaceholders
+		$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 		if ( true === bwfan_is_autonami_pro_active() && in_array( 'bwfcrm_broadcast_run_queue', $hooks, true ) ) {
 			/** Reschedule broadcast */
@@ -10263,7 +10337,7 @@ class BWFAN_Common {
 	 *
 	 * @return void
 	 */
-	public static function set_uid_in_cookies( $optin_id, $posted_data, $bwf_contact = null ) {
+	public static function set_uid_in_cookies( $optin_id, $posted_data, ?WooFunnels_Contact $bwf_contact = null ) {
 		if ( headers_sent() ) {
 			return;
 		}
@@ -10491,7 +10565,7 @@ class BWFAN_Common {
 				'search'     => 1,
 				'created_at' => current_time( 'mysql', 1 ),
 			];
-			$wpdb->insert( $crm_fields_table, $data );
+			$wpdb->insert( $crm_fields_table, $data ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$field_id = $wpdb->insert_id;
 			if ( ! empty( $wpdb->last_error ) ) {
 				$db_errors[] = 'Error in default field creation: ' . $field_data['name'] . ' ' . $wpdb->last_error;
@@ -10523,7 +10597,7 @@ class BWFAN_Common {
 	public static function check_field_exist( $slug ) {
 		global $wpdb;
 		$query  = $wpdb->prepare( "SELECT `ID` FROM `{$wpdb->prefix}bwfan_fields` WHERE `slug` = %s LIMIT 0, 1", $slug );
-		$result = $wpdb->get_var( $query );
+		$result = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 		return ! empty( $result );
 	}
@@ -10763,7 +10837,7 @@ class BWFAN_Common {
 		global $wpdb;
 		$query = "SELECT MAX(id) FROM {$wpdb->prefix}bwfan_conversions";
 
-		return empty( $wpdb->get_var( $query ) );
+		return empty( $wpdb->get_var( $query ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 	}
 
 	public static function get_skip_conversion_automations() {
@@ -10773,9 +10847,9 @@ class BWFAN_Common {
 		$placeholder = array_fill( 0, count( $skip_events ), '%s' );
 		$placeholder = implode( ", ", $placeholder );
 
-		$query = $wpdb->prepare( "SELECT `ID` FROM {$wpdb->prefix}bwfan_automations WHERE 1 = 1 AND `event` IN ($placeholder) ", $skip_events );
+		$query = $wpdb->prepare( "SELECT `ID` FROM {$wpdb->prefix}bwfan_automations WHERE 1 = 1 AND `event` IN ($placeholder) ", $skip_events );// phpcs:ignore WordPress.DB.PreparedSQL,  WordPress.DB.PreparedSQLPlaceholders
 
-		$query_res = $wpdb->get_results( $query, ARRAY_A );
+		$query_res = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 		if ( empty( $query_res ) ) {
 			return [];
@@ -10834,7 +10908,7 @@ class BWFAN_Common {
 	public static function bwfan_run_event_queue() {
 		global $wpdb;
 		$query   = $wpdb->prepare( "SELECT `ID`, `args` FROM {$wpdb->prefix}bwfan_automation_events WHERE `execution_time` < %d ORDER BY `execution_time` ASC LIMIT 100", current_time( 'timestamp', 1 ) );
-		$results = $wpdb->get_results( $query, ARRAY_A );
+		$results = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 		if ( empty( $results ) ) {
 			return;
 		}
@@ -11357,16 +11431,18 @@ class BWFAN_Common {
 
 		$dates['from_date'] = $date->format( 'Y-m-d' );
 
+		$last_month = clone $date;
+
 		$date->modify( 'last day of this month' );
 		$dates['to_date'] = $date->format( 'Y-m-d' );
 
-		$date->modify( 'last Month' );
-		$date->setDate( $date->format( 'Y' ), $date->format( 'm' ), 1 );
+		$last_month->modify( 'last Month' );
+		$last_month->setDate( $last_month->format( 'Y' ), $last_month->format( 'm' ), 1 );
 
-		$dates['from_date_previous'] = $date->format( 'Y-m-d' );
+		$dates['from_date_previous'] = $last_month->format( 'Y-m-d' );
 
-		$date->modify( 'last day of this month' );
-		$dates['to_date_previous'] = $date->format( 'Y-m-d' );
+		$last_month->modify( 'last day of this month' );
+		$dates['to_date_previous'] = $last_month->format( 'Y-m-d' );
 
 		return $dates;
 	}
@@ -11403,23 +11479,42 @@ class BWFAN_Common {
 
 		$start_time = time();
 
+		$last_id_query = $wpdb->prepare( "SELECT MIN(`ID`) FROM {$wpdb->prefix}bwfan_engagement_tracking WHERE `c_status` NOT IN (2, 3)" );
+
+		$last_id = $wpdb->get_var( $last_id_query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
+
 		do {
-			$query = $wpdb->prepare( "DELETE etm
-			    FROM {$wpdb->prefix}bwfan_engagement_trackingmeta etm
-			    INNER JOIN (
-			        SELECT etm.ID
-			        FROM {$wpdb->prefix}bwfan_engagement_trackingmeta etm
-			        INNER JOIN {$wpdb->prefix}bwfan_engagement_tracking et ON etm.eid = et.ID
-			        WHERE etm.meta_key = %s
-			        AND et.c_status IN (2, 3)
-			        LIMIT 500
-			    ) subquery ON etm.ID = subquery.ID", 'merge_tags' );
+			$rows_affected_first = 0;
 
-			$rows_affected = $wpdb->query( $query );
+			// Only run the first query if we have a valid last_id
+			if ( $last_id ) {
+				$query = $wpdb->prepare( "DELETE FROM {$wpdb->prefix}bwfan_engagement_trackingmeta WHERE `eid` <= %d AND `meta_key` = %s LIMIT 500", $last_id, 'merge_tags' );
 
-			if ( empty( $rows_affected ) ) {
-				bwf_unschedule_actions( 'bwfan_delete_engagement_tracking_meta_tool_action' );
-				break;
+				$rows_affected_first = $wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
+			}
+
+			// If the first query didn't delete anything, delete from second query
+			if ( $rows_affected_first === 0 ) {
+				$query = $wpdb->prepare( "DELETE FROM {$wpdb->prefix}bwfan_engagement_trackingmeta 
+                WHERE ID IN (
+                    SELECT ID FROM (
+                        SELECT etm.ID
+                        FROM {$wpdb->prefix}bwfan_engagement_trackingmeta etm
+                        INNER JOIN {$wpdb->prefix}bwfan_engagement_tracking et 
+                            ON etm.eid = et.ID
+                        WHERE etm.meta_key = %s
+                        AND et.c_status IN (2, 3)
+                        LIMIT 500
+                    ) as t
+                )", 'merge_tags' );
+
+				$rows_affected_second = $wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
+
+				// If neither query deleted anything, we're done
+				if ( $rows_affected_second === 0 ) {
+					bwf_unschedule_actions( 'bwfan_delete_engagement_tracking_meta_tool_action' );
+					break;
+				}
 			}
 
 		} while ( ( time() - $start_time ) < 20 );
@@ -11541,21 +11636,22 @@ class BWFAN_Common {
 		// Remove unnecessary whitespaces and newlines between tags
 		$htmlMinified = preg_replace( '/\s+/', ' ', $content );
 		$htmlMinified = preg_replace( '/> </', '><', $htmlMinified ); // Remove space between tags
-//		$htmlMinified = preg_replace('/<!--.*?-->/', '', $htmlMinified); // Remove comments
 
 		// Call minifyCSS to handle embedded CSS inside <style> tags
 		$htmlMinified = self::minifyCSSInHTML( $htmlMinified );
 
 		// Return the minified HTML content
 		return $htmlMinified;
-
 	}
 
 	private static function minifyCSSContent( $css ) {
+		if ( empty( $css ) ) {
+			return '';
+		}
+
 		// Remove unnecessary whitespaces, comments, and newlines
 		$cssMinified = preg_replace( '/\s+/', ' ', $css ); // Collapse multiple spaces into one
-		$cssMinified = preg_replace( '/\/\*.*?\*\//', '', $cssMinified ); // Remove comments
-		$cssMinified = preg_replace( '/\s*([{:},;])\s*/', '$1', $cssMinified ); // Remove spaces around colons, commas, semicolons
+		$cssMinified = preg_replace( '/\/\*.*?\*\//s', '', $cssMinified ); // Remove comments with /s modifier
 		$cssMinified = preg_replace( '/\s*([{:},;])\s*/', '$1', $cssMinified ); // Remove spaces around colons, commas, semicolons
 		$cssMinified = preg_replace( '/[^\}]+\{\s*\}/', '', $cssMinified ); // Remove empty CSS selectors
 
@@ -11588,12 +11684,19 @@ class BWFAN_Common {
 		// Extract all media queries and their rules
 		$mediaQueries = [];
 
+		$change_resolution = apply_filters( 'bwfan_change_media_query_resolution', '' );
+
 		preg_match_all( '/@media[^{]+\{([\s\S]*?)\}}/i', $style, $mediaMatches );
 		foreach ( $mediaMatches[0] as $mediaQuery ) {
 			// Split the media query and its rules
 			$parts = explode( '{', $mediaQuery, 2 );
 			$query = trim( $parts[0] );
 			$rules = trim( $parts[1] );
+
+			if ( ! empty( $change_resolution ) && intval( $change_resolution ) > 0 ) {
+				// Update screen sizes from 768px to 480px
+				$query = preg_replace( '/(\(max-width:\s*)768px(\s*\))/i', '${1}' . $change_resolution . 'px${2}', $query );
+			}
 
 			// Store rules in the mediaQueries array
 			if ( ! isset( $mediaQueries[ $query ] ) ) {
@@ -11650,11 +11753,44 @@ class BWFAN_Common {
 	/**
 	 * Validate redirect link by domain
 	 *
-	 * @param $link string
+	 * @param $link
+	 * @param $l_hash
+	 * @param $engagement_data
 	 *
-	 * @return string
+	 * @return mixed|string|null
 	 */
-	public static function validate_target_link( $link = '' ) {
+	public static function validate_target_link( $link = '', $l_hash = '', $engagement_data = [] ) {
+
+		/** Validate target link if all links not saved and l_hash empty */
+		if ( empty( get_option( 'bwfan_all_link_saved' ) ) && empty( $l_hash ) ) {
+			return self::validate_old_target_link( $link, $engagement_data );
+		}
+
+		/** Checking by cleaned url */
+		$cleaned_url = BWFAN_Core()->conversation->get_cleaned_url( urldecode( $link ) );
+
+		/** Checking by l_hash & clean url */
+		if ( ! empty( $l_hash ) ) {
+			$is_link_exists = BWFAN_Model_Links::is_link_hash_exists( $cleaned_url, $l_hash );
+			// if link entry not found return home url
+			if ( empty( $is_link_exists ) ) {
+				return home_url();
+			}
+
+			BWFAN_Email_Conversations::$link_id = $is_link_exists;
+
+			return $link;
+		}
+
+		/** Checking by link exist in links table */
+		$is_link_exists = BWFAN_Model_Links::get_link_id_by_tid( $cleaned_url, $engagement_data[0]??[] );
+		if ( ! empty( $is_link_exists ) ) {
+			BWFAN_Email_Conversations::$link_id = $is_link_exists;
+
+			return $link;
+		}
+
+		/** If site url and redirect url host are same */
 		try {
 			$link_host     = wp_parse_url( urldecode( $link ), PHP_URL_HOST );
 			$site_url      = home_url();
@@ -11662,6 +11798,30 @@ class BWFAN_Common {
 		} catch ( Error|Exception $e ) {
 			return $link;
 		}
+
+		return $link_host === $site_url_host ? $link : home_url();
+	}
+
+	/**
+	 * Validate old target link if link is not saved
+	 *
+	 * @param $link
+	 * @param $e_data
+	 *
+	 * @return mixed|string|null
+	 */
+	public static function validate_old_target_link( $link, $e_data = [] ) {
+		try {
+			$link_host     = wp_parse_url( urldecode( $link ), PHP_URL_HOST );
+			$site_url      = home_url();
+			$site_url_host = wp_parse_url( $site_url, PHP_URL_HOST );
+		} catch ( Error|Exception $e ) {
+			return $link;
+		}
+
+		/** Checking by cleaned url */
+		$cleaned_url                        = BWFAN_Core()->conversation->get_cleaned_url( urldecode( $link ) );
+		BWFAN_Email_Conversations::$link_id = BWFAN_Model_Links::get_link_id_by_tid( $cleaned_url, $e_data[0] );
 
 		/** If site url and redirect url host are same */
 		if ( $link_host === $site_url_host ) {
@@ -11680,5 +11840,148 @@ class BWFAN_Common {
 		}, $allowed_domains ) );
 
 		return in_array( $link_host, $allowed_domains, true ) ? $link : $site_url;
+	}
+
+	/**
+	 * Store links
+	 *
+	 * @return void
+	 */
+	public static function bwfan_store_template_links() {
+		$last_id = intval( get_option( 'bwfan_template_links' ) );
+		BWFAN_Common::log_test_data( 'Template link store process start', 'fk-store-link', true );
+		global $wpdb;
+
+		$email_regex        = BWFAN_Common::get_regex_pattern();
+		$sms_whatsapp_regex = BWFAN_Common::get_regex_pattern( 3 );
+
+		$start_time = time();
+		while ( ( time() - $start_time ) < 15 ) {
+			$query     = "SELECT et.`oid`,et.`sid`,et.`type`,et.`mode`,t.`ID`,t.`template` FROM {$wpdb->prefix}bwfan_templates AS t JOIN {$wpdb->prefix}bwfan_engagement_tracking AS et ON t.`ID`=et.`tid` WHERE tid > $last_id GROUP BY tid LIMIT 20";
+			$templates = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
+			if ( empty( $templates ) ) {
+				bwf_unschedule_actions( 'bwfan_store_template_links' );
+				delete_option( 'bwfan_template_links' );
+				update_option( 'bwfan_all_link_saved', true, true );
+				BWFAN_Common::log_test_data( 'Template link store process complete', 'fk-store-link', true );
+				break;
+			}
+			$template_ids = array_column( $templates, 'ID' );
+			BWFAN_Common::log_test_data( 'Template ids :' . implode( ',', $template_ids ), 'fk-store-link', true );
+			foreach ( $templates as $template ) {
+				$mode = intval( $template['mode'] );
+				$mode = $mode === BWFAN_Email_Conversations::$MODE_EMAIL ? 'email' : ( $mode === BWFAN_Email_Conversations::$MODE_SMS ? 'sms' : 'whatsapp' );
+
+				$regex_pattern = ( $mode === 'email' ) ? $email_regex : $sms_whatsapp_regex;
+				preg_replace_callback( $regex_pattern, function ( $matches ) use ( $mode, $template ) {
+					/** According to Href (1) regex, URL is at 1 index. And for Link (3) Regex, 0 index. */
+					$url = 'email' !== $mode ? $matches[0] : $matches[1];
+					BWFAN_Common::log_test_data( 'id:' . $template['ID'] . ' URL: ' . $url, 'fk-store-link', true );
+
+					if ( BWFAN_Common::is_exclude_url( $url ) ) {
+						BWFAN_Common::log_test_data( 'exclude url', 'fk-store-link', true );
+
+						return $matches[0];
+					}
+
+					/** Exclude click tracking for unsubscribe link and view email browser link*/
+					if ( false !== strpos( $url, 'bwfan-action=unsubscribe' ) || false !== strpos( $url, 'bwfan-action=view_in_browser' ) ) {
+						BWFAN_Common::log_test_data( 'unsubscribe or view url', 'fk-store-link', true );
+
+						return 'email' !== $mode ? $url : str_replace( $matches[1], $url, $matches[0] );
+					}
+					$data = [
+						'type'        => $template['type'],
+						'oid'         => $template['oid'],
+						'step_id'     => $template['sid'],
+						'template_id' => $template['ID'],
+					];
+
+					/** Save link in DB */
+					BWFAN_Core()->conversation->get_link_hash( $url, $data );
+
+					return 'email' !== $mode ? $url : str_replace( $matches[1], $url, $matches[0] );
+				}, $template['template'] );
+
+				$last_id = $template['ID'];
+			}
+			BWFAN_Common::log_test_data( 'Last process template id :' . $last_id, 'fk-store-link', true );
+			update_option( 'bwfan_template_links', $last_id );
+		}
+		BWFAN_Common::log_test_data( 'Template link store process end :', 'fk-store-link', true );
+	}
+
+	/**
+	 * Get mail replace string
+	 *
+	 * @return array
+	 */
+	public static function get_mail_replace_string() {
+		if ( defined( 'BWFAN_PRO_VERSION' ) && version_compare( BWFAN_PRO_VERSION, '3.5.2', '<=' ) ) {
+			return [];
+		}
+
+		return [
+			'http-equiv' => md5( 'http-equiv' ),
+		];
+	}
+
+	/**
+	 * Create contact if not created
+	 *
+	 * @param $user_id
+	 *
+	 * @return void
+	 */
+	public static function bwfan_register_user( $user_id ) {
+		if ( did_action( 'woocommerce_before_checkout_process' ) ) {
+			return;
+		}
+
+		$db_updater = WooFunnels_DB_Updater::get_instance();
+		$db_updater->do_profile_update_async_call( $user_id );
+
+		define( 'BWF_DISABLE_CONTACT_PROFILE_UPDATE', 1 );
+	}
+
+	/**
+	 * @return string
+	 *
+	 */
+	public static function get_wc_tax_label_if_displayed() {
+		if ( ! wc_tax_enabled() ) {
+			return '';
+		}
+
+		$tax_display_mode   = get_option( 'woocommerce_tax_display_cart' );
+		$prices_include_tax = wc_prices_include_tax();
+
+		if ( $tax_display_mode === 'incl' && ! $prices_include_tax ) {
+			return WC()->countries->inc_tax_or_vat();
+		}
+
+		if ( $tax_display_mode === 'excl' && $prices_include_tax ) {
+			return WC()->countries->ex_tax_or_vat();
+		}
+
+		return '';
+	}
+
+	/**
+	 * If constant define then get contact email by user id
+	 *
+	 * @param $user_id
+	 * @param $contact_id
+	 *
+	 * @return string
+	 */
+	public static function get_contact_email( $user_id = 0, $contact_id = 0 ) {
+		if ( ! defined( 'BWFAN_GET_CONTACT_EMAIL' ) || true !== BWFAN_GET_CONTACT_EMAIL || ( empty( $user_id ) && empty( $contact_id ) ) ) {
+			return '';
+		}
+
+		$contact = new WooFunnels_Contact( $user_id, '', '', $contact_id );
+
+		return $contact->get_id() > 0 ? $contact->get_email() : '';
 	}
 }

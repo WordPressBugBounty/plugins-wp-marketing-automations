@@ -2,9 +2,9 @@
 Contributors: xlplugins, amans2k
 Tags: cart abandonment, follow up emails, email marketing, newsletter, marketing automation
 Requires at least: 5.0
-Tested up to: 6.7.2
+Tested up to: 6.8.1
 Requires PHP: 7.0
-Stable tag: 3.5.3
+Stable tag: 3.6.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -416,11 +416,71 @@ FunnelKit Automations is 100% self-hosted and fully GDPR compliant.
 
 == Change log ==
 
+= 3.6.0 (Jun 03, 2025) =
+* Compatible upto WordPress 6.8.1
+* Security: Third-Party Links: Restricted redirect links if not sent from email. (#3833)
+* Security: Plugin Activation: Fixed unique key logic in FK Automation on plugin activation. (#3931)
+* Added: Pro: Cart Export: Added cart export feature. (#3581)
+* Added: Elementor Image Optimization: Added compatibility with 'Elementor - Image optimization' plugin. (#3919)
+* Added: Orders Resync: Added orders resync feature on single contact and single order pages to resync all contact orders. (#3209)
+* Added: Auto-Create CRM Contact: Automatically create CRM contact when a new WordPress user registers. (#3990)
+* Added: ATUM WooCommerce Compatibility: Added compatibility with ATUM WooCommerce Inventory Management and Stock Tracking. (#4025)
+* Added: GTranslate Plugin: Added compatibility, now supporting correct cart recovery link by contact's country. (#3846)
+* Added: Pro: Automation Events: Added support for 'User created' and 'User login' events in the 'Add to Automation' feature. (#3948)
+* Added: Pro: Conditional Rule: New rule 'Reviewed Product Categories' added for the 'Review received' automation event. (#3922)
+* Added: Pro: Twilio Advanced Logs: Added advanced logs for Twilio webhook response and Short URL service response, to help in debugging. (#3890, #4013)
+* Added: Pagination Component: Jump to specific page number in pagination. (#2816)
+* Added: Pro: New Email Editor: Improved to reduce CORS errors. (#3791)
+* Improved: General: Overall product improvements with some core features restricted to run in specific areas. (#3776)
+* Improved: Emogrifier Library: Updated for the latest PHP versions. (#3946)
+* Improved: LiteSpeed Cache Compatibility updated. (#3994)
+* Improved: Automation Steps: Delay and Goal steps now support 'Failed' status when steps are not configured. (#3916)
+* Improved: Contact Navigation: Improved experience when navigating from contact listing to single contact and back, retaining filters. (#3892)
+* Improved: Reset Password Fallback: Added fallback for reset password link in transactional emails if 'My Account' page isn't set. (#3902)
+* Improved: Pro: Link Trigger: Allowed editing link trigger title from the overview page. (#3956)
+* Improved: Send Test Email: Required handling added for better performance. (#3961)
+* Improved: Manage Subscribe Page: Handling for when the page is selected but deleted. (#3976)
+* Improved: WooCommerce Checkout: Improved compatibility for billing & shipping fields scenarios. (#3858, #3848)
+* Improved: Cart Capturing: Optimized to handle duplicate carts. (#4027)
+* Improved: Cart Items Table: Updated merge tag handling for the latest WooCommerce version. (#3996, #4021)
+* Improved: Action Scheduler: Updated library and added extra handling to support Broadcast. (#3913, #3934)
+* Improved: Single Automation API: Optimized for better performance. (#4003, #3879)
+* Improved: Single Automation: Code optimization for move and delete steps. (#3982, #3963)
+* Improved: Send Mail Action:
+    - Extra field validation added. (#4009)
+    - Improved handling of CSS media queries. (#3869)
+* Improved: Pro: Forms Listing Page: Optimized to avoid redundant data requests. (#3859)
+* Improved: Lost Cart Handling: Modified to create new cart if old cart is lost. (#3895)
+* Improved: Essential Addons for Elementor: Added compatibility for user-created automation events. (#3905)
+* Improved: List Search: Allowed special characters in list search queries. (#3997)
+* Improved: Coupon API: Updated to get title instead of name. (#3865)
+* Improved: Engagement Meta Query: Optimized query for better performance. (#3958)
+* Improved: Cart API: Optimized contact data handling. (#3974, #3875)
+* Improved: Contact Filter: Now supports multiple custom contact field values. (#3904)
+* Fixed: Order Items Merge Tag: Supported for inline product setting determining review eligibility. (#3883)
+* Fixed: Pro: REST API: Fixed 'Add tag' issue in automation triggers. (#3854)
+* Fixed: Duplicated Carts: Handled scenarios for capturing duplicate carts. (#3881)
+* Fixed: Database Errors:
+    - During table alteration. (#3882)
+    - During cart capturing in rare cases. (#3896, #3829)
+    - While deleting automation. (#4016)
+* Fixed: Pagination Issue: Persistent issue when switching between lists in app, fixed. (#3836)
+* Fixed: Datetime Handling: Fixed handling of multiple formats in the admin app. (#3892)
+* Fixed: PHPCS & Plugin Rank: Fixed errors and warnings. (#3938)
+* Fixed: My Account Page: Fixed public CSS not loading. (#3969)
+* Fixed: Checkout Page: Fixed deprecated notices. (#4019)
+* Fixed: Textdomain Warning: Warnings fixed by early loading. (#4007)
+* Fixed: Performance Notification Email: Monthly date range issue fixed. (#3877)
+* Fixed: Pro: Broadcast Tags Filter: Tags filter text in single broadcast view fixed. (#3943)
+* Fixed: Pro: Broadcast Screen: Filters now carry forward correctly from admin app. (#3954)
+* Developer Updates: Mail Headers: Added filter hook to update mail headers. (#3851)
+* Developer Updates: Automation Duplicate Contact Wait Time: Added filter hook to modify wait time. (#3853)
+
 = 3.5.3 (Mar 21, 2025) =
-Fixed: Abandoned Cart: Modified database call to correctly fetch the last abandoned cart. (#3829)
-Fixed: Email Templates: Fixed issue where template data wasn't retained after import and closing without any modifications. (#3837)
-Fixed: Manage Subscribe Page: Fixed issue where unsubscribed lists were still being shown after a user unsubscribed from them. (#3839)
-Fixed: Automation Errors: Conditional step failures now show the reason for failure. Fixed PHP error related to getting the default language during automation execution. (#3842)
+* Fixed: Abandoned Cart: Modified database call to correctly fetch the last abandoned cart. (#3829)
+* Fixed: Email Templates: Fixed issue where template data wasn't retained after import and closing without any modifications. (#3837)
+* Fixed: Manage Subscribe Page: Fixed issue where unsubscribed lists were still being shown after a user unsubscribed from them. (#3839)
+* Fixed: Automation Errors: Conditional step failures now show the reason for failure. Fixed PHP error related to getting the default language during automation execution. (#3842)
 
 = 3.5.2 (Mar 18, 2025) =
 * Security: Fixed a database update call security issue by a logged in user. (#3812)

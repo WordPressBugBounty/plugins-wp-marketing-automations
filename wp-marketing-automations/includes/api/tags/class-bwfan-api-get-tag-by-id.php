@@ -34,14 +34,15 @@ class BWFAN_API_Get_Tag_By_ID extends BWFAN_API_Base {
 		$tag_data = BWFAN_Model_Terms::get( absint( $tag_id ) );
 		if ( empty( $tag_data ) ) {
 			$this->response_code = 404;
-
-			$response = __( 'No tag data found related with tag id:' . $tag_id, 'wp-marketing-automations' );
+			/* translators: 1: Tag ID */
+			$response = sprintf( __( 'No tag data found related with tag id: %1$d', 'wp-marketing-automations' ), $tag_id );
 
 			return $this->error_response( $response );
 		}
 
 		$this->response_code = 200;
-		$success_message     = __( 'Tag data found with tag id:' . $tag_id, 'wp-marketing-automations' );
+		/* translators: 1: Tag ID */
+		$success_message = sprintf( __( 'Tag data found with tag id: %1$d', 'wp-marketing-automations' ), $tag_id );
 
 		return $this->success_response( $tag_data, $success_message );
 	}

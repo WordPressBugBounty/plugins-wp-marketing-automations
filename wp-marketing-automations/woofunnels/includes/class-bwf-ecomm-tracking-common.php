@@ -41,7 +41,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 			add_action( 'bwf_conversion_tracking_index_completed', array( $this, 'update_conversion_table' ), 10, 2 );
 
 
-			add_action( 'wfocu_schedule_thankyou_action', array( $this, 'maybe_execute_thankyou_hook' ), 999 );
+			add_action( 'fk_fb_every_4_minute', array( $this, 'maybe_execute_thankyou_hook' ), 999 );
 
 		}
 
@@ -149,7 +149,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				WFFN_Core()->logger->log( 'migration process failed update table ' . $wpdb->last_error . ' last query ' . $wpdb->last_query, 'fk_conv_migration', true );
 			}
 
-			$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . $wpdb->prefix . 'bwf_conversion_tracking WHERE funnel_id = %d OR  source = %d', 0, 0 ) );
+			$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . $wpdb->prefix . 'bwf_conversion_tracking WHERE funnel_id = %d OR  source = %d', 0, 0 ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			if ( ! empty( $wpdb->last_error ) ) {
 				WFFN_Core()->logger->log( 'migration process failed optimised referrer table ' . $wpdb->last_error . ' last query ' . $wpdb->last_query, 'fk_conv_migration', true );
@@ -328,7 +328,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 			// Handle case if primary order already processed
 			if ( in_array( $parent_order->get_status(), wc_get_is_paid_statuses(), true ) ) {
 				global $wpdb;
-				$get_data = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}{$this->conv_table} WHERE type = %d AND source = %d", 2, $parent_order->get_id() ), ARRAY_A );
+				$get_data = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}{$this->conv_table} WHERE type = %d AND source = %d", 2, $parent_order->get_id() ), ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 				if ( $get_data ) {
 
@@ -364,7 +364,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 						/**
 						 * Copy data form parent row and modify and insert offer data
 						 */
-						$wpdb->update( "{$wpdb->prefix}{$this->conv_table}", $get_data, [ 'type' => 2, 'source' => $parent_order->get_id() ] );
+						$wpdb->update( "{$wpdb->prefix}{$this->conv_table}", $get_data, [ 'type' => 2, 'source' => $parent_order->get_id() ] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 					}
 
 					return;
@@ -754,14 +754,27 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				$get_id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$conv_table} WHERE type = 2 AND source = %d", $args['source'] ) ); //phpcs:ignore
                 if ( ! empty( $get_id ) && absint( $get_id ) > 0 ) {
 					$lastId = $get_id;
-					$wpdb->update( $conv_table, $args, [ 'id' => $get_id ] );
+					$wpdb->update( $conv_table, $args, [ 'id' => $get_id ] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				} else {
-					$inserted = $wpdb->insert( $conv_table, $args );
+					$inserted = $wpdb->insert( $conv_table, $args ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 					if ( $inserted ) {
 						$lastId = $wpdb->insert_id;
 					}
 				}
+
 				if ( ! empty( $wpdb->last_error ) ) {
+					if ( strpos( $wpdb->last_error, 'Unknown column' ) !== false ) {
+						// Regenerate column
+						$current_tables = get_option( '_bwf_db_table_list' );
+						if ( ! empty( $current_tables['tables'] ) && is_array( $current_tables['tables'] ) ) {
+							$key = array_search( $this->conv_table, $current_tables['tables'], true );
+
+							if ( $key !== false ) {
+								unset( $current_tables['tables'][ $key ] );
+								update_option( '_bwf_db_table_list', $current_tables, true );
+							}
+						}
+					}
 					BWF_Logger::get_instance()->log( 'Get last error in ' . $this->conv_table . ' : ' . $wpdb->last_error . ' --- Last query ' . $wpdb->last_query, 'woofunnel-failed-actions', 'buildwoofunnels', true );
 				}
 			} catch ( Exception $e ) {
@@ -770,7 +783,6 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 
 			return $lastId;
 		}
-
 
 		/**
 		 * @param $timezone
@@ -850,7 +862,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 			 * so we run query in conversion table and check order created by funnel
 			 */ global $wpdb;
 			$query    = $wpdb->prepare( "SELECT * from " . $wpdb->prefix . $this->conv_table . " WHERE type = %s AND source = %d", 2, $order_id );
-			$get_data = $wpdb->get_row( $query, ARRAY_A );//phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			$get_data = $wpdb->get_row( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 			if ( empty( $get_data ) ) {
 				return;
 			}
@@ -859,7 +871,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				'bwf_meta_data' => $get_data,
 			);
 
-			add_meta_box( 'bwfan_utm_info_box', __( 'Conversion Tracking', 'woofunnels' ), array(
+			add_meta_box( 'bwfan_utm_info_box', __( 'Conversion Tracking', 'woofunnels' ), array( // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				$this,
 				'order_meta_box_data'
 			), function_exists( 'wc_get_page_screen_id' ) ? wc_get_page_screen_id( 'shop-order' ) : 'shop_order', 'side', 'default', $data );
@@ -900,7 +912,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 			$offer_query = $wpdb->prepare( "SELECT events.object_type as object_type, events.id as event_id, events.object_id as object_id, events.action_type_id as action_type_id, events.value as total FROM " . $wpdb->prefix . "wfocu_event AS events
                   LEFT JOIN " . $wpdb->prefix . "wfocu_session AS session ON ( events.sess_id = session.id ) WHERE 1=1 AND events.object_type = 'offer' AND (events.action_type_id = '4' OR events.action_type_id = '6' ) AND session.order_id = %s", $order_id );
 
-			$offer_data = $wpdb->get_results( $offer_query, ARRAY_A );
+			$offer_data = $wpdb->get_results( $offer_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			if ( is_array( $offer_data ) && count( $offer_data ) > 0 ) {
 				foreach ( $offer_data as $o_item ) {
@@ -974,72 +986,72 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				$ref = explode( '?', $get_data['referrer'] );
 			}
 			$data['funnel'] = array(
-				'name'  => __( 'Funnel', 'woofunnels' ),
+				'name'  => __( 'Funnel', 'woofunnels' ),  // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'value' => $funnel
 			);
 			if ( '' !== $first_click ) {
 				$data['first_click'] = array(
-					'name'  => __( 'First Interaction', 'woofunnels' ),
+					'name'  => __( 'First Interaction', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					'value' => $first_click
 				);
 			}
 			if ( '' !== $diff ) {
 				$data['convert'] = array(
-					'name'  => __( 'Conversion Time', 'woofunnels' ),
+					'name'  => __( 'Conversion Time', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					'value' => $diff,
 				);
 			}
 			if ( isset( $get_data['utm_source'] ) && '' !== $get_data['utm_source'] ) {
 				$data['utm_source'] = array(
-					'name'  => __( 'UTM Source', 'woofunnels' ),
+					'name'  => __( 'UTM Source', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					'value' => ucfirst( $get_data['utm_source'] ),
 				);
 			}
 			if ( isset( $get_data['utm_medium'] ) && '' !== $get_data['utm_medium'] ) {
 				$data['utm_medium'] = array(
-					'name'  => __( 'UTM Medium', 'woofunnels' ),
+					'name'  => __( 'UTM Medium', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					'value' => ucfirst( $get_data['utm_medium'] ),
 				);
 			}
 			if ( isset( $get_data['utm_campaign'] ) && '' !== $get_data['utm_campaign'] ) {
 				$data['utm_campaign'] = array(
-					'name'  => __( 'UTM Campaign', 'woofunnels' ),
+					'name'  => __( 'UTM Campaign', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					'value' => $get_data['utm_campaign'],
 				);
 			}
 			if ( isset( $get_data['utm_term'] ) && '' !== $get_data['utm_term'] ) {
 				$data['utm_term'] = array(
-					'name'  => __( 'UTM Term', 'woofunnels' ),
+					'name'  => __( 'UTM Term', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					'value' => $get_data['utm_term'],
 				);
 			}
 			if ( isset( $get_data['utm_content'] ) && '' !== $get_data['utm_content'] ) {
 				$data['utm_content'] = array(
-					'name'  => __( 'UTM Content', 'woofunnels' ),
+					'name'  => __( 'UTM Content', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					'value' => $get_data['utm_content'],
 				);
 			}
 			if ( isset( $get_data['referrer'] ) && '' !== $get_data['referrer'] ) {
 				$data['referrer'] = array(
-					'name'  => __( 'Referrer', 'woofunnels' ),
+					'name'  => __( 'Referrer', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					'value' => ( is_array( $ref ) && isset( $ref[0] ) ) ? '<a href="' . $ref[0] . '" target="_blank">' . $ref[0] . '</a>' : ''
 				);
 			}
 			if ( isset( $get_data['click_id'] ) ) {
 				$data['click_id'] = array(
-					'name'  => __( 'Click ID', 'woofunnels' ),
-					'value' => ( '' !== $get_data['click_id'] ) ? __( 'Yes', 'woofunnels' ) : __( 'No', 'woofunnels' ),
+					'name'  => __( 'Click ID', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+					'value' => ( '' !== $get_data['click_id'] ) ? __( 'Yes', 'woofunnels' ) : __( 'No', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				);
 			}
 			if ( isset( $get_data['device'] ) && '' !== $get_data['device'] ) {
 				$data['device'] = array(
-					'name'  => __( 'Device', 'woofunnels' ),
+					'name'  => __( 'Device', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					'value' => ucfirst( $get_data['device'] ),
 				);
 			}
 			if ( isset( $get_data['browser'] ) && '' !== $get_data['browser'] ) {
 				$data['browser'] = array(
-					'name'  => __( 'Browser', 'woofunnels' ),
+					'name'  => __( 'Browser', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					'value' => $get_data['browser'],
 				);
 			}
@@ -1081,8 +1093,8 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				foreach ( $data as $item ) {
 					?>
                     <div>
-                        <span class="bwf-utm-lable"><?php echo $item['name'] . ': '; ?></span>
-                        <span class="bwf-utm-text"><?php echo $item['value']; ?></span>
+                        <span class="bwf-utm-lable"><?php echo esc_html($item['name']) . ': '; ?></span>
+                        <span class="bwf-utm-text"><?php echo esc_html($item['value']); ?></span>
                     </div>
 					<?php
 				}
@@ -1139,7 +1151,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				}
 			}
 			global $wpdb;
-			$wpdb->query( $wpdb->prepare( "DELETE FROM " . $wpdb->prefix . $this->conv_table . " WHERE type= 2 AND source = %1s ", $order_id ) ); //phpcs:ignore WordPress.DB.PreparedSQL
+			$wpdb->query( $wpdb->prepare( "DELETE FROM " . $wpdb->prefix . $this->conv_table . " WHERE type= 2 AND source = %1s ", $order_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 		}
 
 		public function partially_refunded_process( $order_id, $refund_id ) {
@@ -1207,7 +1219,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 			}
 
 			if ( $total_refund > 0 ) {
-				$get_totals = $wpdb->get_row( "SELECT value, checkout_total, bump_total, offer_total FROM " . $wpdb->prefix . $this->conv_table . " WHERE type = 2 AND source = " . $order_id, ARRAY_A ); //phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared*/
+				$get_totals = $wpdb->get_row( "SELECT value, checkout_total, bump_total, offer_total FROM " . $wpdb->prefix . $this->conv_table . " WHERE type = 2 AND source = " . $order_id, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 				if ( is_array( $get_totals ) && count( $get_totals ) > 0 ) {
 					/**
@@ -1230,7 +1242,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 						$update_args['checkout_total'] = $update_args['value'];
 					}
 
-					$wpdb->update( $wpdb->prefix . $this->conv_table, $update_args, [ 'type' => 2, 'source' => $order_id ] );
+					$wpdb->update( $wpdb->prefix . $this->conv_table, $update_args, [ 'type' => 2, 'source' => $order_id ] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 				}
 			}
@@ -1291,7 +1303,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
                                 ORDER BY p.post_date DESC LIMIT 0, 10", 'shop_order' );
 			}
 
-			$query_results = $wpdb->get_results( $query );
+			$query_results = $wpdb->get_results( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			if ( ! empty( $query_results ) && is_array( $query_results ) ) {
 
@@ -1364,7 +1376,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
                                 ORDER BY p.post_date DESC LIMIT 0, 10", 'shop_order' );
 					}
 
-					$wfacp_results = $wpdb->get_results( $wfacp_query );
+					$wfacp_results = $wpdb->get_results( $wfacp_query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 					if ( is_array( $wfacp_results ) && count( $wfacp_results ) > 0 ) {
 						$wfacp_report = WFACP_Reporting::get_instance();
@@ -1413,7 +1425,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
                                 ORDER BY p.post_date DESC LIMIT 0, 10", 'shop_order' );
 					}
 
-					$ob_results = $wpdb->get_results( $ob_query );
+					$ob_results = $wpdb->get_results( $ob_query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 					if ( is_array( $ob_results ) && count( $ob_results ) > 0 ) {
 						$ob_report = WFOB_Reporting::get_instance();
 						foreach ( $ob_results as $ob_result ) {

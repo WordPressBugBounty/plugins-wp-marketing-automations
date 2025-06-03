@@ -56,9 +56,9 @@ $automation_migrated = isset( $automation_meta['meta'] ) && isset( $automation_m
 							<?php /** Build via template engine */ ?>
                         </div>
 
-                        <input type="hidden" id="a_track_id" name="a_track_id" value="<?php echo $a_track_id ? esc_attr__( $a_track_id ) : 0; ?>"/>
+                        <input type="hidden" id="a_track_id" name="a_track_id" value="<?php echo $a_track_id ? esc_attr( $a_track_id ) : 0; ?>"/>
                         <input type="hidden" id="t_to_delete" name="t_to_delete" value=""/>
-                        <input type="hidden" name="automation_id" value="<?php esc_attr_e( $automation_id ); ?>"/>
+                        <input type="hidden" name="automation_id" value="<?php echo esc_attr( $automation_id ); ?>"/>
                         <input type="submit" name="test_sub" value=<?php esc_attr_e( 'Submit', 'wp-marketing-automations' ); ?> class="bwfan-display-none">
                     </form>
                     <div class="bwfan_copied_action_msg"></div>

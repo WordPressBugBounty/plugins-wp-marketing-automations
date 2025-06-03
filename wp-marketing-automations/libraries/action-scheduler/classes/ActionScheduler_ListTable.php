@@ -2,6 +2,7 @@
 
 /**
  * Implements the admin view of the actions.
+ *
  * @codeCoverageIgnore
  */
 class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
@@ -49,9 +50,8 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 	protected $runner;
 
 	/**
-	 * Bulk actions. The key of the array is the method name of the implementation:
-	 *
-	 *     bulk_<key>(array $ids, string $sql_in).
+	 * Bulk actions. The key of the array is the method name of the implementation.
+	 * Example: bulk_<key>(array $ids, string $sql_in).
 	 *
 	 * See the comments in the parent class for further details
 	 *
@@ -76,9 +76,9 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 	/**
 	 * Sets the current data store object into `store->action` and initialises the object.
 	 *
-	 * @param ActionScheduler_Store $store
-	 * @param ActionScheduler_Logger $logger
-	 * @param ActionScheduler_QueueRunner $runner
+	 * @param ActionScheduler_Store       $store Store object.
+	 * @param ActionScheduler_Logger      $logger Logger object.
+	 * @param ActionScheduler_QueueRunner $runner Runner object.
 	 */
 	public function __construct( ActionScheduler_Store $store, ActionScheduler_Logger $logger, ActionScheduler_QueueRunner $runner ) {
 
@@ -86,20 +86,20 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 		$this->logger = $logger;
 		$this->runner = $runner;
 
-		$this->table_header = __( 'Scheduled Actions', 'action-scheduler' );
+		$this->table_header = __( 'Scheduled Actions', 'woocommerce' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 
 		$this->bulk_actions = array(
-			'delete' => __( 'Delete', 'action-scheduler' ),
+			'delete' => __( 'Delete', 'woocommerce' ),  // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 		);
 
 		$this->columns = array(
-			'hook'        => __( 'Hook', 'action-scheduler' ),
-			'status'      => __( 'Status', 'action-scheduler' ),
-			'args'        => __( 'Arguments', 'action-scheduler' ),
-			'group'       => __( 'Group', 'action-scheduler' ),
-			'recurrence'  => __( 'Recurrence', 'action-scheduler' ),
-			'schedule'    => __( 'Scheduled Date', 'action-scheduler' ),
-			'log_entries' => __( 'Log', 'action-scheduler' ),
+			'hook'        => __( 'Hook', 'woocommerce' ),  // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'status'      => __( 'Status', 'woocommerce' ),  // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'args'        => __( 'Arguments', 'woocommerce' ),  // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'group'       => __( 'Group', 'woocommerce' ),  // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'recurrence'  => __( 'Recurrence', 'woocommerce' ),  // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'schedule'    => __( 'Scheduled Date', 'woocommerce' ),  // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			'log_entries' => __( 'Log', 'woocommerce' ),  // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 		);
 
 		$this->sort_by = array(
@@ -118,20 +118,20 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 
 		if ( empty( $request_status ) ) {
 			$this->sort_by[] = 'status';
-		} elseif ( in_array( $request_status, array( 'in-progress', 'failed' ) ) ) {
-			$this->columns  += array( 'claim_id' => __( 'Claim ID', 'action-scheduler' ) );
+		} elseif ( in_array( $request_status, array( 'in-progress', 'failed' ), true ) ) {
+			$this->columns  += array( 'claim_id' => __( 'Claim ID', 'woocommerce' ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			$this->sort_by[] = 'claim_id';
 		}
 
 		$this->row_actions = array(
 			'hook' => array(
-				'run' => array(
-					'name'  => __( 'Run', 'action-scheduler' ),
-					'desc'  => __( 'Process the action now as if it were run as part of a queue', 'action-scheduler' ),
+				'run'    => array(
+					'name' => __( 'Run', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+					'desc' => __( 'Process the action now as if it were run as part of a queue', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				),
 				'cancel' => array(
-					'name'  => __( 'Cancel', 'action-scheduler' ),
-					'desc'  => __( 'Cancel the action now to avoid it being run in future', 'action-scheduler' ),
+					'name'  => __( 'Cancel', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+					'desc'  => __( 'Cancel the action now to avoid it being run in future', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					'class' => 'cancel trash',
 				),
 			),
@@ -141,47 +141,70 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 			array(
 				'seconds' => YEAR_IN_SECONDS,
 				/* translators: %s: amount of time */
-				'names'   => _n_noop( '%s year', '%s years', 'action-scheduler' ),
+				'names'   => _n_noop( '%s year', '%s years', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			),
 			array(
 				'seconds' => MONTH_IN_SECONDS,
 				/* translators: %s: amount of time */
-				'names'   => _n_noop( '%s month', '%s months', 'action-scheduler' ),
+				'names'   => _n_noop( '%s month', '%s months', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			),
 			array(
 				'seconds' => WEEK_IN_SECONDS,
 				/* translators: %s: amount of time */
-				'names'   => _n_noop( '%s week', '%s weeks', 'action-scheduler' ),
+				'names'   => _n_noop( '%s week', '%s weeks', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			),
 			array(
 				'seconds' => DAY_IN_SECONDS,
 				/* translators: %s: amount of time */
-				'names'   => _n_noop( '%s day', '%s days', 'action-scheduler' ),
+				'names'   => _n_noop( '%s day', '%s days', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			),
 			array(
 				'seconds' => HOUR_IN_SECONDS,
 				/* translators: %s: amount of time */
-				'names'   => _n_noop( '%s hour', '%s hours', 'action-scheduler' ),
+				'names'   => _n_noop( '%s hour', '%s hours', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			),
 			array(
 				'seconds' => MINUTE_IN_SECONDS,
 				/* translators: %s: amount of time */
-				'names'   => _n_noop( '%s minute', '%s minutes', 'action-scheduler' ),
+				'names'   => _n_noop( '%s minute', '%s minutes', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			),
 			array(
 				'seconds' => 1,
 				/* translators: %s: amount of time */
-				'names'   => _n_noop( '%s second', '%s seconds', 'action-scheduler' ),
+				'names'   => _n_noop( '%s second', '%s seconds', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			),
 		);
 
-		parent::__construct( array(
-			'singular' => 'action-scheduler',
-			'plural'   => 'action-scheduler',
-			'ajax'     => false,
-		) );
+		parent::__construct(
+			array(
+				'singular' => 'action-scheduler',
+				'plural'   => 'action-scheduler',
+				'ajax'     => false,
+			)
+		);
+
+		add_screen_option(
+			'per_page',
+			array(
+				'default' => $this->items_per_page,
+			)
+		);
+
+		add_filter( 'set_screen_option_' . $this->get_per_page_option_name(), array( $this, 'set_items_per_page_option' ), 10, 3 );
+		set_screen_options();
 	}
 
+	/**
+	 * Handles setting the items_per_page option for this screen.
+	 *
+	 * @param mixed  $status Default false (to skip saving the current option).
+	 * @param string $option Screen option name.
+	 * @param int    $value  Screen option value.
+	 * @return int
+	 */
+	public function set_items_per_page_option( $status, $option, $value ) {
+		return $value;
+	}
 	/**
 	 * Convert an interval of seconds into a two part human friendly string.
 	 *
@@ -198,12 +221,13 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 	private static function human_interval( $interval, $periods_to_include = 2 ) {
 
 		if ( $interval <= 0 ) {
-			return __( 'Now!', 'action-scheduler' );
+			return __( 'Now!', 'woocommerce' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 		}
 
-		$output = '';
+		$output           = '';
+		$num_time_periods = count( self::$time_periods );
 
-		for ( $time_period_index = 0, $periods_included = 0, $seconds_remaining = $interval; $time_period_index < count( self::$time_periods ) && $seconds_remaining > 0 && $periods_included < $periods_to_include; $time_period_index++ ) {
+		for ( $time_period_index = 0, $periods_included = 0, $seconds_remaining = $interval; $time_period_index < $num_time_periods && $seconds_remaining > 0 && $periods_included < $periods_to_include; $time_period_index++ ) {
 
 			$periods_in_interval = floor( $seconds_remaining / self::$time_periods[ $time_period_index ]['seconds'] );
 
@@ -211,7 +235,7 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 				if ( ! empty( $output ) ) {
 					$output .= ' ';
 				}
-				$output .= sprintf( _n( self::$time_periods[ $time_period_index ]['names'][0], self::$time_periods[ $time_period_index ]['names'][1], $periods_in_interval, 'action-scheduler' ), $periods_in_interval );
+				$output            .= sprintf( translate_nooped_plural( self::$time_periods[ $time_period_index ]['names'], $periods_in_interval, 'action-scheduler' ), $periods_in_interval );
 				$seconds_remaining -= $periods_in_interval * self::$time_periods[ $time_period_index ]['seconds'];
 				$periods_included++;
 			}
@@ -223,30 +247,30 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 	/**
 	 * Returns the recurrence of an action or 'Non-repeating'. The output is human readable.
 	 *
-	 * @param ActionScheduler_Action $action
+	 * @param ActionScheduler_Action $action Action object.
 	 *
 	 * @return string
 	 */
 	protected function get_recurrence( $action ) {
 		$schedule = $action->get_schedule();
-		if ( $schedule->is_recurring() ) {
+		if ( $schedule->is_recurring() && method_exists( $schedule, 'get_recurrence' ) ) {
 			$recurrence = $schedule->get_recurrence();
 
 			if ( is_numeric( $recurrence ) ) {
 				/* translators: %s: time interval */
-				return sprintf( __( 'Every %s', 'action-scheduler' ), self::human_interval( $recurrence ) );
+				return sprintf( __( 'Every %s', 'woocommerce' ), self::human_interval( $recurrence ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			} else {
 				return $recurrence;
 			}
 		}
 
-		return __( 'Non-repeating', 'action-scheduler' );
+		return __( 'Non-repeating', 'woocommerce' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 	}
 
 	/**
 	 * Serializes the argument of an action to render it in a human friendly format.
 	 *
-	 * @param array $row The array representation of the current row of the table
+	 * @param array $row The array representation of the current row of the table.
 	 *
 	 * @return string
 	 */
@@ -257,7 +281,7 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 
 		$row_html = '<ul>';
 		foreach ( $row['args'] as $key => $value ) {
-			$row_html .= sprintf( '<li><code>%s => %s</code></li>', esc_html( var_export( $key, true ) ), esc_html( var_export( $value, true ) ) );
+			$row_html .= sprintf( '<li><code>%s => %s</code></li>', esc_html( var_export( $key, true ) ), esc_html( var_export( $value, true ) ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
 		}
 		$row_html .= '</ul>';
 
@@ -288,8 +312,8 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 	/**
 	 * Prints the logs entries inline. We do so to avoid loading Javascript and other hacks to show it in a modal.
 	 *
-	 * @param ActionScheduler_LogEntry $log_entry
-	 * @param DateTimezone $timezone
+	 * @param ActionScheduler_LogEntry $log_entry Log entry object.
+	 * @param DateTimezone             $timezone Timestamp.
 	 * @return string
 	 */
 	protected function get_log_entry_html( ActionScheduler_LogEntry $log_entry, DateTimezone $timezone ) {
@@ -301,13 +325,13 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 	/**
 	 * Only display row actions for pending actions.
 	 *
-	 * @param array  $row         Row to render
-	 * @param string $column_name Current row
+	 * @param array  $row         Row to render.
+	 * @param string $column_name Current row.
 	 *
 	 * @return string
 	 */
 	protected function maybe_render_actions( $row, $column_name ) {
-		if ( 'pending' === strtolower( $row[ 'status_name' ] ) ) {
+		if ( 'pending' === strtolower( $row['status_name'] ) ) {
 			return parent::maybe_render_actions( $row, $column_name );
 		}
 
@@ -333,12 +357,12 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 				'actionscheduler_claims',
 			);
 
-			$found_tables = $wpdb->get_col( "SHOW TABLES LIKE '{$wpdb->prefix}actionscheduler%'" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$found_tables = $wpdb->get_col( "SHOW TABLES LIKE '{$wpdb->prefix}actionscheduler%'" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			foreach ( $table_list as $table_name ) {
-				if ( ! in_array( $wpdb->prefix . $table_name, $found_tables ) ) {
+				if ( ! in_array( $wpdb->prefix . $table_name, $found_tables, true ) ) {
 					$this->admin_notices[] = array(
 						'class'   => 'error',
-						'message' => __( 'It appears one or more database tables were missing. Attempting to re-create the missing table(s).' , 'action-scheduler' ),
+						'message' => __( 'It appears one or more database tables were missing. Attempting to re-create the missing table(s).', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					);
 					$this->recreate_tables();
 					parent::display_admin_notices();
@@ -358,7 +382,7 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 						'Maximum simultaneous queues already in progress (%s queue). No additional queues will begin processing until the current queues are complete.',
 						'Maximum simultaneous queues already in progress (%s queues). No additional queues will begin processing until the current queues are complete.',
 						$claim_count,
-						'action-scheduler'
+						'woocommerce' // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					),
 					$claim_count
 				),
@@ -367,14 +391,14 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 
 			$async_request_lock_expiration = ActionScheduler::lock()->get_expiration( 'async-request-runner' );
 
-			// No lock set or lock expired
+			// No lock set or lock expired.
 			if ( false === $async_request_lock_expiration || $async_request_lock_expiration < time() ) {
-				$in_progress_url       = add_query_arg( 'status', 'in-progress', remove_query_arg( 'status' ) );
+				$in_progress_url = add_query_arg( 'status', 'in-progress', remove_query_arg( 'status' ) );
 				/* translators: %s: process URL */
-				$async_request_message = sprintf( __( 'A new queue has begun processing. <a href="%s">View actions in-progress &raquo;</a>', 'action-scheduler' ), esc_url( $in_progress_url ) );
+				$async_request_message = sprintf( __( 'A new queue has begun processing. <a href="%s">View actions in-progress &raquo;</a>', 'woocommerce' ), esc_url( $in_progress_url ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			} else {
 				/* translators: %d: seconds */
-				$async_request_message = sprintf( __( 'The next queue will begin processing in approximately %d seconds.', 'action-scheduler' ), $async_request_lock_expiration - time() );
+				$async_request_message = sprintf( __( 'The next queue will begin processing in approximately %d seconds.', 'woocommerce' ), $async_request_lock_expiration - time() ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			}
 
 			$this->admin_notices[] = array(
@@ -388,28 +412,29 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 		if ( is_array( $notification ) ) {
 			delete_transient( 'action_scheduler_admin_notice' );
 
-			$action = $this->store->fetch_action( $notification['action_id'] );
+			$action           = $this->store->fetch_action( $notification['action_id'] );
 			$action_hook_html = '<strong><code>' . $action->get_hook() . '</code></strong>';
-			if ( 1 == $notification['success'] ) {
+
+			if ( 1 === absint( $notification['success'] ) ) {
 				$class = 'updated';
 				switch ( $notification['row_action_type'] ) {
-					case 'run' :
+					case 'run':
 						/* translators: %s: action HTML */
-						$action_message_html = sprintf( __( 'Successfully executed action: %s', 'action-scheduler' ), $action_hook_html );
+						$action_message_html = sprintf( __( 'Successfully executed action: %s', 'woocommerce' ), $action_hook_html ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 						break;
-					case 'cancel' :
+					case 'cancel':
 						/* translators: %s: action HTML */
-						$action_message_html = sprintf( __( 'Successfully canceled action: %s', 'action-scheduler' ), $action_hook_html );
+						$action_message_html = sprintf( __( 'Successfully canceled action: %s', 'woocommerce' ), $action_hook_html ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 						break;
-					default :
+					default:
 						/* translators: %s: action HTML */
-						$action_message_html = sprintf( __( 'Successfully processed change for action: %s', 'action-scheduler' ), $action_hook_html );
+						$action_message_html = sprintf( __( 'Successfully processed change for action: %s', 'woocommerce' ), $action_hook_html ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 						break;
 				}
 			} else {
 				$class = 'error';
 				/* translators: 1: action HTML 2: action ID 3: error message */
-				$action_message_html = sprintf( __( 'Could not process change for action: "%1$s" (ID: %2$d). Error: %3$s', 'action-scheduler' ), $action_hook_html, esc_html( $notification['action_id'] ), esc_html( $notification['error_message'] ) );
+				$action_message_html = sprintf( __( 'Could not process change for action: "%1$s" (ID: %2$d). Error: %3$s', 'woocommerce' ), $action_hook_html, esc_html( $notification['action_id'] ), esc_html( $notification['error_message'] ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			}
 
 			$action_message_html = apply_filters( 'action_scheduler_admin_notice_html', $action_message_html, $action, $notification );
@@ -426,7 +451,7 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 	/**
 	 * Prints the scheduled date in a human friendly format.
 	 *
-	 * @param array $row The array representation of the current row of the table
+	 * @param array $row The array representation of the current row of the table.
 	 *
 	 * @return string
 	 */
@@ -437,14 +462,18 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 	/**
 	 * Get the scheduled date in a human friendly format.
 	 *
-	 * @param ActionScheduler_Schedule $schedule
+	 * @param ActionScheduler_Schedule $schedule Action's schedule.
 	 * @return string
 	 */
 	protected function get_schedule_display_string( ActionScheduler_Schedule $schedule ) {
 
 		$schedule_display_string = '';
 
-		if ( ! $schedule->get_date() ) {
+		if ( is_a( $schedule, 'ActionScheduler_NullSchedule' ) ) {
+			return __( 'async', 'woocommerce' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+		}
+
+		if ( ! method_exists( $schedule, 'get_date' ) || ! $schedule->get_date() ) {
 			return '0000-00-00 00:00:00';
 		}
 
@@ -455,27 +484,41 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 
 		if ( gmdate( 'U' ) > $next_timestamp ) {
 			/* translators: %s: date interval */
-			$schedule_display_string .= sprintf( __( ' (%s ago)', 'action-scheduler' ), self::human_interval( gmdate( 'U' ) - $next_timestamp ) );
+			$schedule_display_string .= sprintf( __( ' (%s ago)', 'woocommerce' ), self::human_interval( gmdate( 'U' ) - $next_timestamp ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 		} else {
 			/* translators: %s: date interval */
-			$schedule_display_string .= sprintf( __( ' (%s)', 'action-scheduler' ), self::human_interval( $next_timestamp - gmdate( 'U' ) ) );
+			$schedule_display_string .= sprintf( __( ' (%s)', 'woocommerce' ), self::human_interval( $next_timestamp - gmdate( 'U' ) ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 		}
 
 		return $schedule_display_string;
 	}
 
 	/**
-	 * Bulk delete
+	 * Bulk delete.
 	 *
 	 * Deletes actions based on their ID. This is the handler for the bulk delete. It assumes the data
 	 * properly validated by the callee and it will delete the actions without any extra validation.
 	 *
-	 * @param array $ids
-	 * @param string $ids_sql Inherited and unused
+	 * @param int[]  $ids Action IDs.
+	 * @param string $ids_sql Inherited and unused.
 	 */
 	protected function bulk_delete( array $ids, $ids_sql ) {
 		foreach ( $ids as $id ) {
-			$this->store->delete_action( $id );
+			try {
+				$this->store->delete_action( $id );
+			} catch ( Exception $e ) {
+				// A possible reason for an exception would include a scenario where the same action is deleted by a
+				// concurrent request.
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				error_log(
+					sprintf(
+						/* translators: 1: action ID 2: exception message. */
+						__( 'Action Scheduler was unable to delete action %1$d. Reason: %2$s', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+						$id,
+						$e->getMessage()
+					)
+				);
+			}
 		}
 	}
 
@@ -483,7 +526,7 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 	 * Implements the logic behind running an action. ActionScheduler_Abstract_ListTable validates the request and their
 	 * parameters are valid.
 	 *
-	 * @param int $action_id
+	 * @param int $action_id Action ID.
 	 */
 	protected function row_action_cancel( $action_id ) {
 		$this->process_row_action( $action_id, 'cancel' );
@@ -493,7 +536,7 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 	 * Implements the logic behind running an action. ActionScheduler_Abstract_ListTable validates the request and their
 	 * parameters are valid.
 	 *
-	 * @param int $action_id
+	 * @param int $action_id Action ID.
 	 */
 	protected function row_action_run( $action_id ) {
 		$this->process_row_action( $action_id, 'run' );
@@ -520,23 +563,23 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 	/**
 	 * Implements the logic behind processing an action once an action link is clicked on the list table.
 	 *
-	 * @param int $action_id
+	 * @param int    $action_id Action ID.
 	 * @param string $row_action_type The type of action to perform on the action.
 	 */
 	protected function process_row_action( $action_id, $row_action_type ) {
 		try {
 			switch ( $row_action_type ) {
-				case 'run' :
+				case 'run':
 					$this->runner->process_action( $action_id, 'Admin List Table' );
 					break;
-				case 'cancel' :
+				case 'cancel':
 					$this->store->cancel_action( $action_id );
 					break;
 			}
-			$success = 1;
+			$success       = 1;
 			$error_message = '';
 		} catch ( Exception $e ) {
-			$success = 0;
+			$success       = 0;
 			$error_message = $e->getMessage();
 		}
 
@@ -549,7 +592,8 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 	public function prepare_items() {
 		$this->prepare_column_headers();
 
-		$per_page = $this->get_items_per_page( $this->package . '_items_per_page', $this->items_per_page );
+		$per_page = $this->get_items_per_page( $this->get_per_page_option_name(), $this->items_per_page );
+
 		$query = array(
 			'per_page' => $per_page,
 			'offset'   => $this->get_items_offset(),
@@ -558,6 +602,16 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 			'order'    => $this->get_request_order(),
 			'search'   => $this->get_request_search_query(),
 		);
+
+		/**
+		 * Change query arguments to query for past-due actions.
+		 * Past-due actions have the 'pending' status and are in the past.
+		 * This is needed because registering 'past-due' as a status is overkill.
+		 */
+		if ( 'past-due' === $this->get_request_status() ) {
+			$query['status'] = ActionScheduler_Store::STATUS_PENDING;
+			$query['date']   = as_get_datetime_object();
+		}
 
 		$this->items = array();
 
@@ -588,18 +642,20 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 			);
 		}
 
-		$this->set_pagination_args( array(
-			'total_items' => $total_items,
-			'per_page'    => $per_page,
-			'total_pages' => ceil( $total_items / $per_page ),
-		) );
+		$this->set_pagination_args(
+			array(
+				'total_items' => $total_items,
+				'per_page'    => $per_page,
+				'total_pages' => ceil( $total_items / $per_page ),
+			)
+		);
 	}
 
 	/**
 	 * Prints the available statuses so the user can click to filter.
 	 */
 	protected function display_filter_by_status() {
-		$this->status_counts = $this->store->action_counts();
+		$this->status_counts = $this->store->action_counts() + $this->store->extra_action_counts();
 		parent::display_filter_by_status();
 	}
 
@@ -607,6 +663,13 @@ class ActionScheduler_ListTable extends ActionScheduler_Abstract_ListTable {
 	 * Get the text to display in the search box on the list table.
 	 */
 	protected function get_search_box_button_text() {
-		return __( 'Search hook, args and claim ID', 'action-scheduler' );
+		return __( 'Search hook, args and claim ID', 'woocommerce' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function get_per_page_option_name() {
+		return str_replace( '-', '_', $this->screen->id ) . '_per_page';
 	}
 }

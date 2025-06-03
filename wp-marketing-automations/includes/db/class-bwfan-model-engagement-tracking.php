@@ -25,7 +25,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 			$query[] = $wpdb->prepare( "AND cid = %d", $cid );
 			$query[] = $wpdb->prepare( "AND mode = %d", $mode );
 
-			return $wpdb->get_var( implode( ' ', $query ) ); //phpcs:ignore WordPress.DB.PreparedSQL
+			return $wpdb->get_var( implode( ' ', $query ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		public static function get_recipents_by_type( $oid, $type, $offset = 0, $limit = 25 ) {
@@ -38,7 +38,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 
 			/** Fetch Engagements total count **/
 			$query = "SELECT COUNT(conv.ID) FROM $table AS conv WHERE conv.type = $type AND conv.oid = $oid";
-			$total = absint( $wpdb->get_var( $query ) );
+			$total = absint( $wpdb->get_var( $query ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			$conversations_ids = empty( $results ) ? [] : array_column( $results, 'conversation_id' );
 			$conversions       = [];
@@ -297,7 +297,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 
 			$query = "SELECT MIN(created_at) FROM `{$wpdb->prefix}bwfan_engagement_tracking` where oid = $oid and type = $o_type";
 
-			return $wpdb->get_var( $query );
+			return $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -311,7 +311,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 
 			$query = "select count( ID ) as sent_total, sum( open ) as total_open, sum( click ) as total_click from {$wpdb->prefix}bwfan_engagement_tracking where c_status = 2 group by c_status";
 
-			return $wpdb->get_results( $query, ARRAY_A );
+			return $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -323,7 +323,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 			$engagement_table = $wpdb->prefix . 'bwfan_engagement_tracking';
 
 			$query   = "SELECT `tid`, SUM(`open`) as `opens`, SUM(`click`) as `clicks` FROM $engagement_table WHERE tid IS NOT NULL AND open > 0 GROUP BY tid ORDER BY `opens` DESC LIMIT 0,5";
-			$results = $wpdb->get_results( $query, ARRAY_A );
+			$results = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			if ( empty( $results ) ) {
 				return [];
@@ -335,7 +335,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 			$placeholders = implode( ', ', $placeholders );
 
 			$query   = $wpdb->prepare( "SELECT `ID`, `subject` FROM $template_table WHERE `ID` IN ($placeholders)", $tids );
-			$result2 = $wpdb->get_results( $query, ARRAY_A );
+			$result2 = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			$subjects = [];
 			foreach ( $result2 as $val ) {
@@ -362,42 +362,13 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 			return $res;
 		}
 
-		public static function get_last_email_open_time( $contact_id ) {
-			$query           = "SELECT o_interaction,c_interaction FROM {table_name} WHERE cid = $contact_id AND c_status = 2";
-			$results         = self::get_results( $query );
-			$last_open_time  = 0;
-			$last_click_time = 0;
-			foreach ( $results as $data ) {
-				$o_interactions = ! empty( $data['o_interaction'] ) ? json_decode( $data['o_interaction'], true ) : '';
-				$c_interaction  = ! empty( $data['c_interaction'] ) ? json_decode( $data['c_interaction'], true ) : '';
-
-				// Get last open time
-				if ( is_array( $o_interactions ) ) {
-					$max_o_interaction = max( $o_interactions );
-					if ( $max_o_interaction > $last_open_time ) {
-						$last_open_time = $max_o_interaction;
-					}
-				}
-
-				// Get last click time
-				if ( is_array( $c_interaction ) ) {
-					$max_c_interaction = max( $c_interaction );
-					if ( $max_c_interaction > $last_click_time ) {
-						$last_click_time = $max_c_interaction;
-					}
-				}
-			}
-
-			return [ 'last_open_time' => $last_open_time, 'last_click_time' => $last_click_time ];
-		}
-
 		public static function get_last_24_hours_conversations_count( $mode = 1 ) {
 			global $wpdb;
 			$start_time = date( 'Y-m-d H:i:s', strtotime( '-24 hours' ) );
 			$and_mode   = ! empty( absint( $mode ) ) ? " AND mode = $mode " : "";
 			$query      = "SELECT COUNT(ID)  FROM {$wpdb->prefix}bwfan_engagement_tracking WHERE c_status = 2 AND created_at > '$start_time' $and_mode";
 
-			return $wpdb->get_var( $query );
+			return $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		public static function get_most_interacted_template( $oid, $otype, $mode ) {
@@ -408,7 +379,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 
 			$sql = "SELECT tid, SUM($interaction) AS $interaction FROM `{$wpdb->prefix}bwfan_engagement_tracking` WHERE oid=$oid AND type=$otype AND c_status=2 GROUP BY tid ORDER BY $interaction DESC LIMIT 0, 1";
 
-			return $wpdb->get_row( $sql, ARRAY_A );
+			return $wpdb->get_row( $sql, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -418,7 +389,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 			global $wpdb;
 			$query = 'SELECT MIN(`ID`) FROM ' . self::_table();
 
-			return $wpdb->get_var( $query );
+			return $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -455,7 +426,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 				$query .= " AND ( con.created_at > '$after_date' AND con.created_at < '$end_date' ) ";
 			}
 
-			$results                  = $wpdb->get_row( $query, ARRAY_A );
+			$results                  = $wpdb->get_row( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$results['unsubscribers'] = self::get_automation_unsubscribers( $oid, $step_ids );
 
 			return $results;
@@ -475,7 +446,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 
 			$query = $wpdb->prepare( $query, $args );
 
-			return absint( $wpdb->get_var( $query ) );
+			return absint( $wpdb->get_var( $query ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		public static function get_contact_engagements( $aid, $cid, $start_date, $last_date ) {
@@ -483,7 +454,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 			$table = self::_table();
 			$query = $wpdb->prepare( "SELECT ID FROM {$table} WHERE cid = %d AND oid = %d AND type = 1 AND `created_at` BETWEEN %s AND %s", $cid, $aid, $start_date, $last_date );
 
-			return $wpdb->get_col( $query ); //phpcs:ignore WordPress.DB.PreparedSQL
+			return $wpdb->get_col( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		public static function delete_contact_engagements( $ids ) {
@@ -499,7 +470,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 
 			$query = $wpdb->prepare( "DELETE FROM {$table} WHERE ID IN ($placeholders)", $ids );
 
-			return $wpdb->query( $query ); //phpcs:ignore WordPress.DB.PreparedSQL
+			return $wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		public static function get_engagements_tid( $aid, $sids ) {
@@ -514,7 +485,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 			$args         = array_merge( $args, $sids );
 			$query        = "SELECT `sid`, `tid` FROM {$wpdb->prefix}bwfan_engagement_tracking WHERE `oid` = %d AND `type` = %d AND `sid` IN ($placeholders)";
 
-			return $wpdb->get_results( $wpdb->prepare( $query, $args ), ARRAY_A );
+			return $wpdb->get_results( $wpdb->prepare( $query, $args ), ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -595,7 +566,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 
 			$query   .= $filter_query;
 			$query   .= " ORDER BY ID DESC LIMIT {$limit} OFFSET {$offset}";
-			$results = $wpdb->get_results( $query, ARRAY_A );
+			$results = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			if ( empty( $results ) ) {
 				return array(
@@ -608,7 +579,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 			$cids = array_unique( array_column( $results, 'cid' ) );
 
 			$con_query    = $wpdb->prepare( "SELECT ID, f_name, email, l_name FROM {$wpdb->prefix}bwf_contact WHERE ID IN (" . implode( ',', array_map( 'absint', $cids ) ) . ")" );
-			$contact_data = $wpdb->get_results( $con_query, ARRAY_A );
+			$contact_data = $wpdb->get_results( $con_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			// Map contact details by ID
 			$contact_map = [];
@@ -628,7 +599,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 			}
 
 			$template      = $wpdb->prepare( "SELECT ct.ID, ct.subject, ct.title, ct.mode FROM {$wpdb->prefix}bwfan_templates AS ct WHERE ct.ID IN (" . implode( ',', array_map( 'absint', $tids ) ) . ")" );
-			$template_data = $wpdb->get_results( $template, ARRAY_A );
+			$template_data = $wpdb->get_results( $template, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			// Map subjects by ID
 			$template_map       = [];
@@ -707,7 +678,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 
 			return [
 				'data'  => $con_data,
-				'total' => $wpdb->get_var( $count . $filter_query )
+				'total' => $wpdb->get_var( $count . $filter_query ) //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			];
 		}
 
@@ -721,7 +692,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 			}
 
 
-			return $only_count ? $wpdb->get_var( $query ) : $wpdb->get_results( $query, ARRAY_A );
+			return $only_count ? $wpdb->get_var( $query ) : $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 	}
 }

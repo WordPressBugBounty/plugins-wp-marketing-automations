@@ -56,11 +56,7 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_Aelia_CS' ) ) {
 
 		public function add_currency_parameter_in_url( $url, $token ) {
 			global $wpdb;
-			$currency = $wpdb->get_var( $wpdb->prepare( "
-										SELECT currency
-										FROM {$wpdb->prefix}bwfan_abandonedcarts
-										WHERE `token` = %s
-									", $token ) );
+			$currency = $wpdb->get_var( $wpdb->prepare( "SELECT currency FROM {$wpdb->prefix}bwfan_abandonedcarts WHERE `token` = %s", $token ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			$url = add_query_arg( array(
 				'aelia_cs_currency' => $currency,

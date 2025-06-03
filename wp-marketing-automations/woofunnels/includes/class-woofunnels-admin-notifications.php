@@ -41,11 +41,11 @@ if ( ! class_exists( 'WooFunnels_Admin_Notifications' ) ) {
 		public static function hide_notices() {
 			if ( isset( $_GET['woofunnels-hide-notice'] ) && isset( $_GET['_woofunnels_notice_nonce'] ) ) {
 				if ( ! wp_verify_nonce( sanitize_text_field( $_GET['_woofunnels_notice_nonce'] ), 'woofunnels_hide_notices_nonce' ) ) {
-					wp_die( __( 'Action failed. Please refresh the page and retry.', 'woofunnels' ) );
+					wp_die( esc_html__( 'Action failed. Please refresh the page and retry.', 'woofunnels' ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				}
 
 				if ( ! current_user_can( 'manage_options' ) ) {
-					wp_die( __( 'Cheating huh?', 'woofunnels' ) );
+					wp_die( esc_html__( 'Cheating huh?', 'woofunnels' ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				}
 
 				$hide_notice = sanitize_text_field( $_GET['woofunnels-hide-notice'] );
@@ -80,7 +80,7 @@ if ( ! class_exists( 'WooFunnels_Admin_Notifications' ) ) {
 				foreach ( self::$all_notifications as $slug => $notification ) {
 					?>
 
-                    <div id="message" class="notice notice-<?php echo $notification['type']; ?>"><?php echo wp_kses_post( $notification['content'] ); ?></div>
+                    <div id="message" class="notice notice-<?php echo esc_attr($notification['type']); ?>"><?php echo wp_kses_post( $notification['content'] ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 					<?php
 				}
 			}

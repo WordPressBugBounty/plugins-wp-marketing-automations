@@ -21,7 +21,7 @@ if ( ! class_exists( 'WooFunnels_OptIn_Manager' ) ) {
 			add_action( 'admin_init', array( __CLASS__, 'maybe_push_optin_notice' ), 15 );
 			add_action( 'admin_init', array( __CLASS__, 'maybe_clear_optin' ), 15 );
 			// track usage user callback
-			add_action( 'bwf_maybe_track_usage_scheduled', array( __CLASS__, 'maybe_track_usage' ), 10, 2 );
+			add_action( 'fk_fb_every_day', array( __CLASS__, 'maybe_track_usage' ), 10, 2 );
 			add_action( 'bwf_track_usage_scheduled_single', array( __CLASS__, 'maybe_track_usage' ), 10, 2 );
 
 			//initializing schedules
@@ -63,9 +63,7 @@ if ( ! class_exists( 'WooFunnels_OptIn_Manager' ) ) {
 			} else {
 				delete_option( 'bwf_is_opted' );
 			}
-			if ( false !== wp_next_scheduled( 'bwf_maybe_track_usage_scheduled' ) ) {
-				wp_clear_scheduled_hook( 'bwf_maybe_track_usage_scheduled' );
-			}
+
 		}
 
 		/**
@@ -226,7 +224,7 @@ if ( ! class_exists( 'WooFunnels_OptIn_Manager' ) ) {
 		 */
 		public static function maybe_track_usage( $is_jit = false, $product = 'FB' ) {
 			//checking optin state
-			if ( 'yes' === self::get_optIn_state() ) {
+			if ( true === self::is_optin_allowed() && 'yes' === self::get_optIn_state() ) {
 				$data = self::collect_data();
 
 				if ( $is_jit === 'yes' ) {
@@ -239,23 +237,68 @@ if ( ! class_exists( 'WooFunnels_OptIn_Manager' ) ) {
 		}
 
 		/**
-		 * Initiate schedules in order to start tracking data regularly,
-		 * only on Mondays and only on the admin dashboard (index.php).
+		 * Initiate schedules in order to start tracking data regularly.
+		 *
 		 */
 		public static function initiate_schedules() {
 
 			// Run only in the admin dashboard
-			if ( ! is_admin() || get_current_screen()->base !== 'dashboard' ) {
-				return; // Exit if not in the admin dashboard's index.php
+
+			try {
+				if ( ! is_admin() ) {
+					return;
+				}
+				if ( ! current_user_can( 'administrator' ) ) {
+					return;
+				}
+				if ( ! wp_next_scheduled( 'fk_fb_every_day' ) ) {
+					wp_schedule_event( self::get_midnight_store_time(), 'daily', 'fk_fb_every_day' );
+				}
+				$legacy_schedules = array(
+					'wfocu_schedule_mails_for_bacs_and_cheque',
+					'wfocu_schedule_pending_emails',
+					'wfocu_schedule_normalize_order_statuses',
+					'wfocu_schedule_thankyou_action',
+					'wfocu_remove_orphaned_transients',
+					'wffn_performance_notification',
+					'wffn_remove_orphaned_transients',
+					'bwf_maybe_track_usage_scheduled',
+					'woofunnels_license_check',
+				);
+				foreach ( $legacy_schedules as $schedule ) {
+
+					if ( strpos( $schedule, 'wfocu_' ) === 0 && ! wp_next_scheduled( 'fk_fb_every_4_minute' ) ) {
+						continue;
+					}
+					if ( wp_next_scheduled( $schedule ) ) {
+						wp_clear_scheduled_hook( $schedule );
+					}
+				}
+			} catch ( Exception $e ) {
+
 			}
 
 
-			if ( current_user_can( 'administrator' ) && true === self::is_optin_allowed() && 'yes' === self::get_optIn_state() && ! wp_next_scheduled( 'bwf_maybe_track_usage_scheduled' ) ) {
-
-				wp_schedule_event( current_time( 'timestamp' ), 'weekly_bwf', 'bwf_maybe_track_usage_scheduled' );
-			}
 		}
 
+
+		/**
+		 * @return int|void
+		 */
+		public static function get_midnight_store_time() {
+
+			try {
+				$timezone = new DateTimeZone( wp_timezone_string() );
+				$date     = new DateTime();
+				$date->modify( '+1 days' );
+				$date->setTimezone( $timezone );
+				$date->setTime( 0, 0, 0 );
+
+				return $date->getTimestamp();
+			} catch ( Exception $e ) {
+
+			}
+		}
 
 		public static function is_optin_allowed() {
 			return apply_filters( 'buildwoofunnels_optin_allowed', true );
@@ -300,7 +343,7 @@ if ( ! class_exists( 'WooFunnels_OptIn_Manager' ) ) {
 		public static function register_weekly_schedule( $schedules ) {
 			$schedules['weekly_bwf'] = array(
 				'interval' => WEEK_IN_SECONDS,
-				'display'  => __( 'Weekly BWF' ),
+				'display'  => __( 'Weekly BWF', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			);
 
 			return $schedules;

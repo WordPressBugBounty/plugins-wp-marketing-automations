@@ -72,7 +72,7 @@ class BWFAN_API_Get_Recent_Recovered extends BWFAN_API_Base {
 
 		if ( $item->get_billing_first_name() || $item->get_billing_last_name() ) {
 			/* translators: 1: first name 2: last name */
-			$buyer = trim( sprintf( _x( '%1$s %2$s', 'full name', 'woocommerce' ), $item->get_billing_first_name(), $item->get_billing_last_name() ) );
+			$buyer = trim( sprintf( _x( '%1$s %2$s', 'full name', 'woocommerce' ), $item->get_billing_first_name(), $item->get_billing_last_name() ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 		} elseif ( $item->get_billing_company() ) {
 			$buyer = trim( $item->get_billing_company() );
 		} elseif ( $item->get_customer_id() ) {

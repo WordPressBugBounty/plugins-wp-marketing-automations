@@ -35,7 +35,7 @@ class BWFAN_API_Get_Recent_Contacts_Unsubscribe extends BWFAN_API_Base {
 
 		$query = "SELECT sub.recipient as email, COALESCE(con.id, 0) as id, COALESCE(con.f_name, '') as f_name, COALESCE(con.l_name, '') as l_name, sub.c_date from $unsubscribe_table as sub LEFT JOIN $contact_table as con ON sub.recipient = con.email ORDER BY sub.ID DESC LIMIT 5 OFFSET 0";
 
-		$unsubscribes = $wpdb->get_results( $query );
+		$unsubscribes = $wpdb->get_results( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		$contacts['contacts'] = $unsubscribes;
 

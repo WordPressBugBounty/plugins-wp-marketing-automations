@@ -141,7 +141,7 @@ if ( ! bwfan_is_autonami_pro_active() || version_compare( BWFAN_PRO_VERSION, '2.
 				return $full_name;
 			}
 
-			return $this->get_full_name( $contact->get_f_name(), $contact->get_l_name() );
+			return ucwords( $this->get_full_name( $contact->get_f_name(), $contact->get_l_name() ) );
 		}
 	}
 

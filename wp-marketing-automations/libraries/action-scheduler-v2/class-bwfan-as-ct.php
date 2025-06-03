@@ -90,8 +90,7 @@ class BWFAN_AS_V2 {
 		$now->modify( "-3 minutes" );
 		$date_limit = $now->format( 'Y-m-d H:i:s' );
 
-		$query = $wpdb->prepare( "SELECT `ID` FROM `{$wpdb->prefix}bwfan_automation_contact_claim` WHERE `created_at` < %s", $date_limit );
-		$ids   = $wpdb->get_col( $query );
+		$ids   = $wpdb->get_col( $wpdb->prepare( "SELECT `ID` FROM `{$wpdb->prefix}bwfan_automation_contact_claim` WHERE `created_at` < %s", $date_limit ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( empty( $ids ) ) {
 			return;
 		}
@@ -99,11 +98,10 @@ class BWFAN_AS_V2 {
 		$time = time();
 		do {
 			foreach ( $ids as $k => $id ) {
-				$query   = $wpdb->prepare( "UPDATE `{$wpdb->prefix}bwfan_automation_contact` SET `claim_id` = 0 WHERE `claim_id` = %d", $id );
-				$updated = $wpdb->query( $query );
+				$updated = $wpdb->query( $wpdb->prepare( "UPDATE `{$wpdb->prefix}bwfan_automation_contact` SET `claim_id` = 0 WHERE `claim_id` = %d", $id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				if ( 0 === intval( $updated ) ) {
 					/** No rows to update */
-					$wpdb->delete( $wpdb->prefix . 'bwfan_automation_contact_claim', [ 'ID' => $id ] );
+					$wpdb->delete( $wpdb->prefix . 'bwfan_automation_contact_claim', [ 'ID' => $id ] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 					unset( $ids[ $k ] );
 				}
 				if ( time() - 10 > $time ) {

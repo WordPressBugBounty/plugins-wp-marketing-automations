@@ -47,7 +47,7 @@ class BWFAN_Action_Controller extends BWFAN_Base_Step_Controller {
 		if ( ! $this->action_ins instanceof BWFAN_Action ) {
 			return array(
 				'status'  => BWFAN_Action::$RESPONSE_FAILED,
-				'message' => __( 'Action object not defined', 'wp-marketing-automations' ),
+				'message' => __( 'Action is not defined', 'wp-marketing-automations' ),
 			);
 		}
 
@@ -104,6 +104,8 @@ class BWFAN_Action_Controller extends BWFAN_Base_Step_Controller {
 
 			return $this->action_failed( $message );
 		}
+		// Reset automation id
+		$this->action_ins->automation_id = 0;
 
 		return $result;
 	}
@@ -222,6 +224,9 @@ class BWFAN_Action_Controller extends BWFAN_Base_Step_Controller {
 	private function action_failed( $message ) {
 		$this->attempts ++;
 		$attempt_limit = $this->action_ins->get_action_retry_data();
+
+		/** Reset automation id */
+		$this->action_ins->automation_id = 0;
 
 		if ( ! is_array( $attempt_limit ) || ( count( $attempt_limit ) < $this->attempts ) || ! isset( $attempt_limit[ $this->attempts - 1 ] ) ) {
 			return array(

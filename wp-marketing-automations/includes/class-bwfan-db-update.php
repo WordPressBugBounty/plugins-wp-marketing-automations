@@ -269,7 +269,7 @@ class BWFAN_DB_Update {
 				$query = "SELECT p.ID as id FROM {$wpdb->prefix}posts as p LEFT JOIN {$wpdb->prefix}postmeta as m ON p.ID = m.post_id WHERE p.post_type = 'shop_order' AND p.post_status NOT IN ('$post_statuses') AND m.meta_key = '_bwfan_ab_cart_recovered_a_id' $last_order ORDER BY p.`id` ASC LIMIT 10";
 			}
 
-			$order_ids = $wpdb->get_col( $query );
+			$order_ids = $wpdb->get_col( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( ! is_array( $order_ids ) || 0 === count( $order_ids ) ) {
 				bwf_options_delete( 'last_index_order' );
 				bwf_options_delete( 'is_conversion_empty' );
@@ -362,7 +362,7 @@ class BWFAN_DB_Update {
 				$last_id = intval( $last_processed_id ) > 0 ? " AND `ID` > $last_processed_id " : "";
 				$query   = "SELECT `ID`, `wctotal` AS total, `wcid` FROM `{$wpdb->prefix}bwfan_conversions` WHERE 1=1 $last_id ORDER BY `ID` ASC LIMIT 0,30";
 
-				$result = $wpdb->get_results( $query, ARRAY_A );
+				$result = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				if ( is_array( $result ) && count( $result ) > 0 ) {
 					$last_id = 0;
 					foreach ( $result as $data ) {
@@ -384,7 +384,7 @@ class BWFAN_DB_Update {
 							$order_total = BWF_Plugin_Compatibilities::get_fixed_currency_price_reverse( $order_total, $currency );
 						}
 
-						$wpdb->update( $wpdb->prefix . 'bwfan_conversions', [ 'wctotal' => $order_total ], array( 'ID' => $id ) );
+						$wpdb->update( $wpdb->prefix . 'bwfan_conversions', [ 'wctotal' => $order_total ], array( 'ID' => $id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 						$last_id = $id;
 					}
 
@@ -402,7 +402,7 @@ class BWFAN_DB_Update {
 			$last_id = intval( $last_processed_id ) > 0 ? " AND `ID` > $last_processed_id " : "";
 			$query   = "SELECT `ID`, `total`, `currency` FROM `{$wpdb->prefix}bwfan_abandonedcarts` WHERE 1=1 $last_id ORDER BY `ID` ASC LIMIT 0,30";
 
-			$result = $wpdb->get_results( $query, ARRAY_A );
+			$result = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( is_array( $result ) && count( $result ) > 0 ) {
 				$last_id = 0;
 				foreach ( $result as $data ) {
@@ -418,7 +418,7 @@ class BWFAN_DB_Update {
 						$order_total = BWF_Plugin_Compatibilities::get_fixed_currency_price_reverse( $saved_price, $currency );
 					}
 
-					$wpdb->update( $wpdb->prefix . 'bwfan_abandonedcarts', [ 'total_base' => $order_total ], array( 'ID' => $id ) );
+					$wpdb->update( $wpdb->prefix . 'bwfan_abandonedcarts', [ 'total_base' => $order_total ], array( 'ID' => $id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 					$last_id = $id;
 				}
 

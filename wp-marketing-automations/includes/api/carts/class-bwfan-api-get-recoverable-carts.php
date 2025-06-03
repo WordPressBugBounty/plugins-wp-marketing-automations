@@ -67,17 +67,18 @@ class BWFAN_API_Get_Recoverable_Carts extends BWFAN_API_Base {
 			$diff          = BWFAN_Common::get_difference_string( $diff );
 			$currency_data = BWFAN_Recoverable_Carts::get_currency( $item );
 			$total         = ! is_null( $item->total ) ? $item->total : 0;
-
-			$result[] = [
+			$fee_data      = $this->get_formatted_fee_data( $item->fees );
+			$result[]      = [
 				'id'            => ! is_null( $item->ID ) ? $item->ID : 0,
 				'email'         => ! is_null( $item->email ) ? $item->email : '',
 				'phone'         => $this->get_phone( $item ),
-				'preview'       => $this->get_preview_data( $item ),
+				'preview'       => $this->get_preview_data( $item, $fee_data['total'] ),
 				'date'          => get_date_from_gmt( $item->last_modified ),
 				'created_on'    => get_date_from_gmt( $item->created_time ),
 				'diffstring'    => $diff,
 				'status'        => ! is_null( $item->status ) ? $item->status : '',
 				'items'         => $this->get_items( $item ),
+				'fees'          => ! empty( $fee_data['data'] ) ? $fee_data['data'] : [],
 				'total'         => $total,
 				'currency'      => $currency_data,
 				'buyer_name'    => $this->get_order_name( $item ),
@@ -94,6 +95,39 @@ class BWFAN_API_Get_Recoverable_Carts extends BWFAN_API_Base {
 		return $this->success_response( $result, __( 'Recoverable carts found', 'wp-marketing-automations' ) );
 	}
 
+	/**
+	 * Get formatted fee data
+	 *
+	 * @param $data
+	 *
+	 * @return array|string
+	 */
+	public function get_formatted_fee_data( $data ) {
+		$fee_data = [
+			'data'  => [],
+			'total' => 0,
+		];
+		$data     = maybe_unserialize( $data );
+		if ( empty( $data ) || ! is_array( $data ) ) {
+			return $fee_data;
+		}
+		foreach ( $data as $fee ) {
+			if ( ! isset( $fee->name ) || empty( $fee->total ) ) {
+				continue;
+			}
+
+			$amount = floatval( $fee->total );
+			if ( ! empty( $fee->tax ) ) {
+				$amount += floatval( $fee->tax );
+			}
+
+			$fee_data['data'][ ! empty( $fee->name ) ? $fee->name : __( 'Fee', 'wp-marketing-automations' ) ] = $amount;
+			$fee_data['total']                                                                                += $amount;
+		}
+
+		return $fee_data;
+	}
+
 	public function get_recovery_link( $item ) {
 		$checkout_data = json_decode( $item->checkout_data, true );
 		if ( empty( $checkout_data ) || ! is_array( $checkout_data ) || empty( $item->token ) ) {
@@ -108,10 +142,20 @@ class BWFAN_API_Get_Recoverable_Carts extends BWFAN_API_Base {
 	public function get_phone( $item ) {
 		$checkout_data = json_decode( $item->checkout_data, true );
 
-		return ( is_array( $checkout_data ) && isset( $checkout_data['fields'] ) && is_array( $checkout_data['fields'] ) && isset( $checkout_data['fields']['billing_phone'] ) && ! empty( $checkout_data['fields']['billing_phone'] ) ) ? $checkout_data['fields']['billing_phone'] : '';
+		if ( is_array( $checkout_data ) && isset( $checkout_data['fields'] ) && is_array( $checkout_data['fields'] ) ) {
+			if ( isset( $checkout_data['fields']['billing_phone'] ) && ! empty( $checkout_data['fields']['billing_phone'] ) ) {
+				return $checkout_data['fields']['billing_phone'];
+			}
+
+			if ( isset( $checkout_data['fields']['shipping_phone'] ) && ! empty( $checkout_data['fields']['shipping_phone'] ) ) {
+				return $checkout_data['fields']['shipping_phone'];
+			}
+		}
+
+		return '';
 	}
 
-	public function get_preview_data( $item ) {
+	public function get_preview_data( $item, $fee_total = 0 ) {
 		$data          = array();
 		$billing       = array();
 		$shipping      = array();
@@ -130,6 +174,10 @@ class BWFAN_API_Get_Recoverable_Carts extends BWFAN_API_Base {
 			if ( ! empty( $fields ) ) {
 				foreach ( $fields as $key => $value ) {
 					if ( 'billing_phone' === $key ) {
+						$others[ $nice_names[ $key ] ] = $value;
+						continue;
+					}
+					if ( 'shipping_phone' === $key && isset( $fields['shipping_phone'] ) && ! empty( $fields['shipping_phone'] ) && empty( $fields['billing_phone'] ) ) {
 						$others[ $nice_names[ $key ] ] = $value;
 						continue;
 					}
@@ -169,7 +217,7 @@ class BWFAN_API_Get_Recoverable_Carts extends BWFAN_API_Base {
 				}
 			}
 		}
-		$product_total = 0;
+		$product_total = floatval( $fee_total );
 		if ( is_array( $products_data ) ) {
 			$hide_free_products = BWFAN_Common::hide_free_products_cart_order_items();
 			foreach ( $products_data as $product ) {
@@ -235,11 +283,14 @@ class BWFAN_API_Get_Recoverable_Carts extends BWFAN_API_Base {
 
 		$product_total              = $product_total - floatval( $data['discount'] );
 		$data['total']              = round( $product_total, 2 );
-		$shipping_total             = $item->shipping_total + $item->shipping_tax_total;
+		$shipping_total_value       = ! empty( $item->shipping_total ) ? floatval( $item->shipping_total ) : 0;
+		$shipping_tax_value         = ! empty( $item->shipping_tax_total ) ? floatval( $item->shipping_tax_total ) : 0;
+		$shipping_total             = $shipping_total_value + $shipping_tax_value;
 		$data['total']              = $data['total'] + $shipping_total;
 		$data['total']              = ! empty( $data['total'] ) ? number_format( $data['total'], 2, '.', '' ) : 0;
 		$data['shipping_total']     = ! empty( $shipping_total ) ? number_format( $shipping_total, 2, '.', '' ) : 0;
-		$data['shipping_tax_total'] = ! empty( $item->shipping_tax_total ) ? number_format( $item->shipping_tax_total, 2, '.', '' ) : 0;
+		$data['shipping_tax_total'] = ! empty( $shipping_tax_value ) ? number_format( $shipping_tax_value, 2, '.', '' ) : 0;
+
 
 		return $data;
 	}
@@ -259,7 +310,7 @@ class BWFAN_API_Get_Recoverable_Carts extends BWFAN_API_Base {
 			if ( ! $value['data'] instanceof WC_Product ) {
 				continue;
 			}
-			$names[ $value['data']->get_id() ] = $value['data']->get_name();
+			$names[ $value['data']->get_id() ] = wp_strip_all_tags( $value['data']->get_name() );
 		}
 
 		return $names;

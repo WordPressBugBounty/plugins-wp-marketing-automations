@@ -24,7 +24,7 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_Handle_UTM_Grabber' ) ) {
 		 * @return mixed
 		 */
 		public function bwfan_set_handle_utm_field( $fields ) {
-			$fields['handle_utm_grabber'] = __( 'Handle UTM Grabber' );
+			$fields['handle_utm_grabber'] = __( 'Handle UTM Grabber', 'wp-marketing-automations' );
 
 			return $fields;
 		}

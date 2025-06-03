@@ -555,7 +555,7 @@ if ( ! class_exists( 'WooFunnels_License_check' ) ) {
 					$parse_data = $this->get_data();
 					if ( ! empty( $parse_data['domain'] ) ) {
 						global $wpdb;
-						$db_domain = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s", 'siteurl' ) );
+						$db_domain = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s", 'siteurl' ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 						if ( ! empty( $db_domain ) && $db_domain !== $parse_data['domain'] ) {
 							$parse_data['db_domain'] = rtrim( $db_domain, '/' );

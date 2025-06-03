@@ -36,7 +36,8 @@ class BWFAN_API_Get_Event_Data extends BWFAN_API_Base {
 		}
 		$actions = BWFAN_Core()->automations->get_all_actions();
 		if ( ! isset( $actions[ $source ]['actions'] ) ) {
-			return $this->error_response( __( 'Action not found for this source ' . $source, 'wp-marketing-automations' ), null, 500 );
+			/* translators: 1: Event slug */
+			return $this->error_response( sprintf( __( 'Action not found for this source %1$s', 'wp-marketing-automations' ), $source ), null, 500 );
 		}
 
 		$event = BWFAN_Core()->sources->get_event( $event_slug );

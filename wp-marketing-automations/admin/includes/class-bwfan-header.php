@@ -194,7 +194,7 @@ final class BWFAN_Header {
 			$left_nav_data = array_filter( $left_nav_data, function ( $key ) use ( $menu_data ) {
 				return $key === 'tools' || in_array( $key, $menu_data );
 			}, ARRAY_FILTER_USE_KEY );
-			if( isset( $left_nav_data['tools'] ) && empty( $left_nav_data['tools']['items'] ) ){
+			if ( isset( $left_nav_data['tools'] ) && empty( $left_nav_data['tools']['items'] ) ) {
 				unset( $left_nav_data['tools'] );
 			}
 		}
@@ -531,7 +531,7 @@ final class BWFAN_Header {
 				'name' => __( 'Global Styles', 'wp-marketing-automations' ),
 				'link' => admin_url( 'admin.php?page=autonami&path=/global-style' ),
 			),
-			'history' => array(
+			'history'      => array(
 				'name' => __( 'Email History', 'wp-marketing-automations' ),
 				'link' => admin_url( 'admin.php?page=autonami&path=/history' ),
 			)
@@ -610,7 +610,7 @@ final class BWFAN_Header {
             <div class="bwfan_header_l1">
                 <div class="bwfan_header_l">
                     <div>
-                        <a class="bwf-breadcrumb-svg-icon" href="<?php echo admin_url( 'admin.php?page=autonami' ); ?>">
+                        <a class="bwf-breadcrumb-svg-icon" href="<?php echo esc_url( admin_url( 'admin.php?page=autonami' ) ); ?>">
                             <img src="<?php echo esc_url( plugin_dir_url( BWFAN_PLUGIN_FILE ) . 'woofunnels/assets/img/menu/funnelkit-logo.svg' ); ?>"/>
                         </a>
                     </div>
@@ -623,7 +623,7 @@ final class BWFAN_Header {
                 </div>
                 <div class="bwfan_header_r">
                     <div class="bwfan_navigation bwf-header-ellipses-wrap">
-                        <a href="<?php echo admin_url( 'admin.php?page=autonami&path=/settings' ); ?>" class="bwf-link-setting" title="Settings" data-link-type="bwf-crm">
+                        <a href="<?php echo esc_url( admin_url( 'admin.php?page=autonami&path=/settings' ) ); ?>" class="bwf-link-setting" title="Settings" data-link-type="bwf-crm">
                             <svg style="width: 24px; height: 24px; max-height: initial;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
                                 <rect width="24" height="24" fill="white"></rect>
                                 <path d="M12.0124 16.1667C9.71484 16.1667 7.84564 14.2975 7.84564 12C7.84564 9.70248 9.71484 7.83328 12.0124 7.83328C14.3097 7.83328 16.1789 9.70248 16.1789 12C16.1789 14.2975 14.3097 16.1667 12.0124 16.1667ZM12.0124 9.08328C10.4039 9.08328 9.09564 10.3917 9.09564 12C9.09564 13.6083 10.4039 14.9167 12.0124 14.9167C13.6206 14.9167 14.9289 13.6083 14.9289 12C14.9289 10.3917 13.6206 9.08328 12.0124 9.08328Z" fill="#353030"></path>
@@ -644,29 +644,29 @@ final class BWFAN_Header {
                             <path d="M14.3348 10.915C14.9768 9.53459 15.331 8.05295 15.3786 6.54899H18.4612C19.0109 6.54899 19.5188 6.2756 19.7937 5.83181C20.0683 5.38782 20.0683 4.84102 19.7937 4.39724C19.5188 3.95345 19.0109 3.68006 18.4612 3.68006H12.765L13.2795 3.38035C13.7501 3.106 14.0316 2.62185 14.0217 2.1045C14.0118 1.58709 13.7116 1.11258 13.2309 0.854169C12.7502 0.595767 12.1593 0.591345 11.6742 0.842641L4.46585 4.5769C4.36798 4.62743 4.3074 4.7233 4.3074 4.82743C4.3074 4.83818 4.30802 4.84875 4.30926 4.85932C4.51118 6.55441 4.51118 8.26503 4.30926 9.96007C4.29648 10.0667 4.34861 10.171 4.44442 10.2304C6.31962 11.3962 9.34967 11.9706 9.47784 11.9944C9.49762 11.9981 9.51781 12 9.53821 12H12.8472C13.6487 12 14.0325 11.4853 14.3348 10.915ZM9.56984 11.4264C9.2649 11.3666 6.63396 10.8323 4.94152 9.84675C5.12057 8.23085 5.12098 6.60201 4.94276 4.98611L11.9734 1.34427C12.2695 1.19076 12.6302 1.19345 12.9239 1.35118C13.2175 1.50891 13.4007 1.79863 13.4068 2.11465C13.4128 2.43049 13.2408 2.72619 12.9535 2.8937L11.5294 3.72366C11.4132 3.79168 11.3588 3.92289 11.3967 4.04604C11.4346 4.169 11.5551 4.25373 11.6924 4.25373H18.4614C18.7912 4.25373 19.096 4.4178 19.2608 4.68408C19.4256 4.95036 19.4256 5.2785 19.2608 5.54478C19.096 5.81106 18.7912 5.97513 18.4614 5.97513H15.0769C14.9078 5.97513 14.7705 6.10231 14.7691 6.25985C14.7606 7.77896 14.4227 9.28056 13.7762 10.6748C13.478 11.2366 13.2435 11.4264 12.8476 11.4264L9.56984 11.4264ZM2.7692 11.4264H0.923059C0.678488 11.426 0.443804 11.3353 0.270737 11.1739C0.0976691 11.0125 0.000411425 10.7937 0 10.5657V4.25354C0.000412111 4.02549 0.0976638 3.80667 0.270737 3.6453C0.44381 3.48392 0.678499 3.39323 0.923059 3.39285H2.7692C3.00903 3.39323 3.23939 3.48046 3.41165 3.63607C3.5839 3.79169 3.68446 4.00379 3.69208 4.22725C4.07161 6.33405 4.07161 8.48501 3.69208 10.592C3.68445 10.8154 3.5839 11.0275 3.41165 11.1832C3.2394 11.3388 3.00905 11.426 2.7692 11.4264ZM21.5386 5.40146V4.82759H24V5.40146H21.5386ZM20.6788 3.10467L22.6057 1.67625L22.9885 2.12543L21.0616 3.55385L20.6788 3.10467ZM20.6788 7.12438L21.0616 6.67521L22.9885 8.10343L22.6057 8.5528L20.6788 7.12438ZM19.3888 7.86537L19.8897 10.1126L19.287 10.2292L18.7861 7.98199L19.3888 7.86537ZM18.7861 2.24721L19.287 0L19.8897 0.116809L19.3888 2.36402L18.7861 2.24721Z" fill="#ECA717"></path>
                             <path d="M14.3348 10.915C14.9768 9.53459 15.331 8.05295 15.3786 6.54899H18.4612C19.0109 6.54899 19.5188 6.2756 19.7937 5.83181C20.0683 5.38782 20.0683 4.84102 19.7937 4.39724C19.5188 3.95345 19.0109 3.68006 18.4612 3.68006H12.765L13.2795 3.38035C13.7501 3.106 14.0316 2.62185 14.0217 2.1045C14.0118 1.58709 13.7116 1.11258 13.2309 0.854169C12.7502 0.595767 12.1593 0.591345 11.6742 0.842641L4.46585 4.5769C4.36798 4.62743 4.3074 4.7233 4.3074 4.82743C4.3074 4.83818 4.30802 4.84875 4.30926 4.85932C4.51118 6.55441 4.51118 8.26503 4.30926 9.96007C4.29648 10.0667 4.34861 10.171 4.44442 10.2304C6.31962 11.3962 9.34967 11.9706 9.47784 11.9944C9.49762 11.9981 9.51781 12 9.53821 12H12.8472C13.6487 12 14.0325 11.4853 14.3348 10.915ZM9.56984 11.4264C9.2649 11.3666 6.63396 10.8323 4.94152 9.84675C5.12057 8.23085 5.12098 6.60201 4.94276 4.98611L11.9734 1.34427C12.2695 1.19076 12.6302 1.19345 12.9239 1.35118C13.2175 1.50891 13.4007 1.79863 13.4068 2.11465C13.4128 2.43049 13.2408 2.72619 12.9535 2.8937L11.5294 3.72366C11.4132 3.79168 11.3588 3.92289 11.3967 4.04604C11.4346 4.169 11.5551 4.25373 11.6924 4.25373H18.4614C18.7912 4.25373 19.096 4.4178 19.2608 4.68408C19.4256 4.95036 19.4256 5.2785 19.2608 5.54478C19.096 5.81106 18.7912 5.97513 18.4614 5.97513H15.0769C14.9078 5.97513 14.7705 6.10231 14.7691 6.25985C14.7606 7.77896 14.4227 9.28056 13.7762 10.6748C13.478 11.2366 13.2435 11.4264 12.8476 11.4264L9.56984 11.4264ZM2.7692 11.4264H0.923059C0.678488 11.426 0.443804 11.3353 0.270737 11.1739C0.0976691 11.0125 0.000411425 10.7937 0 10.5657V4.25354C0.000412111 4.02549 0.0976638 3.80667 0.270737 3.6453C0.44381 3.48392 0.678499 3.39323 0.923059 3.39285H2.7692C3.00903 3.39323 3.23939 3.48046 3.41165 3.63607C3.5839 3.79169 3.68446 4.00379 3.69208 4.22725C4.07161 6.33405 4.07161 8.48501 3.69208 10.592C3.68445 10.8154 3.5839 11.0275 3.41165 11.1832C3.2394 11.3388 3.00905 11.426 2.7692 11.4264ZM21.5386 5.40146V4.82759H24V5.40146H21.5386ZM20.6788 3.10467L22.6057 1.67625L22.9885 2.12543L21.0616 3.55385L20.6788 3.10467ZM20.6788 7.12438L21.0616 6.67521L22.9885 8.10343L22.6057 8.5528L20.6788 7.12438ZM19.3888 7.86537L19.8897 10.1126L19.287 10.2292L18.7861 7.98199L19.3888 7.86537ZM18.7861 2.24721L19.287 0L19.8897 0.116809L19.3888 2.36402L18.7861 2.24721Z" stroke="#ECA717"></path>
                         </svg>
-                        <div class="bwf-migration-header-message">' . __( 'This automation is built using an older version of Automation Builder. Try Next-Gen Automation Builder.', 'wp-marketing-automations' ) . '</div>
+                        <div class="bwf-migration-header-message">' . esc_html__( 'This automation is built using an older version of Automation Builder. Try Next-Gen Automation Builder.', 'wp-marketing-automations' ) . '</div>
                         <a class="bwf-migration-header-button"  href="https://funnelkit.com/docs/autonami-2/automations/migrate-from-older-version/?utm_source=WordPress&utm_medium=Automation+Nextgen+Migrate&utm_campaign=FKA+Lite+Plugin" target="_blank">
-                            ' . __( 'Learn about Migrating', 'wp-marketing-automations' ) . '
+                            ' . esc_html__( 'Learn about Migrating', 'wp-marketing-automations' ) . '
                         </a>
                         <a class="bwf-migration-header-button bwf-info" id="bwf-migration-header-button" href="#" data-izimodal-open="#modal-autonami-migrator-modal" data-izimodal-title="Migrate Automation" data-izimodal-transitionin="comingIn">
-                            ' . __( 'Confirm Migration', 'wp-marketing-automations' ) . '
+                            ' . esc_html__( 'Confirm Migration', 'wp-marketing-automations' ) . '
                         </a>
                     </div>';
 			}
 			?>
-            <div class="bwfan_page_header"> Automations</div>
+            <div class="bwfan_page_header"><?php esc_html_e( 'Automations', 'wp-marketing-automations' ); ?></div>
             <div class="bwfan_header_l2 bwfan_header_l2_single">
                 <div class="bwfan_header_l">
 					<?php
 					if ( ! empty( $this->data['back_link'] ) ) {
-						echo '<span class="bwfan_header_l2_back"><a href="' . $this->data['back_link'] . '">All Automations</a></span>';
+						echo '<span class="bwfan_header_l2_back"><a href="' . esc_url( $this->data['back_link'] ) . '">' . esc_html__( 'All Automations', 'wp-marketing-automations' ) . '</a></span>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
 					echo '<span class="bwfan_header_l2_wrap">';
 					if ( ! empty( $this->data['level_2_title'] ) ) {
-						echo '<span id="bwfan_automation_name">' . $this->data['level_2_title'] . '</span>';
+						echo '<span id="bwfan_automation_name">' . $this->data['level_2_title'] . '</span>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
 					if ( ! empty( $this->data['level_2_post_title'] ) ) {
-						echo $this->data['level_2_post_title'];
+						echo $this->data['level_2_post_title']; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
 					echo '</span>';
 					if ( ( 'menu' === $this->data['level_2_right_wrap_type'] || 'both' === $this->data['level_2_right_wrap_type'] ) && 'right' !== $this->data['level_2_navigation_pos'] ) {
@@ -696,7 +696,7 @@ final class BWFAN_Header {
                 <div class="bwfan_header_r">
 					<?php
 					if ( ( 'html' === $this->data['level_2_right_wrap_type'] || 'both' === $this->data['level_2_right_wrap_type'] ) && ! empty( $this->data['level_2_right_html'] ) ) {
-						echo $this->data['level_2_right_html'];
+						echo $this->data['level_2_right_html']; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
 					?>
                 </div>
@@ -717,23 +717,25 @@ final class BWFAN_Header {
 				$active        = false;
 				if ( isset( $item['items'] ) && ! empty( $item['items'] ) ) {
 					$dropdown_data = '<span class="bwf-hover-suheader-menu">';
-					foreach ( $item['items'] as $key => $data ) {
-						$class         = $active_slug == $key ? 'bwfan_navigation_active' : '';
+					foreach ( $item['items'] as $ikey => $data ) {
+						$class         = $active_slug == $ikey ? 'bwfan_navigation_active' : '';
 						$dropdown_data .= '<a href="' . esc_url( $data['link'] ) . '" class="' . $class . '" data-link-type="bwf-crm">' . $data['name'] . '</a>';
 
-						if ( $active_slug == $key ) {
+						if ( $active_slug == $ikey ) {
 							$active = true;
 						}
 					}
 					$dropdown_data .= '</span>';
 				}
 				$mainclass = $active ? 'bwfan_navigation_active' : '';
+
 				echo '<span class="bwf-hover-submenu bwf-hover-submenu-php">
-                    <span class="' . $mainclass . '">' . $item['name'] . '</span>
-                    <svg fill="#000000" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                        <path d="M12,14.071L8.179,10.25c-0.414-0.414-1.086-0.414-1.5,0l0,0c-0.414,0.414-0.414,1.086,0,1.5l4.614,4.614 c0.391,0.391,1.024,0.391,1.414,0l4.614-4.614c0.414-0.414,0.414-1.086,0-1.5v0c-0.414-0.414-1.086-0.414-1.5,0L12,14.071z"></path>
-                    </svg> ' . $dropdown_data . '
-                </span>';
+                    <span class="' . esc_attr( $mainclass ) . '">' .
+					 $item['name'] . // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					 '</span>
+						<svg fill="#000000" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+							<path d="M12,14.071L8.179,10.25c-0.414-0.414-1.086-0.414-1.5,0l0,0c-0.414,0.414-0.414,1.086,0,1.5l4.614,4.614 c0.391,0.391,1.024,0.391,1.414,0l4.614-4.614c0.414-0.414,0.414-1.086,0-1.5v0c-0.414-0.414-1.086-0.414-1.5,0L12,14.071z"></path>
+						</svg> ' . $dropdown_data . '</span>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			} else {
 				$active = ( ! empty( $active_slug ) && $key === $active_slug ) ? 'bwfan_navigation_active' : '';
 
@@ -741,14 +743,12 @@ final class BWFAN_Header {
 
 				$target = ( isset( $item['target'] ) && ! empty( $item['target'] ) ) ? ' target="' . $item['target'] . '"' : '';
 
-				$item_link = isset( $item['link'] ) ? $item['link'] : '#';
-				$item_name = isset( $item['name'] ) ? $item['name'] : '';
+				$item_link = $item['link'] ?? '#';
+				$item_name = $item['name'] ?? '';
 
-				echo '<span><a href="' . $item_link . '" class="' . $active . '"' . $target . '>' . $icon . $item_name . '</a></span>';
+				echo '<span><a href="' . $item_link . '" class="' . $active . '"' . $target . '>' . $icon . $item_name . '</a></span>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
-
 		}
-		$active = null;
 	}
 
 	public function outputEllipsisMenu( $navigation, $active_slug = '' ) {
@@ -780,18 +780,18 @@ final class BWFAN_Header {
 									<?php
 									foreach ( $navigation as $key => $item ) {
 										?>
-                                        <a href="<?php echo $item['link']; ?>" target="<?php echo $item['target']; ?>" role="menuitem" tabindex="0" class="bwf-ellipsis-menu__item">
+                                        <a href="<?php echo esc_url( $item['link'] ); ?>" target="<?php echo esc_attr( $item['target'] ); ?>" role="menuitem" tabindex="0" class="bwf-ellipsis-menu__item">
                                             <div class="components-flex css-1ahbsz-Flex eboqfv50">
                                                 <div class="components-flex__item css-1s295sp-Item eboqfv51">
 													<?php
 													$icon = ( isset( $item['icon'] ) && ! empty( $item['icon'] ) ) ? wp_remote_retrieve_body( wp_remote_get( esc_url( plugin_dir_url( BWFAN_PLUGIN_FILE ) . 'admin/assets/img/menu/' . $item['icon'] . '.svg' ) ) ) : '';
-													echo $icon;
+													echo $icon; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 													?>
                                                 </div>
                                                 <div class="components-flex__block css-yr442k-Item-Block eboqfv52">
                                                     <div class="bwf_display_block">
-                                                        <div class="menu-item-title"><?php echo $item['name']; ?></div>
-                                                        <div class="menu-item-desc"><?php echo $item['desc']; ?></div>
+                                                        <div class="menu-item-title"><?php echo $item['name']; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
+                                                        <div class="menu-item-desc"><?php echo $item['desc']; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
                                                     </div>
                                                 </div>
                                             </div>

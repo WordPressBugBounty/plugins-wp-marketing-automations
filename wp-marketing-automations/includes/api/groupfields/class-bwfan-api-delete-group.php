@@ -50,7 +50,9 @@ class BWFAN_Api_Delete_Group extends BWFAN_API_Base {
 
 			$this->response_code = 400;
 
-			return $this->error_response( __( 'Unable to delete group with group id ' . $group_id, 'wp-marketing-automations' ) );
+			/* translators: 1: Group ID */
+
+			return $this->error_response( sprintf( __( 'Unable to delete group with group id %1$d', 'wp-marketing-automations' ), $group_id ) );
 		}
 
 		return $this->success_response( __( 'Field group deleted', 'wp-marketing-automations' ) );

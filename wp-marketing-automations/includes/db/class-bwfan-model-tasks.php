@@ -49,7 +49,7 @@ class BWFAN_Model_Tasks extends BWFAN_Model {
 		$time  = current_time( 'timestamp', 1 );
 		$table = self::_table();
 		$query = $wpdb->prepare( "SELECT MAX(`ID`) FROM {$table} WHERE `e_date` < %s AND `status` = 0", $time );
-		$count = $wpdb->get_var( $query );
+		$count = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( empty( $count ) ) {
 			return false;
 		}

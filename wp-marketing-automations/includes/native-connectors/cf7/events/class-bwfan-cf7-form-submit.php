@@ -87,7 +87,7 @@ final class BWFAN_CF7_Form_Submit extends BWFAN_Event {
 	public function get_view( $db_eventmeta_saved_value ) {
 
 		?>
-        <script type="text/html" id="tmpl-event-<?php echo esc_html__( $this->get_slug() ); ?>">
+        <script type="text/html" id="tmpl-event-<?php echo esc_html( $this->get_slug() ); ?>">
             <#
             selected_form_id = (_.has(data, 'eventSavedData') &&_.has(data.eventSavedData, 'form_id')) ? data.eventSavedData.form_id : '';
             selected_field_map = (_.has(data, 'eventSavedData') &&_.has(data.eventSavedData, 'email_map')) ? data.eventSavedData.email_map : '';
@@ -144,7 +144,7 @@ final class BWFAN_CF7_Form_Submit extends BWFAN_Event {
                 jQuery(".bwfan-cf7-field-map").hide();
                 jQuery.ajax({
                     method: 'post',
-                    url: "<?php echo admin_url( 'admin-ajax.php' ); ?>",
+                    url: "<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>",
                     datatype: "JSON",
                     data: {
                         action: 'bwfan_get_cf7_form_fields',
@@ -383,11 +383,11 @@ final class BWFAN_CF7_Form_Submit extends BWFAN_Event {
 		?>
         <li>
             <strong><?php echo esc_html__( 'Form ID:', 'wp-marketing-automations' ); ?> </strong>
-            <span><?php echo esc_html__( $global_data['form_id'] ); ?></span>
+            <span><?php echo esc_html( $global_data['form_id'] ); ?></span>
         </li>
         <li>
             <strong><?php echo esc_html__( 'Form Title:', 'wp-marketing-automations' ); ?> </strong>
-			<?php echo esc_html__( $global_data['form_title'] ); ?>
+			<?php echo esc_html( $global_data['form_title'] ); ?>
         </li>
 		<?php
 		if ( isset( $global_data['fields'] ) && is_array( $global_data['fields'] ) && count( $global_data['fields'] ) > 0 ) {
@@ -396,8 +396,8 @@ final class BWFAN_CF7_Form_Submit extends BWFAN_Event {
 				if ( ! empty( $value ) ) {
 					?>
                     <li>
-                        <strong><?php echo esc_html__( 'Field ', 'wp-marketing-automations' ) . '(' . $key; ?>): </strong>
-						<?php echo is_array( $value ) ? implode( ', ', $value ) : $value; ?>
+                        <strong><?php echo esc_html__( 'Field ', 'wp-marketing-automations' ) . '(' . esc_html( $key ); ?>): </strong>
+						<?php echo is_array( $value ) ? implode( ', ', $value ) : $value; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                     </li>
 					<?php
 					$h ++;

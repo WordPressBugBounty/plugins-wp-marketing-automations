@@ -24,10 +24,7 @@ final class BWFAN_WP_User_Login extends BWFAN_Event {
 		);
 		$this->priority               = 105.1;
 		$this->v2                     = true;
-	}
-
-	public function load_hooks() {
-		add_action( 'wp_login', array( $this, 'user_logged_in' ), 10, 2 );
+		$this->automation_add         = true;
 	}
 
 	public static function get_instance() {
@@ -36,6 +33,10 @@ final class BWFAN_WP_User_Login extends BWFAN_Event {
 		}
 
 		return self::$instance;
+	}
+
+	public function load_hooks() {
+		add_action( 'wp_login', array( $this, 'user_logged_in' ), 10, 2 );
 	}
 
 	/**
@@ -115,11 +116,11 @@ final class BWFAN_WP_User_Login extends BWFAN_Event {
 		?>
         <li>
             <strong><?php esc_html_e( 'User:', 'wp-marketing-automations' ); ?> </strong>
-            <a target="_blank" href="<?php echo admin_url( 'user-edit.php?user_id=' . $global_data['user_id'] ); //phpcs:ignore WordPress.Security.EscapeOutput ?>"><?php echo esc_html__( $user_data->user_nicename ); ?></a>
+            <a target="_blank" href="<?php echo admin_url( 'user-edit.php?user_id=' . $global_data['user_id'] ); //phpcs:ignore WordPress.Security.EscapeOutput ?>"><?php echo esc_html( $user_data->user_nicename ); ?></a>
         </li>
         <li>
             <strong><?php esc_html_e( 'Email:', 'wp-marketing-automations' ); ?> </strong>
-            <span><?php esc_html_e( $global_data['email'] ); ?></span>
+            <span><?php echo esc_html( $global_data['email'] ); ?></span>
         </li>
 		<?php
 		return ob_get_clean();
@@ -197,6 +198,46 @@ final class BWFAN_WP_User_Login extends BWFAN_Event {
 		return $automation_data;
 	}
 
+	/**
+	 * Get contact automation data for manual triggers
+	 *
+	 * @param $automation_data
+	 * @param $cid
+	 *
+	 * @return array
+	 */
+	public function get_manually_added_contact_automation_data( $automation_data, $cid ) {
+		$contact = new WooFunnels_Contact( '', '', '', $cid );
+
+		/** Check if contact exists */
+		if ( ! $contact instanceof WooFunnels_Contact || empty( $contact->get_id() ) ) {
+			return [ 'status' => 0, 'type' => 'contact_not_found' ];
+		}
+
+		$user_id = $contact->get_wpid();
+
+		/** Validate user ID */
+		if ( empty( $user_id ) || $user_id <= 0 ) {
+			return [ 'status' => 0, 'type' => 'user_not_found' ];
+		}
+
+		/**  Verify user exists */
+		$user = get_user_by( 'id', $user_id );
+		if ( ! $user instanceof WP_User ) {
+			return [ 'status' => 0, 'type' => '', 'message' => __( "Associated user no longer exists.", 'wp-marketing-automations' ) ];
+		}
+
+		/**  Set user data for the event */
+		$this->user_id = $user_id;
+		$this->user    = $user;
+
+		/** Merge automation data with user info */
+		$data = [
+			'user_id' => $user_id,
+		];
+
+		return array_merge( $automation_data, $data );
+	}
 }
 
 /**

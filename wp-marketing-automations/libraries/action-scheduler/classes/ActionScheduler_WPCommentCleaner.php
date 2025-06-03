@@ -42,10 +42,10 @@ class ActionScheduler_WPCommentCleaner {
 
 		// While there are orphaned logs left in the comments table, we need to attach the callbacks which filter comment counts.
 		add_action( 'pre_get_comments', array( self::$wp_comment_logger, 'filter_comment_queries' ), 10, 1 );
-		add_action( 'wp_count_comments', array( self::$wp_comment_logger, 'filter_comment_count' ), 20, 2 ); // run after WC_Comments::wp_count_comments() to make sure we exclude order notes and action logs
+		add_action( 'wp_count_comments', array( self::$wp_comment_logger, 'filter_comment_count' ), 20, 2 ); // run after WC_Comments::wp_count_comments() to make sure we exclude order notes and action logs.
 		add_action( 'comment_feed_where', array( self::$wp_comment_logger, 'filter_comment_feed' ), 10, 2 );
 
-		// Action Scheduler may be displayed as a Tools screen or WooCommerce > Status administration screen
+		// Action Scheduler may be displayed as a Tools screen or WooCommerce > Status administration screen.
 		add_action( 'load-tools_page_action-scheduler', array( __CLASS__, 'register_admin_notice' ) );
 		add_action( 'load-woocommerce_page_wc-status', array( __CLASS__, 'register_admin_notice' ) );
 	}
@@ -66,13 +66,23 @@ class ActionScheduler_WPCommentCleaner {
 	 * Attached to the migration complete hook 'action_scheduler/migration_complete'.
 	 */
 	public static function maybe_schedule_cleanup() {
-		if ( (bool) get_comments( array( 'type' => ActionScheduler_wpCommentLogger::TYPE, 'number' => 1, 'fields' => 'ids' ) ) ) {
-			update_option( self::$has_logs_option_key, 'yes' );
+		$has_logs = 'no';
+
+		$args = array(
+			'type'   => ActionScheduler_wpCommentLogger::TYPE,
+			'number' => 1,
+			'fields' => 'ids',
+		);
+
+		if ( (bool) get_comments( $args ) ) {
+			$has_logs = 'yes';
 
 			if ( ! as_next_scheduled_action( self::$cleanup_hook ) ) {
 				as_schedule_single_action( gmdate( 'U' ) + ( 6 * MONTH_IN_SECONDS ), self::$cleanup_hook );
 			}
 		}
+
+		update_option( self::$has_logs_option_key, $has_logs, true );
 	}
 
 	/**
@@ -80,8 +90,17 @@ class ActionScheduler_WPCommentCleaner {
 	 */
 	public static function delete_all_action_comments() {
 		global $wpdb;
-		$wpdb->delete( $wpdb->comments, array( 'comment_type' => ActionScheduler_wpCommentLogger::TYPE, 'comment_agent' => ActionScheduler_wpCommentLogger::AGENT ) );
-		delete_option( self::$has_logs_option_key );
+
+		//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->delete(
+			$wpdb->comments,
+			array(
+				'comment_type'  => ActionScheduler_wpCommentLogger::TYPE,
+				'comment_agent' => ActionScheduler_wpCommentLogger::AGENT,
+			)
+		);
+
+		update_option( self::$has_logs_option_key, 'no', true );
 	}
 
 	/**
@@ -90,7 +109,7 @@ class ActionScheduler_WPCommentCleaner {
 	public static function register_admin_notice() {
 		add_action( 'admin_notices', array( __CLASS__, 'print_admin_notice' ) );
 	}
-	
+
 	/**
 	 * Prints details about the orphaned action logs and includes information on where to learn more.
 	 */
@@ -100,12 +119,12 @@ class ActionScheduler_WPCommentCleaner {
 
 		if ( $next_scheduled_cleanup_hook ) {
 			/* translators: %s: date interval */
-			$next_cleanup_message = sprintf( __( 'This data will be deleted in %s.', 'action-scheduler' ), human_time_diff( gmdate( 'U' ), $next_scheduled_cleanup_hook ) );
+			$next_cleanup_message = sprintf( __( 'This data will be deleted in %s.', 'woocommerce' ), human_time_diff( gmdate( 'U' ), $next_scheduled_cleanup_hook ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 		}
 
 		$notice = sprintf(
 			/* translators: 1: next cleanup message 2: github issue URL */
-			__( 'Action Scheduler has migrated data to custom tables; however, orphaned log entries exist in the WordPress Comments table. %1$s <a href="%2$s">Learn more &raquo;</a>', 'action-scheduler' ),
+			__( 'Action Scheduler has migrated data to custom tables; however, orphaned log entries exist in the WordPress Comments table. %1$s <a href="%2$s">Learn more &raquo;</a>', 'woocommerce' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			$next_cleanup_message,
 			'https://github.com/woocommerce/action-scheduler/issues/368'
 		);

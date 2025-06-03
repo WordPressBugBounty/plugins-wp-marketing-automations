@@ -1,4 +1,5 @@
 <?php
+
 #[AllowDynamicProperties]
 final class BWFAN_AB_Cart_Recovered extends BWFAN_Event {
 	private static $instance = null;
@@ -236,7 +237,7 @@ final class BWFAN_AB_Cart_Recovered extends BWFAN_Event {
 			$query     = $wpdb->prepare( "SELECT p.ID as id FROM {$wpdb->prefix}posts as p LEFT JOIN {$wpdb->prefix}postmeta as m ON p.ID = m.post_id $left_join WHERE p.post_type = %s AND p.post_status NOT IN ('$post_statuses') AND m.meta_key = %s $where ORDER BY p.ID DESC LIMIT 1", 'shop_order', '_bwfan_ab_cart_recovered_a_id' );
 		}
 
-		return intval( $wpdb->get_var( $query ) );//phpcs:ignore WordPress.DB.PreparedSQL
+		return intval( $wpdb->get_var( $query ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 }

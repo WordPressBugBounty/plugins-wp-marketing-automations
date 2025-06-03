@@ -112,6 +112,13 @@ class BWFAN_Rule_All_Cart_Items_Purchased extends BWFAN_Rule_Base {
 		return $this->get_possible_rule_values();
 	}
 
+	public function get_possible_rule_values() {
+		return array(
+			'yes' => __( 'Yes', 'wp-marketing-automations' ),
+			'no'  => __( 'No', 'wp-marketing-automations' ),
+		);
+	}
+
 	public function get_rule_type() {
 		return 'Select';
 	}
@@ -164,15 +171,6 @@ class BWFAN_Rule_All_Cart_Items_Purchased extends BWFAN_Rule_Base {
 
 	public function get_possible_rule_operators() {
 		return null;
-	}
-
-	public function get_possible_rule_values() {
-		$operators = array(
-			'yes' => __( 'Yes', 'wp-marketing-automations' ),
-			'no'  => __( 'No', 'wp-marketing-automations' ),
-		);
-
-		return $operators;
 	}
 
 	public function is_match( $rule_data ) {
@@ -580,6 +578,39 @@ class BWFAN_Rule_Cart_Coupons extends BWFAN_Dynamic_Option_Base {
 		return $this->get_search_results( $term, true );
 	}
 
+	public function get_search_results( $term, $v2 = false ) {
+		$array = array();
+		$args  = array(
+			'post_type'      => 'shop_coupon',
+			'posts_per_page' => 10,
+			'paged'          => 1,
+			's'              => $term ?? '',
+		);
+
+		$posts = get_posts( $args );
+		if ( $posts && is_array( $posts ) && count( $posts ) > 0 ) {
+			foreach ( $posts as $post ) :
+				setup_postdata( $post );
+				if ( ! $v2 ) {
+					$array[] = array(
+						'id'   => (string) $post->ID,
+						'text' => $post->post_title,
+					);
+				} else {
+					$array[ $post->ID ] = $post->post_title;
+				}
+			endforeach;
+		}
+
+		if ( $v2 ) {
+			return $array;
+		}
+
+		wp_send_json( array(
+			'results' => $array,
+		) );
+	}
+
 	public function get_rule_type() {
 		return 'Search';
 	}
@@ -610,7 +641,7 @@ class BWFAN_Rule_Cart_Coupons extends BWFAN_Dynamic_Option_Base {
 
 		$used_coupons_ids = [];
 		foreach ( $used_coupons as $coupon => $value ) { //phpcs:ignore WordPressVIPMinimum.Variables.VariableAnalysis
-			$used_coupons_ids[] = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_title = %s AND post_type = 'shop_coupon' AND post_status = 'publish' LIMIT 1;", $coupon ) );
+			$used_coupons_ids[] = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_title = %s AND post_type = 'shop_coupon' AND post_status = 'publish' LIMIT 1;", $coupon ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		$result = false;
@@ -642,41 +673,6 @@ class BWFAN_Rule_Cart_Coupons extends BWFAN_Dynamic_Option_Base {
 		return 'coupon_rule';
 	}
 
-	public function get_search_results( $term, $v2 = false ) {
-		$array = array();
-		if ( isset( $term ) && '' !== $term ) {
-			$args = array(
-				'post_type'     => 'shop_coupon',
-				'post_per_page' => 2,
-				'paged'         => 1,
-				's'             => $term,
-			);
-
-			$posts = get_posts( $args );
-			if ( $posts && is_array( $posts ) && count( $posts ) > 0 ) {
-				foreach ( $posts as $post ) :
-					setup_postdata( $post );
-					if ( ! $v2 ) {
-						$array[] = array(
-							'id'   => (string) $post->ID,
-							'text' => $post->post_title,
-						);
-					} else {
-						$array[ $post->ID ] = $post->post_title;
-					}
-				endforeach;
-			}
-		}
-
-		if ( $v2 ) {
-			return $array;
-		}
-
-		wp_send_json( array(
-			'results' => $array,
-		) );
-	}
-
 	public function is_match( $rule_data ) {
 		global $wpdb;
 		$type           = $rule_data['operator'];
@@ -695,7 +691,7 @@ class BWFAN_Rule_Cart_Coupons extends BWFAN_Dynamic_Option_Base {
 
 		$used_coupons_ids = [];
 		foreach ( $used_coupons as $coupon => $value ) { //phpcs:ignore WordPressVIPMinimum.Variables.VariableAnalysis
-			$used_coupons_ids[] = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_title = %s AND post_type = 'shop_coupon' AND post_status = 'publish' LIMIT 1;", $coupon ) );
+			$used_coupons_ids[] = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_title = %s AND post_type = 'shop_coupon' AND post_status = 'publish' LIMIT 1;", $coupon ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		$result = false;
@@ -823,6 +819,13 @@ class BWFAN_Rule_Cart_Contains_Coupon extends BWFAN_Rule_Base {
 		return $this->get_possible_rule_values();
 	}
 
+	public function get_possible_rule_values() {
+		return array(
+			'yes' => __( 'Yes', 'wp-marketing-automations' ),
+			'no'  => __( 'No', 'wp-marketing-automations' ),
+		);
+	}
+
 	public function get_rule_type() {
 		return 'Select';
 	}
@@ -851,15 +854,6 @@ class BWFAN_Rule_Cart_Contains_Coupon extends BWFAN_Rule_Base {
 
 	public function get_possible_rule_operators() {
 		return null;
-	}
-
-	public function get_possible_rule_values() {
-		$operators = array(
-			'yes' => __( 'Yes', 'wp-marketing-automations' ),
-			'no'  => __( 'No', 'wp-marketing-automations' ),
-		);
-
-		return $operators;
 	}
 
 	public function is_match( $rule_data ) {
@@ -1008,6 +1002,13 @@ class BWFAN_Rule_Is_Global_Checkout extends BWFAN_Rule_Base {
 		return $this->get_possible_rule_values();
 	}
 
+	public function get_possible_rule_values() {
+		return array(
+			'yes' => __( 'Yes', 'wp-marketing-automations' ),
+			'no'  => __( 'No', 'wp-marketing-automations' ),
+		);
+	}
+
 	public function get_rule_type() {
 		return 'Select';
 	}
@@ -1037,13 +1038,6 @@ class BWFAN_Rule_Is_Global_Checkout extends BWFAN_Rule_Base {
 
 	public function get_possible_rule_operators() {
 		return null;
-	}
-
-	public function get_possible_rule_values() {
-		return array(
-			'yes' => __( 'Yes', 'wp-marketing-automations' ),
-			'no'  => __( 'No', 'wp-marketing-automations' ),
-		);
 	}
 
 	public function is_match( $rule_data ) {

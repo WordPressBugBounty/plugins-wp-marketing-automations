@@ -62,7 +62,7 @@ final class BWFAN_Automation_V2_Contact {
 		} catch ( Error $e ) {
 			$msg = "Error occurred with message {$e->getMessage()} for action id {$action_id}";
 			BWFAN_Common::log_test_data( $msg, 'automation_contact_execution_fail', true );
-			throw new Exception( $msg, 1 );
+			throw new Exception( esc_html( $msg ), 1 );
 		}
 	}
 

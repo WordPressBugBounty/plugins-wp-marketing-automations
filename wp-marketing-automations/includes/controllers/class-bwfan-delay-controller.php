@@ -13,7 +13,7 @@ class BWFAN_Delay_Controller extends BWFAN_Base_Step_Controller {
 	private $is_contact_timezone = null;
 
 	public function populate_step_data( $db_step = array() ) {
-		if ( ! parent::populate_step_data( $db_step ) || ! is_array( $this->step_data['sidebarData']['data'] ) || ! isset( $this->step_data['sidebarData']['type'] ) ) {
+		if ( ! parent::populate_step_data( $db_step ) || ! isset( $this->step_data['sidebarData']['data'] ) || ! is_array( $this->step_data['sidebarData']['data'] ) || ! isset( $this->step_data['sidebarData']['type'] ) ) {
 			return false;
 		}
 

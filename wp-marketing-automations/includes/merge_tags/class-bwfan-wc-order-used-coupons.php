@@ -31,7 +31,7 @@ class BWFAN_WC_Order_Used_Coupons extends BWFAN_Merge_Tag {
         <select id="" class="bwfan-input-wrapper bwfan-mb-15 bwfan_tag_select" name="type">
 			<?php
 			foreach ( $templates as $slug => $name ) {
-				echo '<option value="' . esc_attr__( $slug ) . '">' . esc_attr__( $name ) . '</option>';
+				echo '<option value="' . esc_attr( $slug ) . '">' . esc_attr( $name ) . '</option>';
 			}
 			?>
         </select>

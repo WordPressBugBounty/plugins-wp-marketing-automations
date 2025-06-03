@@ -24,7 +24,7 @@ class BWFAN_API_Get_Rules extends BWFAN_API_Base {
 		}
 
 		$aid = $this->get_sanitized_arg( 'automation_id' );
-
+		BWFAN_Core()->rules->load_rules_classes();
 		$rules = BWFAN_Core()->rules->get_rules( $event, absint( $aid ) );
 
 		return $this->success_response( $rules );

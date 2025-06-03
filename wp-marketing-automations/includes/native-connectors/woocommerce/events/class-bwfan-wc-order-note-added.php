@@ -100,7 +100,7 @@ final class BWFAN_WC_Order_Note_Added extends BWFAN_Event {
 		<?php } ?>
         <li>
             <strong><?php esc_html_e( 'Email:', 'wp-marketing-automations' ); ?> </strong>
-			<?php esc_html_e( $global_data['email'] ); ?>
+			<?php echo esc_html( $global_data['email'] ); ?>
         </li>
 		<?php if ( isset( $global_data['current_order_note'] ) ) { ?>
             <li>
@@ -113,9 +113,9 @@ final class BWFAN_WC_Order_Note_Added extends BWFAN_Event {
 			<?php
 
 			if ( wc_string_to_bool( $global_data['order_customer_note_type'] ) ) {
-				esc_html_e( 'Note to customer', 'woocommerce' );
+				esc_html_e( 'Note to customer', 'woocommerce' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			} else {
-				esc_html_e( 'Private note', 'woocommerce' );
+				esc_html_e( 'Private note', 'woocommerce' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			}
 			?>
         </li>
@@ -128,7 +128,7 @@ final class BWFAN_WC_Order_Note_Added extends BWFAN_Event {
 	 */
 	public function get_view( $db_eventmeta_saved_value ) {
 		?>
-        <script type="text/html" id="tmpl-event-<?php esc_attr_e( $this->get_slug() ); ?>">
+        <script type="text/html" id="tmpl-event-<?php echo esc_attr( $this->get_slug() ); ?>">
             <div class="bwfan_mt15"></div>
             <label for="bwfan-select-box-order-note" class="bwfan-label-title"><?php esc_html_e( 'Select Order Note Mode', 'wp-marketing-automations' ); ?></label>
             <div class="bwfan-select-box">
@@ -285,13 +285,18 @@ final class BWFAN_WC_Order_Note_Added extends BWFAN_Event {
 			$data_to_send['global']['order_save_note_type'] = $save_type;
 		}
 
-		$this->order                     = wc_get_order( $this->order_id );
-		$data_to_send['global']['email'] = BWFAN_Common::get_email_from_order( $this->order_id, $this->order );
-		$data_to_send['global']['phone'] = BWFAN_Common::get_phone_from_order( $this->order_id, $this->order );
-		$user_id                         = BWFAN_Common::get_wp_user_id_from_order( $this->order_id, $this->order );
+		$this->order = wc_get_order( $this->order_id );
+		$user_id     = BWFAN_Common::get_wp_user_id_from_order( $this->order_id, $this->order );
 		if ( intval( $user_id ) > 0 ) {
 			$data_to_send['global']['user_id'] = $user_id;
 		}
+
+		$email = ! empty( $user_id ) ? BWFAN_Common::get_contact_email( $user_id ) : '';
+
+		/** Set billing email if email is empty */
+		$data_to_send['global']['email'] = ! empty( $email ) ? $email : BWFAN_Common::get_email_from_order( $this->order_id, $this->order );
+		$data_to_send['global']['phone'] = BWFAN_Common::get_phone_from_order( $this->order_id, $this->order );
+
 		$order_lang = BWFAN_Common::get_order_language( $this->order );
 
 		if ( ! empty( $order_lang ) ) {

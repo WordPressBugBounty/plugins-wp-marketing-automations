@@ -61,14 +61,14 @@ class BWFAN_API_Change_Automation_Status extends BWFAN_API_Base {
 			case 're_run' === $to:
 				global $wpdb;
 				$query        = " SELECT `ID`,`cid`,`aid`,`trail`,`event`,`data` FROM {$wpdb->prefix}bwfan_automation_complete_contact WHERE `ID` = '$a_cid' ";
-				$query_result = $wpdb->get_results( $query, ARRAY_A );
+				$query_result = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				BWFAN_Common::insert_automations( $query_result );
 				$result = true;
 				break;
 			case 'startbegin' === $to:
 				global $wpdb;
 				$query        = " SELECT `ID`,`cid`,`aid`,`trail` FROM {$wpdb->prefix}bwfan_automation_contact WHERE `ID` = '$a_cid'";
-				$query_result = $wpdb->get_results( $query, ARRAY_A );
+				$query_result = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$trails       = array_column( $query_result, 'trail' );
 				BWFAN_Common::update_automation_status( array( $a_cid ), 1, $trails, current_time( 'timestamp', 1 ), true );
 				$result = true;

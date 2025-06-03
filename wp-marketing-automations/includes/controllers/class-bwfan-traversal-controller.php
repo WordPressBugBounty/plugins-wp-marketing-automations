@@ -147,6 +147,9 @@ class BWFAN_Traversal_Controller {
 			}
 		}
 
+		$goal_found_nodes = array_unique( $goal_found_nodes );
+		sort( $goal_found_nodes );
+
 		return $goal_found_nodes;
 	}
 
@@ -368,12 +371,12 @@ class BWFAN_Traversal_Controller {
 
 		$step_id = $ins->step_id;
 		$query   = $wpdb->prepare( "SELECT `ID` FROM `{$wpdb->prefix}bwfan_automation_contact_trail` WHERE `tid` = %s AND `sid` = %d LIMIT 0,1;", $ins->automation_contact['trail'], $step_id );
-		$result  = $wpdb->get_var( $query );
+		$result  = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		$valid_step_id = 0;
 		if ( ! empty( $result ) ) {
 			$query  = $wpdb->prepare( "SELECT t.`sid` FROM `{$wpdb->prefix}bwfan_automation_contact_trail` as t INNER JOIN `{$wpdb->prefix}bwfan_automation_step` as s ON s.`ID` = t.`sid` WHERE t.`tid` = %s AND t.`ID` < %d AND s.`status` IN (%d, %d) ORDER BY t.ID DESC LIMIT 0,1;", $ins->automation_contact['trail'], $result, 0, 1 );
-			$result = $wpdb->get_var( $query );
+			$result = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( ! empty( $result ) ) {
 				$valid_step_id = strval( $result );
 			}

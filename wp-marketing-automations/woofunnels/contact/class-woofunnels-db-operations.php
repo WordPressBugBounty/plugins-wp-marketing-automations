@@ -66,7 +66,7 @@ if ( ! class_exists( 'WooFunnels_DB_Operations' ) ) {
 			}
 			global $wpdb;
 
-			$inserted = $wpdb->insert( $this->contact_tbl, $contact );
+			$inserted = $wpdb->insert( $this->contact_tbl, $contact ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$lastId   = 0;
 			if ( $inserted ) {
 				$lastId = $wpdb->insert_id;
@@ -94,7 +94,7 @@ if ( ! class_exists( 'WooFunnels_DB_Operations' ) ) {
 				$update_data[ $key ] = $value;
 			}
 
-			$wpdb->update( $this->contact_tbl, $update_data, array( 'id' => $contact['id'] ) );
+			$wpdb->update( $this->contact_tbl, $update_data, array( 'id' => $contact['id'] ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			if ( $wpdb->last_error !== '' ) {
 				BWF_Logger::get_instance()->log( "Get last error in update_customer for cid: {$contact['id']} " . print_r( $wpdb->last_error, true ), 'woofunnels_indexing' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
@@ -110,7 +110,7 @@ if ( ! class_exists( 'WooFunnels_DB_Operations' ) ) {
 			global $wpdb;
 			$sql = "SELECT COUNT(id) FROM `$this->contact_tbl`";
 
-			return $wpdb->get_var( $sql ); //WPCS: unprepared SQL ok
+			return $wpdb->get_var( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -144,19 +144,19 @@ if ( ! class_exists( 'WooFunnels_DB_Operations' ) ) {
 
 			$query = implode( ' ', $query );
 
-			return $wpdb->get_results( $query ); //WPCS: unprepared SQL ok
+			return $wpdb->get_results( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		protected function get_set_cached_response( $sql, $get = 'row' ) {
 			global $wpdb;
 			if ( 'row' === $get ) {
-				$result = $wpdb->get_row( $sql );
+				$result = $wpdb->get_row( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			} elseif ( 'var' === $get ) {
-				$result = $wpdb->get_var( $sql );
+				$result = $wpdb->get_var( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			} elseif ( 'col' === $get ) {
-				$result = $wpdb->get_col( $sql );
+				$result = $wpdb->get_col( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			} else {
-				$result = $wpdb->get_results( $sql );
+				$result = $wpdb->get_results( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			}
 
 			return $result;
@@ -265,6 +265,7 @@ if ( ! class_exists( 'WooFunnels_DB_Operations' ) ) {
 
 				if ( $this->meta_id_exists( $contact_id, $meta_key ) ) {
 					$meta_exists = true;
+					//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 					$wpdb->update( $this->contact_meta_tbl, array(
 						'meta_value' => $meta_value,    //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 					), array(
@@ -280,7 +281,7 @@ if ( ! class_exists( 'WooFunnels_DB_Operations' ) ) {
 						'meta_key'   => $meta_key, //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 						'meta_value' => $meta_value, //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 					);
-					$wpdb->insert( $this->contact_meta_tbl, $contact_meta ); // WPCS: unprepared SQL ok
+					$wpdb->insert( $this->contact_meta_tbl, $contact_meta ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 				}
 			}
 
@@ -293,7 +294,7 @@ if ( ! class_exists( 'WooFunnels_DB_Operations' ) ) {
 		public function meta_id_exists( $contact_id, $meta_key ) {
 			global $wpdb;
 			$sql     = "SELECT `meta_id` FROM `$this->contact_meta_tbl` WHERE `contact_id` = '$contact_id' AND `meta_key` = '$meta_key'";
-			$meta_id = $wpdb->get_var( $sql ); // WPCS: unprepared SQL ok
+			$meta_id = $wpdb->get_var( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			return ( ! empty( $meta_id ) && $meta_id > 0 ) ? true : false;
 		}
@@ -328,6 +329,7 @@ if ( ! class_exists( 'WooFunnels_DB_Operations' ) ) {
 
 			if ( $this->meta_id_exists( $contact_id, $meta_key ) ) {
 				$meta_exists = true;
+				//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->update( $this->contact_meta_tbl, array(
 					'meta_value' => $meta_value,    //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 				), array(
@@ -343,7 +345,7 @@ if ( ! class_exists( 'WooFunnels_DB_Operations' ) ) {
 					'meta_key'   => $meta_key,      //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 					'meta_value' => $meta_value,    //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 				);
-				$inserted     = $wpdb->insert( $this->contact_meta_tbl, $contact_meta );
+				$inserted     = $wpdb->insert( $this->contact_meta_tbl, $contact_meta );//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 				$last_id      = 0;
 				if ( $inserted ) {
 					$last_id = $wpdb->insert_id;
@@ -391,7 +393,7 @@ if ( ! class_exists( 'WooFunnels_DB_Operations' ) ) {
 				'used_coupons'            => $customer['used_coupons'],
 			);
 
-			$inserted = $wpdb->insert( $this->customer_tbl, $customer_data ); // WPCS: unprepared SQL ok
+			$inserted = $wpdb->insert( $this->customer_tbl, $customer_data ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 
 			$lastId = 0;
 			if ( $inserted ) {
@@ -421,7 +423,7 @@ if ( ! class_exists( 'WooFunnels_DB_Operations' ) ) {
 				$update_data[ $key ] = $value;
 			}
 
-			$wpdb->update( $this->customer_tbl, $update_data, array( 'id' => $customer['id'] ) );
+			$wpdb->update( $this->customer_tbl, $update_data, array( 'id' => $customer['id'] ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			if ( $wpdb->last_error !== '' ) {
 				BWF_Logger::get_instance()->log( "Get last error in update_customer for cid: {$customer['cid']} " . print_r( $wpdb->last_error, true ), 'woofunnels_indexing' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
@@ -482,7 +484,7 @@ if ( ! class_exists( 'WooFunnels_DB_Operations' ) ) {
 
 			$query = implode( ' ', $query );
 
-			$customers = $wpdb->get_results( $query ); // WPCS: unprepared SQL ok
+			$customers = $wpdb->get_results( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			return $customers;
 		}
@@ -529,6 +531,7 @@ if ( ! class_exists( 'WooFunnels_DB_Operations' ) ) {
 		public function delete_contact_meta( $cid, $meta_key ) {
 			global $wpdb;
 			if ( $this->meta_id_exists( $cid, $meta_key ) ) {
+				//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->delete( $this->contact_meta_tbl, array(
 					'contact_id' => $cid,
 					'meta_key'   => $meta_key, //phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key

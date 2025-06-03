@@ -41,7 +41,9 @@ class BWFAN_API_Get_Contact_Note extends BWFAN_API_Base {
 		if ( ! $contact->is_contact_exists() ) {
 			$this->response_code = 404;
 
-			return $this->error_response( sprintf( __( 'No contact found with given id #%s', 'wp-marketing-automations' ), $contact_id ) );
+			/* translators: 1: Contact ID */
+
+			return $this->error_response( sprintf( __( 'No contact found with given id #%1$d', 'wp-marketing-automations' ), $contact_id ) );
 		}
 
 		$contact_notes = $contact->get_contact_notes_array( $offset, $limit );
@@ -49,12 +51,15 @@ class BWFAN_API_Get_Contact_Note extends BWFAN_API_Base {
 		if ( empty( $contact_notes ) ) {
 			$this->response_code = 200;
 
-			return $this->success_response( [], sprintf( __( 'No contact notes found related with contact id #%s', 'wp-marketing-automations' ), $contact_id ) );
+			/* translators: 1: Contact ID */
+
+			return $this->success_response( [], sprintf( __( 'No contact notes found related with contact id #%1$d', 'wp-marketing-automations' ), $contact_id ) );
 		}
 		$all_contact_notes   = $contact->get_contact_notes_array( 0, 0 );
 		$this->total_count   = count( $all_contact_notes );
 		$this->response_code = 200;
-		$success_message     = sprintf( __( 'Contact notes related to contact id : #%s', 'wp-marketing-automations' ), $contact_id );
+		/* translators: 1: Contact ID */
+		$success_message = sprintf( __( 'Contact notes related to contact id : #%1$d', 'wp-marketing-automations' ), $contact_id );
 
 		return $this->success_response( $contact_notes, $success_message );
 	}

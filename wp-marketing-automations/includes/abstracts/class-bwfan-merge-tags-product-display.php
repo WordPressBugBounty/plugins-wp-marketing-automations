@@ -30,7 +30,7 @@ abstract class Merge_Tag_Abstract_Product_Display extends BWFAN_Merge_Tag {
                 <select id="" class="bwfan-input-wrapper bwfan_tag_select" name="template">
 					<?php
 					foreach ( $templates as $slug => $name ) {
-						echo '<option value="' . esc_attr__( $slug ) . '">' . esc_attr__( $name ) . '</option>';
+						echo '<option value="' . esc_attr( $slug ) . '">' . esc_attr( $name ) . '</option>';
 					}
 					?>
                 </select>

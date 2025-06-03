@@ -38,7 +38,7 @@ class BWFAN_API_Sort_Group_Fields extends BWFAN_API_Base {
 		}
 		update_option( 'bwf_crm_field_sort', $this->args['field_sort'] );
 
-		return $this->success_response( $this->args['field_sort'], __( 'Fields order updated' ) );
+		return $this->success_response( $this->args['field_sort'], __( 'Fields order updated', 'wp-marketing-automations' ) );
 	}
 
 

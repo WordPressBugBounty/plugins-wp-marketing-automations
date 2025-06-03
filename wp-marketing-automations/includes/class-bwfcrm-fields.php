@@ -130,7 +130,7 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 				$address_fields[ $field['ID'] ] = array(
 					'ID'         => $field['ID'],
 					'group_id'   => $field['gid'],
-					'name'       => __( $field['name'], 'wp-marketing-automations' ),
+					'name'       => $field['name'],
 					'type'       => $field['type'],
 					'meta'       => json_decode( $field['meta'], true ),
 					'created_at' => $field['created_at'],
@@ -151,7 +151,7 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 				$return[ 'slug' === $return_by ? $field['slug'] : $field['ID'] ] = array(
 					'ID'         => absint( $field['ID'] ),
 					'group_id'   => $field['gid'],
-					'name'       => __( $field['name'], 'wp-marketing-automations' ),
+					'name'       => $field['name'],
 					'type'       => $field['type'],
 					'meta'       => json_decode( $field['meta'], true ),
 					'created_at' => $field['created_at'],
@@ -172,8 +172,8 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 		 *
 		 * @return array|null
 		 */
-		public static function get_custom_fields( $mode = null, $vmode = null, $searchable = null, $exclude_sys_fields = false, $viewable = null, $type = null ) {
-			$fields = BWFAN_Model_Fields::get_custom_fields( $mode, $vmode, $searchable, $viewable, $type );
+		public static function get_custom_fields( $mode = null, $vmode = null, $searchable = null, $exclude_sys_fields = false, $viewable = null, $type = null, $limit = 0, $offset = 0 ) {
+			$fields = BWFAN_Model_Fields::get_custom_fields( $mode, $vmode, $searchable, $viewable, $type, $limit, $offset );
 
 			$contact_fields = array_keys( self::$contact_fields );
 			$address_fields = array_keys( self::$contact_address_fields );
@@ -192,7 +192,7 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 				$field_data[ $field['ID'] ] = array(
 					'group_id'   => $field['gid'],
 					'ID'         => $field['ID'],
-					'name'       => __( $field['name'], 'wp-marketing-automations' ),
+					'name'       => $field['name'],
 					'type'       => $field['type'],
 					'search'     => $field['search'],
 					'meta'       => json_decode( $field['meta'], true ),
@@ -236,10 +236,10 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 			$field_data = array();
 			foreach ( $fields as $field ) {
 				$field_data['id']       = $field['gid'];
-				$field_data['name']     = __( $field['group_name'], 'wp-marketing-automations' );
+				$field_data['name']     = $field['group_name'];
 				$field_data['fields'][] = array(
 					'id'   => $field['field_id'],
-					'name' => __( $field['name'], 'wp-marketing-automations' ),
+					'name' => $field['name'],
 					'type' => $field['type'],
 					'meta' => json_decode( $field['meta'] ),
 				);
@@ -289,10 +289,10 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 					if ( true !== $mapping ) {
 						$val = $field_name;
 					}
-					$field_data[0]['fields'][ $field_key ] = __( $val, 'wp-marketing-automations' );
+					$field_data[0]['fields'][ $field_key ] = $val;
 				} else {
 					$field_data[0]['fields'][ $field_from_db['ID'] ] = array(
-						'name'       => __( $field_from_db['name'], 'wp-marketing-automations' ),
+						'name'       => $field_from_db['name'],
 						'slug'       => $field_from_db['slug'],
 						'type'       => $field_from_db['type'],
 						'meta'       => json_decode( $field_from_db['meta'], true ),
@@ -313,16 +313,16 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 				$group_name = __( 'General', 'wp-marketing-automations' );
 				if ( ! empty( $field['gid'] ) ) {
 					$group_id   = $field['gid'];
-					$group_name = __( $field['group_name'], 'wp-marketing-automations' );
+					$group_name = $field['group_name'];
 				}
 				$field_data[ $group_id ]['id']   = $group_id;
-				$field_data[ $group_id ]['name'] = __( $group_name, 'wp-marketing-automations' );
+				$field_data[ $group_id ]['name'] = $group_name;
 				/** Remove default contact field from general group if default contact field is in other groups */
 				if ( 0 !== absint( $field['gid'] ) && in_array( $field['slug'], array_keys( self::$contact_fields ), false ) ) {
 					unset( $field_data[0]['fields'][ $field['field_id'] ] );
 				}
 				$field_data[ $group_id ]['fields'][ $field['field_id'] ] = array(
-					'name'       => __( $field['name'], 'wp-marketing-automations' ),
+					'name'       => $field['name'],
 					'slug'       => $field['slug'],
 					'type'       => $field['type'],
 					'search'     => $field['search'],
@@ -332,16 +332,16 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 				);
 
 				if ( true === $mapping && self::$TYPE_DATE === intval( $field['type'] ) ) {
-					$field_data[ $group_id ]['fields'][ $field['field_id'] ]['name'] = __( $field['name'] . ' (Y-m-d)', 'wp-marketing-automations' );
+					$field_data[ $group_id ]['fields'][ $field['field_id'] ]['name'] = $field['name'] . ' (Y-m-d)';
 				}
 				if ( true === $mapping && self::$TYPE_NUMBER === intval( $field['type'] ) ) {
-					$field_data[ $group_id ]['fields'][ $field['field_id'] ]['name'] = __( $field['name'] . ' (number)', 'wp-marketing-automations' );
+					$field_data[ $group_id ]['fields'][ $field['field_id'] ]['name'] = $field['name'] . ' (number)';
 				}
 				if ( true === $mapping && self::$TYPE_DATETIME === intval( $field['type'] ) ) {
-					$field_data[ $group_id ]['fields'][ $field['field_id'] ]['name'] = __( $field['name'] . ' (Y-m-d H:i:s)', 'wp-marketing-automations' );
+					$field_data[ $group_id ]['fields'][ $field['field_id'] ]['name'] = $field['name'] . ' (Y-m-d H:i:s)';
 				}
 				if ( true === $mapping && self::$TYPE_TIME === intval( $field['type'] ) ) {
-					$field_data[ $group_id ]['fields'][ $field['field_id'] ]['name'] = __( $field['name'] . ' (H:i)', 'wp-marketing-automations' );
+					$field_data[ $group_id ]['fields'][ $field['field_id'] ]['name'] = $field['name'] . ' (H:i)';
 				}
 			}
 
@@ -351,7 +351,7 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 
 			foreach ( $without_fields_groups as $group ) {
 				$field_data[ $group['id'] ]['id']     = $group['id'];
-				$field_data[ $group['id'] ]['name']   = __( $group['name'], 'wp-marketing-automations' );
+				$field_data[ $group['id'] ]['name']   = $group['name'];
 				$field_data[ $group['id'] ]['fields'] = array();
 			}
 
@@ -379,7 +379,7 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 					$group_id = 0;
 				}
 				$field_sort[ $group_id ]['id']   = $group_id;
-				$field_sort[ $group_id ]['name'] = __( $field_data[ $group_id ]['name'], 'wp-marketing-automations' );
+				$field_sort[ $group_id ]['name'] = $field_data[ $group_id ]['name'];
 				if ( ! isset( $field_sort[ $group_id ]['fields'] ) ) {
 					$field_sort[ $group_id ]['fields'] = array();
 				}
@@ -390,10 +390,10 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 				/** Hard adding Email and Creation date at the top */
 				if ( 0 === $group_id ) {
 					if ( isset( $field_data[0] ) && isset( $field_data[0]['fields'] ) && isset( $field_data[0]['fields']['email'] ) ) {
-						$field_sort[ $group_id ]['fields']['email'] = __( $field_data[0]['fields']['email'], 'wp-marketing-automations' );
+						$field_sort[ $group_id ]['fields']['email'] = $field_data[0]['fields']['email'];
 					}
 					if ( isset( $field_data[0] ) && isset( $field_data[0]['fields'] ) && isset( $field_data[0]['fields']['creation_date'] ) ) {
-						$field_sort[ $group_id ]['fields']['creation_date'] = __( $field_data[0]['fields']['creation_date'], 'wp-marketing-automations' );
+						$field_sort[ $group_id ]['fields']['creation_date'] = $field_data[0]['fields']['creation_date'];
 					}
 				}
 
@@ -420,7 +420,7 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 								if ( true === $mapping && 'country' === $index ) {
 									$field_sort[ $group_id ]['fields'][ $index ] = $candidate_field;
 								} else {
-									$field_sort[ $group_id ]['fields'][ $index ] = __( self::get_address_fields()[ $index ], 'wp-marketing-automations' );
+									$field_sort[ $group_id ]['fields'][ $index ] = self::get_address_fields()[ $index ];
 								}
 								unset( $field_data[ $group_id ]['fields'][ $index ] );
 							}
@@ -498,7 +498,7 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 					if ( is_string( $field ) ) {
 						$new_group['fields'][] = array(
 							'id'        => $field_id,
-							'name'      => __( $field, 'wp-marketing-automations' ),
+							'name'      => $field,
 							'merge_tag' => BWFAN_Core()->merge_tags->get_field_tag( $field_id ),
 						);
 					}
@@ -516,7 +516,7 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 			$field = self::get_fieldby_name( $field_name );
 
 			if ( ! empty( $field ) ) {
-				return BWFAN_Common::crm_error( __( 'Field already exists' ) );
+				return BWFAN_Common::crm_error( __( 'Field already exists', 'wp-marketing-automations' ) );
 			}
 			$meta = array();
 			if ( ! empty( $options ) ) {
@@ -751,7 +751,7 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 
 		public static function delete_unwanted_field_columns() {
 			global $wpdb;
-			$cols = $wpdb->get_col( "DESC {$wpdb->prefix}bwf_contact_fields", 0 );
+			$cols = $wpdb->get_col( "DESC {$wpdb->prefix}bwf_contact_fields", 0 ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$cols = array_diff( $cols, array( 'ID', 'cid' ) );
 			if ( empty( $cols ) ) {
 				return;
@@ -763,7 +763,7 @@ if ( ! class_exists( 'BWFCRM_Fields' ) && BWFAN_Common::is_pro_3_0() ) {
 			$cols        = array_values( $cols );
 			$cols_string = implode( ',', $cols );
 
-			$fields = $wpdb->get_results( "SELECT ID FROM {$wpdb->prefix}bwfan_fields WHERE ID in ($cols_string)" );
+			$fields = $wpdb->get_results( "SELECT ID FROM {$wpdb->prefix}bwfan_fields WHERE ID in ($cols_string)" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( empty( $fields ) ) {
 				return;
 			}

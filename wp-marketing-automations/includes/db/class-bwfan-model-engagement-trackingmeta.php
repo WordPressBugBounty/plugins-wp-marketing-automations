@@ -12,7 +12,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Trackingmeta' ) && BWFAN_Common::is
 				$meta_key_query = "meta_key = '$key'";
 			}
 
-			return $wpdb->get_results( "SELECT meta_key, meta_value from $table WHERE $meta_key_query AND eid=$con_id", ARRAY_A );
+			return $wpdb->get_results( "SELECT meta_key, meta_value from $table WHERE $meta_key_query AND eid=$con_id", ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		static function get_merge_tags( $con_id ) {
@@ -57,7 +57,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Trackingmeta' ) && BWFAN_Common::is
 
 			$query = $wpdb->prepare( "DELETE FROM {$table} WHERE eid IN ($placeholders)", $ids );
 
-			return $wpdb->query( $query ); //phpcs:ignore WordPress.DB.PreparedSQL
+			return $wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 	}
 }

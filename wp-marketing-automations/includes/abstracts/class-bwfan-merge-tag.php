@@ -88,7 +88,7 @@ abstract class BWFAN_Merge_Tag {
 					<?php
 					foreach ( $time_types as $value1 => $text ) {
 						?>
-                        <option value="<?php echo esc_attr__( $value1 ); ?>"><?php echo esc_attr__( $text ); ?></option>
+                        <option value="<?php echo esc_attr( $value1 ); ?>"><?php echo esc_attr( $text ); ?></option>
 						<?php
 					}
 					?>

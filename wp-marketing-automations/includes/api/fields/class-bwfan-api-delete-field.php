@@ -37,7 +37,9 @@ class BWFAN_Api_Delete_Field extends BWFAN_API_Base {
 
 			$this->response_code = 400;
 
-			return $this->error_response( __( 'Unable to delete field with id #' . $field_id, 'wp-marketing-automations' ) );
+			/* translators: 1: Field ID */
+
+			return $this->error_response( sprintf( __( 'Unable to delete field with id #%1$d', 'wp-marketing-automations' ), $field_id ) );
 		}
 
 		return $this->success_response( __( 'Field deleted', 'wp-marketing-automations' ) );

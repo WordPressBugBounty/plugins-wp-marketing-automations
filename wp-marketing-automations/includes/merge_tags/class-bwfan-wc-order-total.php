@@ -37,7 +37,7 @@ class BWFAN_WC_Order_Total extends BWFAN_Merge_Tag {
         <select id="" class="bwfan-input-wrapper bwfan-mb-15 bwfan_tag_select" name="price">
 			<?php
 			foreach ( $templates as $slug => $name ) {
-				echo '<option value="' . esc_attr__( $slug ) . '">' . esc_html__( $name ) . '</option>';
+				echo '<option value="' . esc_attr( $slug ) . '">' . esc_html( $name ) . '</option>';
 			}
 			?>
         </select>

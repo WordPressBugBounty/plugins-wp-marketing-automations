@@ -89,7 +89,8 @@ class BWFAN_API_Send_Test_Notification extends BWFAN_API_Base {
 				$sent[ $frequency ] = true;
 				break;
 			} else {
-				$errors->add( $frequency, sprintf( __( 'Unable to send test notification for frequency: %s', 'wp-marketing-automations' ), $frequency ) );
+				/* translators: 1: Frequency */
+				$errors->add( $frequency, sprintf( __( 'Unable to send test notification for frequency: %1$s', 'wp-marketing-automations' ), $frequency ) );
 			}
 		}
 

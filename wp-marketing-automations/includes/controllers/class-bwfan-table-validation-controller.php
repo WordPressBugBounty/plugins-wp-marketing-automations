@@ -76,7 +76,7 @@ class BWFAN_Table_Validation_Controller {
 
 		$placeholders    = implode( ',', array_fill( 0, count( $table_names ), '%s' ) );
 		$query           = $wpdb->prepare( "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = %s AND TABLE_NAME IN ($placeholders)", array_merge( [ $db_name ], $table_names ) );
-		$existing_tables = $wpdb->get_col( $query );
+		$existing_tables = $wpdb->get_col( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		$missing_tables = array_diff( $table_names, $existing_tables );
 
@@ -104,7 +104,7 @@ class BWFAN_Table_Validation_Controller {
 					continue;
 				}
 				$sql    = call_user_func_array( [ __CLASS__, $method_name ], [] );
-				$result = $wpdb->query( $sql );
+				$result = $wpdb->query( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				if ( $result === false ) {
 					$db_errors[] = $wpdb->last_error;
 				}

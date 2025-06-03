@@ -109,7 +109,7 @@ final class BWFAN_WC_Create_Coupon extends BWFAN_Action {
             });
         </script>
 
-        <script type="text/html" id="tmpl-action-<?php esc_attr_e( $this->get_slug() ); ?>">
+        <script type="text/html" id="tmpl-action-<?php echo esc_attr( $this->get_slug() ); ?>">
             <#
             automation_searched_coupons = _.has(data.actionFieldsOptions, 'automation_searched_coupons') && _.isObject(data.actionFieldsOptions.automation_searched_coupons) ? data.actionFieldsOptions.automation_searched_coupons : '';
             searched_coupon = (_.has(data.actionSavedData, 'data') && _.has(data.actionSavedData.data, 'searched_coupon')) ? data.actionSavedData.data.searched_coupon : '';
@@ -138,7 +138,7 @@ final class BWFAN_WC_Create_Coupon extends BWFAN_Action {
 					<?php esc_html_e( 'Select Coupon', 'wp-marketing-automations' ); ?>
 					<?php
 					$message = __( "The selected Coupon data will be used to generate a new coupon", 'wp-marketing-automations' );
-					echo $this->add_description( esc_html__( $message ), '2xl', 'right' ); //phpcs:ignore WordPress.Security.EscapeOutput
+					echo $this->add_description( esc_html( $message ), '2xl', 'right' ); //phpcs:ignore WordPress.Security.EscapeOutput
 					?>
                 </label>
                 <select required id="" data-search="coupon"
@@ -199,7 +199,7 @@ final class BWFAN_WC_Create_Coupon extends BWFAN_Action {
                 }
                 #>
                 <input type="checkbox" name="bwfan[{{data.action_id}}][data][restrict][]" id="bwfan-{{key}}"
-                       value="{{key}}" class="<?php esc_attr_e( $this->get_slug() ); ?>-restrict" {{checked}}/>
+                       value="{{key}}" class="<?php echo esc_attr( $this->get_slug() ); ?>-restrict" {{checked}}/>
                 <label for="bwfan-{{key}}" class="bwfan-checkbox-label">{{value}}</label>
                 <# })
                 }
@@ -362,8 +362,8 @@ final class BWFAN_WC_Create_Coupon extends BWFAN_Action {
 		}
 
 		return array(
-			'status'  => 3,
-			'message' => sprintf( __( 'Coupon %s created', 'wp-marketing-automations' ), $this->data['coupon_name'] ),
+			'status'                                     => 3,
+			/* translators: 1: Dynamic Data */ 'message' => sprintf( __( 'Coupon %1$s created', 'wp-marketing-automations' ), $this->data['coupon_name'] ),
 		);
 	}
 

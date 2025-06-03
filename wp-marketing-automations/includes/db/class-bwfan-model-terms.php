@@ -223,7 +223,7 @@ if ( ! class_exists( 'BWFAN_Model_Terms' ) && BWFAN_Common::is_pro_3_0() ) {
 		public static function delete_term( $id ) {
 			global $wpdb;
 			$term_table  = $wpdb->prefix . 'bwfan_terms';
-			$delete_term = $wpdb->delete( $term_table, array( 'ID' => $id ) );
+			$delete_term = $wpdb->delete( $term_table, array( 'ID' => $id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			if ( false === $delete_term ) {
 				return false;
@@ -259,7 +259,7 @@ if ( ! class_exists( 'BWFAN_Model_Terms' ) && BWFAN_Common::is_pro_3_0() ) {
 			$keys  = '(' . implode( ', ', $keys ) . ')';
 			$query = 'INSERT INTO ' . self::_table() . ' ' . $keys . ' VALUES ' . $values;
 
-			return $wpdb->query( $wpdb->prepare( "$query ", $values ) );
+			return $wpdb->query( $wpdb->prepare( "$query ", $values ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -296,7 +296,7 @@ if ( ! class_exists( 'BWFAN_Model_Terms' ) && BWFAN_Common::is_pro_3_0() ) {
 
 			$query = "SELECT COUNT(ID) from {$wpdb->prefix}bwfan_terms where type='$type' $search_terms ";
 
-			return $wpdb->get_var( $query );
+			return $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**

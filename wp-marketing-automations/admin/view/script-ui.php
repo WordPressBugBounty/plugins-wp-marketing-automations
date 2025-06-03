@@ -20,9 +20,9 @@ $hard_array = array(
 function bwfan_automation_builder_plus_icon( $color = '#fff', $size = '13' ) {
 	ob_start();
 	?>
-    <svg xmlns="http://www.w3.org/2000/svg" width="<?php echo $size ?>" height="<?php echo $size ?>" viewBox="0 0 13 13">
+    <svg xmlns="http://www.w3.org/2000/svg" width="<?php echo esc_attr($size) ?>" height="<?php echo esc_attr($size) ?>" viewBox="0 0 13 13">
         <g fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
-            <g stroke="<?php echo $color ?>" stroke-width="2">
+            <g stroke="<?php echo esc_attr($color) ?>" stroke-width="2">
                 <g>
                     <path d="M5.5 0v11M0 5.5h11" transform="translate(-287 -372) translate(288 373)"/>
                 </g>
@@ -35,8 +35,8 @@ function bwfan_automation_builder_plus_icon( $color = '#fff', $size = '13' ) {
 
 ?>
     <script>
-        var bwfan_hard_texts = <?php echo wp_json_encode( $hard_array ); //phpcs:ignore WordPress.Security.EscapeOutput ?>;
-        var adminImgPath = '<?php echo BWFAN_PLUGIN_URL . '/admin/assets/img/' ?>';
+        var bwfan_hard_texts = <?php echo wp_json_encode( $hard_array ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;
+        var adminImgPath = '<?php echo BWFAN_PLUGIN_URL . '/admin/assets/img/'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>';
     </script>
 
     <!-- Add trigger template -->
@@ -44,10 +44,10 @@ function bwfan_automation_builder_plus_icon( $color = '#fff', $size = '13' ) {
         <div class="workflow_item" data-ui="{{data.ui}}">
             <div class="workflow_item_data workflow_flex_col">
                 <div class="item_wrap">
-                    <div class="item_wrap_top bwfan_no_select"><?php esc_html_e( $text_start_when ); ?></div>
+                    <div class="item_wrap_top bwfan_no_select"><?php echo esc_html( $text_start_when ); ?></div>
                     <div class="item_wrap_conditions">
                         <div class="item_wrap_single item_add_trigger">
-							<?php esc_html_e( $text_select_trigger ); ?>
+							<?php echo esc_html( $text_select_trigger ); ?>
                         </div>
                     </div>
                 </div>
@@ -60,10 +60,10 @@ function bwfan_automation_builder_plus_icon( $color = '#fff', $size = '13' ) {
         <div class="workflow_item" data-ui="{{data.ui}}">
             <div class="workflow_item_data workflow_flex_col">
                 <div class="item_wrap">
-                    <div class="item_wrap_top bwfan_no_select"><?php esc_html_e( $text_start_when ); ?></div>
+                    <div class="item_wrap_top bwfan_no_select"><?php echo esc_html( $text_start_when ); ?></div>
                     <div class="item_wrap_conditions">
                         <div class="item_wrap_single item_modify_trigger">
-							<?php esc_html_e( $text_select_trigger ); ?>
+							<?php echo esc_html( $text_select_trigger ); ?>
                         </div>
                     </div>
                 </div>
@@ -76,7 +76,7 @@ function bwfan_automation_builder_plus_icon( $color = '#fff', $size = '13' ) {
         <div class="workflow_item" data-ui="{{data.ui}}">
             <div class="workflow_item_data workflow_flex_col">
                 <div class="item_wrap">
-                    <div class="item_wrap_top bwfan_no_select"><?php esc_html_e( $text_start_when ); ?></div>
+                    <div class="item_wrap_top bwfan_no_select"><?php echo esc_html( $text_start_when ); ?></div>
                     <div class="item_wrap_conditions">
                         <div class="item_wrap_single item_modify_trigger">
                             <div class="bwfan_name_wrap">
@@ -96,7 +96,7 @@ function bwfan_automation_builder_plus_icon( $color = '#fff', $size = '13' ) {
         <div class="workflow_item">
             <div class="workflow_item_data workflow_flex_col">
                 <div class="item_wrap_html_add">
-					<?php echo bwfan_automation_builder_plus_icon() ?>
+					<?php echo bwfan_automation_builder_plus_icon(); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                 </div>
             </div>
         </div>
@@ -108,28 +108,28 @@ function bwfan_automation_builder_plus_icon( $color = '#fff', $size = '13' ) {
             <div class="workflow_item_data workflow_item_hidden_line workflow_flex_col">
                 <div class="item_wrap">
                     <div class="item_wrap_top bwfan_no_select">
-						<?php esc_html_e( $text_if ); ?>
+						<?php echo esc_html( $text_if ); ?>
                         <i class="dashicons dashicons-trash"></i>
                     </div>
                     <div class="item_wrap_conditions">
                         <div class="item_wrap_single item_modify_condition item_condition_default">
                             <div class="item_single_l_icon">
                                 <div class="item_icon_add">
-									<?php echo bwfan_automation_builder_plus_icon( '#444', '11' ); ?>
+									<?php echo bwfan_automation_builder_plus_icon( '#444', '11' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                                 </div>
                             </div>
-							<?php esc_html_e( $text_select_condition ); ?>
+							<?php echo esc_html( $text_select_condition ); ?>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="workflow_item_btn workflow_flex_col">
-                <div class="item_wrap_html_vert bwfan_no_select"><?php esc_html_e( $text_yes ); ?></div>
+                <div class="item_wrap_html_vert bwfan_no_select"><?php echo esc_html( $text_yes ); ?></div>
                 <div class="item_wrap_hor_line"></div>
             </div>
             <div class="workflow_item_data workflow_flex_col">
                 <div class="item_wrap">
-                    <div class="item_wrap_top bwfan_no_select"><?php esc_html_e( $text_then ); ?></div>
+                    <div class="item_wrap_top bwfan_no_select"><?php echo esc_html( $text_then ); ?></div>
                     <div class="item_wrap_conditions">
                         <# _.each( data.actions, function( value, key ){
                         if(_.isEmpty(value)) {
@@ -171,21 +171,21 @@ function bwfan_automation_builder_plus_icon( $color = '#fff', $size = '13' ) {
                         </div>
                         <# }) #>
                         <# if( _.has(BWFAN_Auto.uiCopiedAction,'data') ) { #>
-                        <div class="item_wrap_single item_paste_action"><?php esc_html_e( 'Click to insert the copied action' ); ?></div>
+                        <div class="item_wrap_single item_paste_action"><?php esc_html_e( 'Click to insert the copied action', 'wp-marketing-automations' ); ?></div>
                         <# } #>
                         <div class="item_wrap_single item_add_action">
                             <div class="item_single_l_icon">
                                 <div class="item_icon_add">
-									<?php echo bwfan_automation_builder_plus_icon( '#444', '11' ); ?>
+									<?php echo bwfan_automation_builder_plus_icon( '#444', '11' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                                 </div>
                             </div>
-							<?php esc_html_e( $text_add_action ); ?>
+							<?php echo esc_html( $text_add_action ); ?>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="workflow_item_btn workflow_flex_col">
-                <div class="item_wrap_html_vert item_wrap_html_right bwfan_no_select"><?php esc_html_e( $text_end ); ?></div>
+                <div class="item_wrap_html_vert item_wrap_html_right bwfan_no_select"><?php echo esc_html( $text_end ); ?></div>
                 <div class="item_wrap_hor_line"></div>
             </div>
         </div>
@@ -197,7 +197,7 @@ function bwfan_automation_builder_plus_icon( $color = '#fff', $size = '13' ) {
             <div class="workflow_item_data workflow_item_hidden_line workflow_flex_col">
                 <div class="item_wrap">
                     <div class="item_wrap_top bwfan_no_select">
-						<?php esc_html_e( $text_if ); ?>
+						<?php echo esc_html( $text_if ); ?>
                         <i class="dashicons dashicons-trash"></i>
                     </div>
                     <div class="item_wrap_conditions">
@@ -208,12 +208,12 @@ function bwfan_automation_builder_plus_icon( $color = '#fff', $size = '13' ) {
                 </div>
             </div>
             <div class="workflow_item_btn workflow_flex_col">
-                <div class="item_wrap_html_vert bwfan_no_select"><?php esc_html_e( $text_yes ); ?></div>
+                <div class="item_wrap_html_vert bwfan_no_select"><?php echo esc_html( $text_yes ); ?></div>
                 <div class="item_wrap_hor_line"></div>
             </div>
             <div class="workflow_item_data workflow_flex_col">
                 <div class="item_wrap">
-                    <div class="item_wrap_top bwfan_no_select"><?php esc_html_e( $text_then ); ?></div>
+                    <div class="item_wrap_top bwfan_no_select"><?php echo esc_html( $text_then ); ?></div>
                     <div class="item_wrap_conditions">
                         <#
                         _.each( data.actions, function( value, key ){
@@ -256,21 +256,21 @@ function bwfan_automation_builder_plus_icon( $color = '#fff', $size = '13' ) {
                         </div>
                         <# }) #>
                         <# if( _.has(BWFAN_Auto.uiCopiedAction,'data') ) { #>
-                        <div class="item_wrap_single item_paste_action"><?php esc_html_e( 'Click to insert the copied action' ); ?></div>
+                        <div class="item_wrap_single item_paste_action"><?php esc_html_e( 'Click to insert the copied action', 'wp-marketing-automations' ); ?></div>
                         <# } #>
                         <div class="item_wrap_single item_add_action">
                             <div class="item_single_l_icon">
                                 <div class="item_icon_add">
-									<?php echo bwfan_automation_builder_plus_icon( '#444', '11' ); ?>
+									<?php echo bwfan_automation_builder_plus_icon( '#444', '11' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                                 </div>
                             </div>
-							<?php esc_html_e( $text_add_action ); ?>
+							<?php echo esc_html( $text_add_action ); ?>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="workflow_item_btn workflow_flex_col">
-                <div class="item_wrap_html_vert item_wrap_html_right bwfan_no_select"><?php esc_html_e( $text_end ); ?></div>
+                <div class="item_wrap_html_vert item_wrap_html_right bwfan_no_select"><?php echo esc_html( $text_end ); ?></div>
                 <div class="item_wrap_hor_line"></div>
             </div>
         </div>
@@ -280,7 +280,7 @@ function bwfan_automation_builder_plus_icon( $color = '#fff', $size = '13' ) {
     <script type="text/html" id="tmpl-end_html">
         <div class="workflow_item">
             <div class="workflow_item_data workflow_flex_col">
-                <div class="item_wrap_html bwfan_no_select"><?php esc_html_e( $text_end ); ?></div>
+                <div class="item_wrap_html bwfan_no_select"><?php echo esc_html( $text_end ); ?></div>
             </div>
         </div>
     </script>
@@ -307,7 +307,7 @@ function bwfan_automation_builder_plus_icon( $color = '#fff', $size = '13' ) {
     <script type="text/html" id="tmpl-no_html">
         <div class="workflow_item">
             <div class="workflow_item_data workflow_flex_col">
-                <div class="item_wrap_html bwfan_no_select"><?php esc_html_e( $text_no ); ?></div>
+                <div class="item_wrap_html bwfan_no_select"><?php echo esc_html( $text_no ); ?></div>
             </div>
         </div>
         <div class="workflow_item">
@@ -317,7 +317,7 @@ function bwfan_automation_builder_plus_icon( $color = '#fff', $size = '13' ) {
         </div>
         <div class="workflow_item">
             <div class="workflow_item_data workflow_flex_col">
-                <div class="item_wrap_html_add"><?php echo bwfan_automation_builder_plus_icon() ?></div>
+                <div class="item_wrap_html_add"><?php echo bwfan_automation_builder_plus_icon(); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
             </div>
         </div>
         <div class="workflow_item">
@@ -331,7 +331,7 @@ function bwfan_automation_builder_plus_icon( $color = '#fff', $size = '13' ) {
     <script type="text/html" id="tmpl-add_block">
         <div class="workflow_item">
             <div class="workflow_item_data workflow_flex_col">
-                <div class="item_wrap_html_add"><?php echo bwfan_automation_builder_plus_icon() ?></div>
+                <div class="item_wrap_html_add"><?php echo bwfan_automation_builder_plus_icon(); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
             </div>
         </div>
     </script>
@@ -340,7 +340,7 @@ function bwfan_automation_builder_plus_icon( $color = '#fff', $size = '13' ) {
     <script type="text/html" id="tmpl-select_action">
         <div class="item_wrap_single item_modify_action" data-action="{{data.action_id}}">
             <div class="bwfan_name_wrap">
-                <div class="action_text"><?php esc_html_e( $text_select_action ); ?></div>
+                <div class="action_text"><?php echo esc_html( $text_select_action ); ?></div>
                 <div class="item_actions bwfan_hide_hard"><i class="dashicons dashicons-ellipsis"></i></div>
                 <div class="item_actions_list">
                     <ul>
@@ -355,15 +355,15 @@ function bwfan_automation_builder_plus_icon( $color = '#fff', $size = '13' ) {
     <!-- Add action template -->
     <script type="text/html" id="tmpl-add_action">
         <# if( _.has(BWFAN_Auto.uiCopiedAction,'data') ) { #>
-        <div class="item_wrap_single item_paste_action"><?php esc_html_e( 'Click to insert the copied action' ); ?></div>
+        <div class="item_wrap_single item_paste_action"><?php esc_html_e( 'Click to insert the copied action', 'wp-marketing-automations' ); ?></div>
         <# } #>
         <div class="item_wrap_single item_add_action">
             <div class="item_single_l_icon">
                 <div class="item_icon_add">
-					<?php echo bwfan_automation_builder_plus_icon( '#444', '11' ); ?>
+					<?php echo bwfan_automation_builder_plus_icon( '#444', '11' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                 </div>
             </div>
-			<?php esc_html_e( $text_add_action ); ?>
+			<?php echo esc_html( $text_add_action ); ?>
         </div>
     </script>
 
@@ -373,7 +373,7 @@ function bwfan_automation_builder_plus_icon( $color = '#fff', $size = '13' ) {
             <div class="workflow_item_data workflow_item_hidden_line workflow_flex_col">
                 <div class="item_wrap">
                     <div class="item_wrap_top bwfan_no_select">
-						<?php esc_html_e( $text_then ); ?>
+						<?php echo esc_html( $text_then ); ?>
                         <i class="dashicons dashicons-trash"></i>
                     </div>
                     <div class="item_wrap_conditions">
@@ -417,15 +417,15 @@ function bwfan_automation_builder_plus_icon( $color = '#fff', $size = '13' ) {
                         </div>
                         <# }) #>
                         <# if( _.has(BWFAN_Auto.uiCopiedAction,'data') ) { #>
-                        <div class="item_wrap_single item_paste_action"><?php esc_html_e( 'Click to insert the copied action' ); ?></div>
+                        <div class="item_wrap_single item_paste_action"><?php esc_html_e( 'Click to insert the copied action', 'wp-marketing-automations' ); ?></div>
                         <# } #>
                         <div class="item_wrap_single item_add_action">
                             <div class="item_single_l_icon">
                                 <div class="item_icon_add">
-									<?php echo bwfan_automation_builder_plus_icon( '#444', '11' ); ?>
+									<?php echo bwfan_automation_builder_plus_icon( '#444', '11' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                                 </div>
                             </div>
-							<?php esc_html_e( $text_add_action ); ?>
+							<?php echo esc_html( $text_add_action ); ?>
                         </div>
                     </div>
                 </div>

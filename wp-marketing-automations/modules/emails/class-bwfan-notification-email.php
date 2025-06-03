@@ -391,11 +391,11 @@ class BWFAN_Notification_Email {
 		$date_string = self::get_date_string( $dates, $frequency );
 		switch ( $frequency ) {
 			case 'daily':
-				return sprintf( __( '%s - Daily Report for %s', 'wp-marketing-automations' ), get_bloginfo( 'name' ), $date_string );
+				/* translators: 1: Dynamic Text, 2: Dynamic Date */ return sprintf( __( '%1$s - Daily Report for %2$s', 'wp-marketing-automations' ), get_bloginfo( 'name' ), $date_string );
 			case 'weekly':
-				return sprintf( __( '%s - Weekly Report for %s', 'wp-marketing-automations' ), get_bloginfo( 'name' ), $date_string );
+				/* translators: 1: Dynamic Text, 2: Dynamic Date */ return sprintf( __( '%1$s - Weekly Report for %2$s', 'wp-marketing-automations' ), get_bloginfo( 'name' ), $date_string );
 			case 'monthly':
-				return sprintf( __( '%s - Monthly Report for %s', 'wp-marketing-automations' ), get_bloginfo( 'name' ), $date_string );
+				/* translators: 1: Dynamic Text, 2: Dynamic Date */ return sprintf( __( '%1$s - Monthly Report for %2$s', 'wp-marketing-automations' ), get_bloginfo( 'name' ), $date_string );
 			default:
 				return '';
 		}
@@ -412,10 +412,11 @@ class BWFAN_Notification_Email {
 	 */
 	public static function get_date_string( $dates = array(), $frequency = 'weekly' ) {
 		if ( 'daily' === $frequency && isset( $dates['from_date'] ) ) {
-			return sprintf( __( '%1$s', 'wp-marketing-automations' ), self::format_date( $dates['from_date'] ) );
+			return self::format_date( $dates['from_date'] );
 		}
 
 		if ( isset( $dates['from_date'] ) && isset( $dates['to_date'] ) ) {
+			/* translators: 1: Dynamic From Date, 2: Dynamic to date */
 			return sprintf( __( '%1$s - %2$s', 'wp-marketing-automations' ), self::format_date( $dates['from_date'] ), self::format_date( $dates['to_date'] ) );
 		}
 
@@ -477,7 +478,7 @@ class BWFAN_Notification_Email {
 		$data             = $metrics_controller->get_data();
 		$email_controller = new BWFAN_Notification_Email_Controller( $mode, $data, $dates );
 
-		echo $email_controller->get_content_html();
+		echo $email_controller->get_content_html(); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		exit;
 	}
 

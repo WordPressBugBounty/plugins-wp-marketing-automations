@@ -58,7 +58,7 @@ if ( ! class_exists( 'WooFunnels_License_Controller' ) ) {
 
 				if ( ! empty( $data['domain'] ) ) {
 					global $wpdb;
-					$db_domain = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s", 'siteurl' ) );
+					$db_domain = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s", 'siteurl' ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 					if ( ! empty( $db_domain ) && $db_domain !== $data['domain'] ) {
 						$data['db_domain'] = rtrim( $db_domain, '/' );
@@ -146,7 +146,7 @@ if ( ! class_exists( 'WooFunnels_License_Controller' ) ) {
 				}
 				if ( ! empty( $data['domain'] ) ) {
 					global $wpdb;
-					$db_domain = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s", 'siteurl' ) );
+					$db_domain = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s", 'siteurl' ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 					if ( ! empty( $db_domain ) && $db_domain !== $data['domain'] ) {
 						$data['db_domain'] = rtrim( $db_domain, '/' );

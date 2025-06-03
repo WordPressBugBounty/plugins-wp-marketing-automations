@@ -280,7 +280,7 @@ abstract class BWFAN_Recipes {
 			$data_check    = self::check_data_value( $current_value, $operator, $check_value );
 
 			if ( false === $data_check ) {
-				$data_error[] = __( "{$data['message']}", 'autonami-automation' );
+				$data_error[] = $data['message'];
 
 				return $data_error;
 			}

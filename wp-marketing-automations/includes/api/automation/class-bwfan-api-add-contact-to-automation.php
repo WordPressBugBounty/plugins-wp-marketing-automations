@@ -44,8 +44,8 @@ class BWFAN_API_Add_Contact_To_Automation extends BWFAN_API_Base {
 		$ins      = new BWFAN_Add_Contact_To_Automation_Controller( $automation_id, $contact_id );
 		$response = $ins->add_contact_to_automation();
 
-		$this->response_code = isset( $response['code'] ) ? $response['code'] : 200;
-		$message             = isset( $response['message'] ) ? $response['message'] : __( 'Unknown error occurred', 'wp-marketing-automations' );
+		$this->response_code = $response['code'] ?? 200;
+		$message             = $response['message'] ?? __( 'Unknown error occurred', 'wp-marketing-automations' );
 
 		return $this->success_response( [], $message );
 	}

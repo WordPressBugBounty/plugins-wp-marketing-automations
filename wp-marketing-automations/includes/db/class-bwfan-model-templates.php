@@ -119,7 +119,7 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 				$query .= $wpdb->prepare( " AND title LIKE %s", "%" . esc_sql( $search ) . "%" );
 			}
 
-			$result = $wpdb->get_var( $query );
+			$result = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			return $result ? intval( $result ) : 0;
 		}
@@ -149,7 +149,7 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 				$query .= $wpdb->prepare( " AND title LIKE %s", "%" . esc_sql( $search ) . "%" );
 			}
 
-			$result = $wpdb->get_var( $query );
+			$result = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			return $result ? intval( $result ) : 0;
 		}
@@ -168,7 +168,7 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 			$query            = 'SELECT COUNT(ID) FROM ' . self::_table();
 			$string_with_dash = "$data - %";
 			$query            .= $wpdb->prepare( " WHERE ( {$field} = %s OR {$field} LIKE %s ) AND canned = %d LIMIT 0,1", $data, esc_sql( $string_with_dash ), 1 );
-			$result           = $wpdb->get_var( $query );
+			$result           = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			return $result;
 		}
@@ -187,7 +187,7 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 			$query            = 'SELECT COUNT(ID) FROM ' . self::_table();
 			$string_with_dash = "$data - %";
 			$query            .= $wpdb->prepare( " WHERE ( {$field} = %s OR {$field} LIKE %s ) AND canned = %d LIMIT 0,1", $data, esc_sql( $string_with_dash ), 0 );
-			$result           = $wpdb->get_var( $query );
+			$result           = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			return $result;
 		}
@@ -258,7 +258,7 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 		public static function bwf_delete_layout( $id ) {
 			global $wpdb;
 			$table_name    = self::_table();
-			$delete_layout = $wpdb->delete( $table_name, array( 'ID' => $id ) );
+			$delete_layout = $wpdb->delete( $table_name, array( 'ID' => $id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( false === $delete_layout ) {
 				return false;
 			}
@@ -309,7 +309,7 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 			$table = "{$wpdb->prefix}bwfan_templates";
 			$query = " SELECT MIN(`id`) FROM $table WHERE `type` = 1 AND `canned` = 1 ";
 
-			return $wpdb->get_var( $query );
+			return $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		/**
@@ -369,7 +369,7 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 			$placeholders = array_fill( 0, count( $tids ), '%d' );
 			$placeholders = implode( ', ', $placeholders );
 			$query        = "SELECT " . implode( ', ', $columns ) . " FROM {$wpdb->prefix}bwfan_templates WHERE `ID` IN( $placeholders )";
-			$result       = $wpdb->get_results( $wpdb->prepare( $query, $tids ), ARRAY_A );
+			$result       = $wpdb->get_results( $wpdb->prepare( $query, $tids ), ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 
 			$data = [];
 			foreach ( $result as $template ) {
@@ -377,6 +377,27 @@ if ( ! class_exists( 'BWFAN_Model_Templates' ) && BWFAN_Common::is_pro_3_0() ) {
 			}
 
 			return $data;
+		}
+
+		/**
+		 * Get templates
+		 *
+		 * @param $offset
+		 *
+		 * @return array|object|stdClass[]|null
+		 */
+		public static function get_templates( $offset = '' ) {
+			global $wpdb;
+			$where = '';
+			$args  = [];
+			if ( ! empty( $offset ) ) {
+				$where = " WHERE `id` > %d ";
+				$args  = [ intval( $offset ) ];
+			}
+
+			$query = "SELECT * FROM {$wpdb->prefix}bwfan_templates $where";
+
+			return $wpdb->get_results( $wpdb->prepare( $query, $args ), ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 		}
 	}
 }

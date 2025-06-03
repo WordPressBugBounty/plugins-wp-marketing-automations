@@ -37,8 +37,9 @@ class BWFAN_Api_Get_Export_Action extends BWFAN_API_Base {
 		$this->response_code = 404;
 
 		/** if isset type param **/
-		$type   = $this->get_sanitized_arg( 'type', 'text_field' );
-		$action = $this->get_sanitized_arg( 'action', 'text_field' );
+		$type       = $this->get_sanitized_arg( 'type', 'text_field' );
+		$action     = $this->get_sanitized_arg( 'action', 'text_field' );
+		$extra_data = ! empty( $this->args['extra_data'] ) ? $this->args['extra_data'] : [];
 
 		if ( $type === '' || $action === '' ) {
 			$response = __( 'Exporter mandatory options not passed', 'wp-marketing-automations' );
@@ -62,7 +63,7 @@ class BWFAN_Api_Get_Export_Action extends BWFAN_API_Base {
 		switch ( $action ) {
 			case 'start':
 				// add user data and start scheduler
-				$action_status = BWFAN_Core()->exporter->bwfan_start_export( $type, get_current_user_id() );
+				$action_status = BWFAN_Core()->exporter->bwfan_start_export( $type, get_current_user_id(), $extra_data );
 				break;
 			case 'cancel':
 				// remove user data and unset scheduler

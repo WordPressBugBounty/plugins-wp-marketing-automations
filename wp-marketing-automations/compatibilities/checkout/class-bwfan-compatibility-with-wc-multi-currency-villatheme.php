@@ -54,7 +54,7 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_WC_Multi_Currency_Villatheme' ) )
 		 */
 		public function add_currency_parameter_in_url( $url, $token ) {
 			global $wpdb;
-			$currency = $wpdb->get_var( $wpdb->prepare( "SELECT `currency` FROM {$wpdb->prefix}bwfan_abandonedcarts WHERE `token` = %s", $token ) );
+			$currency = $wpdb->get_var( $wpdb->prepare( "SELECT `currency` FROM {$wpdb->prefix}bwfan_abandonedcarts WHERE `token` = %s", $token ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			if ( empty( $currency ) ) {
 				return $url;

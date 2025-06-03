@@ -2,7 +2,7 @@
 defined( 'ABSPATH' ) || exit;
 
 $business_details = '<u style="text-decoration: underline;"><a rel="noreferrer noopener" style="text-decoration-line: none; background-color: rgba(0, 0, 0, 0); color: #236fa1;" href="' . esc_url( get_home_url() ) . '" target="_blank">' . esc_html( $business_name ) . '</a></u>';
-$settings_text = '<u style="text-decoration: underline;"><a rel="noreferrer noopener" style="text-decoration-line: none; background-color: rgba(0, 0, 0, 0); color: #236fa1;" href="' . esc_url( admin_url( 'admin.php?page=autonami&path=/settings/notifications' ) ) . '"  target="_blank">' . esc_html( __( 'Click here', 'wp-marketing-automations' ) ) . '</a></u>';
+$settings_text    = '<u style="text-decoration: underline;"><a rel="noreferrer noopener" style="text-decoration-line: none; background-color: rgba(0, 0, 0, 0); color: #236fa1;" href="' . esc_url( admin_url( 'admin.php?page=autonami&path=/settings/notifications' ) ) . '"  target="_blank">' . esc_html( __( 'Click here', 'wp-marketing-automations' ) ) . '</a></u>';
 ?>
 <table cellpadding="0" cellspacing="0" border="0" bgcolor="" align="center" role="presentation"
        class="bwfbe-block-section-container bwfbe-block-section bwfbe-block-834352e"
@@ -69,7 +69,7 @@ $settings_text = '<u style="text-decoration: underline;"><a rel="noreferrer noop
 																							<span
                                                                                                 style="mso-line-height-alt: 130%; font-size: 12px;"
                                                                                                 class="has-font-size">
-                                                                                                <?php echo sprintf( __( 'This performance report email was sent from your site %s for period %s.', 'wp-marketing-automations' ), $business_details, $date ); ?>
+                                                                                                <?php echo sprintf( __( 'This performance report email was sent from your site %1$s for period %2$s.', 'wp-marketing-automations' ), $business_details, $date ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.MissingTranslatorsComment ?>
 																							</span>
 																						</span>
                                                     <br/>
@@ -78,7 +78,7 @@ $settings_text = '<u style="text-decoration: underline;"><a rel="noreferrer noop
                                                         class="has-inline-color">
 																							<span
                                                                                                 style="mso-line-height-alt: 130%; font-size: 12px;"
-                                                                                                class="has-font-size"><?php echo sprintf( __( '%s to manage the frequency and recipients.', 'wp-marketing-automations' ), $settings_text ); ?>
+                                                                                                class="has-font-size"><?php echo sprintf( __( '%s to manage the frequency and recipients.', 'wp-marketing-automations' ), $settings_text ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.I18n.MissingTranslatorsComment	 ?>
 																							</span>
 																						</span>
                                                 </p>

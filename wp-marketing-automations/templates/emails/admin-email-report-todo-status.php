@@ -55,7 +55,7 @@ defined( 'ABSPATH' ) || exit;
                                                                 <tr
                                                                         style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px;">
                                                                     <td
-                                                                            style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; line-height: 1.5; border-bottom: <?php echo $border_bottom ?>; padding: 10px 0;">
+                                                                            style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; line-height: 1.5; border-bottom: <?php echo intval($border_bottom) ?>; padding: 10px 0;">
                                                                         <table
                                                                                 cellpadding="0"
                                                                                 cellspacing="0"
@@ -67,16 +67,16 @@ defined( 'ABSPATH' ) || exit;
                                                                                     style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px;">
                                                                                 <td
                                                                                         style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; line-height: 1.5; font-family: Arial, sans-serif; font-size: 14px; color: #333333;">
-																					<?php echo $list['title']; ?>
+																					<?php echo $list['title']; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                                                                                 </td>
 																				<?php if( $list['status'] === 'pro' ){
 																					?>
                                                                                     <td style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; line-height: 1.5; width: 130px; text-align: right;"
                                                                                         width="130"
-                                                                                        align="right"><a href="<?php echo $upgrade_link; ?>"
+                                                                                        align="right"><a href="<?php echo esc_url( $upgrade_link ); ?>"
                                                                                                          style="color: #0073aa; text-decoration: underline; font-family: Arial, sans-serif; font-size: 14px;">
                                                                                             <b>
-			                                                                                    <?php echo __( 'Upgrade to Pro', 'wp-marketing-automations' );?>
+			                                                                                    <?php echo esc_html__( 'Upgrade to Pro', 'wp-marketing-automations' );?>
                                                                                             </b>
                                                                                         </a>
                                                                                     </td>
@@ -95,10 +95,10 @@ defined( 'ABSPATH' ) || exit;
                                                                                     <td style="border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-spacing: 0px; line-height: 1.5; width: 50px; text-align: right;"
                                                                                         width="50"
                                                                                         align="right">
-                                                                                        <a href="<?php echo $list['link']; ?>"
+                                                                                        <a href="<?php echo esc_url($list['link']); ?>"
                                                                                            style="color: #0073aa; text-decoration: underline; font-family: Arial, sans-serif; font-size: 14px;">
                                                                                             <b>
-																								<?php echo __( 'Setup', 'wp-marketing-automations' );?>
+																								<?php esc_html_e( 'Setup', 'wp-marketing-automations' );?>
                                                                                             </b>
                                                                                         </a>
                                                                                     </td>

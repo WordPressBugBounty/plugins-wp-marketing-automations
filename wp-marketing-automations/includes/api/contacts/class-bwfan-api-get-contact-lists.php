@@ -61,7 +61,9 @@ class BWFAN_API_Get_Contact_Lists extends BWFAN_API_Base {
 		if ( ! $contact->is_contact_exists() ) {
 			$this->response_code = 404;
 
-			return $this->error_response( sprintf( __( 'No contact found with given id #%s', 'wp-marketing-automations' ), $contact_id ) );
+			/* translators: 1: Contact ID */
+
+			return $this->error_response( sprintf( __( 'No contact found with given id #%1$d', 'wp-marketing-automations' ), $contact_id ) );
 		}
 
 //		$contact_terms_count = BWFCRM_Model_Contact_Terms::get_contact_terms_count( $contact->get_id(), $search, 1 );
@@ -69,14 +71,16 @@ class BWFAN_API_Get_Contact_Lists extends BWFAN_API_Base {
 		$contact_terms = $contact->get_all_lists();
 		if ( empty( $contact_terms ) ) {
 			$this->response_code = 404;
-			$error_message       = ! empty( $search ) ? sprintf( __( 'No Searched lists found for contact with name \'%s\'', 'wp-marketing-automations' ), $search ) : __( 'No contacts lists found', 'wp-marketing-automations' );
+			/* translators: 1: Search term */
+			$error_message = ! empty( $search ) ? sprintf( __( 'No Searched lists found for contact with name %1$s', 'wp-marketing-automations' ), " '$search'" ) : __( 'No contacts lists found', 'wp-marketing-automations' );
 
 			return $this->error_response( $error_message );
 		}
 
 		$this->total_count   = count( $contact_terms );
 		$this->response_code = 200;
-		$success_message     = ! empty( $search ) ? sprintf( __( 'Searched lists for contact \'%s\'', 'wp-marketing-automations' ), $search ) : __( 'Got all contacts lists', 'wp-marketing-automations' );
+		/* translators: 1: Search term */
+		$success_message = ! empty( $search ) ? sprintf( __( 'Searched lists for contact ', 'wp-marketing-automations' ), " '$search'" ) : __( 'Got all contacts lists', 'wp-marketing-automations' );
 
 		return $this->success_response( $contact_terms, $success_message );
 	}

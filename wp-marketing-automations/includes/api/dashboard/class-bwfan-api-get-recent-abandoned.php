@@ -32,7 +32,7 @@ class BWFAN_API_Get_Recent_Abandoned extends BWFAN_API_Base {
 
 		$query = "SELECT abandon.email,abandon.checkout_data, abandon.total as revenue, COALESCE(con.id, 0) as id, COALESCE(con.f_name, '') as f_name, COALESCE(con.l_name, '') as l_name from $abandoned_table as abandon LEFT JOIN $contact_table as con ON abandon.email = con.email ORDER BY abandon.ID DESC LIMIT 5 OFFSET 0";
 
-		$abandoned = $wpdb->get_results( $query );
+		$abandoned = $wpdb->get_results( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		if ( ! is_array( $abandoned ) ) {
 			$this->response_code = 500;

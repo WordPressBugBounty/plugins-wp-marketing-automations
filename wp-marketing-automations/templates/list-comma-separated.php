@@ -21,7 +21,7 @@ if ( false !== $cart ) {
 		if ( $product instanceof WC_Product_Variation && false === $exclude_variable_attribute ) {
 			$name .= ' - ' . $product->get_attribute_summary();
 		}
-		$product_names[] = esc_html__( $name );
+		$product_names[] = esc_html( $name );
 	}
 } else {
 	foreach ( $products as $product ) {
@@ -32,7 +32,7 @@ if ( false !== $cart ) {
 		if ( $product instanceof WC_Product_Variation && false === $exclude_variable_attribute ) {
 			$name .= ' - ' . $product->get_attribute_summary();
 		}
-		$product_names[] = esc_html__( $name );
+		$product_names[] = esc_html( $name );
 	}
 }
 

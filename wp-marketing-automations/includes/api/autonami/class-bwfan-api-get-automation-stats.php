@@ -113,7 +113,7 @@ class BWFAN_API_Get_Automation_stats extends BWFAN_API_Base {
 
 			$tasks_table = "{$wpdb->prefix}bwfan_tasks";
 			$tasks_query = "SELECT `automation_id`, count(`ID`) AS `total_scheduled`, `status` FROM $tasks_table WHERE `automation_id` IN ($ids) GROUP BY `automation_id`, `status`";
-			$tasks       = $wpdb->get_results( $tasks_query, ARRAY_A );
+			$tasks       = $wpdb->get_results( $tasks_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$total_tasks = array();
 			foreach ( $tasks as $automation_tasks ) {
 				$status = absint( $automation_tasks['status'] ) === 1 ? 'paused' : 'scheduled';
@@ -125,7 +125,7 @@ class BWFAN_API_Get_Automation_stats extends BWFAN_API_Base {
 			/** Get completed and failed task count */
 			$logs_table = "{$wpdb->prefix}bwfan_logs";
 			$logs_query = "SELECT `automation_id`, count(`ID`) AS `total_logs`, `status` FROM $logs_table WHERE `automation_id` IN ($ids) AND `status` IN (0, 1) GROUP BY `automation_id`, `status`";
-			$logs       = $wpdb->get_results( $logs_query, ARRAY_A );
+			$logs       = $wpdb->get_results( $logs_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$total_logs = array();
 			foreach ( $logs as $automation_logs ) {
 				$status = absint( $automation_logs['status'] ) === 1 ? 'completed' : 'failed';

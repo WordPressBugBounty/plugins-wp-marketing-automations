@@ -74,14 +74,14 @@ class BWFAN_Model_Automation_Step extends BWFAN_Model {
 		/** Form sql query */
 		$sql = $sql . $where_sql . $order . $pagination_sql;
 
-		$response['steps'] = $wpdb->get_results( $sql, ARRAY_A );
+		$response['steps'] = $wpdb->get_results( $sql, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		/**
 		 * Get total
 		 */
 		if ( $get_total ) {
 			$total_sql         = "SELECT count(*) FROM {$table} " . $where_sql;
-			$response['total'] = absint( $wpdb->get_var( $total_sql ) );
+			$response['total'] = absint( $wpdb->get_var( $total_sql ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		return $response;
@@ -151,9 +151,12 @@ class BWFAN_Model_Automation_Step extends BWFAN_Model {
 			$ids = [ $ids ];
 		}
 
-		$ids = implode( ',', array_map( 'absint', $ids ) );
+		$ids          = array_filter( array_map( 'intval', $ids ) );
+		$placeholders = array_fill( 0, count( $ids ), '%d' );
 
-		return $wpdb->query( "DELETE FROM $table_name WHERE `ID` IN( $ids )" );
+		$query = $wpdb->prepare( "DELETE FROM $table_name WHERE `ID` IN ( " . implode( ',', $placeholders ) . " ) AND status = 0", $ids );
+
+		return $wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	public static function get_step_data_by_id( $step_id ) {
@@ -179,7 +182,7 @@ class BWFAN_Model_Automation_Step extends BWFAN_Model {
 		$query = " DELETE FROM $table_name WHERE $where";
 		$query = $wpdb->prepare( $query, $aid );
 
-		return $wpdb->query( $wpdb->prepare( $query, $aid ) );
+		return $wpdb->query( $wpdb->prepare( $query, $aid ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	public static function get_step_by_trail( $trail ) {
@@ -187,7 +190,7 @@ class BWFAN_Model_Automation_Step extends BWFAN_Model {
 		$table_name = self::_table();
 
 		$query   = "SELECT ct.c_time AS run_time, st.action, st.type FROM {$wpdb->prefix}bwfan_automation_contact_trail AS ct JOIN {$table_name} AS st ON ct.sid=st.ID WHERE ct.tid='$trail' ORDER BY ct.ID DESC LIMIT 1";
-		$results = $wpdb->get_results( $query, ARRAY_A );
+		$results = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return $results;
 	}
@@ -208,7 +211,7 @@ class BWFAN_Model_Automation_Step extends BWFAN_Model {
 		$table = self::_table();
 
 		$query   = $wpdb->prepare( "SELECT ID FROM {$table} WHERE `status` != %d AND aid = %d", 3, $aid );
-		$results = $wpdb->get_results( $query, ARRAY_A );
+		$results = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return $results;
 	}
@@ -230,7 +233,7 @@ class BWFAN_Model_Automation_Step extends BWFAN_Model {
 
 		$query = $wpdb->prepare( "SELECT ID FROM {$table} WHERE `status` != %d AND ID = %d", 3, $id );
 
-		return $wpdb->get_var( $query );
+		return $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -243,7 +246,7 @@ class BWFAN_Model_Automation_Step extends BWFAN_Model {
 		$table = self::_table();
 		$sql   = "SELECT `ID` FROM {$table}  WHERE `action` LIKE '%s' AND `status`= %d ";
 
-		return $wpdb->get_col( $wpdb->prepare( $sql, '%wp_sendemail%', 1 ) );
+		return $wpdb->get_col( $wpdb->prepare( $sql, '%wp_sendemail%', 1 ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -265,7 +268,7 @@ class BWFAN_Model_Automation_Step extends BWFAN_Model {
 		$query = "SELECT `ID` FROM {$wpdb->prefix}bwfan_automation_step WHERE `ID` IN($placeholder) AND `action` LIKE %s";
 		$query = $wpdb->prepare( $query, $args );
 
-		return $wpdb->get_col( $query );
+		return $wpdb->get_col( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -289,7 +292,7 @@ class BWFAN_Model_Automation_Step extends BWFAN_Model {
 
 		$query = "UPDATE $table_name SET `status` = %d WHERE `ID` IN ($placeholder)";
 
-		return $wpdb->query( $wpdb->prepare( $query, $args ) );
+		return $wpdb->query( $wpdb->prepare( $query, $args ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	public static function get_step_data( $step_id ) {
@@ -325,13 +328,17 @@ class BWFAN_Model_Automation_Step extends BWFAN_Model {
 		$query = "SELECT `ID`, `action` FROM $table_name WHERE `ID` IN ($placeholder) AND `type` = 3;";
 		$query = $wpdb->prepare( $query, $args );
 
-		$results      = $wpdb->get_results( $query, ARRAY_A );
+		$results      = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$return_array = [];
 		if ( is_array( $results ) && count( $results ) > 0 ) {
 			foreach ( $results as $val ) {
-				$benchmark                  = json_decode( $val['action'], true );
-				$benchmark                  = $benchmark['benchmark'];
-				$return_array[ $val['ID'] ] = $benchmark;
+				if ( ! empty( $val['action'] ) ) {
+					$benchmark = json_decode( $val['action'], true );
+					$benchmark = $benchmark['benchmark'] ?? '';
+					if ( ! empty( $benchmark ) ) {
+						$return_array[ $val['ID'] ] = $benchmark;
+					}
+				}
 			}
 		}
 

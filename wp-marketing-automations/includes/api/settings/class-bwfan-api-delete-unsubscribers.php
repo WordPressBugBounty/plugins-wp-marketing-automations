@@ -52,7 +52,8 @@ class BWFAN_API_Delete_Unsubscribers extends BWFAN_API_Base {
 		}
 
 		if ( ! empty( $failed_ids ) ) {
-			return $this->error_response( __( 'Unable to delete some of unsubscribers with IDs:' . implode( ', ', $failed_ids ), 'wp-marketing-automations' ) );
+			/* translators: 1: comma seperated ids  */
+			return $this->error_response( sprintf( __( 'Unable to delete some of unsubscribers with IDs: %1$s', 'wp-marketing-automations' ), implode( ', ', $failed_ids ) ) );
 		}
 
 		do_action( 'bwfan_bulk_delete_unsubscribers' );

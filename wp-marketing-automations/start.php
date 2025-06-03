@@ -65,7 +65,7 @@ class WooFunnel_BWFAN {
 	public static function load_files() {
 		$get_global_path = dirname( __FILE__ ) . '/woofunnels/';
 		if ( false === @file_exists( $get_global_path . 'includes/class-woofunnels-api.php' ) ) { //phpcs:ignore PHP_CodeSniffer - Generic.PHP.NoSilencedErrors, Generic.PHP.NoSilencedErrors
-			_doing_it_wrong( __FUNCTION__, esc_html__( 'WooFunnels Core should be present in folder \'woofunnels\' in order to run this properly. ' ), self::$version ); //phpcs:ignore WordPress.Security.EscapeOutput
+			_doing_it_wrong( __FUNCTION__, esc_html__( 'WooFunnels Core should be present in folder \'woofunnels\' in order to run this properly. ', 'wp-marketing-automations' ), self::$version ); //phpcs:ignore WordPress.Security.EscapeOutput
 			die( 0 );
 		}
 
@@ -77,7 +77,7 @@ class WooFunnel_BWFAN {
 		if ( BWF_VERSION === self::$version ) {
 			do_action( 'woofunnels_loaded', $get_global_path );
 		} elseif ( ( defined( 'BWFAN_IS_DEV' ) && true === BWFAN_IS_DEV ) || ( defined( 'BWF_DEV' ) && true === BWF_DEV ) ) {
-			_doing_it_wrong( __FUNCTION__, esc_html__( 'WooFunnels Core should be at the same version as declared in your start.php' ), self::$version ); //phpcs:ignore WordPress.Security.EscapeOutput
+			_doing_it_wrong( __FUNCTION__, esc_html__( 'WooFunnels Core should be at the same version as declared in your start.php', 'wp-marketing-automations' ), self::$version ); //phpcs:ignore WordPress.Security.EscapeOutput
 			die( 0 );
 		}
 	}

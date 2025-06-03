@@ -233,7 +233,6 @@ class BWFAN_Admin {
 	}
 
 	public function maybe_show_sandbox_mode_notice() {
-		/** Check if Autonami is in sandbox mode */
 		if ( false === BWFAN_Common::is_sandbox_mode_active() ) {
 			return;
 		}
@@ -241,7 +240,7 @@ class BWFAN_Admin {
         <div class="notice notice-warning" style="display: block!important;">
             <p>
 				<?php
-				echo __( '<strong>Warning! FunnelKit Automations is in Sandbox Mode</strong>. New Tasks will not be created & existing Tasks will not execute.', 'wp-marketing-automations' );
+				echo __( '<strong>Warning! FunnelKit Automations is currently in Sandbox Mode</strong>. Automations and Broadcasts will not run or trigger for any contacts while this mode is active.', 'wp-marketing-automations' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				?>
             </p>
         </div>
@@ -698,6 +697,9 @@ class BWFAN_Admin {
 		wp_localize_script( 'bwfan-admin', 'bwfan_events_excluded_actions', $events_excluded_actions );
 		wp_localize_script( 'bwfan-admin', 'bwfan_set_select2ajax_js_data', BWFAN_Core()->admin->get_select2ajax_js_data() );
 		wp_localize_script( 'bwfan-admin', 'bwfan_set_actions_js_data', BWFAN_Core()->admin->get_actions_js_data() );
+
+
+		do_action( 'bwfan_automation_v1_loaded' );
 	}
 
 	public function get_events_js_data() {
@@ -908,7 +910,9 @@ class BWFAN_Admin {
 			'utm_campaign' => 'FKA+Lite+Plugin',
 		), 'https://funnelkit.com/support' );
 
-		return sprintf( __( 'Over 200+ 5 star reviews show that FunnelKit users trust our top-rated support for their online business. Do you need help? <a href="%s" target="_blank"><b>Contact FunnelKit Support</b></a>.', 'wp-marketing-automations' ), $link );
+		/* translators: 1: Dynamic URL */
+
+		return sprintf( __( 'Over 260+ 5 star reviews show that FunnelKit users trust our top-rated support for their online business. Do you need help? <a href="%1$s" target="_blank"><b>Contact FunnelKit Support</b></a>.', 'wp-marketing-automations' ), $link );
 	}
 
 	public function admin_footer_version( $footer_version ) {
@@ -919,7 +923,9 @@ class BWFAN_Admin {
 			return '';
 		}
 
-		return sprintf( __( 'Version %s', 'wp-marketing-automations' ), BWFAN_VERSION );
+		/* translators: 1: Dynamic Data */
+
+		return sprintf( __( 'Version %1$s', 'wp-marketing-automations' ), BWFAN_VERSION );
 	}
 
 	public function get_automation_section() {
@@ -1007,7 +1013,7 @@ class BWFAN_Admin {
 
 	public function tooltip( $text ) {
 		?>
-        <span class="bwfan-help"><i class="icon"></i><div class="helpText"><?php esc_html_e( $text ); ?></div></span>
+        <span class="bwfan-help"><i class="icon"></i><div class="helpText"><?php echo esc_html( $text ); ?></div></span>
 		<?php
 	}
 
@@ -1075,11 +1081,11 @@ class BWFAN_Admin {
 	public function maybe_handle_optin_choice() {
 		if ( isset( $_GET['bwfan-optin-choice'] ) && isset( $_GET['_bwfan_optin_nonce'] ) ) {
 			if ( ! wp_verify_nonce( $_GET['_bwfan_optin_nonce'], 'bwfan_optin_nonce' ) ) {
-				wp_die( __( 'Action failed. Please refresh the page and retry.', 'wp-marketing-automations' ) );
+				wp_die( esc_html__( 'Action failed. Please refresh the page and retry.', 'wp-marketing-automations' ) );
 			}
 
 			if ( ! current_user_can( 'manage_options' ) ) {
-				wp_die( __( 'Cheating huh?', 'wp-marketing-automations' ) );
+				wp_die( esc_html__( 'Cheating huh?', 'wp-marketing-automations' ) );
 			}
 
 			$optin_choice = sanitize_text_field( $_GET['bwfan-optin-choice'] );
@@ -1261,7 +1267,7 @@ class BWFAN_Admin {
 
 			?>
             <a href="<?php echo $href; //phpcs:ignore WordPress.Security.EscapeOutput ?>"
-               class="<?php esc_attr_e( implode( ' ', $class ) ); ?>"<?php esc_attr_e( implode( ' ', $attr ) ); ?>><?php esc_html_e( $val['name'] ); ?></a>
+               class="<?php echo esc_attr( implode( ' ', $class ) ); ?>"<?php echo esc_attr( implode( ' ', $attr ) ); ?>><?php echo esc_html( $val['name'] ); ?></a>
 			<?php
 		}
 		echo '</nav>';
@@ -1478,7 +1484,7 @@ class BWFAN_Admin {
 			$result = $is_cache;
 		} else {
 			global $wpdb;
-			$result = $wpdb->get_row( $wpdb->prepare( "SELECT `total_order_value`, `total_order_count` FROM `{$wpdb->prefix}bwf_wc_customers` WHERE `cid` = %d LIMIT 0, 1", $cid ), ARRAY_A );
+			$result = $wpdb->get_row( $wpdb->prepare( "SELECT `total_order_value`, `total_order_count` FROM `{$wpdb->prefix}bwf_wc_customers` WHERE `cid` = %d LIMIT 0, 1", $cid ), ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			$WooFunnels_Cache_obj->set_cache( 'bwf_cid_' . $cid . '_wc_columns', $result, 'bwfan_order_contact_data' );
 		}
@@ -1492,9 +1498,10 @@ class BWFAN_Admin {
         <div style="display: flex; align-items: center">
 			<span>
 				<?php
-				echo wc_price( $result['total_order_value'], array( 'currency' => $default_currency_symbol ) );
+				echo wc_price( $result['total_order_value'], array( 'currency' => $default_currency_symbol ) ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				echo ' | ';
-				printf( _n( '%s order', '%s orders', intval( $result['total_order_count'] ), 'wp-marketing-automations' ), intval( $result['total_order_count'] ) );
+				// translators: %s: number of orders
+				printf( _n( '%s order', '%s orders', intval( $result['total_order_count'] ), 'wp-marketing-automations' ), intval( $result['total_order_count'] ) ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				?>
 			</span>
         </div>
@@ -1534,7 +1541,7 @@ class BWFAN_Admin {
 	public function bwf_order_meta_box_data( $post, $data ) {
 		$args = $data['args'];
 		if ( ! isset( $args['cid'] ) || empty( $args['cid'] ) ) {
-			echo __( 'No Contact Mapped', 'wp-marketing-automations' );
+			esc_html_e( 'No Contact Mapped', 'wp-marketing-automations' );
 
 			return;
 		}
@@ -1546,7 +1553,7 @@ class BWFAN_Admin {
 		$contact_id = absint( $args['cid'] );
 		$contact    = new BWFCRM_Contact( $contact_id );
 		if ( ! $contact instanceof BWFCRM_Contact || false === $contact->is_contact_exists() ) {
-			echo __( 'No Contact Mapped', 'wp-marketing-automations' );
+			esc_html_e( 'No Contact Mapped', 'wp-marketing-automations' );
 
 			return;
 		}
@@ -1564,6 +1571,10 @@ class BWFAN_Admin {
 		$joined_date = $contact->contact->get_creation_date();
 		$format      = BWFAN_Common::bwfan_get_date_format();
 		$joined_date = gmdate( $format, strtotime( $joined_date ) );
+		$resync_text = [
+			'text'    => __( 'Resync Orders', 'wp-marketing-automations' ),
+			'loading' => __( 'Syncing ...', 'wp-marketing-automations' ),
+		]
 		?>
         <style type="text/css">
             .bwf-order-edit-wrap {
@@ -1615,6 +1626,31 @@ class BWFAN_Admin {
 
             .bwf-contact-wc-detail a {
                 text-decoration: none;
+            }
+
+            #bwfan-admin-resync-order {
+                color: #0073AA;
+                font-size: 13px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 20px;
+                margin: 8px auto;
+                cursor: pointer;
+            }
+
+            #bwfan-admin-resync-order.loading {
+                color: #82838e;
+                cursor: default;
+            }
+
+            #bwfan-editorder-message-section {
+                display: none;
+                font-size: 13px;
+                line-height: 20px;
+            }
+
+            #bwfan-editorder-message-section.bwf-error {
+                color: #E15334;
             }
 
             .bwf-contact-wc-status {
@@ -1686,25 +1722,37 @@ class BWFAN_Admin {
                     <img alt="" class="bwf-gravatar" src="<?php echo esc_url( $avatar_url ); ?>" width="80" height="80"/>
                     <div class="bwf-c-name-initials">
 							<span>
-								<?php echo substr( $user_fname, 0, 1 ) . substr( $user_lname, 0, 1 ); ?>
+								<?php echo substr( $user_fname, 0, 1 ) . substr( $user_lname, 0, 1 ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped?>
 							</span>
                     </div>
                 </a>
             </div>
             <div class="bwf-contact-wc-detail">
                 <b>
-					<?php echo empty( $contact_name ) ? $user_mail : $contact_name; ?>
+					<?php echo esc_html( empty( $contact_name ) ? $user_mail : $contact_name ); ?>
                 </b>
-                <span>Joined On <?php echo $joined_date; ?></span>
+                <span><?php esc_html_e( 'Joined On', 'wp-marketing-automations' ); ?> <?php echo esc_html( $joined_date ); ?></span>
                 <span class="bwf-contact-wc-status">
                     <a href='<?php echo esc_url( $admin_url ); ?>' target="_blank">
                         <?php esc_html_e( 'View Contact', 'wp-marketing-automations' ); ?>
                     </a>
                 </span>
+                <span id="bwfan-admin-resync-order" title="<?php esc_html_e( 'Automatically sync orders', 'wp-marketing-automations' ); ?>">
+					<?php echo esc_html( $resync_text['text'] ) ?>
+				</span>
             </div>
+            <div id="bwfan-editorder-message-section"></div>
         </div>
 		<?php
 		do_action( 'bwfan_crm_order_autonami_metabox', $contact, $status );
+
+		wp_enqueue_script( 'bwfan-admin-common', $this->admin_url . '/assets/js/bwfan-admin-common.js', array(), BWFAN_VERSION_DEV, true );
+		wp_localize_script( 'bwfan-admin-common', 'bwfanProObj', array(
+			'siteUrl'       => site_url(),
+			'apiNamespace'  => BWFAN_API_NAMESPACE,
+			'contactId'     => $contact_id,
+			'localize_text' => $resync_text,
+		) );
 	}
 
 	/**
@@ -1757,7 +1805,8 @@ class BWFAN_Admin {
                     </svg>
                     <p>
 						<?php
-						echo sprintf( wp_kses_post( __( '<strong>Your FunnelKit Automation Pro license has expired!</strong> Please renew your license to continue using premium features without interruption. <a href="%s">Renew Now</a> or <a href="%s">I have My License Key</a>', 'wp-marketing-automations' ) ), 'https://funnelkit.com/my-account/?utm_source=WordPress&utm_campaign=FKA+Lite+Plugin&utm_medium=Plugin+Inline+Notice+Renew+Now', esc_url( admin_url( 'admin.php?page=autonami&path=/settings' ) ) );
+						/* translators: 1: Dynamic Data, 2: Dynamic URL */
+						echo sprintf( wp_kses_post( __( '<strong>Your FunnelKit Automation Pro license has expired!</strong> Please renew your license to continue using premium features without interruption. <a href="%1$s">Renew Now</a> or <a href="%2$s">I have My License Key</a>', 'wp-marketing-automations' ) ), 'https://funnelkit.com/my-account/?utm_source=WordPress&utm_campaign=FKA+Lite+Plugin&utm_medium=Plugin+Inline+Notice+Renew+Now', esc_url( admin_url( 'admin.php?page=autonami&path=/settings' ) ) );
 						?>
                     </p>
                 </div>

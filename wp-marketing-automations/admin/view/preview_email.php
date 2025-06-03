@@ -33,7 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		$action_object->is_preview              = true;
 		$data_to_set                            = $action_object->make_data( '', $email_data );
 
-		echo $data_to_set['body'];
+		echo $data_to_set['body']; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 	?>
 

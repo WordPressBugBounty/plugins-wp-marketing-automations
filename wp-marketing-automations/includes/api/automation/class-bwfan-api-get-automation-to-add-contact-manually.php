@@ -38,7 +38,7 @@ class BWFAN_API_Get_Automation_To_Add_Contact_Manually extends BWFAN_API_Base {
 		$args = array_merge( $args, [ $status, $version, '%' . $search . '%', $offset, $limit ] );
 
 		global $wpdb;
-		$automations = $wpdb->get_results( $wpdb->prepare( "SELECT `ID` as `key`,`title` as `value` FROM `{$wpdb->prefix}bwfan_automations` WHERE `event` IN($placeholder) AND `status`=%d AND `v`=%d AND `title` LIKE %s LIMIT %d, %d", $args ), ARRAY_A );
+		$automations = $wpdb->get_results( $wpdb->prepare( "SELECT `ID` as `key`,`title` as `value` FROM `{$wpdb->prefix}bwfan_automations` WHERE `event` IN($placeholder) AND `status`=%d AND `v`=%d AND `title` LIKE %s LIMIT %d, %d", $args ), ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		if ( empty( $automations ) ) {
 			return $this->success_response( [], __( 'No automations found in which contact can be added manually', 'wp-marketing-automations' ) );

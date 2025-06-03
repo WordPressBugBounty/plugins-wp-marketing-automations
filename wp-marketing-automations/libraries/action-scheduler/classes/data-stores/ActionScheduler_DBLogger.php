@@ -12,13 +12,13 @@ class ActionScheduler_DBLogger extends ActionScheduler_Logger {
 	/**
 	 * Add a record to an action log.
 	 *
-	 * @param int      $action_id Action ID.
-	 * @param string   $message Message to be saved in the log entry.
-	 * @param DateTime $date Timestamp of the log entry.
+	 * @param int           $action_id Action ID.
+	 * @param string        $message Message to be saved in the log entry.
+	 * @param DateTime|null $date Timestamp of the log entry.
 	 *
 	 * @return int     The log entry ID.
 	 */
-	public function log( $action_id, $message, DateTime $date = null ) {
+	public function log( $action_id, $message, ?DateTime $date = null ) {
 		if ( empty( $date ) ) {
 			$date = as_get_datetime_object();
 		} else {
@@ -29,14 +29,19 @@ class ActionScheduler_DBLogger extends ActionScheduler_Logger {
 		ActionScheduler_TimezoneHelper::set_local_timezone( $date );
 		$date_local = $date->format( 'Y-m-d H:i:s' );
 
-		/** @var \wpdb $wpdb */
+		/** @var \wpdb $wpdb */ //phpcs:ignore Generic.Commenting.DocComment.MissingShort
 		global $wpdb;
-		$wpdb->insert( $wpdb->actionscheduler_logs, [
-			'action_id'      => $action_id,
-			'message'        => $message,
-			'log_date_gmt'   => $date_gmt,
-			'log_date_local' => $date_local,
-		], [ '%d', '%s', '%s', '%s' ] );
+		//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->insert(
+			$wpdb->actionscheduler_logs,
+			array(
+				'action_id'      => $action_id,
+				'message'        => $message,
+				'log_date_gmt'   => $date_gmt,
+				'log_date_local' => $date_local,
+			),
+			array( '%d', '%s', '%s', '%s' )
+		);
 
 		return $wpdb->insert_id;
 	}
@@ -49,9 +54,9 @@ class ActionScheduler_DBLogger extends ActionScheduler_Logger {
 	 * @return ActionScheduler_LogEntry
 	 */
 	public function get_entry( $entry_id ) {
-		/** @var \wpdb $wpdb */
+		/** @var \wpdb $wpdb */ //phpcs:ignore Generic.Commenting.DocComment.MissingShort
 		global $wpdb;
-		$entry = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->actionscheduler_logs} WHERE log_id=%d", $entry_id ) );
+		$entry = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$wpdb->actionscheduler_logs} WHERE log_id=%d", $entry_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return $this->create_entry_from_db_record( $entry );
 	}
@@ -78,19 +83,19 @@ class ActionScheduler_DBLogger extends ActionScheduler_Logger {
 	}
 
 	/**
-	 * Retrieve the an action's log entries from the database.
+	 * Retrieve an action's log entries from the database.
 	 *
 	 * @param int $action_id Action ID.
 	 *
 	 * @return ActionScheduler_LogEntry[]
 	 */
 	public function get_logs( $action_id ) {
-		/** @var \wpdb $wpdb */
+		/** @var \wpdb $wpdb */ //phpcs:ignore Generic.Commenting.DocComment.MissingShort
 		global $wpdb;
 
-		$records = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->actionscheduler_logs} WHERE action_id=%d", $action_id ) );
+		$records = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$wpdb->actionscheduler_logs} WHERE action_id=%d", $action_id ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
-		return array_map( [ $this, 'create_entry_from_db_record' ], $records );
+		return array_map( array( $this, 'create_entry_from_db_record' ), $records );
 	}
 
 	/**
@@ -105,7 +110,7 @@ class ActionScheduler_DBLogger extends ActionScheduler_Logger {
 
 		parent::init();
 
-		add_action( 'action_scheduler_deleted_action', [ $this, 'clear_deleted_action_logs' ], 10, 1 );
+		add_action( 'action_scheduler_deleted_action', array( $this, 'clear_deleted_action_logs' ), 10, 1 );
 	}
 
 	/**
@@ -114,9 +119,9 @@ class ActionScheduler_DBLogger extends ActionScheduler_Logger {
 	 * @param int $action_id Action ID.
 	 */
 	public function clear_deleted_action_logs( $action_id ) {
-		/** @var \wpdb $wpdb */
+		/** @var \wpdb $wpdb */ //phpcs:ignore Generic.Commenting.DocComment.MissingShort
 		global $wpdb;
-		$wpdb->delete( $wpdb->actionscheduler_logs, [ 'action_id' => $action_id, ], [ '%d' ] );
+		$wpdb->delete( $wpdb->actionscheduler_logs, array( 'action_id' => $action_id ), array( '%d' ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
 	/**
@@ -129,22 +134,22 @@ class ActionScheduler_DBLogger extends ActionScheduler_Logger {
 			return;
 		}
 
-		/** @var \wpdb $wpdb */
+		/** @var \wpdb $wpdb */ //phpcs:ignore Generic.Commenting.DocComment.MissingShort
 		global $wpdb;
 		$date     = as_get_datetime_object();
 		$date_gmt = $date->format( 'Y-m-d H:i:s' );
 		ActionScheduler_TimezoneHelper::set_local_timezone( $date );
 		$date_local = $date->format( 'Y-m-d H:i:s' );
-		$message    = __( 'action canceled', 'action-scheduler' );
+		$message    = __( 'action canceled', 'woocommerce' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 		$format     = '(%d, ' . $wpdb->prepare( '%s, %s, %s', $message, $date_gmt, $date_local ) . ')';
 		$sql_query  = "INSERT {$wpdb->actionscheduler_logs} (action_id, message, log_date_gmt, log_date_local) VALUES ";
-		$value_rows = [];
+		$value_rows = array();
 
 		foreach ( $action_ids as $action_id ) {
-			$value_rows[] = $wpdb->prepare( $format, $action_id );
+			$value_rows[] = $wpdb->prepare( $format, $action_id ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		}
 		$sql_query .= implode( ',', $value_rows );
 
-		$wpdb->query( $sql_query );
+		$wpdb->query( $sql_query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 }

@@ -37,6 +37,8 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 
 		public static $query_cache = [];
 
+		public static $link_id = null;
+
 		public $days = array(
 			'monday'    => 1,
 			'tuesday'   => 2,
@@ -46,6 +48,8 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 			'saturday'  => 6,
 			'sunday'    => 7,
 		);
+
+		public static $template = null;
 
 		public function __construct() {
 			add_action( 'plugins_loaded', array( $this, 'handle_track_open' ), 99 );
@@ -108,6 +112,7 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 		 * @return array|mixed|string|string[]|null
 		 */
 		public function add_tracking_code( $body, $data, $hash_code, $automation_id, $automation_open_click = false, $mode = 1 ) {
+			$body = BWFAN_Common::bwfan_correct_protocol_url( $body );
 			/** Check for click tracking */
 			if ( $automation_open_click ) {
 				$this->track_click_utm_parameters['bwfan-track-action'] = 'click';
@@ -131,10 +136,9 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 				$this->engagement_mode            = $mode === self::$MODE_EMAIL ? 'email' : ( $mode === self::$MODE_SMS ? 'sms' : 'whatsapp' );
 
 				$regex_pattern = BWFAN_Common::get_regex_pattern( 'email' !== $this->engagement_mode ? 3 : 1 );
-				$body          = preg_replace_callback( $regex_pattern, function ( $matches ) use ( $hash_code ) {
+				$body          = preg_replace_callback( $regex_pattern, function ( $matches ) use ( $hash_code, $data ) {
 					/** According to Href (1) regex, URL is at 1 index. And for Link (3) Regex, 0 index. */
 					$url = 'email' !== $this->engagement_mode ? $matches[0] : $matches[1];
-
 					/** Check url needs to exclude from click track */
 					if ( BWFAN_Common::is_exclude_url( $url ) ) {
 						return $matches[0];
@@ -142,16 +146,26 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 
 					/** Exclude click tracking for unsubscribe link and view email browser link*/
 					if ( false === strpos( $url, 'bwfan-action=unsubscribe' ) && false === strpos( $url, 'bwfan-action=view_in_browser' ) ) {
-						$url = $this->append_tracking_in_url( $url );
+						BWFAN_Core()->conversation->template = self::$template;
+						$l_hash                              = BWFAN_Core()->conversation->get_link_hash( $url, $data );
+						$url                                 = $this->append_tracking_in_url( $url, $l_hash );
 					}
 
-					/** Add track id in unsubscribe link */
+					/** Add step id in unsubscribe link */
 					if ( false !== strpos( $url, 'bwfan-action=unsubscribe' ) ) {
-						$link = urlencode( str_replace( 'amp;', '', $url ) );
-						$url  = add_query_arg( [
-							'bwfan-track-id' => $hash_code,
-							'bwfan-link'     => $link
-						], home_url() );
+						$link = str_replace( 'amp;', '', $url );
+
+						/** If step id exists in data then no need to pass track id */
+						if ( ! empty( $data['step_id'] ) ) {
+							$url = add_query_arg( [
+								'sid' => $data['step_id'],
+							], $link );
+						} else {
+							$url = add_query_arg( [
+								'bwfan-track-id' => $hash_code,
+								'bwfan-link'     => urlencode( $link )
+							], home_url() );
+						}
 					}
 
 					/** Add hash_code if view email browser link */
@@ -262,6 +276,8 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 			$data['cid'] = $cid;
 			$template_id = self::check_already_exists_template( $subject, $body, $mode, $data );
 
+			$data['template_id'] = $template_id;
+
 			$insert_data = array(
 				'cid'           => $e_cid,
 				'hash_code'     => $hash_code,
@@ -282,7 +298,7 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 			);
 
 			/** Insert Conversation, (Before adding merge tags) */
-			BWFAN_Model_Engagement_Tracking::insert( $insert_data );
+			BWFAN_Model_Engagement_Tracking::insert_ignore( $insert_data );
 			$this->track_id = BWFAN_Model_Engagement_Tracking::insert_id();
 
 			/** Fetch Merge tags and add to Conversation Meta, for quick uses */
@@ -309,6 +325,8 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 				return $body;
 			}
 
+			/** Add engagement type for links it will be use when saving links */
+			$data['type'] = self::$TYPE_AUTOMATION;
 			/** Add tracking code */
 			$body = $this->add_tracking_code( $body, $data, $hash_code, $automation_id, $is_track_enable, $mode );
 
@@ -360,26 +378,26 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 
 			$template_id = $core_cache_obj->get_cache( md5( $query ), 'fka-automation' );
 			if ( false === $template_id ) {
-				try {
-					$template_data = $wpdb->get_results( $query, ARRAY_A );
-				} catch ( Exception $e ) {
-					if ( false !== strpos( $e->getMessage(), 'collation' ) ) {
-						$wp_collation = $wpdb->get_var( "SELECT @@collation_database" );
-						if ( ! empty( $wp_collation ) && false !== strpos( $wp_collation, 'unicode' ) ) {
-							$wp_collation = str_replace( 'unicode', 'general', $wp_collation );
-						}
-						if ( empty( $wp_collation ) ) {
-							$wp_collation = 'utf8mb4_general_ci';
-						}
-						$wpdb->query( "ALTER TABLE $table_name MODIFY `template` longtext COLLATE $wp_collation" );
-						$template_data = $wpdb->get_results( $query );
+				$template_data = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				if ( false !== strpos( $wpdb->last_error, 'collations' ) ) {
+					$wp_collation = $wpdb->get_var( "SELECT @@collation_database" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+					if ( ! empty( $wp_collation ) && false !== strpos( $wp_collation, 'unicode' ) ) {
+						$wp_collation = str_replace( 'unicode', 'general', $wp_collation );
 					}
-				}
 
+					if ( empty( $wp_collation ) ) {
+						$wp_collation = 'utf8mb4_general_ci';
+					}
+
+					$charset = ( ! empty( $wpdb->charset ) && 'utf8mb3' !== $wpdb->charset ) ? $wpdb->charset : 'utf8mb4';
+					$wpdb->query( "SET NAMES '$charset' COLLATE '$wp_collation'" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+					$template_data = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				}
 
 				if ( ! empty( $template_data[0]['ID'] ) ) {
 					$template_id = intval( $template_data[0]['ID'] );
 					$core_cache_obj->set_cache( md5( $query ), $template_id, 'fka-automation' );
+					self::$template = $template_data[0];
 
 					return $template_id;
 				}
@@ -389,6 +407,8 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 				$template_id = BWFAN_Model_Templates::insert_id();
 				$core_cache_obj->set_cache( md5( $query ), $template_id, 'fka-automation' );
 			}
+			$templates_data['ID'] = $template_id;
+			self::$template       = $templates_data;
 
 			return $template_id;
 		}
@@ -467,11 +487,14 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 		}
 
 		/**
-		 * @param $url
+		 * Append tracking code
 		 *
-		 * @return string
+		 * @param $url
+		 * @param $l_hash
+		 *
+		 * @return mixed|string
 		 */
-		public function append_tracking_in_url( $url ) {
+		public function append_tracking_in_url( $url, $l_hash = '' ) {
 			if ( empty( $url ) ) {
 				return $url;
 			}
@@ -486,7 +509,9 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 			if ( false === $is_link_trigger ) {
 				/** When multiple links and if unset because of link trigger URL, then needs to add again */
 				$this->track_click_utm_parameters['bwfan-track-action'] = 'click';
-
+				if ( ! empty( $l_hash ) ) {
+					$this->track_click_utm_parameters['l_hash'] = $l_hash;
+				}
 				$this->track_click_utm_parameters['bwfan-link'] = urlencode( str_replace( 'amp;', '', $url ) );
 				$home_url                                       = home_url();
 			} else {
@@ -630,6 +655,11 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 
 			/** Update contact status if needed */
 			$this->maybe_subscribe_contact( $contact );
+
+			/** Update link metrics */
+			if ( 'click' === $type ) {
+				self::update_link_metrics( $get_row[0] );
+			}
 		}
 
 		/**
@@ -677,7 +707,7 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 			}
 
 			global $wpdb;
-			$wpdb->update( "{$wpdb->prefix}bwf_contact", [ 'status' => 1 ], [ 'id' => $contact->id ] );
+			$wpdb->update( "{$wpdb->prefix}bwf_contact", [ 'status' => 1 ], [ 'id' => $contact->id ] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			/** Delete soft bounce count meta */
 			$ins = WooFunnels_DB_Operations::get_instance();
@@ -696,15 +726,15 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 				return;
 			}
 
-			$link = filter_input( INPUT_GET, 'bwfan-link' );
-			if ( empty( $link ) ) {
+			$link   = filter_input( INPUT_GET, 'bwfan-link' );
+			$l_hash = filter_input( INPUT_GET, 'l_hash' );
+			if ( empty( $link ) && empty( $l_hash ) ) {
 				$this->track_click_skip();
 
 				return;
 			}
-
-			$link = BWFAN_Common::validate_target_link( $link );
-
+			$engagement_data = $this->get_engagement_data();
+			$link            = BWFAN_Common::validate_target_link( $link, $l_hash, $engagement_data );
 			/** Checking source of click */
 			if ( self::skipping_user_agent() ) {
 				BWFAN_Common::wp_redirect( $link );
@@ -742,7 +772,6 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 
 			$link = bwfan_is_autonami_pro_active() ? BWFCRM_Core()->link_trigger_handler->may_append_query_arg( $link ) : $link;
 
-			$engagement_data = $this->get_engagement_data();
 			/** Record tracking */
 			$this->track_click_skip( $link, $engagement_data );
 
@@ -767,9 +796,9 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 			if ( false === strpos( $link, 'bwfan-action=unsubscribe' ) ) {
 				return;
 			}
-			$link = BWFAN_Common::validate_target_link( $link );
 
 			$engagement_data = $this->get_engagement_data();
+			$link            = BWFAN_Common::validate_target_link( $link, '', $engagement_data );
 			if ( empty( $engagement_data ) ) {
 				return;
 			}
@@ -1286,7 +1315,7 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
                 <label><?php esc_html_e( 'Order Tracking Conversion', 'wp-marketing-automations' ); ?></label>
                 <div class="field-wrap">
                     <div class="wrapper">
-                        <input type="number" placeholder="Days to track order" name="bwfan_order_tracking_conversion" min="1" value="<?php echo esc_attr_e( $order_tracking_conversation ); ?>"/>
+                        <input type="number" placeholder="Days to track order" name="bwfan_order_tracking_conversion" min="1" value="<?php echo esc_attr( $order_tracking_conversation ); ?>"/>
                     </div>
                     <span class="hint"><?php esc_attr_e( 'Days to Track order details for conversion', 'wp-marketing-automations' ); ?></span>
                 </div>
@@ -1349,6 +1378,50 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 			}
 
 			return false;
+		}
+
+		/**
+		 * update link metrics
+		 *
+		 * @param $engagement
+		 *
+		 * @return void
+		 */
+		public static function update_link_metrics( $engagement ) {
+			if ( empty( $engagement ) ) {
+				return;
+			}
+
+			/** If link trigger found */
+			$link_trigger = filter_input( INPUT_GET, 'bwfan-link-trigger' );
+			if ( ! empty( $link_trigger ) ) {
+				$cleaned_url   = BWFAN_Core()->conversation->get_cleaned_url( urldecode( site_url( '/?bwfan-link-trigger=' . $link_trigger ) ) );
+				self::$link_id = BWFAN_Model_Links::get_link_id_by_tid( $cleaned_url, $engagement );
+			}
+
+			if ( empty( self::$link_id ) ) {
+				return;
+			}
+			$metrics = BWFAN_Model_Link_Metrics::get_link_metrics( self::$link_id, $engagement['cid'] );
+			if ( empty( $metrics ) ) {
+				$data = [
+					'link_id'    => self::$link_id,
+					'contact_id' => $engagement['cid'] ?? 0,
+					'ip_address' => $_SERVER['REMOTE_ADDR'] ?? '',
+					'count'      => 1,
+					'created_at' => current_time( 'mysql', 1 ),
+				];
+				BWFAN_Model_Link_Metrics::insert( $data );
+
+				return;
+			}
+
+			try {
+				BWFAN_Model_Link_Metrics::update( [
+					'count' => intval( $metrics['count'] ) + 1
+				], [ 'ID' => $metrics['ID'] ] );
+			} catch ( Exception $e ) {
+			}
 		}
 	}
 

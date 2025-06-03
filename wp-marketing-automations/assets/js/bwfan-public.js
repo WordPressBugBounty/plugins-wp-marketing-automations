@@ -49,6 +49,9 @@ var BWFAN_Public;
                 'shipping_state',
                 'shipping_postcode',
                 'shipping_phone',
+                'ship_to_different_address',
+                'shipping_same_as_billing',
+                'billing_same_as_shipping'
             ];
 
             if (bwfanParamspublic.bwfan_custom_checkout_field != undefined && bwfanParamspublic.bwfan_custom_checkout_field != null) {
@@ -156,29 +159,107 @@ var BWFAN_Public;
                 BWFAN_Public.checkout_fields_data[field_name] = $this.val();
             });
         },
-        bwfan_captureCheckoutField: function () {
-
-            var field_name = $(this).attr('name');
-            /** for checking checkbox fields **/
-            if ($(this).attr('type') == 'checkbox') {
-                if ($(this).prop('checked')) {
-                    $(this).val(1);
-                } else {
-                    $(this).val(0);
-                }
-            }
-            if (!field_name || BWFAN_Public.checkout_fields.indexOf(field_name) === -1) {
-                return;
-            }
-
-            if (!$(this).val() || BWFAN_Public.checkout_fields_data[field_name] === $(this).val()) {
-                return;
-            }
-
+        bwfanUpdateOnAddressCheckbox: function ( field_name, field_value ) {
             var checkout_formdata = BWFAN_Public.checkout_form.bwfanac_serializeAndEncode();
             checkout_formdata = bwfanac_deserialize_obj(checkout_formdata);
-            BWFAN_Public.checkout_fields_data = checkout_formdata;
+            checkout_formdata[field_name] = field_value;
+            if (
+               ! (( $('#ship-to-different-address-checkbox').length && $('#ship-to-different-address-checkbox').is(':checked') && !$('.wfacp_page').length ) ||
+                $('#billing_same_as_shipping').length && $('#billing_same_as_shipping').is(':checked') ||
+                $('#shipping_same_as_billing').length && $('#shipping_same_as_billing').is(':checked'))
+            ) {
+                for (var i = 0; i < BWFAN_Public.checkout_fields.length; i++) {
+                    let field = BWFAN_Public.checkout_fields[i];
+                    var fields = '';
 
+                    if (checkout_formdata[field] && ($('#shipping_same_as_billing').length && !$('#shipping_same_as_billing').is(':checked')) || // For Aero Checkout - if shipping same as billing checkbox exists and is not checked
+                        (!$('#ship-to-different-address-checkbox').is(':checked'))  ) {
+                        fields = field.replace('billing_', 'shipping_');
+                    }
+                    if (checkout_formdata[field] && ( $('#billing_same_as_shipping').length && !$('#billing_same_as_shipping').is(':checked' ) )) {
+                        fields = field.replace('shipping_', 'billing_');
+                    }
+
+                    checkout_formdata[fields] = checkout_formdata[field];
+                }
+
+
+            }
+            BWFAN_Public.checkout_fields_data = checkout_formdata;
+        },
+        bwfan_captureCheckoutField: function () {
+            var field_name = $(this).attr('name');
+            if (!field_name) {
+                return;
+            }
+
+            var field_value = $(this).val();
+
+            /** for checking checkbox fields **/
+            if ($(this).attr('type') == 'checkbox') {
+                field_value = $(this).prop('checked') ? 1 : 0;
+            }
+
+            if (BWFAN_Public.checkout_fields.indexOf(field_name) === -1) {
+                return;
+            }
+
+            if (BWFAN_Public.checkout_fields_data[field_name] === field_value) {
+                return;
+            }
+
+            if ( ['ship_to_different_address', 'billing_same_as_shipping', 'shipping_same_as_billing'].includes( field_name ) ) {
+                setTimeout(function () {
+                    BWFAN_Public.bwfanUpdateOnAddressCheckbox(field_name, field_value);
+                }, 200);
+                return;
+            }
+            BWFAN_Public.checkout_fields_data[field_name] = field_value;
+
+            // For WooCommerce - shipping same as billing
+            if ($('#ship-to-different-address-checkbox').length) {
+                BWFAN_Public.checkout_fields_data['ship_to_different_address'] = $('#ship-to-different-address-checkbox').is(':checked') ? 1 : 0;
+            }
+
+            // For AeroCheckout - billing same as shipping
+            if ($('#billing_same_as_shipping').length) {
+                BWFAN_Public.checkout_fields_data['billing_same_as_shipping'] = $('#billing_same_as_shipping').is(':checked') ? 1 : 0;
+            }
+
+            // For AeroCheckout - shipping same as billing
+            if ($('#shipping_same_as_billing').length) {
+                BWFAN_Public.checkout_fields_data['shipping_same_as_billing'] = $('#shipping_same_as_billing').is(':checked') ? 1 : 0;
+            }
+
+            var field = '';
+
+            // For Aero Checkout - if billing same as shipping checkbox exists and is not checked
+            if ($('#billing_same_as_shipping').length && !$('#billing_same_as_shipping').is(':checked')) {
+                if (field_name.indexOf('shipping_') === 0) {
+                    field = field_name.replace('shipping_', 'billing_');
+                }
+            }
+
+            if (
+                ($('#shipping_same_as_billing').length && !$('#shipping_same_as_billing').is(':checked')) || // For Aero Checkout - if shipping same as billing checkbox exists and is not checked
+                (!$('#ship-to-different-address-checkbox').is(':checked')) // For WooCommerce native checkout
+            ) {
+                if (field_name.indexOf('billing_') === 0) {
+                    field = field_name.replace('billing_', 'shipping_');
+                }
+            }
+
+            // For Aero Checkout - if billing/shipping same as shipping/billing checkbox not exists
+            if(!$('#shipping_same_as_billing').length && !$('#billing_same_as_shipping').length && $('.wfacp_page').length) {
+                if (field_name.indexOf('billing_') === 0) {
+                    field = field_name.replace('billing_', 'shipping_');
+                }
+                if (field_name.indexOf('shipping_') === 0) {
+                    field = field_name.replace('shipping_', 'billing_');
+                }
+            }
+
+            BWFAN_Public.checkout_fields_data[field] = field_value;
         },
         bwfan_process_email: async function (email) {
             if ('undefined' === typeof email) {
@@ -466,7 +547,7 @@ var BWFAN_Public;
             });
         }
     });
-
+    let bwfFieldChangeTimer = null;
     $(window).on('load', function () {
         BWFAN_Public.abandoned_cart();
         BWFAN_Public.unsubscribe_event();
@@ -483,10 +564,30 @@ var BWFAN_Public;
          * Detect change and save data in database
          */
         BWFAN_Public.checkout_form.on('change', 'select', BWFAN_Public.bwfan_captureCheckoutField);
-        BWFAN_Public.checkout_form.on('click change', '.input-checkbox', BWFAN_Public.bwfan_captureCheckoutField);
-        BWFAN_Public.checkout_form.on('blur change', '.input-text', BWFAN_Public.bwfan_captureCheckoutField);
-        BWFAN_Public.checkout_form.on('focusout', '.input-text', BWFAN_Public.bwfan_captureCheckoutField);
-        $(document).on('blur change', '#billing_email,.input-text,.input-checkbox', BWFAN_Public.bwfan_get_checkout_data);
+        BWFAN_Public.checkout_form.on('click', '.input-checkbox', BWFAN_Public.bwfan_captureCheckoutField);
+        BWFAN_Public.checkout_form.on('change', '.input-checkbox', BWFAN_Public.bwfan_captureCheckoutField);
+        BWFAN_Public.checkout_form.on('change', '.input-text', BWFAN_Public.bwfan_captureCheckoutField);
+        BWFAN_Public.checkout_form.on('blur focusout', '.input-text', () => {
+            // add check update on typing stops
+            if (bwfFieldChangeTimer) {
+                clearTimeout(bwfFieldChangeTimer);
+            }
+            bwfFieldChangeTimer = setTimeout(() => {
+                BWFAN_Public.bwfan_captureCheckoutField();
+            }, 500);
+        });
+        // Reset the 'triggered' flag when the input element gets focused again
+        BWFAN_Public.checkout_form.on('focus', '.input-text', function () {
+            $(this).removeData('triggered');
+        });
+
+        var interval = null;
+        $(document).on('blur change', '#billing_email,.input-text,.input-checkbox', function () {
+            if (interval !== null) {
+                clearTimeout(interval);
+            }
+            interval = setTimeout(BWFAN_Public.bwfan_get_checkout_data, 100);
+        });
 
         if (typeof bwfan_unsubscribe_preference !== 'undefined' && 'one_click' === bwfan_unsubscribe_preference) {
             var urlParams = new URLSearchParams(window.location.search);
@@ -505,18 +606,37 @@ var BWFAN_Public;
             }
         }
     });
-
+    var updateCartTimeout = null;
     $(document).on('updated_checkout', function () {
-        BWFAN_Public.bwfan_captureCheckoutField();
-        var email = $('#billing_email').val();
-        if (email !== '') {
-            BWFAN_Public.bwfan_process_email(email);
+        if (updateCartTimeout !== null) {
+            clearTimeout(updateCartTimeout);
         }
+        updateCartTimeout = setTimeout(function (){
+            var email = $('#billing_email').val();
+            if (email !== '') {
+                BWFAN_Public.bwfan_process_email(email);
+            }
+        }, 500);
     });
     $("#bwfan-tyb-save-btn").on('click', function () {
         var $this = $(this);
         var $parent = $this.parents(".bwfan-tyb-wrap");
         var res_msg_selector = $parent.find('.bwfan-tyb-msg');
+
+        // Get values from the dropdown fields if they exist
+        var yearSelect = $parent.find('select[name="bwfan_birthday_date_yy"]');
+        var monthSelect = $parent.find('select[name="bwfan_birthday_date_mm"]');
+        var daySelect = $parent.find('select[name="bwfan_birthday_date_dd"]');
+
+        // Check if the dropdowns exist
+        var dropdownsExist = yearSelect.length && monthSelect.length && daySelect.length;
+        var year = '', month = '', day = '';
+        // If dropdowns exist, validate their values
+        if (dropdownsExist) {
+            year = yearSelect.val();
+            month = monthSelect.val();
+            day = daySelect.val();
+        }
 
         $this.addClass('bwfan-btn-spin');
         $.ajax({
@@ -526,6 +646,9 @@ var BWFAN_Public;
             data: {
                 "order_id": $parent.find('#bwfan-order-id').val(),
                 "birthday": $parent.find('#bwfan-tyb-field').val(),
+                "bwfan_birthday_date_yy": year,
+                "bwfan_birthday_date_mm": month,
+                "bwfan_birthday_date_dd": day,
                 "cid": $parent.find('#bwfan-cid').val(),
                 "nonce": $parent.find('#bwfan-tyb-nonce').val(),
                 "action": "save_birthday_on_thankyou"

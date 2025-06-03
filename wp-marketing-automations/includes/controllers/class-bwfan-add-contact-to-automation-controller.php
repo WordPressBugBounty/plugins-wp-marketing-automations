@@ -3,21 +3,23 @@
 class BWFAN_Add_Contact_To_Automation_Controller {
 	public $automation_id = '';
 	public $contact_id = '';
-	protected $messages = [
-		'required_data_missing'     => 'Required data are missing',
-		'automation_data_not_found' => 'Automation data not found',
-		'automation_is_not_active'  => 'Automation is not active',
-		'event_not_found'           => 'Event not found',
-		'contact_not_found'         => 'Contact does not exist',
-		'not_added_to_automation'   => 'Contact not added to automation',
-		'added_to_automation'       => 'Contact added to automation',
-		'validation_failed'         => 'Event validation failed',
-		'user_not_found'            => 'Wordpress user not found for this contact'
-	];
+	protected $messages = [];
 
 	public function __construct( $automation_id, $contact_id ) {
 		$this->automation_id = intval( $automation_id );
 		$this->contact_id    = intval( $contact_id );
+
+		$this->messages = [
+			'required_data_missing'     => __( 'Required data are missing', 'wp-marketing-automations' ),
+			'automation_data_not_found' => __( 'Automation data not found', 'wp-marketing-automations' ),
+			'automation_is_not_active'  => __( 'Automation is not active', 'wp-marketing-automations' ),
+			'event_not_found'           => __( 'Event not found', 'wp-marketing-automations' ),
+			'contact_not_found'         => __( 'Contact does not exist', 'wp-marketing-automations' ),
+			'not_added_to_automation'   => __( 'Contact not added to automation', 'wp-marketing-automations' ),
+			'added_to_automation'       => __( 'Contact added to automation', 'wp-marketing-automations' ),
+			'validation_failed'         => __( 'Event validation failed', 'wp-marketing-automations' ),
+			'user_not_found'            => __( 'No linked WordPress user for this contact.', 'wp-marketing-automations' )
+		];
 	}
 
 	public function add_contact_to_automation() {
@@ -26,7 +28,6 @@ class BWFAN_Add_Contact_To_Automation_Controller {
 		}
 
 		$automation_data = $this->prepare_automation_data();
-
 		if ( empty( $automation_data ) ) {
 			return $this->get_response( 404, 'automation_data_not_found' );
 		}
@@ -43,7 +44,9 @@ class BWFAN_Add_Contact_To_Automation_Controller {
 
 		$automation_data = $event->get_manually_added_contact_automation_data( $automation_data, $this->contact_id );
 		if ( isset( $automation_data['status'] ) && 0 === $automation_data['status'] ) {
-			return $this->get_response( 404, $automation_data['type'], $automation_data['message'] );
+			$message = $automation_data['message'] ?? '';
+
+			return $this->get_response( 404, $automation_data['type'], $message );
 		}
 
 		if ( false === $event->validate_v2_event_settings( $automation_data ) ) {
@@ -97,9 +100,9 @@ class BWFAN_Add_Contact_To_Automation_Controller {
 	}
 
 	protected function get_response( $code, $type = '', $msg = '' ) {
-		$msg = ! empty( $msg ) ? $msg : ( isset( $this->messages[ $type ] ) ? $this->messages[ $type ] : '' );
+		$msg = ! empty( $msg ) ? $msg : ( $this->messages[ $type ] ?? '' );
 
-		return [ 'code' => $code, 'message' => __( $msg, 'wp-marketing-automations' ) ];
+		return [ 'code' => $code, 'message' => $msg ];
 	}
 
 }

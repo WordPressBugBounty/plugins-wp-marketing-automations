@@ -48,6 +48,9 @@ class BWFAN_DB {
 
 		add_action( 'admin_init', [ $this, 'version_1_0_0' ], 10 );
 		add_action( 'admin_init', [ $this, 'db_update' ], 11 );
+
+		/** Save time when db version updated */
+		add_filter( 'pre_update_option_bwfan_db', [ $this, 'db_updated' ] );
 	}
 
 	/**
@@ -141,6 +144,18 @@ class BWFAN_DB {
 			$db_errors[] = $table_instance->db_errors;
 		}
 
+		$table_instance = new BWFAN_DB_Table_Links();
+		$table_instance->create_table();
+		if ( ! empty( $table_instance->db_errors ) ) {
+			$db_errors[] = $table_instance->db_errors;
+		}
+
+		$table_instance = new BWFAN_DB_Table_Link_Metrics();
+		$table_instance->create_table();
+		if ( ! empty( $table_instance->db_errors ) ) {
+			$db_errors[] = $table_instance->db_errors;
+		}
+
 		$this->tables_created = true;
 
 		$this->method_run[] = '1.0.0';
@@ -151,7 +166,7 @@ class BWFAN_DB {
 		update_option( 'bwfan_new_user', 'yes', true );
 
 		/** Unique key to share in rest calls */
-		$unique_key = md5( time() );
+		$unique_key = wp_generate_password( 32, false );
 		update_option( 'bwfan_u_key', $unique_key, true );
 
 		/** Update v1 automation status */
@@ -186,8 +201,8 @@ class BWFAN_DB {
 		);
 		update_option( 'bwfan_email_notification_updated', $executed_last, false );
 
-		/** Check for old drag & drop email builder */
-		$this->check_for_old_visual_builder();
+		/** Adding a new unique key for file download */
+		update_option( 'bwfan_unique_secret', wp_generate_password( 32, false ), true );
 
 		/** Log if any mysql errors */
 		if ( ! empty( $db_errors ) ) {
@@ -283,6 +298,10 @@ class BWFAN_DB {
 			'3.2.1'    => '3_2_1',
 			'3.2.2'    => '3_2_2',
 			'3.4.1'    => '3_4_1',
+			'3.4.2'    => '3_4_2',
+			'3.4.3'    => '3_4_3',
+			'3.4.4'    => '3_4_4',
+			'3.5.0'    => '3_5_0',
 		);
 		$db_version = get_option( 'bwfan_db', '2.0' );
 
@@ -297,6 +316,21 @@ class BWFAN_DB {
 	}
 
 	/**
+	 * Save time when DB version updated
+	 *
+	 * @param $value
+	 *
+	 * @return mixed
+	 */
+	public function db_updated( $value ) {
+		$versions           = bwf_options_get( 'bwfan_db_updated', 'value', [] );
+		$versions[ $value ] = current_time( 'mysql', 1 );
+		bwf_options_update( 'bwfan_db_updated', $versions );
+
+		return $value;
+	}
+
+	/**
 	 * @param $version_key
 	 *
 	 * @return void
@@ -306,7 +340,7 @@ class BWFAN_DB {
 		$db_errors = [];
 
 		if ( ! is_array( $this->method_run ) || ! in_array( '1.0.0', $this->method_run, true ) ) {
-			$column_exists = $wpdb->query( "SHOW COLUMNS FROM {$wpdb->prefix}bwfan_automations LIKE 'start'" );
+			$column_exists = $wpdb->query( "SHOW COLUMNS FROM {$wpdb->prefix}bwfan_automations LIKE 'start'" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( empty( $column_exists ) ) {
 				/** Add new columns in bwfan_automations table */
 				$query = "ALTER TABLE {$wpdb->prefix}bwfan_automations
@@ -314,7 +348,7 @@ class BWFAN_DB {
 				ADD COLUMN `v` tinyint(1) UNSIGNED NOT NULL default 1,
 				ADD COLUMN `benchmark` varchar(150) NOT NULL,
 				ADD COLUMN `title` varchar(255) NULL;";
-				$wpdb->query( $query );
+				$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				if ( ! empty( $wpdb->last_error ) ) {
 					$db_errors[] = 'bwfan_automations alter table - ' . $wpdb->last_error;
 				}
@@ -353,6 +387,10 @@ class BWFAN_DB {
 
 		/** Create v2 tables */
 		$this->v2_tables();
+
+		/** Check for old drag & drop email builder */
+		$this->check_for_old_visual_builder();
+
 		$this->method_run[] = $version_key;
 
 		/** Updating version key */
@@ -482,11 +520,11 @@ class BWFAN_DB {
 		$db_errors = [];
 
 		/** Check if 'next' column exists before attempting to drop it */
-		$column_exists = $wpdb->query( "SHOW COLUMNS FROM {$wpdb->prefix}bwfan_automation_contact LIKE 'next'" );
+		$column_exists = $wpdb->query( "SHOW COLUMNS FROM {$wpdb->prefix}bwfan_automation_contact LIKE 'next'" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( $column_exists ) {
 			/** Drop next column */
 			$drop_col = "ALTER TABLE {$wpdb->prefix}bwfan_automation_contact DROP COLUMN `next`";
-			$wpdb->query( $drop_col );
+			$wpdb->query( $drop_col ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( ! empty( $wpdb->last_error ) ) {
 				$db_errors[] = 'bwfan_automation_contact drop call - ' . $wpdb->last_error;
 			}
@@ -534,24 +572,24 @@ class BWFAN_DB {
 
 		if ( ! is_array( $this->method_run ) || ! in_array( '2.0.10.2', $this->method_run, true ) ) {
 			/** Alter bwfan_automation_complete_contact table */
-			$column_exists = $wpdb->query( "SHOW COLUMNS FROM {$wpdb->prefix}bwfan_automation_complete_contact LIKE 'event'" );
+			$column_exists = $wpdb->query( "SHOW COLUMNS FROM {$wpdb->prefix}bwfan_automation_complete_contact LIKE 'event'" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( empty( $column_exists ) ) {
 				$query = "ALTER TABLE {$wpdb->prefix}bwfan_automation_complete_contact
     			CHANGE `trail` `trail` VARCHAR(40) NULL COMMENT 'Trail ID',
 		    	ADD COLUMN `event` varchar(120) NOT NULL;";
-				$wpdb->query( $query );
+				$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				if ( ! empty( $wpdb->last_error ) ) {
 					$db_errors[] = 'bwfan_automation_complete_contact alter table - ' . $wpdb->last_error;
 				}
 			}
 
 			/** Alter bwfan_automation_contact table */
-			$column_exists = $wpdb->query( "SHOW COLUMNS FROM {$wpdb->prefix}bwfan_automation_contact LIKE 'last_time'" );
+			$column_exists = $wpdb->query( "SHOW COLUMNS FROM {$wpdb->prefix}bwfan_automation_contact LIKE 'last_time'" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( empty( $column_exists ) ) {
 				$query = "ALTER TABLE {$wpdb->prefix}bwfan_automation_contact
     			CHANGE `trail` `trail` VARCHAR(40) NULL COMMENT 'Trail ID',
 		    	ADD COLUMN `last_time` bigint(12) UNSIGNED NOT NULL;";
-				$wpdb->query( $query );
+				$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				if ( ! empty( $wpdb->last_error ) ) {
 					$db_errors[] = 'bwfan_automation_contact alter table - ' . $wpdb->last_error;
 				}
@@ -617,7 +655,7 @@ class BWFAN_DB {
 		/** Automation complete contact */
 		$query = "SELECT MAX(`ID`) FROM `{$wpdb->prefix}bwfan_automation_complete_contact`";
 
-		$max_completed_aid = $wpdb->get_var( $query );
+		$max_completed_aid = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( intval( $max_completed_aid ) > 0 ) {
 			update_option( 'bwfan_max_automation_completed', $max_completed_aid );
 			if ( ! bwf_has_action_scheduled( 'bwfan_store_automation_completed_ids' ) ) {
@@ -628,7 +666,7 @@ class BWFAN_DB {
 		/** Automation contact */
 		$query = "SELECT MAX(`ID`) FROM `{$wpdb->prefix}bwfan_automation_contact`";
 
-		$max_active_aid = $wpdb->get_var( $query );
+		$max_active_aid = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( intval( $max_active_aid ) > 0 ) {
 			update_option( 'bwfan_max_active_automation', $max_active_aid );
 			if ( ! bwf_has_action_scheduled( 'bwfan_store_automation_active_ids' ) ) {
@@ -659,7 +697,7 @@ class BWFAN_DB {
 		/** Automation contact */
 		$query = $wpdb->prepare( "SELECT MIN(`ID`) FROM `{$wpdb->prefix}bwfan_automations` WHERE `v` = %d", 1 );
 
-		$automation_v1 = $wpdb->get_var( $query );
+		$automation_v1 = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$automation_v1 = ( 0 === intval( $automation_v1 ) ) ? '0' : '1';
 		update_option( 'bwfan_automation_v1', $automation_v1, true );
 
@@ -741,7 +779,7 @@ class BWFAN_DB {
 
 		/** Automation steps meta data normalize */
 		$query  = "SELECT MIN(`ID`) as `ID` FROM `{$wpdb->prefix}bwfan_automations` WHERE `v` = 2 LIMIT 0, 1";
-		$min_id = $wpdb->get_var( $query ); // phpcs:disable WordPress.DB.PreparedSQL
+		$min_id = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( $min_id > 0 ) {
 			/** schedule recurring event */
 			bwf_schedule_recurring_action( time(), ( 5 * MINUTE_IN_SECONDS ), 'bwfan_update_meta_automations_v2' );
@@ -751,11 +789,11 @@ class BWFAN_DB {
 
 		/** Delete some repetitive actions to delete duplicated actions */
 		$query  = "SELECT count(*) AS `count` FROM `{$wpdb->prefix}bwf_actions` WHERE `hook` IN ('bwfan_run_midnight_cron', 'bwfan_5_minute_worker', 'bwfan_run_midnight_connectors_sync')";
-		$result = $wpdb->get_var( $query ); // phpcs:disable WordPress.DB.PreparedSQL
+		$result = $wpdb->get_var( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		if ( ! empty( $result ) ) {
 			/** Delete the rows */
 			$query = "DELETE FROM `{$wpdb->prefix}bwf_actions` WHERE `hook` IN ('bwfan_run_midnight_cron', 'bwfan_5_minute_worker', 'bwfan_run_midnight_connectors_sync')";
-			$wpdb->query( $query );
+			$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 
 		$this->method_run[] = $version_key;
@@ -807,7 +845,7 @@ class BWFAN_DB {
 
 		global $wpdb;
 		$query = "TRUNCATE TABLE `{$wpdb->prefix}bwf_actions`";
-		$wpdb->query( $query );
+		$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		/** Scheduling Broadcast action */
 		if ( true === bwfan_is_autonami_pro_active() && ! bwf_has_action_scheduled( 'bwfcrm_broadcast_run_queue' ) ) {
@@ -829,10 +867,16 @@ class BWFAN_DB {
 		}
 
 		global $wpdb;
-		$query = "ALTER TABLE {$wpdb->prefix}bwfan_automations
-    			CHANGE `benchmark` `benchmark` longtext;";
-		$wpdb->query( $query );
-		$db_errors = [];
+		$db_errors     = [];
+		$column_exists = $wpdb->get_row( "SHOW COLUMNS FROM {$wpdb->prefix}bwfan_automations LIKE 'benchmark'", ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		if ( ! empty( $column_exists ) && 'longtext' !== $column_exists['Type'] ) {
+			$query = "ALTER TABLE {$wpdb->prefix}bwfan_automations CHANGE `benchmark` `benchmark` longtext;";
+			$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		} elseif ( empty( $column_exists ) ) {
+			$query = "ALTER TABLE {$wpdb->prefix}bwfan_automations ADD COLUMN `benchmark` longtext;";
+			$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		}
+
 		if ( ! empty( $wpdb->last_error ) ) {
 			$db_errors[] = 'bwfan_automations alter table - ' . $wpdb->last_error;
 		}
@@ -862,7 +906,7 @@ class BWFAN_DB {
 		global $wpdb;
 		$query = "SELECT COUNT(ct.ID) FROM `{$wpdb->prefix}bwfan_automation_contact_trail` AS ct JOIN `{$wpdb->prefix}bwfan_automation_complete_contact` AS cc ON ct.tid = cc.trail WHERE ct.status = 2 LIMIT 0,1";
 
-		if ( intval( $wpdb->get_var( $query ) > 0 ) ) {
+		if ( intval( $wpdb->get_var( $query ) > 0 ) ) { //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			/** Scheduling recurring action */
 			bwf_schedule_recurring_action( time(), 300, 'bwfan_update_contact_trail', array(), 'bwfan' );
 		}
@@ -1001,6 +1045,9 @@ class BWFAN_DB {
 
 		$this->v2_tables();
 
+		/** Check for old drag & drop email builder */
+		$this->check_for_old_visual_builder();
+
 		/** Updating version key */
 		update_option( 'bwfan_db', $version_key, true );
 	}
@@ -1055,17 +1102,22 @@ class BWFAN_DB {
 		}
 		global $wpdb;
 
-		$query = "ALTER TABLE {$wpdb->prefix}bwfan_message ADD data longtext;";
-		$wpdb->query( $query );
-		if ( ! empty( $wpdb->last_error ) ) {
-			$db_errors[] = 'bwfan_message alter table - ' . $wpdb->last_error;
+		$db_errors = [];
+
+		$column_exists = $wpdb->query( "SHOW COLUMNS FROM {$wpdb->prefix}bwfan_message LIKE 'data'" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		if ( empty( $column_exists ) ) {
+			$query = "ALTER TABLE {$wpdb->prefix}bwfan_message ADD data longtext;";
+			$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			if ( ! empty( $wpdb->last_error ) ) {
+				$db_errors[] = 'bwfan_message alter table - ' . $wpdb->last_error;
+			}
 		}
 
 		$columns       = [ 'f_open', 'f_click', 'day', 'hour' ];
 		$index_queries = [];
 		foreach ( $columns as $column ) {
 			$query      = "SHOW COLUMNS FROM `{$wpdb->prefix}bwfan_engagement_tracking` LIKE '$column'";
-			$sid_exists = $wpdb->get_row( $query, ARRAY_A );
+			$sid_exists = $wpdb->get_row( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( empty( $sid_exists['Key'] ) ) {
 				$index_queries[] = "ADD KEY `$column`(`$column`)";
 			}
@@ -1073,7 +1125,7 @@ class BWFAN_DB {
 
 		if ( ! empty( $index_queries ) ) {
 			$index_queries = implode( ', ', $index_queries );
-			$wpdb->query( "ALTER TABLE `{$wpdb->prefix}bwfan_engagement_tracking` $index_queries" );
+			$wpdb->query( "ALTER TABLE `{$wpdb->prefix}bwfan_engagement_tracking` $index_queries" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 			if ( ! empty( $wpdb->last_error ) ) {
 				$db_errors[] = 'bwfan_engagement_tracking alter table - ' . $wpdb->last_error;
 			}
@@ -1437,11 +1489,144 @@ class BWFAN_DB {
 		update_option( 'bwfan_db', $version_key, true );
 	}
 
+	/**
+	 * Add cookie_key index to bwfan_abandonedcarts table
+	 *
+	 * @param $version_key
+	 *
+	 * @return void
+	 */
+	public function db_update_3_4_2( $version_key ) {
+		if ( is_array( $this->method_run ) && in_array( '1.0.0', $this->method_run, true ) ) {
+			update_option( 'bwfan_db', $version_key, true );
+			$this->method_run[] = $version_key;
+
+			return;
+		}
+
+		global $wpdb;
+		$db_errors = [];
+
+		// Check if index already exists
+		$query        = "SHOW INDEX FROM {$wpdb->prefix}bwfan_abandonedcarts WHERE Key_name = 'cookie_key'";
+		$index_exists = $wpdb->get_results( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+
+		if ( empty( $index_exists ) ) {
+			// Add the cookie_key index
+			$query = "ALTER TABLE {$wpdb->prefix}bwfan_abandonedcarts ADD KEY `cookie_key` (`cookie_key`)";
+			$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+
+			if ( ! empty( $wpdb->last_error ) ) {
+				$db_errors[] = 'bwfan_abandonedcarts add cookie_key index - ' . $wpdb->last_error;
+			}
+		}
+
+		// Log any errors
+		if ( ! empty( $db_errors ) ) {
+			BWFAN_Common::log_test_data( array_merge( [ __FUNCTION__ ], $db_errors ), 'db-creation-errors' );
+		}
+
+		// Updating version key
+		update_option( 'bwfan_db', $version_key, true );
+	}
+
+	public function db_update_3_4_3( $version_key ) {
+		if ( is_array( $this->method_run ) && in_array( '1.0.0', $this->method_run, true ) ) {
+			update_option( 'bwfan_db', $version_key, true );
+			$this->method_run[] = $version_key;
+
+			return;
+		}
+
+		if ( ! get_option( 'bwfan_unique_secret', false ) ) {
+			/** Adding a new unique key for file download */
+			update_option( 'bwfan_unique_secret', wp_generate_password( 32, false ), true );
+		}
+
+		/** Updating version key */
+		update_option( 'bwfan_db', $version_key, true );
+	}
+
 	public function check_for_old_visual_builder() {
 		global $wpdb;
 		$query   = "SELECT ID FROM {$wpdb->prefix}bwfan_templates WHERE `mode`=4 ORDER BY ID DESC LIMIT 1 ";
-		$is_used = ! empty( $wpdb->get_var( $query ) ) ? 1 : 0;
+		$is_used = ! empty( $wpdb->get_var( $query ) ) ? 1 : 0; //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		bwf_options_update( 'fk_legacy_builder', $is_used );
+	}
+
+	/**
+	 * Change email column varchar length
+	 *
+	 * @param $version_key
+	 *
+	 * @return void
+	 */
+	public function db_update_3_4_4( $version_key ) {
+		if ( is_array( $this->method_run ) && in_array( '1.0.0', $this->method_run, true ) ) {
+			update_option( 'bwfan_db', $version_key, true );
+			$this->method_run[] = $version_key;
+
+			return;
+		}
+		$db_errors = [];
+		global $wpdb;
+		$column_exists = $wpdb->query( "SHOW COLUMNS FROM {$wpdb->prefix}bwfan_abandonedcarts LIKE 'email'" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		if ( empty( $column_exists ) ) {
+			$query = "ALTER TABLE {$wpdb->prefix}bwfan_abandonedcarts ADD email varchar(100) NOT NULL";
+		} else {
+			$query = "ALTER TABLE {$wpdb->prefix}bwfan_abandonedcarts CHANGE `email` `email` varchar(100) NOT NULL";
+		}
+
+		$wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		if ( ! empty( $wpdb->last_error ) ) {
+			$db_errors[] = 'bwfan_abandonedcarts alter table - ' . $wpdb->last_error;
+		}
+
+		// Log any errors
+		if ( ! empty( $db_errors ) ) {
+			BWFAN_Common::log_test_data( array_merge( [ __FUNCTION__ ], $db_errors ), 'db-creation-errors' );
+		}
+
+		/** Updating version key */
+		update_option( 'bwfan_db', $version_key, true );
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function db_update_3_5_0( $version_key ) {
+		if ( is_array( $this->method_run ) && in_array( '1.0.0', $this->method_run, true ) ) {
+			update_option( 'bwfan_db', $version_key, true );
+			$this->method_run[] = $version_key;
+
+			return;
+		}
+
+		$table_instance = new BWFAN_DB_Table_Links();
+		$table_instance->create_table();
+		$db_errors = [];
+		if ( ! empty( $table_instance->db_errors ) ) {
+			$db_errors[] = $table_instance->db_errors;
+		}
+
+		$table_instance = new BWFAN_DB_Table_Link_Metrics();
+		$table_instance->create_table();
+		if ( ! empty( $table_instance->db_errors ) ) {
+			$db_errors[] = $table_instance->db_errors;
+		}
+
+		/** Log if any mysql errors */
+		if ( ! empty( $db_errors ) ) {
+			BWFAN_Common::log_test_data( array_merge( [ __FUNCTION__ ], $db_errors ), 'db-creation-errors' );
+		}
+
+		if ( ! bwf_has_action_scheduled( 'bwfan_store_template_links' ) ) {
+			$time = BWFAN_Common::get_store_time( '01', '30' );
+			bwf_schedule_recurring_action( $time, 60, 'bwfan_store_template_links' );
+		}
+
+		/** Updating version key */
+		update_option( 'bwfan_db', $version_key, true );
 	}
 }
 

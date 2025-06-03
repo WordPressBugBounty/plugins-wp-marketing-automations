@@ -12,7 +12,14 @@ class ActionScheduler_wcSystemStatus {
 	 */
 	protected $store;
 
-	function __construct( $store ) {
+	/**
+	 * Constructor method for ActionScheduler_wcSystemStatus.
+	 *
+	 * @param ActionScheduler_Store $store Active store object.
+	 *
+	 * @return void
+	 */
+	public function __construct( $store ) {
 		$this->store = $store;
 	}
 
@@ -67,12 +74,14 @@ class ActionScheduler_wcSystemStatus {
 
 		$order = 'oldest' === $date_type ? 'ASC' : 'DESC';
 
-		$action = $this->store->query_actions( array(
-			'claimed'  => false,
-			'status'   => $status,
-			'per_page' => 1,
-			'order'    => $order,
-		) );
+		$action = $this->store->query_actions(
+			array(
+				'claimed'  => false,
+				'status'   => $status,
+				'per_page' => 1,
+				'order'    => $order,
+			)
+		);
 
 		if ( ! empty( $action ) ) {
 			$date_object = $this->store->get_date( $action[0] );
@@ -92,29 +101,29 @@ class ActionScheduler_wcSystemStatus {
 	 * @param array $oldest_and_newest Date of the oldest and newest action with each status.
 	 */
 	protected function get_template( $status_labels, $action_counts, $oldest_and_newest ) {
-		$as_version = ActionScheduler_Versions::instance()->latest_version();
+		$as_version   = ActionScheduler_Versions::instance()->latest_version();
 		$as_datastore = get_class( ActionScheduler_Store::instance() );
 		?>
 
 		<table class="wc_status_table widefat" cellspacing="0">
 			<thead>
 				<tr>
-					<th colspan="5" data-export-label="Action Scheduler"><h2><?php esc_html_e( 'Action Scheduler', 'action-scheduler' ); ?><?php echo wc_help_tip( esc_html__( 'This section shows details of Action Scheduler.', 'action-scheduler' ) ); ?></h2></th>
+					<th colspan="5" data-export-label="Action Scheduler"><h2><?php esc_html_e( 'Action Scheduler', 'woocommerce' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch ?><?php echo wc_help_tip( esc_html__( 'This section shows details of Action Scheduler.', 'woocommerce' ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch, WordPress.Security.EscapeOutput.OutputNotEscaped ?></h2></th>
 				</tr>
 				<tr>
-					<td colspan="2" data-export-label="Version"><?php esc_html_e( 'Version:', 'action-scheduler' ); ?></td>
+					<td colspan="2" data-export-label="Version"><?php esc_html_e( 'Version:', 'woocommerce' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch ?></td>
 					<td colspan="3"><?php echo esc_html( $as_version ); ?></td>
 				</tr>
 				<tr>
-					<td colspan="2" data-export-label="Data store"><?php esc_html_e( 'Data store:', 'action-scheduler' ); ?></td>
+					<td colspan="2" data-export-label="Data store"><?php esc_html_e( 'Data store:', 'woocommerce' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch ?></td>
 					<td colspan="3"><?php echo esc_html( $as_datastore ); ?></td>
 				</tr>
 				<tr>
-					<td><strong><?php esc_html_e( 'Action Status', 'action-scheduler' ); ?></strong></td>
+					<td><strong><?php esc_html_e( 'Action Status', 'woocommerce' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch ?></strong></td>
 					<td class="help">&nbsp;</td>
-					<td><strong><?php esc_html_e( 'Count', 'action-scheduler' ); ?></strong></td>
-					<td><strong><?php esc_html_e( 'Oldest Scheduled Date', 'action-scheduler' ); ?></strong></td>
-					<td><strong><?php esc_html_e( 'Newest Scheduled Date', 'action-scheduler' ); ?></strong></td>
+					<td><strong><?php esc_html_e( 'Count', 'woocommerce' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch ?></strong></td>
+					<td><strong><?php esc_html_e( 'Oldest Scheduled Date', 'woocommerce' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch ?></strong></td>
+					<td><strong><?php esc_html_e( 'Newest Scheduled Date', 'woocommerce' ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch ?></strong></td>
 				</tr>
 			</thead>
 			<tbody>
@@ -124,9 +133,9 @@ class ActionScheduler_wcSystemStatus {
 					printf(
 						'<tr><td>%1$s</td><td>&nbsp;</td><td>%2$s<span style="display: none;">, Oldest: %3$s, Newest: %4$s</span></td><td>%3$s</td><td>%4$s</td></tr>',
 						esc_html( $status_labels[ $status ] ),
-						number_format_i18n( $count ),
-						$oldest_and_newest[ $status ]['oldest'],
-						$oldest_and_newest[ $status ]['newest']
+						esc_html( number_format_i18n( $count ) ),
+						esc_html( $oldest_and_newest[ $status ]['oldest'] ),
+						esc_html( $oldest_and_newest[ $status ]['newest'] )
 					);
 				}
 				?>
@@ -137,10 +146,10 @@ class ActionScheduler_wcSystemStatus {
 	}
 
 	/**
-	 * is triggered when invoking inaccessible methods in an object context.
+	 * Is triggered when invoking inaccessible methods in an object context.
 	 *
-	 * @param string $name
-	 * @param array  $arguments
+	 * @param string $name Name of method called.
+	 * @param array  $arguments Parameters to invoke the method with.
 	 *
 	 * @return mixed
 	 * @link https://php.net/manual/en/language.oop5.overloading.php#language.oop5.overloading.methods

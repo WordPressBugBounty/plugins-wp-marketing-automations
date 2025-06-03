@@ -70,8 +70,8 @@ final class BWFAN_AB_Cart_Abandoned extends BWFAN_Event {
 		if ( ! is_array( $active_abandoned_carts ) || count( $active_abandoned_carts ) === 0 ) {
 			return;
 		}
-
-		$ids = array_column( $active_abandoned_carts, 'ID', 'ID' );
+		$active_abandoned_carts = BWFAN_Abandoned_Cart::remove_duplicate_cart( $active_abandoned_carts );
+		$ids                    = array_column( $active_abandoned_carts, 'ID', 'ID' );
 
 		/** Status 1: In-Progress (Automations Found), 3: Pending (No Tasks Found) */
 		BWFAN_Core()->public->load_active_automations( $this->get_slug() );
@@ -106,7 +106,7 @@ final class BWFAN_AB_Cart_Abandoned extends BWFAN_Event {
 					)
 					AND customers.l_order_date >= %s
 					LIMIT 1";
-			$last_order = $wpdb->get_var( $wpdb->prepare( $query, $active_abandoned_cart['email'], $after_date ) );
+			$last_order = $wpdb->get_var( $wpdb->prepare( $query, $active_abandoned_cart['email'], $after_date ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			if ( ! empty( $last_order ) ) {
 				/** Order found. No need to process the cart */
@@ -630,7 +630,7 @@ final class BWFAN_AB_Cart_Abandoned extends BWFAN_Event {
 
 		$query = $wpdb->prepare( "DELETE FROM `{$wpdb->prefix}bwfan_abandonedcarts` WHERE `ID` IN ({$placeholder})", $duplicate_entries );
 
-		return ( $wpdb->query( $query ) > 0 );
+		return ( $wpdb->query( $query ) > 0 ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 }
 

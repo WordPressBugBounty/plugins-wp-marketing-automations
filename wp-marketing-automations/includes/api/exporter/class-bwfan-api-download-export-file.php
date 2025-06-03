@@ -49,6 +49,20 @@ class BWFAN_API_Download_Export_File extends BWFAN_API_Base {
 		}
 		wp_die();
 	}
+
+	/**
+	 * Rest api permission callback
+	 *
+	 * @return bool
+	 */
+	public function rest_permission_callback( WP_REST_Request $request ) {
+		$query_params = $request->get_query_params();
+		if ( isset( $query_params['bwf-nonce'] ) && $query_params['bwf-nonce'] === get_option( 'bwfan_unique_secret', '' ) ) {
+			return true;
+		}
+
+		return false;
+	}
 }
 
 BWFAN_API_Loader::register( 'BWFAN_API_Download_Export_File' );

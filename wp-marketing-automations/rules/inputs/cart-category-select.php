@@ -31,10 +31,10 @@ class bwfan_Input_Cart_Category_Select {
             </tr>
             <tr>
                 <td style="width:32px; vertical-align:top;">
-                    <input type="text" id="<?php echo esc_attr( $field['id'] ); ?>_qty" name="<?php echo $field['name']; //phpcs:ignore WordPress.Security.EscapeOutput ?>[qty]" value="<?php echo isset( $value['qty'] ) ? esc_attr__( sanitize_text_field( $value['qty'] ) ) : 1; ?>"/>
+                    <input type="text" id="<?php echo esc_attr( $field['id'] ); ?>_qty" name="<?php echo $field['name']; //phpcs:ignore WordPress.Security.EscapeOutput ?>[qty]" value="<?php echo isset( $value['qty'] ) ? esc_attr( sanitize_text_field( $value['qty'] ) ) : 1; ?>"/>
                 </td>
                 <td>
-                    <select id="<?php echo esc_attr( $field['id'] ); ?>" name="<?php echo $field['name']; //phpcs:ignore WordPress.Security.EscapeOutput ?>[categories][]" class="chosen_select <?php echo esc_attr( $field['class'] ); ?>" multiple="multiple" data-placeholder="<?php echo( isset( $field['placeholder'] ) ? esc_attr__( sanitize_text_field( $field['placeholder'] ) ) : esc_attr__( 'Search...', 'wp-marketing-automations' ) ); ?>">
+                    <select id="<?php echo esc_attr( $field['id'] ); ?>" name="<?php echo $field['name']; //phpcs:ignore WordPress.Security.EscapeOutput ?>[categories][]" class="chosen_select <?php echo esc_attr( $field['class'] ); ?>" multiple="multiple" data-placeholder="<?php echo( isset( $field['placeholder'] ) ? esc_attr( sanitize_text_field( $field['placeholder'] ) ) : esc_html__( 'Search...', 'wp-marketing-automations' ) ); ?>">
 						<?php
 						foreach ( $choices as $choice => $title ) {
 							$selected = in_array( $choice, $current, true );

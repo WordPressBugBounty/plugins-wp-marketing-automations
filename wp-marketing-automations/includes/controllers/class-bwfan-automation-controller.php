@@ -436,7 +436,7 @@ class BWFAN_Automation_Controller {
 			$this->automation_contact_data['end_reason'] = $this->end_reason;
 		}
 
-		BWFAN_Model_Automation_Complete_Contact::insert( array(
+		$data = array(
 			'cid'    => empty( $this->contact_id ) && isset( $this->automation_contact['cid'] ) ? $this->automation_contact['cid'] : $this->contact_id,
 			'aid'    => empty( $this->automation_id ) && isset( $this->automation_contact['aid'] ) ? $this->automation_contact['aid'] : $this->automation_id,
 			'event'  => empty( $this->event_slug ) && isset( $this->automation_contact['event'] ) ? $this->automation_contact['event'] : $this->event_slug,
@@ -444,7 +444,8 @@ class BWFAN_Automation_Controller {
 			'c_date' => current_time( 'mysql', 1 ),
 			'data'   => json_encode( $this->automation_contact_data ),
 			'trail'  => empty( $this->trail_id ) && isset( $this->automation_contact['trail'] ) ? $this->automation_contact['trail'] : $this->trail_id,
-		) );
+		);
+		BWFAN_Model_Automation_Complete_Contact::insert_ignore( $data );
 
 		/** Delete the row from automation contact table */
 		BWFAN_Model_Automation_Contact::delete( $this->automation_contact['ID'] );
@@ -467,7 +468,7 @@ class BWFAN_Automation_Controller {
 		$ins->populate_step_data( $this->current_step );
 
 		if ( 'wp_sendemail' !== $ins->action_data['action'] && ! BWFAN_Common::check_for_lks() ) {
-			$this->set_trail_item( [ 'error_msg' => 'License Expired. Renew Now.' ], 3 );
+			$this->set_trail_item( [ 'error_msg' => __( 'License Expired. Renew Now.', 'wp-marketing-automations' ) ], 3 );
 
 			$this->status = self::$STATUS_FAILED;
 			$this->e_time = current_time( 'timestamp', 1 );
@@ -573,9 +574,6 @@ class BWFAN_Automation_Controller {
 			$arr['data'] = json_encode( $message );
 		}
 
-		/** Check if trail already found then delete */
-		BWFAN_Model_Automation_Contact_Trail::delete_if_trail_exists( $arr );
-
 		BWFAN_Model_Automation_Contact_Trail::insert( $arr );
 	}
 
@@ -594,9 +592,9 @@ class BWFAN_Automation_Controller {
 		$time = $ins->get_time();
 		if ( empty( $time ) ) {
 			BWFAN_Common::log_test_data( 'Wait Step: Unable to get the wait time, step ID: ' . $this->step_id . ', automation ID: ' . $this->automation_id, 'process-wait-error' );
-			$this->set_trail_item( [ 'msg' => 'Unable to get wait step wait time' ], 3 );
-			$this->status = self::$STATUS_FAILED;
-
+			$this->set_trail_item( [ 'error_msg' => __( 'Unable to get the delayed time', 'wp-marketing-automations' ) ], 3 );
+			$this->status              = self::$STATUS_FAILED;
+			$this->e_time              = current_time( 'timestamp', 1 );
 			$this->end_current_process = true;
 
 			return;
@@ -611,7 +609,7 @@ class BWFAN_Automation_Controller {
 			if ( empty( $is_step_active ) && 'end' !== $this->skip_step_id ) {
 				$this->end_current_process = true;
 				$this->skip_step_id        = 0;
-				$this->set_trail_item( [ 'msg' => 'Jump step deleted' ], 3 );
+				$this->set_trail_item( [ 'error_msg' => __( 'Jump step deleted', 'wp-marketing-automations' ) ], 3 );
 
 				$this->status   = BWFAN_Automation_Controller::$STATUS_FAILED;
 				$this->attempts = 0;
@@ -622,7 +620,8 @@ class BWFAN_Automation_Controller {
 			if ( 'end' === $this->skip_step_id ) {
 				$this->should_end_automation = true;
 			}
-			$this->set_trail_item( [ 'msg' => 'Skipped as time passed' ], 2 );
+
+			$this->set_trail_item( [ 'msg' => __( 'Skipped as time passed', 'wp-marketing-automations' ) ], 2 );
 		} else {
 			$this->set_trail_item( '', 2 );
 		}
@@ -647,6 +646,8 @@ class BWFAN_Automation_Controller {
 		}
 
 		$current_step = $this->traverse_ins->get_current_step();
+
+		BWFAN_Core()->rules->load_rules_classes();
 
 		$ins                = new BWFAN_Conditional_Controller();
 		$ins->contact_id    = $this->automation_contact['cid'];
@@ -708,7 +709,7 @@ class BWFAN_Automation_Controller {
 	public function process_goal() {
 		/** Pro is not active */
 		if ( false === bwfan_is_autonami_pro_active() ) {
-			$this->set_trail_item( [ 'msg' => 'This is a pro feature' ] );
+			$this->set_trail_item( [ 'msg' => __( 'This is a pro feature', 'wp-marketing-automations' ) ] );
 
 			return;
 		}
@@ -718,7 +719,16 @@ class BWFAN_Automation_Controller {
 		$ins          = new BWFAN_Goal_Controller();
 		$ins->step_id = absint( $current_step['stepId'] );
 
-		$ins->populate_step_data( $this->current_step );
+		$set_data = $ins->populate_step_data( $this->current_step );
+
+		if ( ! $set_data ) {
+			$this->set_trail_item( [ 'error_msg' => __( 'Goal step is not configured', 'wp-marketing-automations' ) ], 3 );
+			$this->status              = self::$STATUS_FAILED;
+			$this->e_time              = current_time( 'timestamp', 1 );
+			$this->end_current_process = true;
+
+			return;
+		}
 
 		$result = $ins->traverse_setting;
 		$this->traverse_ins->log( $this->automation_contact['trail'] . ' - process_goal result: ' . $result );
@@ -730,7 +740,7 @@ class BWFAN_Automation_Controller {
 			$this->status   = BWFAN_Automation_Controller::$STATUS_ACTIVE;
 			$this->attempts = 0;
 
-			$this->traverse_ins->log( $this->automation_contact['trail'] . ' - Goal pre met for event: ' . $event->get_name() );
+			$this->traverse_ins->log( $this->automation_contact['trail'] . ' - Goal is already met for event: ' . $event->get_name() );
 
 			return;
 		}

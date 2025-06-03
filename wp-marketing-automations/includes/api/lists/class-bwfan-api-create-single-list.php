@@ -39,7 +39,8 @@ class BWFAN_API_Create_Single_List extends BWFAN_API_Base {
 		$already_exists = BWFCRM_Tag::get_terms( BWFCRM_Term_Type::$LIST, [], $name, 0, 0, ARRAY_A, 'exact' );
 		if ( ! empty( $already_exists ) ) {
 			$this->response_code = 404;
-			$response            = __( "List already exists with name: " . $name, 'wp-marketing-automations' );
+			/* translators: 1: List name */
+			$response = sprintf( __( 'List already exists with name: %1$s', 'wp-marketing-automations' ), $name );
 
 			return $this->error_response( $response );
 		}

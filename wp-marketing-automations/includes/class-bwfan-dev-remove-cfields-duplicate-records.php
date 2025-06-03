@@ -53,7 +53,7 @@ if ( ! class_exists( 'BWFAN_DEV_Remove_Contact_Fields_Duplicate_Records' ) ) {
 			global $wpdb;
 			$query = "SELECT `cid`, count(ID) as `count`, MAX(`ID`) AS `key` FROM `{$wpdb->prefix}bwf_contact_fields` GROUP BY `cid` HAVING COUNT(ID) > 1";
 
-			$rows = $wpdb->get_results( $query, ARRAY_A );
+			$rows = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( empty( $query ) ) {
 				return false;
 			}
@@ -81,7 +81,7 @@ if ( ! class_exists( 'BWFAN_DEV_Remove_Contact_Fields_Duplicate_Records' ) ) {
 
 			BWFAN_Common::pr( count( $ids ) . " contacts duplicate rows deleted" );
 
-			return ( $wpdb->query( $query ) > 0 );
+			return ( $wpdb->query( $query ) > 0 ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		}
 	}
 

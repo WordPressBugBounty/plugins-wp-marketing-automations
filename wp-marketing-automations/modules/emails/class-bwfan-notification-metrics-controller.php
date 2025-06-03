@@ -54,6 +54,23 @@ class BWFAN_Notification_Metrics_Controller {
 	}
 
 	/**
+	 * Get percentage change.
+	 *
+	 * @param int $previous_value The previous value.
+	 * @param int $current_value The current value.
+	 *
+	 * @return float
+	 */
+	public function get_percentage_change( $previous_value = 0, $current_value = 0 ) {
+		switch ( $previous_value ) {
+			case 0:
+				return $current_value * 100;
+			default:
+				return ( ( $current_value - $previous_value ) / $previous_value ) * 100;
+		}
+	}
+
+	/**
 	 * Get total contacts.
 	 *
 	 * @return array
@@ -63,18 +80,15 @@ class BWFAN_Notification_Metrics_Controller {
 		$previous_contacts = BWFAN_Dashboards::get_total_contacts( $this->date_params['from_date_previous'], $this->date_params['to_date_previous'] );
 
 		// Calculate percentage change
-		$percentage_change = 0;
-		if ( $previous_contacts != 0 ) {
-			$percentage_change = ( ( $contacts - $previous_contacts ) / $previous_contacts ) * 100;
-		}
+		$percentage_change = $this->get_percentage_change( $previous_contacts, $contacts );
 
 		return array(
-			'text'                       => __( 'New Contacts', 'wp-marketing-automations' ),
-			'previous_text'              => sprintf( __( '- Previous %s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
-			'count'                      => $contacts,
-			'previous_count'             => $previous_contacts,
-			'percentage_change'          => sprintf( '%s%%', round( $percentage_change, 2 ) ),
-			'percentage_change_positive' => $percentage_change >= 0,
+			'text'                                              => __( 'New Contacts', 'wp-marketing-automations' ),
+			/* translators: 1: Dynamic Text. */ 'previous_text' => sprintf( __( '- Previous %1$s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
+			'count'                                             => $contacts,
+			'previous_count'                                    => $previous_contacts,
+			'percentage_change'                                 => sprintf( '%s%%', round( $percentage_change, 2 ) ),
+			'percentage_change_positive'                        => $percentage_change >= 0,
 		);
 	}
 
@@ -113,18 +127,15 @@ class BWFAN_Notification_Metrics_Controller {
 		$previous_email_click = isset( $previous_engagement_click[0]['email_click'] ) ? $previous_engagement_click[0]['email_click'] : 0;
 
 		// Calculate percentage change
-		$percentage_change = 0;
-		if ( $previous_email_click != 0 ) {
-			$percentage_change = ( ( $email_click - $previous_email_click ) / $previous_email_click ) * 100;
-		}
+		$percentage_change = $this->get_percentage_change( $previous_email_click, $email_click );
 
 		return array(
-			'text'                       => __( 'Emails Clicked', 'wp-marketing-automations' ),
-			'previous_text'              => sprintf( __( '- Previous %s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
-			'count'                      => $email_click,
-			'previous_count'             => $previous_email_click,
-			'percentage_change'          => sprintf( '%s%%', round( $percentage_change, 2 ) ),
-			'percentage_change_positive' => $percentage_change >= 0,
+			'text'                                              => __( 'Emails Clicked', 'wp-marketing-automations' ),
+			/* translators: 1: Dynamic Text. */ 'previous_text' => sprintf( __( '- Previous %1$s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
+			'count'                                             => $email_click,
+			'previous_count'                                    => $previous_email_click,
+			'percentage_change'                                 => sprintf( '%s%%', round( $percentage_change, 2 ) ),
+			'percentage_change_positive'                        => $percentage_change >= 0,
 		);
 	}
 
@@ -141,18 +152,15 @@ class BWFAN_Notification_Metrics_Controller {
 		$previous_email_open = isset( $previous_engagement_open[0]['email_open'] ) ? $previous_engagement_open[0]['email_open'] : 0;
 
 		// Calculate percentage change
-		$percentage_change = 0;
-		if ( $previous_email_open != 0 ) {
-			$percentage_change = ( ( $email_open - $previous_email_open ) / $previous_email_open ) * 100;
-		}
+		$percentage_change = $this->get_percentage_change( $previous_email_open, $email_open );
 
 		return array(
-			'text'                       => __( 'Emails Opened', 'wp-marketing-automations' ),
-			'previous_text'              => sprintf( __( '- Previous %s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
-			'count'                      => $email_open,
-			'previous_count'             => $previous_engagement_open,
-			'percentage_change'          => sprintf( '%s%%', round( $percentage_change, 2 ) ),
-			'percentage_change_positive' => $percentage_change >= 0,
+			'text'                                              => __( 'Emails Opened', 'wp-marketing-automations' ),
+			/* translators: 1: Dynamic Text. */ 'previous_text' => sprintf( __( '- Previous %1$s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
+			'count'                                             => $email_open,
+			'previous_count'                                    => $previous_engagement_open,
+			'percentage_change'                                 => sprintf( '%s%%', round( $percentage_change, 2 ) ),
+			'percentage_change_positive'                        => $percentage_change >= 0,
 		);
 	}
 
@@ -169,18 +177,15 @@ class BWFAN_Notification_Metrics_Controller {
 		$previous_email_sent = isset( $previous_engagement_sent[0]['email_sents'] ) ? $previous_engagement_sent[0]['email_sents'] : 0;
 
 		// Calculate percentage change
-		$percentage_change = 0;
-		if ( $previous_email_sent != 0 ) {
-			$percentage_change = ( ( $email_sent - $previous_email_sent ) / $previous_email_sent ) * 100;
-		}
+		$percentage_change = $this->get_percentage_change( $previous_email_sent, $email_sent );
 
 		return array(
-			'text'                       => __( 'Emails Sent', 'wp-marketing-automations' ),
-			'previous_text'              => sprintf( __( '- Previous %s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
-			'count'                      => $email_sent,
-			'previous_count'             => $previous_email_sent,
-			'percentage_change'          => sprintf( '%s%%', round( $percentage_change, 2 ) ),
-			'percentage_change_positive' => $percentage_change >= 0,
+			'text'                                              => __( 'Emails Sent', 'wp-marketing-automations' ),
+			/* translators: 1: Dynamic Text. */ 'previous_text' => sprintf( __( '- Previous %1$s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
+			'count'                                             => $email_sent,
+			'previous_count'                                    => $previous_email_sent,
+			'percentage_change'                                 => sprintf( '%s%%', round( $percentage_change, 2 ) ),
+			'percentage_change_positive'                        => $percentage_change >= 0,
 		);
 	}
 
@@ -197,18 +202,15 @@ class BWFAN_Notification_Metrics_Controller {
 		$previous_sms_sent = isset( $previous_engagement_sent[0]['sms_sent'] ) ? $previous_engagement_sent[0]['sms_sent'] : 0;
 
 		// Calculate percentage change
-		$percentage_change = 0;
-		if ( $previous_sms_sent != 0 ) {
-			$percentage_change = ( ( $sms_sent - $previous_sms_sent ) / $previous_sms_sent ) * 100;
-		}
+		$percentage_change = $this->get_percentage_change( $previous_sms_sent, $sms_sent );
 
 		return array(
-			'text'                       => __( 'SMS Sent', 'wp-marketing-automations' ),
-			'previous_text'              => sprintf( __( '- Previous %s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
-			'count'                      => $sms_sent,
-			'previous_count'             => $previous_sms_sent,
-			'percentage_change'          => sprintf( '%s%%', round( $percentage_change, 2 ) ),
-			'percentage_change_positive' => $percentage_change >= 0,
+			'text'                                              => __( 'SMS Sent', 'wp-marketing-automations' ),
+			/* translators: 1: Dynamic Text. */ 'previous_text' => sprintf( __( '- Previous %1$s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
+			'count'                                             => $sms_sent,
+			'previous_count'                                    => $previous_sms_sent,
+			'percentage_change'                                 => sprintf( '%s%%', round( $percentage_change, 2 ) ),
+			'percentage_change_positive'                        => $percentage_change >= 0,
 		);
 	}
 
@@ -228,36 +230,30 @@ class BWFAN_Notification_Metrics_Controller {
 		$previous_recovered_count = isset( $previous_recovered_cart[0]['count'] ) ? $previous_recovered_cart[0]['count'] : 0;
 
 		// Calculate percentage change
-		$recovered_percentage_change = 0;
-		if ( $previous_recovered_count != 0 ) {
-			$recovered_percentage_change = ( ( $recovered_count - $previous_recovered_count ) / $previous_recovered_count ) * 100;
-		}
+		$recovered_percentage_change = $this->get_percentage_change( $previous_recovered_count, $recovered_count );
 
 		$count          = isset( $captured_cart[0]['count'] ) ? $captured_cart[0]['count'] : 0;
 		$previous_count = isset( $previous_captured_cart[0]['count'] ) ? $previous_captured_cart[0]['count'] : 0;
 
 		// Calculate percentage change
-		$percentage_change = 0;
-		if ( $previous_count != 0 ) {
-			$percentage_change = ( ( $count - $previous_count ) / $previous_count ) * 100;
-		}
+		$percentage_change = $this->get_percentage_change( $previous_count, $count );
 
 		return array(
 			array(
-				'text'                       => __( 'Carts Captured', 'wp-marketing-automations' ),
-				'previous_text'              => sprintf( __( '- Previous %s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
-				'count'                      => $count,
-				'previous_count'             => $previous_count,
-				'percentage_change'          => sprintf( '%s%%', round( $percentage_change, 2 ) ),
-				'percentage_change_positive' => $percentage_change >= 0,
+				'text'                                              => __( 'Carts Captured', 'wp-marketing-automations' ),
+				/* translators: 1: Dynamic Text. */ 'previous_text' => sprintf( __( '- Previous %1$s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
+				'count'                                             => $count,
+				'previous_count'                                    => $previous_count,
+				'percentage_change'                                 => sprintf( '%s%%', round( $percentage_change, 2 ) ),
+				'percentage_change_positive'                        => $percentage_change >= 0,
 			),
 			array(
-				'text'                       => __( 'Carts Recovered', 'wp-marketing-automations' ),
-				'previous_text'              => sprintf( __( '- Previous %s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
-				'count'                      => $recovered_count,
-				'previous_count'             => $previous_recovered_count,
-				'percentage_change'          => sprintf( '%s%%', round( $recovered_percentage_change, 2 ) ),
-				'percentage_change_positive' => $recovered_percentage_change >= 0,
+				'text'                                              => __( 'Carts Recovered', 'wp-marketing-automations' ),
+				/* translators: 1: Dynamic Text. */ 'previous_text' => sprintf( __( '- Previous %1$s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
+				'count'                                             => $recovered_count,
+				'previous_count'                                    => $previous_recovered_count,
+				'percentage_change'                                 => sprintf( '%s%%', round( $recovered_percentage_change, 2 ) ),
+				'percentage_change_positive'                        => $recovered_percentage_change >= 0,
 			),
 		);
 	}
@@ -290,18 +286,15 @@ class BWFAN_Notification_Metrics_Controller {
 		$previous_total_orders = isset( $previous_total_orders[0]['total_orders'] ) ? $previous_total_orders[0]['total_orders'] : 0;
 
 		// Calculate percentage change
-		$percentage_change = 0;
-		if ( $previous_total_orders != 0 ) {
-			$percentage_change = ( ( $total_orders - $previous_total_orders ) / $previous_total_orders ) * 100;
-		}
+		$percentage_change = $this->get_percentage_change( $previous_total_orders, $total_orders );
 
 		return array(
-			'text'                       => __( 'Total Orders', 'wp-marketing-automations' ),
-			'previous_text'              => sprintf( __( '- Previous %s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
-			'count'                      => $total_orders,
-			'previous_count'             => $previous_total_orders,
-			'percentage_change'          => sprintf( '%s%%', round( $percentage_change, 2 ) ),
-			'percentage_change_positive' => $percentage_change >= 0,
+			'text'                                              => __( 'Total Orders', 'wp-marketing-automations' ),
+			/* translators: 1: Dynamic Text. */ 'previous_text' => sprintf( __( '- Previous %1$s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
+			'count'                                             => $total_orders,
+			'previous_count'                                    => $previous_total_orders,
+			'percentage_change'                                 => sprintf( '%s%%', round( $percentage_change, 2 ) ),
+			'percentage_change_positive'                        => $percentage_change >= 0,
 		);
 	}
 
@@ -318,19 +311,16 @@ class BWFAN_Notification_Metrics_Controller {
 		$previous_total_revenue = isset( $previous_total_orders[0]['total_revenue'] ) ? $previous_total_orders[0]['total_revenue'] : 0;
 
 		// Calculate percentage change
-		$percentage_change = 0;
-		if ( $previous_total_revenue != 0 ) {
-			$percentage_change = ( ( $total_revenue - $previous_total_revenue ) / $previous_total_revenue ) * 100;
-		}
+		$percentage_change = $this->get_percentage_change( $previous_total_revenue, $total_revenue );
 
 		return array(
-			'text'                       => __( 'Total Revenue', 'wp-marketing-automations' ),
-			'previous_text'              => sprintf( __( '- Previous %s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
-			'count_suffix'               => function_exists( 'get_woocommerce_currency' ) ? get_woocommerce_currency() : __( 'USD', 'wp-marketing-automations' ),
-			'count'                      => round( $total_revenue, 2 ),
-			'previous_count'             => $previous_total_revenue,
-			'percentage_change'          => sprintf( '%s%%', round( $percentage_change, 2 ) ),
-			'percentage_change_positive' => $percentage_change >= 0,
+			'text'                                              => __( 'Total Revenue', 'wp-marketing-automations' ),
+			/* translators: 1: Dynamic Text. */ 'previous_text' => sprintf( __( '- Previous %1$s', 'wp-marketing-automations' ), $this->get_frequency_text() ),
+			'count_suffix'                                      => function_exists( 'get_woocommerce_currency' ) ? get_woocommerce_currency() : __( 'USD', 'wp-marketing-automations' ),
+			'count'                                             => round( $total_revenue, 2 ),
+			'previous_count'                                    => $previous_total_revenue,
+			'percentage_change'                                 => sprintf( '%s%%', round( $percentage_change, 2 ) ),
+			'percentage_change_positive'                        => $percentage_change >= 0,
 		);
 	}
 
