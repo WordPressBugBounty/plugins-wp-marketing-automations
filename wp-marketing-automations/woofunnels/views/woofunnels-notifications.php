@@ -19,7 +19,7 @@ if ( ! is_array( $notifications_list ) || count( $notifications_list ) === 0 ) {
 				}
 
 				?>
-                <div class="<?php echo esc_attr(implode( ' ', $combined_class )); ?>" wf-noti-key="wf-<?php echo esc_attr($key); ?>" wf-noti-group="<?php echo esc_attr($nkey); ?>">
+                <div class="<?php echo esc_attr( implode( ' ', $combined_class ) ); ?>" wf-noti-key="wf-<?php echo esc_attr( $key ); ?>" wf-noti-group="<?php echo esc_attr( $nkey ); ?>">
                     <div class="wf_overlay_active "></div>
 					<?php
 					echo '<div class="wf_notification_html"><p>' . $value['html'] . '</p></div>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -40,7 +40,7 @@ if ( ! is_array( $notifications_list ) || count( $notifications_list ) === 0 ) {
 								continue;
 							}
 
-							printf( ' <a href="%s" target="%s" class="%s">%s</a>', isset( $btn_val['url'] ) ? esc_url($btn_val['url']) : '#', isset( $btn_val['target'] ) ? esc_attr($btn_val['target']) : '_blank', implode( ' ', esc_attr($btn_class) ), esc_html($btn_val['name']) );
+							printf( ' <a href="%s" target="%s" class="%s">%s</a>', isset( $btn_val['url'] ) ? esc_url( $btn_val['url'] ) : '#', isset( $btn_val['target'] ) ? esc_attr( $btn_val['target'] ) : '_blank', esc_attr( implode( ' ', $btn_class ) ), esc_html( $btn_val['name'] ) );
 						}
 
 						printf( '</div>' );

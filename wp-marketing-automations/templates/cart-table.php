@@ -195,14 +195,13 @@ $suffix = BWFAN_Common::get_wc_tax_label_if_displayed();
 		        if ( isset( $shipping_total ) ) {
 			        $final_total += $shipping_total;
 		        }
-		        if ( isset( $data['fees'] ) ) {
-			        foreach ( $data['fees'] as $fee ) {
-				        $final_total += ( $tax_display === 'excl' ) ? $fee->total : $fee->total + ( $fee->tax ?? 0 );
-			        }
+		        if ( ! empty( $data['fees'] ) ) {
+				        $final_total += $fee_total;
 		        }
 		        if ( $tax_display === 'excl' ) {
 			        $final_total += $subtotal_tax + ( $shipping_tax ?? 0 );
 		        }
+
 		        echo wp_kses_post( BWFAN_Common::price( $final_total, $currency ) );
 		        ?>
             </td>

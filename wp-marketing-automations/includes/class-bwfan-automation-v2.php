@@ -138,7 +138,7 @@ class BWFAN_Automation_V2 {
 			// Check for event metadata
 			if ( ! empty( $selected_event ) && ! empty( $automation_meta ) && ! empty( $automation_meta['event_meta'] ) ) {
 				$event_obj = BWFAN_Core()->sources->get_event( $selected_event );
-				if ( ! is_null( $event_obj ) && method_exists( $event_obj, 'validate_event_meta_data' ) ){
+				if ( ! is_null( $event_obj ) && method_exists( $event_obj, 'validate_event_meta_data' ) ) {
 					$automation_meta['event_meta'] = $event_obj->validate_event_meta_data( $automation_meta['event_meta'] );
 				}
 			}

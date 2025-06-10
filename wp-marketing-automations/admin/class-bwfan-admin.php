@@ -1097,7 +1097,7 @@ class BWFAN_Admin {
 			}
 
 			do_action( 'bwfan_after_optin_choice', $optin_choice );
-			wp_redirect( admin_url( 'admin.php?page=autonami' ) );
+			wp_safe_redirect( admin_url( 'admin.php?page=autonami' ) );
 			exit;
 		}
 	}
@@ -1122,7 +1122,7 @@ class BWFAN_Admin {
 		if ( empty( $page ) || 'autonami-automations' !== strval( $page ) || ! empty( $id ) ) {
 			return;
 		}
-		wp_redirect( admin_url( 'admin.php?page=autonami&path=/automations' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=autonami&path=/automations' ) );
 		exit;
 	}
 
@@ -1282,7 +1282,7 @@ class BWFAN_Admin {
 			unset( $_GET['tab'] );
 			$build_query = http_build_query( $_GET );
 
-			wp_redirect( admin_url( 'admin.php?' . $build_query ) );
+			wp_safe_redirect( admin_url( 'admin.php?' . $build_query ) );
 			exit;
 		}
 
@@ -1291,7 +1291,7 @@ class BWFAN_Admin {
 			$_GET['page'] = 'autonami-automations';
 			$build_query  = http_build_query( $_GET );
 
-			wp_redirect( admin_url( 'admin.php?' . $build_query ) );
+			wp_safe_redirect( admin_url( 'admin.php?' . $build_query ) );
 			exit;
 		}
 
@@ -1301,7 +1301,7 @@ class BWFAN_Admin {
 			unset( $_GET['section'] );
 			$build_query = http_build_query( $_GET );
 
-			wp_redirect( admin_url( 'admin.php?' . $build_query ) );
+			wp_safe_redirect( admin_url( 'admin.php?' . $build_query ) );
 			exit;
 		}
 
@@ -1731,7 +1731,7 @@ class BWFAN_Admin {
                 <b>
 					<?php echo esc_html( empty( $contact_name ) ? $user_mail : $contact_name ); ?>
                 </b>
-                <span><?php esc_html_e( 'Joined On', 'wp-marketing-automations' ); ?> <?php echo esc_html( $joined_date ); ?></span>
+                <span><?php esc_html_e( 'Joined On', 'wp-marketing-automations' ); ?>&nbsp;<?php echo esc_html( $joined_date ); ?></span>
                 <span class="bwf-contact-wc-status">
                     <a href='<?php echo esc_url( $admin_url ); ?>' target="_blank">
                         <?php esc_html_e( 'View Contact', 'wp-marketing-automations' ); ?>

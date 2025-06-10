@@ -126,12 +126,12 @@ class BWFAN_Exporter_Handler {
 	 *
 	 * @param string $type
 	 * @param string $user_id
-	 * @param array  $extra_data
+	 * @param array $extra_data
 	 *
 	 * @return array
 	 */
 	public function bwfan_start_export( $type = '', $user_id = '', $extra_data = [] ) {
-		if( empty( $type ) || empty( $user_id ) || ! bwfan_is_autonami_pro_active() ) {
+		if ( empty( $type ) || empty( $user_id ) || ! bwfan_is_autonami_pro_active() ) {
 			return [
 				'status' => false,
 			];
@@ -145,16 +145,13 @@ class BWFAN_Exporter_Handler {
 		}
 
 		$export      = $this->get_exporter_by_type( $type );
-		$export_arr = [
+		$export_arr  = [
 			'type'      => $type,
 			'user_id'   => $user_id,
 			'export_id' => 0,
 		];
 		$export_data = [];
-		if(
-			(defined( 'BWFAN_PRO_VERSION' ) && version_compare( BWFAN_PRO_VERSION, '3.5.3', '>=' )) ||
-			$type === 'automation'
-		) {
+		if ( ( defined( 'BWFAN_PRO_VERSION' ) && version_compare( BWFAN_PRO_VERSION, '3.5.3', '>=' ) ) || $type === 'automation' ) {
 			$export_data = $export->insert_data_in_table( $extra_data );
 			if ( $export_data === 0 ) {
 				return [
@@ -211,7 +208,7 @@ class BWFAN_Exporter_Handler {
 		$export_arr = [
 			'type'      => $type,
 			'user_id'   => $user_id,
-			'export_id' => isset($export_data['export_id']) ? $export_data['export_id'] : 0
+			'export_id' => isset( $export_data['export_id'] ) ? $export_data['export_id'] : 0
 		];
 
 		// check if running for user so remove schedule action

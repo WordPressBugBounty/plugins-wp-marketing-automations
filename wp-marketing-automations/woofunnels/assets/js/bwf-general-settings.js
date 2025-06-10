@@ -913,17 +913,7 @@
                         }
 
                     },
-                    {
-                        type: "checklist",
-                        listBox: true,
-                        styleClasses: "wfocu_gsettings_sec_chlist",
-                        model: "is_tiktok_complete_payment_event",
-                        inputName: 'is_tiktok_complete_payment_event',
-                        visible: function (modal) {
-                          return '1' === bwfAdminGen.if_tiktok_purchase_enabled;
-                        }
 
-                    },
                     {
                         type: "label",
                         label: "",

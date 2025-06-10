@@ -166,7 +166,7 @@ abstract class BWFCRM_Base_React_Page {
 		}
 		$this->page_data['wp_user_roles'] = get_editable_roles();
 
-		$this->page_data['is_whatsapp_service_available'] = bwfan_is_autonami_pro_active() ? BWFCRM_Core()->conversation->is_whatsapp_service_available() : false;
+		$this->page_data['is_whatsapp_service_available'] = bwfan_is_autonami_pro_active() ? BWFAN_Core()->conversation->is_whatsapp_service_available() : false;
 
 		$this->page_data['is_whatsapp_enabled'] = BWFAN_Common::is_whatsapp_services_enabled();
 

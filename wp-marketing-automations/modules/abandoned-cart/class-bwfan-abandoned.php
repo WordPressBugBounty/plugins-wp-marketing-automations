@@ -60,7 +60,6 @@ class BWFAN_Abandoned_Cart {
 		add_action( 'woocommerce_removed_coupon', [ $this, 'cart_updated' ] );
 		add_action( 'woocommerce_cart_item_removed', [ $this, 'cart_updated' ] );
 		add_action( 'woocommerce_cart_item_restored', [ $this, 'cart_updated' ] );
-		add_action( 'woocommerce_before_cart_item_quantity_zero', [ $this, 'cart_updated' ] );
 		add_action( 'woocommerce_after_cart_item_quantity_update', [ $this, 'cart_updated' ] );
 
 		add_action( 'wp_login', [ $this, 'cart_updated_with_cookie' ], 20, 2 );
@@ -935,24 +934,21 @@ class BWFAN_Abandoned_Cart {
 
 		/** Check excluded emails or user roles */
 		$global_settings = BWFAN_Common::get_global_settings();
-		if ( 0 !== absint( $global_settings['bwfan_ab_exclude_users_cart_tracking'] ) ) {
-			if ( isset( $global_settings['bwfan_ab_exclude_emails'] ) && ! empty( $global_settings['bwfan_ab_exclude_emails'] ) ) {
-				$global_settings['bwfan_ab_exclude_emails'] = str_replace( ' ', '', $global_settings['bwfan_ab_exclude_emails'] );
-				$exclude_emails                             = [];
-				if ( strpos( $global_settings['bwfan_ab_exclude_emails'], ',' ) ) {
-					$exclude_emails = explode( ',', $global_settings['bwfan_ab_exclude_emails'] );
-				}
 
-				if ( empty( $exclude_emails ) ) {
-					$exclude_emails = preg_split( '/$\R?^/m', $global_settings['bwfan_ab_exclude_emails'] );
-				}
+		if ( isset( $global_settings['bwfan_ab_exclude_emails'] ) && ! empty( $global_settings['bwfan_ab_exclude_emails'] ) ) {
+			/** Normalize line breaks to commas and explode */
+			$exclude_emails = preg_split( '/[\r\n,]+/', $global_settings['bwfan_ab_exclude_emails'], - 1, PREG_SPLIT_NO_EMPTY );
+			$exclude_emails = array_map( 'trim', $exclude_emails );
+			$exclude_emails = array_unique( $exclude_emails );
 
-				if ( $this->email_exists_in_patterns( $email, $exclude_emails ) ) {
-					wp_send_json( array(
-						'success' => false,
-					) );
-				}
+			if ( $this->email_exists_in_patterns( $email, $exclude_emails ) ) {
+				wp_send_json( array(
+					'success' => false,
+				) );
 			}
+		}
+
+		if ( 0 !== absint( $global_settings['bwfan_ab_exclude_users_cart_tracking'] ) ) {
 			if ( isset( $global_settings['bwfan_ab_exclude_roles'] ) && ! empty( $global_settings['bwfan_ab_exclude_roles'] ) && is_user_logged_in() ) {
 				$user          = wp_get_current_user();
 				$exclude_roles = array_intersect( (array) $user->roles, $global_settings['bwfan_ab_exclude_roles'] );
@@ -1067,7 +1063,7 @@ class BWFAN_Abandoned_Cart {
 
 	public function email_exists_in_patterns( $email, $email_patterns ) {
 		foreach ( $email_patterns as $pattern ) {
-			if ( false !== strpos( $email, trim( $pattern ) ) ) {
+			if ( false !== strpos( strtolower( $email ), strtolower( trim( $pattern ) ) ) ) {
 				return true;
 			}
 		}

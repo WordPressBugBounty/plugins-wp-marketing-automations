@@ -19,12 +19,9 @@ class BWFAN_API_Get_Log_Files extends BWFAN_API_Base {
 
 	public function process_api_call() {
 
-		$file_list[] = array(
-			'key'   => '',
-			'label' => 'Select Log File',
-		);
+		$file_list = [];
 		if ( ! class_exists( 'BWF_Logger' ) ) {
-			return $this->success_response( $file_list, 'No log files found' );
+			return $this->success_response( $file_list, __( 'No log files found', 'wp-marketing-automations' ) );
 		}
 		$logger_obj        = BWF_Logger::get_instance();
 		$final_logs_result = $logger_obj->get_log_options();
@@ -33,7 +30,7 @@ class BWFAN_API_Get_Log_Files extends BWFAN_API_Base {
 			foreach ( $final_logs_result['autonami-logs'] as $file_slug => $file_name ) {
 				$option_value = 'autonami-logs/' . $file_slug;
 				$file_list[]  = array(
-					'key'   => $option_value,
+					'value' => $option_value,
 					'label' => $file_name,
 				);
 			}

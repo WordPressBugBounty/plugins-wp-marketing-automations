@@ -395,7 +395,7 @@ class BWFAN_Common {
 
 		if ( self::is_whatsapp_services_enabled() ) {
 			$defaults['bwfan_whatsapp_gap_btw_message'] = 1;
-			$services                                   = BWFCRM_Core()->conversation->get_whatsapp_services();
+			$services                                   = self::get_whatsapp_services();
 			if ( ! empty( $services ) ) {
 				$defaults['bwfan_primary_whats_app_service'] = [
 					[
@@ -557,7 +557,7 @@ class BWFAN_Common {
 			return false;
 		}
 
-		$services = BWFCRM_Core()->conversation->get_whatsapp_services();
+		$services = self::get_whatsapp_services();;
 		if ( is_array( $services ) && count( $services ) > 0 ) {
 			return true;
 		}
@@ -1318,7 +1318,7 @@ class BWFAN_Common {
 						continue;
 					}
 
-					if ( false !== strpos( $value1, '{{' . $merge_tag . '}}' ) ) {
+					if ( $value1 && false !== strpos( $value1, '{{' . $merge_tag . '}}' ) ) {
 						$data[ $key1 ] = str_replace( '{{' . $merge_tag . '}}', $details[1], $value1 );
 						continue;
 					}
@@ -2929,10 +2929,6 @@ class BWFAN_Common {
 
 		/** Check if any contact in automation can proceed */
 		if ( false === BWFAN_Model_Automation_Contact::maybe_can_execute() ) {
-			return;
-		}
-
-		if ( false === apply_filters( 'bwfan_run_automation_v2_worker', true ) ) {
 			return;
 		}
 
@@ -5298,7 +5294,7 @@ class BWFAN_Common {
 						"key"         => 'whatsapp',
 						"label"       => __( 'WhatsApp', 'wp-marketing-automations' ),
 						"heading"     => __( 'WhatsApp', 'wp-marketing-automations' ),
-						"showSection" => bwfan_is_autonami_pro_active() ? BWFCRM_Core()->conversation->is_whatsapp_service_available() : false,
+						"showSection" => bwfan_is_autonami_pro_active() ? BWFAN_Core()->conversation->is_whatsapp_service_available() : false,
 						'fields'      => self::get_whatsapp_services_fields(),
 					),
 					array(
@@ -6470,10 +6466,25 @@ class BWFAN_Common {
 	 */
 	public static function get_whatsapp_services_fields() {
 		$fields = array();
+
 		if ( bwfan_is_autonami_pro_active() && class_exists( 'WFCO_Autonami_Connectors_Core' ) ) {
-			$services = BWFCRM_Core()->conversation->get_whatsapp_services();
+			$services          = self::get_whatsapp_services();
+			$additional_fields = apply_filters( 'bwfan_whatsapp_services_additional_fields', array(), $services );
 			if ( count( $services ) > 0 ) {
-				$fields = array(
+
+				if ( count( $services ) > 1 ) {
+					$fields[] = array(
+						"id"       => 'bwfan_primary_whats_app_service',
+						"label"    => __( 'Select Service', 'wp-marketing-automations' ),
+						"type"     => 'select',
+						"class"    => '',
+						"options"  => $services,
+						"required" => false,
+						"multiple" => false,
+						"toggler"  => array(),
+					);
+				}
+				$fields = array_merge( $fields, array(
 					array(
 						"id"           => 'bwfan_whatsapp_gap_btw_message',
 						"label"        => __( 'Time Between Each Message (secs)', 'wp-marketing-automations' ),
@@ -6485,21 +6496,13 @@ class BWFAN_Common {
 						"required"     => false,
 						"autocomplete" => 'off',
 						"toggler"      => array(),
-					)
-				);
+					),
+				) );
 
-				if ( count( $services ) > 1 ) {
-					$fields[] = array(
-						"id"       => 'bwfan_primary_whats_app_service',
-						"label"    => __( 'Select Service', 'wp-marketing-automations' ),
-						"type"     => 'select',
-						"class"    => '',
-						"options"  => $services,
-						"required" => false,
-						'multiple' => false,
-						"toggler"  => array(),
-					);
+				if ( ! empty( $additional_fields ) ) {
+					$fields = array_merge( $fields, $additional_fields );
 				}
+
 			} else {
 				$fields = array(
 					array(
@@ -7248,6 +7251,7 @@ class BWFAN_Common {
 				'drip'           => __( 'Drip', 'wp-marketing-automations' ),
 				'slack'          => __( 'Slack', 'wp-marketing-automations' ),
 				'twilio'         => __( 'Twilio', 'wp-marketing-automations' ),
+				'whatsapp'       => __( 'Whatsapp', 'wp-marketing-automations' ),
 				'google_sheets'  => __( 'Google Sheets', 'wp-marketing-automations' ),
 			),
 			'action'      => array(
@@ -9838,7 +9842,7 @@ class BWFAN_Common {
 	 * @return array|mixed|string|string[]
 	 */
 	public static function correct_shortcode_string( $body, $type ) {
-		if ( ( $type !== 'block' && $type !== 5 ) || strpos( $body, 'bwfan_email_block_visibility' ) === false ) {
+		if ( ! bwfan_is_autonami_pro_active() || ( $type !== 'block' && $type !== 5 ) || strpos( $body, 'bwfan_email_block_visibility' ) === false ) {
 			return $body;
 		}
 		BWFAN_Core()->rules->load_rules_classes();
@@ -10632,7 +10636,17 @@ class BWFAN_Common {
 	 */
 	public static function wp_redirect( $link ) {
 		remove_all_filters( 'wp_redirect' );
-		wp_redirect( $link );
+
+		add_filter( 'allowed_redirect_hosts', function ( $allowed_hosts, $host ) use ( $link ) {
+			/** Add link host in allowed hosts, because already checked link is valid or not */
+			if ( $host === wp_parse_url( $link, PHP_URL_HOST ) ) {
+				$allowed_hosts[] = $host;
+			}
+
+			return $allowed_hosts;
+		}, 10, 2 );
+
+		wp_safe_redirect( $link );
 		exit;
 	}
 
@@ -11783,7 +11797,7 @@ class BWFAN_Common {
 		}
 
 		/** Checking by link exist in links table */
-		$is_link_exists = BWFAN_Model_Links::get_link_id_by_tid( $cleaned_url, $engagement_data[0]??[] );
+		$is_link_exists = BWFAN_Model_Links::get_link_id_by_tid( $cleaned_url, $engagement_data[0] ?? [] );
 		if ( ! empty( $is_link_exists ) ) {
 			BWFAN_Email_Conversations::$link_id = $is_link_exists;
 

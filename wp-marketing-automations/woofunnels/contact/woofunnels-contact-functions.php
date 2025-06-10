@@ -134,14 +134,19 @@ if ( ! function_exists( 'bwf_create_update_contact_object' ) ) {
 		$f_name = empty( $f_name ) ? $wp_f_name : $f_name;
 		$l_name = empty( $l_name ) ? $wp_l_name : $l_name;
 
+		$update_name = apply_filters( 'bwf_update_contact_name', true, $bwf_contact );
 		if ( ! empty( $f_name ) ) {
-			$f_name = ( false === $force && ! empty( $bwf_contact->get_f_name() ) ) ? '' : $f_name;
-			$bwf_contact->set_f_name( $f_name );
+			$should_skip_update = ( false === $force || false === $update_name ) && ! empty( $bwf_contact->get_f_name() );
+			if ( ! $should_skip_update ) {
+				$bwf_contact->set_f_name( $f_name );
+			}
 		}
 
 		if ( ! empty( $l_name ) ) {
-			$l_name = ( false === $force && ! empty( $bwf_contact->get_l_name() ) ) ? '' : $l_name;
-			$bwf_contact->set_l_name( $l_name );
+			$should_skip_update = ( false === $force || false === $update_name ) && ! empty( $bwf_contact->get_l_name() );
+			if ( ! $should_skip_update ) {
+				$bwf_contact->set_l_name( $l_name );
+			}
 		}
 
 		/** New contact */

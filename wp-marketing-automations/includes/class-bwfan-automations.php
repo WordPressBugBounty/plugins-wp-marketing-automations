@@ -50,7 +50,7 @@ class BWFAN_Automations {
 				$query .= $wpdb->prepare( " AND title LIKE %s", '%' . esc_sql( $search ) . '%' );
 			}
 			$query         .= $wpdb->prepare( " ORDER BY ID DESC LIMIT %d OFFSET %d", $limit, $offset );
-			$automation_id    = $wpdb->get_col( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$automation_id = $wpdb->get_col( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( empty( $automation_id ) ) {
 				return;
 			}

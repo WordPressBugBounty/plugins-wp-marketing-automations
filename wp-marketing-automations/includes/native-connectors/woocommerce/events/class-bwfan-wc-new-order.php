@@ -843,7 +843,13 @@ final class BWFAN_WC_New_Order extends BWFAN_Event {
 		$this->order_id  = $order[0]->get_id();
 		$this->to_status = 'wc-' . $order[0]->get_status();
 
-		return array_merge( $automation_data, [ 'order_id' => $this->order_id, 'to_status' => $this->to_status ] );
+		$automation_data = array_merge( $automation_data, [ 'order_id' => $this->order_id, 'to_status' => $this->to_status ] );
+
+		if ( BWFAN_Common::validate_create_order_event_setting( $automation_data ) === false ) {
+			return [ 'status' => 0, 'type' => '', 'message' => __( "No Ordered Products are matching with event products.", 'wp-marketing-automations' ) ];
+		}
+
+		return $automation_data;
 	}
 
 }

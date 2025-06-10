@@ -52,13 +52,13 @@ class BWFAN_Subscribe_Link_Handler {
 				$url = BWFAN_Common::append_extra_url_arguments( $url );
 				if ( false !== wp_http_validate_url( $url ) ) {
 					BWFAN_Email_Conversations::validate_link( $url );
-					wp_redirect( $url );
+					BWFAN_Common::wp_redirect( urldecode( $url ) );
 					exit;
 				}
 			}
 
 			// when no contact found with the uid then redirect to the home url
-			wp_redirect( home_url() );
+			wp_safe_redirect( home_url() );
 			exit();
 		}
 
@@ -77,7 +77,7 @@ class BWFAN_Subscribe_Link_Handler {
 			$url = BWFAN_Common::append_extra_url_arguments( $url );
 			if ( false !== wp_http_validate_url( $url ) ) {
 				BWFAN_Email_Conversations::validate_link( $url );
-				wp_redirect( urldecode( $url ) );
+				BWFAN_Common::wp_redirect( urldecode( $url ) );
 				exit;
 			}
 		}

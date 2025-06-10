@@ -11,7 +11,7 @@ abstract class Base {
 	public static $EXPORTER_ONGOING = 1;
 	public static $EXPORTER_SUCCESS = 2;
 	public static $EXPORTER_FAILED = 3;
-	public static $export_folder = WP_CONTENT_DIR . '/uploads/woofunnels-upload/autonami-single-export';
+	public static $export_folder = BWFAN_SINGLE_EXPORT_DIR;
 
 	/**
 	 * Exporter Type
@@ -28,7 +28,7 @@ abstract class Base {
 	 *
 	 * @return void
 	 */
-	abstract public function handle_export( $user_id , $export_id );
+	abstract public function handle_export( $user_id, $export_id );
 
 	/**
 	 * Save processed and count data in table
@@ -50,7 +50,7 @@ abstract class Base {
 		$meta = [ 'file' => $file_name ];
 
 		// Add extra data to meta
-		if( ! empty( $extra_data ) ) {
+		if ( ! empty( $extra_data ) ) {
 			$meta = array_merge( $meta, $extra_data );
 		}
 

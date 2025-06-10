@@ -1094,7 +1094,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 					?>
                     <div>
                         <span class="bwf-utm-lable"><?php echo esc_html($item['name']) . ': '; ?></span>
-                        <span class="bwf-utm-text"><?php echo esc_html($item['value']); ?></span>
+                        <span class="bwf-utm-text"><?php echo $item['value']; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
                     </div>
 					<?php
 				}

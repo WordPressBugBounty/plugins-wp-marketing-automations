@@ -156,7 +156,7 @@ if ( ! class_exists( 'WooFunnels_Process' ) ) {
 					wp_die( esc_html__( 'Action failed. Please refresh the page and retry.', 'woofunnels' ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				}
 				update_option( 'woofunnel_hide_update_notice', 'yes' );
-				wp_redirect( admin_url( 'index.php' ) );
+				wp_safe_redirect( admin_url( 'index.php' ) );
 				exit;
 			}
 		}
@@ -267,7 +267,6 @@ if ( ! class_exists( 'WooFunnels_Process' ) ) {
 
 			return wp_kses_post( $upgrade_notice );
 		}
-
 
 
 		public function fire_thankyou_ajax( $order_id ) {

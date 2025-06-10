@@ -4,7 +4,7 @@ Tags: cart abandonment, follow up emails, email marketing, newsletter, marketing
 Requires at least: 5.0
 Tested up to: 6.8.1
 Requires PHP: 7.0
-Stable tag: 3.6.0
+Stable tag: 3.6.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -415,6 +415,15 @@ FunnelKit Automations is 100% self-hosted and fully GDPR compliant.
 
 
 == Change log ==
+
+= 3.6.1 (Jun 09, 2025) =
+* Security: Redirect Handling: Now using native wp_safe_redirect() for enhanced security. (#4041)
+* Improved: Deprecated Hook Handling: Replaced usage of deprecated woocommerce_before_cart_item_quantity_zero hook. (#4031)
+* Improved: Logs Screen: Added search functionality to enhance user experience. (#4033)
+* Fixed: Cart Items Table: Improved fee total calculation in the Cart Items merge tag. (#4035)
+* Fixed: Add to Automation: Added extra validation for the Order Created event. (#4043)
+* Fixed: Exclude Settings: Resolved issue where the Exclude Email Patterns setting wasn't working; now correctly bound with Exclude User Roles. (#4048)
+* Fixed: Viewport Issue: Fixed dynamic viewport height rendering issues. (#4044)
 
 = 3.6.0 (Jun 03, 2025) =
 * Compatible upto WordPress 6.8.1

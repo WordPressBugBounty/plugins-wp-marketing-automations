@@ -342,7 +342,7 @@ class BWFAN_API_SendMessage extends BWFAN_API_Base {
 			)
 		) );
 
-		if ( $response['status'] == true ) {
+		if ( ! empty( $response['status'] ) && $response['status'] == true ) {
 			/** Save the time of last sent engagement **/
 			$data = array( 'cid' => $contact_id );
 			$this->conversation::save_last_sent_engagement( $data );

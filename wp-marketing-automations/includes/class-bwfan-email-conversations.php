@@ -255,7 +255,7 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 			$phone           = isset( $data['phone'] ) ? $data['phone'] : '';
 			$template_type   = isset( $data['template'] ) ? $data['template'] : '';
 			$is_track_enable = self::is_automation_open_click_track( $automation_id );
-			$send_to         = $mode === self::$MODE_SMS ? $phone : $email;
+			$send_to         = in_array( $mode, [ self::$MODE_SMS, self::$MODE_WHATSAPP ] ) ? $phone : $email;
 			$hash_code       = md5( time() . $send_to . $task_id );
 			$contact_email   = '';
 			$cid             = 0;

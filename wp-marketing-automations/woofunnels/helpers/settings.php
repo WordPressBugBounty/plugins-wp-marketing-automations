@@ -1249,22 +1249,12 @@ return apply_filters( 'bwf_settings_config', array(
 				'label'  => '',
 				'values' => array(
 					array(
-						'name'  => __( 'Enable PlaceOrder Event', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+						'name'  => __( 'Enable Purchase Event', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 						'value' => 'yes',
 					),
 				),
 			),
-			array(
-				'key'    => 'is_tiktok_complete_payment_event',
-				'type'   => 'checklist',
-				'label'  => '',
-				'values' => array(
-					array(
-						'name'  => __( 'Enable CompletePayment Event', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-						'value' => 'yes',
-					),
-				),
-			),
+
 			array(
 				'type'         => 'label',
 				'key'          => 'label_section_head_ga',

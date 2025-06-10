@@ -150,7 +150,6 @@ if ( ! class_exists( 'BWF_Admin_General_Settings' ) ) {
 				'tiktok_add_to_cart_event'          => '',
 				'tiktok_initiate_checkout_event'    => '',
 				'is_tiktok_purchase_event'          => array(),
-				'is_tiktok_complete_payment_event'  => array(),
 				'pint_key'                          => '',
 				'is_pint_lead_op'                   => array(),
 				'is_pint_add_to_cart_bump'          => '',

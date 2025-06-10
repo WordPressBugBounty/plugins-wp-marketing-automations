@@ -39,7 +39,7 @@ if ( ! class_exists( 'BWFAN_Model_Links' ) ) {
 		 * @return mixed
 		 */
 		public static function is_link_hash_exists( $clean_url = '', $l_hash = '' ) {
-			if( empty( $l_hash ) || empty( $clean_url ) ) {
+			if ( empty( $l_hash ) || empty( $clean_url ) ) {
 				return false;
 			}
 
@@ -52,7 +52,7 @@ if ( ! class_exists( 'BWFAN_Model_Links' ) ) {
 		 * Check if links exist
 		 *
 		 * @param string $link
-		 * @param array  $data
+		 * @param array $data
 		 *
 		 * @return string|bool|null
 		 */
@@ -65,7 +65,7 @@ if ( ! class_exists( 'BWFAN_Model_Links' ) ) {
 
 			$where = " 1=1 ";
 
-			if( ! empty( $data['clean_url'] ) ) {
+			if ( ! empty( $data['clean_url'] ) ) {
 				$where .= $wpdb->prepare( " AND `clean_url` = %s", esc_sql( $data['clean_url'] ) );
 			}
 
@@ -94,7 +94,7 @@ if ( ! class_exists( 'BWFAN_Model_Links' ) ) {
 		 * @return string|null
 		 */
 		public static function get_link_id_by_tid( $cleaned_url, $data ) {
-			if(empty( $cleaned_url ) || empty( $data ) ) {
+			if ( empty( $cleaned_url ) || empty( $data ) ) {
 				return '';
 			}
 			$tid  = $data['tid'] ?? 0;
@@ -104,7 +104,12 @@ if ( ! class_exists( 'BWFAN_Model_Links' ) ) {
 			global $wpdb;
 			$query = "SELECT `ID` FROM {$wpdb->prefix}bwfan_links WHERE `clean_url` = %s AND `tid` = %d AND `oid` = %d AND `type`=%d ORDER BY `ID` DESC LIMIT 1";
 
-			return $wpdb->get_var( $wpdb->prepare( $query, [ $cleaned_url, $tid, $oid, $type ] ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
+			return $wpdb->get_var( $wpdb->prepare( $query, [
+				$cleaned_url,
+				$tid,
+				$oid,
+				$type
+			] ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 		}
 	}
 }

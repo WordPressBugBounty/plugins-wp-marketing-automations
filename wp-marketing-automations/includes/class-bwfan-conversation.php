@@ -854,15 +854,11 @@ class BWFAN_Conversation {
 	 * @return bool
 	 */
 	public function is_whatsapp_service_available() {
-		$response = false;
-		if ( class_exists( 'BWFCO_Wabot' ) ) {
-			$response = true;
-		}
-		if ( class_exists( 'BWFCO_Waapi' ) ) {
-			$response = true;
+		if ( class_exists( 'BWFCO_Wabot' ) || class_exists( 'BWFCO_Waapi' ) ) {
+			return true;
 		}
 
-		return $response;
+		return apply_filters( 'bwfan_is_whatsapp_service_available', false );
 	}
 
 	/**
@@ -885,7 +881,7 @@ class BWFAN_Conversation {
 			);
 		}
 
-		return $services;
+		return apply_filters( 'bwfan_whatsapp_services', $services );
 	}
 
 	/**

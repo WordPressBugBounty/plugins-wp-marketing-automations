@@ -54,7 +54,7 @@ class BWFAN_DB_Update {
 	 */
 	public function db_update() {
 		$db_status  = $this->get_saved_data( 'status' );
-		$db_version = $this->get_saved_data();
+		$db_version = $this->get_saved_data() ?? false;
 		$db_version = ( false === $db_version ) ? '2.8.4' : $db_version;
 
 		/** Status 1 = ready for run, 2 = in progress, 3 = complete */

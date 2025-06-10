@@ -341,6 +341,7 @@ class BWFAN_Load_Sources {
 			'ontraport_webhook_received'    => __( 'Webhook Received', 'wp-marketing-automations' ),
 			'mautic_webhook_received'       => __( 'Webhook Received', 'wp-marketing-automations' ),
 			'twilio_message_received'       => __( 'SMS Received', 'wp-marketing-automations' ),
+			'wa_message_received'           => __( 'Message Received', 'wp-marketing-automations' ),
 			'drip_webhook_received'         => __( 'Webhook Received', 'wp-marketing-automations' ),
 		] );
 	}

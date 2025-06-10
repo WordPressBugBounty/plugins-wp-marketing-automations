@@ -82,12 +82,20 @@ if ( ! class_exists( 'BWF_Logger' ) ) {
 					continue;
 				}
 
+				$file_timestamps = array();
 				foreach ( $files as $value ) {
 					if ( ! in_array( $value, array( '.', '..' ), true ) ) {
-						if ( ! is_dir( $value ) ) {
-							$result[ $value ] = $value;
+						$file_path = $plugin_uploads_directory . '/' . $value;
+						if ( ! is_dir( $file_path ) ) {
+							$file_timestamps[$value] = filemtime( $file_path );
 						}
 					}
+				}
+
+				// Sort files by modified time (newest first)
+				arsort( $file_timestamps );
+				foreach ( $file_timestamps as $file => $timestamp ) {
+					$result[$file] = $file;
 				}
 
 				if ( is_array( $result ) && count( $result ) > 0 ) {

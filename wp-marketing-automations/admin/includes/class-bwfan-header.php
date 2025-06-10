@@ -351,7 +351,7 @@ final class BWFAN_Header {
 			),
 		);
 
-		if ( bwfan_is_autonami_pro_active() && method_exists( 'BWFCRM_Conversation', 'is_whatsapp_available_for_broadcast' ) && BWFCRM_Core()->conversation->is_whatsapp_available_for_broadcast() ) {
+		if ( bwfan_is_autonami_pro_active() && BWFAN_Core()->conversation->is_whatsapp_service_available() && ! apply_filters( 'bwfan_disabled_whatsapp_broadcast', true ) ) {
 			$broadcast_nav['whatsapp'] = array(
 				'name' => __( 'WhatsApp', 'wp-marketing-automations' ),
 				'link' => admin_url( 'admin.php?page=autonami&path=/broadcasts/whatsapp' ),
