@@ -11998,4 +11998,17 @@ class BWFAN_Common {
 
 		return $contact->get_id() > 0 ? $contact->get_email() : '';
 	}
+
+	/**
+	 * Check language support
+	 *
+	 * @return bool
+	 */
+	public static function should_skip_language_support() {
+		if ( ! function_exists( 'icl_get_languages' ) && ! function_exists( 'pll_the_languages' ) && ( ! function_exists( 'bwfan_is_translatepress_active' ) || ! bwfan_is_translatepress_active() ) && ( ! function_exists( 'bwfan_is_weglot_active' ) || ! bwfan_is_weglot_active() ) && ( ! function_exists( 'bwfan_is_gtranslate_active' ) || ! bwfan_is_gtranslate_active() ) ) {
+			return true;
+		}
+
+		return false;
+	}
 }

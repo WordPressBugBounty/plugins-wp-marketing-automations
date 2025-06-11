@@ -439,9 +439,8 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 		if ( ! bwfan_is_autonami_pro_active() ) {
 			return true;
 		}
-
-		/** checking for language plugin **/
-		if ( ! function_exists( 'icl_get_languages' ) && ! function_exists( 'pll_the_languages' ) && ! bwfan_is_translatepress_active() && function_exists( 'bwfan_is_weglot_active' ) && ! bwfan_is_weglot_active() ) {
+		/** checking for language support **/
+		if ( BWFAN_Common::should_skip_language_support() ) {
 			return true;
 		}
 

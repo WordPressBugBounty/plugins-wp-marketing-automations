@@ -40,7 +40,6 @@ class Emogrifier {
 		$css_inliner  = CssInliner::fromHtml( $this->content )->inlineCss( $this->css );
 		$dom_document = $css_inliner->getDomDocument();
 
-		HtmlPruner::fromDomDocument( $dom_document )->removeElementsWithDisplayNone();
 		$content = CssToAttributeConverter::fromDomDocument( $dom_document )->convertCssToVisualAttributes()->render();;
 
 		return defined( 'BWFAN_MINIFY_MAIL_CONTENT' ) && BWFAN_MINIFY_MAIL_CONTENT && method_exists( 'BWFAN_Common', 'minifyHtmlData' ) ? \BWFAN_Common::minifyHtmlData( $content ) : $content;
@@ -66,7 +65,6 @@ class Emogrifier {
 
 		$dom_document = $css_inliner->getDomDocument();
 
-		HtmlPruner::fromDomDocument( $dom_document )->removeElementsWithDisplayNone();
 		$content = CssToAttributeConverter::fromDomDocument( $dom_document )->convertCssToVisualAttributes()->renderBodyContent();
 
 		return defined( 'BWFAN_MINIFY_MAIL_CONTENT' ) && BWFAN_MINIFY_MAIL_CONTENT && method_exists( 'BWFAN_Common', 'minifyHtmlData' ) ? \BWFAN_Common::minifyHtmlData( $content ) : $content;
