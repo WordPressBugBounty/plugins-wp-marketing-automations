@@ -55,7 +55,19 @@ class BWFAN_WC_Order_Billing_First_Name extends BWFAN_Merge_Tag {
 	 * @return string
 	 */
 	public function get_dummy_preview() {
-		return 'John';
+		$contact    = $this->get_contact_data();
+		$first_name = 'John';
+		/** check for contact instance and the contact id */
+		if ( ! $contact instanceof WooFunnels_Contact || 0 === absint( $contact->get_id() ) ) {
+			return $first_name;
+		}
+
+		/** If empty */
+		if ( empty( $contact->get_f_name() ) ) {
+			return $first_name;
+		}
+
+		return ucfirst( $contact->get_f_name() );
 	}
 }
 

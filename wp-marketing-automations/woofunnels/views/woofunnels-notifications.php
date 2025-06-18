@@ -9,12 +9,14 @@ if ( ! is_array( $notifications_list ) || count( $notifications_list ) === 0 ) {
 		<?php
 		foreach ( $notifications_list as $nkey => $nvalue ) {
 			foreach ( $nvalue as $key => $value ) {
-
 				$combined_class = [ $key, 'wf_notification_content_sec' ];
 				if ( isset( $value['type'] ) && $value['type'] !== '' ) {
 					$combined_class[] = $value['type'];
 				}
-				if ( isset( $value['class'] ) && is_array( $value['class'] ) ) {
+				if ( isset( $value['class'] ) && ! empty( $value['class'] ) ) {
+					$value['class'] = is_array( $value['class'] ) ? $value['class'] : explode( ' ', (string) $value['class'] );
+					$value['class'] = array_filter( $value['class'] );
+					$value['class'] = array_map( 'trim', $value['class'] );
 					$combined_class = array_merge( $combined_class, $value['class'] );
 				}
 
@@ -31,9 +33,11 @@ if ( ! is_array( $notifications_list ) || count( $notifications_list ) === 0 ) {
 						foreach ( $value['buttons'] as $btn_key => $btn_val ) {
 
 							$btn_class = [];
-
-							if ( isset( $btn_val['class'] ) && is_array( $btn_val['class'] ) ) {
-								$btn_class = array_merge( $btn_class, $btn_val['class'] );
+							if ( isset( $btn_val['class'] ) && ! empty( $btn_val['class'] ) ) {
+								$btn_val['class'] = is_array( $btn_val['class'] ) ? $btn_val['class'] : explode( ' ', (string) $btn_val['class'] );
+								$btn_val['class'] = array_filter( $btn_val['class'] );
+								$btn_val['class'] = array_map( 'trim', $btn_val['class'] );
+								$btn_class        = $btn_val['class'];
 							}
 
 							if ( ! isset( $btn_val['name'] ) || $btn_val['name'] === '' ) {

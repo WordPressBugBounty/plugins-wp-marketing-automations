@@ -257,7 +257,7 @@ class BWFAN_Admin {
 		$menu_data = BWFAN_Common::get_user_menu_access();
 
 		/** Check if Autonami is in sandbox mode */
-		$title = __( 'FunnelKit Automations', 'wp-marketing-automations' );
+		$title = 'FunnelKit Automations';
 		if ( true === BWFAN_Common::is_sandbox_mode_active() ) {
 			$title .= ' <span style="background-color:#ca4a1f;border-radius:10px;margin-left:0;font-size:10px;padding:3px 6px;">' . __( 'Sandbox', 'wp-marketing-automations' ) . '</span>';
 		}
@@ -912,7 +912,7 @@ class BWFAN_Admin {
 
 		/* translators: 1: Dynamic URL */
 
-		return sprintf( __( 'Over 260+ 5 star reviews show that FunnelKit users trust our top-rated support for their online business. Do you need help? <a href="%1$s" target="_blank"><b>Contact FunnelKit Support</b></a>.', 'wp-marketing-automations' ), $link );
+		return sprintf( __( 'Over %1$s 5 star reviews show that FunnelKit users trust our top-rated support for their online business. Do you need help? <a href="%2$s" target="_blank"><b>Contact FunnelKit Support</b></a>.', 'wp-marketing-automations' ), '270+', esc_url( $link ) );
 	}
 
 	public function admin_footer_version( $footer_version ) {
@@ -1517,9 +1517,6 @@ class BWFAN_Admin {
 	 * @return void
 	 */
 	public function bwf_add_single_order_meta_box( $post_type, $post ) {
-		if ( ! bwfan_is_autonami_pro_active() ) {
-			return;
-		}
 		if ( 'shop_order' === $post_type || ( $post instanceof WC_Order && 'shop_order' === $post->get_type() ) ) {
 			$order = $post instanceof WC_Order ? $post : wc_get_order( $post->ID );
 			if ( ! $order instanceof WC_Order ) {
@@ -1546,20 +1543,17 @@ class BWFAN_Admin {
 			return;
 		}
 
-		if ( ! class_exists( 'BWFCRM_Contact' ) ) {
-			return;
-		}
-
 		$contact_id = absint( $args['cid'] );
-		$contact    = new BWFCRM_Contact( $contact_id );
-		if ( ! $contact instanceof BWFCRM_Contact || false === $contact->is_contact_exists() ) {
+		$contact    = new WooFunnels_Contact( '', '', '', $contact_id );
+		if ( empty( $contact->get_id() ) ) {
 			esc_html_e( 'No Contact Mapped', 'wp-marketing-automations' );
 
 			return;
 		}
-		$user_mail    = $contact->contact->email;
-		$user_fname   = $contact->contact->get_f_name();
-		$user_lname   = $contact->contact->get_l_name();
+
+		$user_mail    = $contact->email;
+		$user_fname   = $contact->get_f_name();
+		$user_lname   = $contact->get_l_name();
 		$contact_name = ucfirst( $user_fname ) . ' ' . ucfirst( $user_lname );
 		$admin_url    = admin_url( 'admin.php?page=autonami&path=/contact/' . $contact_id );
 		$avatar_url   = 'https://www.gravatar.com/avatar/0?s=80&d=blank';
@@ -1567,8 +1561,8 @@ class BWFAN_Admin {
 			$avatar_url = 'https://www.gravatar.com/avatar/' . md5( $user_mail ) . '?s=80&&d=blank';
 		}
 
-		$status      = $contact->get_marketing_status();
-		$joined_date = $contact->contact->get_creation_date();
+		$status      = $this->get_display_status( $contact );
+		$joined_date = $contact->get_creation_date();
 		$format      = BWFAN_Common::bwfan_get_date_format();
 		$joined_date = gmdate( $format, strtotime( $joined_date ) );
 		$resync_text = [
@@ -1721,9 +1715,9 @@ class BWFAN_Admin {
                 <a href='<?php echo esc_url( $admin_url ); ?>' target="_blank">
                     <img alt="" class="bwf-gravatar" src="<?php echo esc_url( $avatar_url ); ?>" width="80" height="80"/>
                     <div class="bwf-c-name-initials">
-							<span>
-								<?php echo substr( $user_fname, 0, 1 ) . substr( $user_lname, 0, 1 ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped?>
-							</span>
+                        <span>
+                            <?php echo substr( $user_fname, 0, 1 ) . substr( $user_lname, 0, 1 ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped?>
+                        </span>
                     </div>
                 </a>
             </div>
@@ -1744,15 +1738,88 @@ class BWFAN_Admin {
             <div id="bwfan-editorder-message-section"></div>
         </div>
 		<?php
-		do_action( 'bwfan_crm_order_autonami_metabox', $contact, $status );
+		$this->bwf_show_contact_list_tags( $contact, $status );//phpcs:ignore WordPress.Security.EscapeOutput
 
-		wp_enqueue_script( 'bwfan-admin-common', $this->admin_url . '/assets/js/bwfan-admin-common.js', array(), BWFAN_VERSION_DEV, true );
+		wp_enqueue_script( 'bwfan-admin-common', $this->admin_url . '/assets/js/bwfan-admin-common.js', array( 'wp-api' ), BWFAN_VERSION_DEV, true );
 		wp_localize_script( 'bwfan-admin-common', 'bwfanProObj', array(
 			'siteUrl'       => site_url(),
 			'apiNamespace'  => BWFAN_API_NAMESPACE,
 			'contactId'     => $contact_id,
 			'localize_text' => $resync_text,
 		) );
+	}
+
+	/**
+	 * Add contact lists and tags on order metabox
+	 *
+	 * @param $contact WooFunnels_Contact
+	 * @param $status
+	 */
+	public function bwf_show_contact_list_tags( $contact, $status ) {
+		if ( ! $contact instanceof WooFunnels_Contact ) {
+			return;
+		}
+
+		/** using $default_currency_symbol to pass the default currency in case client using currency switcher as we show price in default currency */
+		$default_currency_symbol = get_option( 'woocommerce_currency' );
+		$customer                = new WooFunnels_Customer( $contact );
+		$total_orders            = $customer->get_total_order_count();
+		$total_spend             = $customer->get_total_order_value();
+		$aov                     = $customer->get_aov();
+		?>
+        <div class="bwf-pro-data">
+            <div class="bwf-order-data-gap"></div>
+            <div>
+                <span><?php echo esc_html__( 'Status', 'woocommerce' ) . ': '; // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch ?></span>
+				<?php echo $status; //phpcs:ignore WordPress.Security.EscapeOutput ?>
+            </div>
+            <div>
+                <span><?php echo esc_html__( 'Order(s)', 'wp-marketing-automations' ) . ': '; ?></span>
+				<?php echo $total_orders; //phpcs:ignore WordPress.Security.EscapeOutput ?>
+            </div>
+            <div>
+                <span><?php echo esc_html__( 'Total Spend', 'wp-marketing-automations' ) . ': '; ?></span>
+				<?php echo wc_price( $total_spend, array( 'currency' => $default_currency_symbol ) ); //phpcs:ignore WordPress.Security.EscapeOutput ?>
+            </div>
+            <div>
+                <span><?php echo esc_html__( 'AOV', 'wp-marketing-automations' ) . ': '; ?></span>
+				<?php echo wc_price( $aov, array( 'currency' => $default_currency_symbol ) ); //phpcs:ignore WordPress.Security.EscapeOutput ?>
+            </div>
+			<?php
+			$tags  = ! empty( $contact->get_tags() ) ? BWFCRM_Tag::get_tags( $contact->get_tags() ) : [];
+			$lists = ! empty( $contact->get_lists() ) ? BWFCRM_Lists::get_lists( $contact->get_lists() ) : [];
+			if ( ! empty( $tags ) || ! empty( $lists ) ) {
+				echo '<div class="bwf-order-data-gap"></div>'; //phpcs:ignore WordPress.Security.EscapeOutput
+			}
+
+			/** Display contact tags */
+			echo '<div class="bwf-pro-tags-data"><span>' . esc_html__( 'Tags', 'wp-marketing-automations' ) . ': </span><div>';//phpcs:ignore WordPress.Security.EscapeOutput
+			if ( ! empty( $tags ) ) {
+				foreach ( $tags as $tag ) {
+					?>
+                    <li><?php echo isset( $tag['name'] ) ? $tag['name'] : '-'; //phpcs:ignore WordPress.Security.EscapeOutput ?></li>
+					<?php
+				}
+			} else {
+				echo '-';
+			}
+			echo '</div></div>';
+
+			/** Display contact lists */
+			echo '<div class="bwf-pro-tags-data"><span>' . esc_html__( 'Lists', 'wp-marketing-automations' ) . ': </span><div>';//phpcs:ignore WordPress.Security.EscapeOutput
+			if ( ! empty( $lists ) ) {
+				foreach ( $lists as $list ) {
+					?>
+                    <li><?php echo isset( $list['name'] ) ? $list['name'] : '-'; //phpcs:ignore WordPress.Security.EscapeOutput ?></li>
+					<?php
+				}
+			} else {
+				echo '-';
+			}
+			echo '</div></div>';
+			?>
+        </div>
+		<?php
 	}
 
 	/**
@@ -1905,6 +1972,66 @@ class BWFAN_Admin {
 		delete_option( 'bwfan_new_user' );
 		wp_safe_redirect( $this->wizard_url );
 		exit;
+	}
+
+	/**
+	 * Check if contact is in unsubscribe table
+	 *
+	 * @param $contact
+	 *
+	 * @return array|object|string|null
+	 */
+	public static function is_contact_unsubscribe( $contact ) {
+		if ( ! $contact instanceof WooFunnels_Contact ) {
+			return [];
+		}
+		$data = array(
+			'recipient' => array( $contact->get_email(), $contact->get_contact_no() ),
+		);
+
+		return BWFAN_Model_Message_Unsubscribe::get_message_unsubscribe_row( $data );
+	}
+
+	/**
+	 * Get display status
+	 *
+	 * @param $contact
+	 *
+	 * @return string|WP_Error|null
+	 */
+	public function get_display_status( $contact ) {
+		if ( ! $contact instanceof WooFunnels_Contact ) {
+			return '';
+		}
+		if ( 0 === $contact->get_id() ) {
+			return BWFAN_Common::crm_error( __( 'Contact not valid', 'wp-marketing-automations' ) );
+		}
+
+		$status          = intval( $contact->get_status() );
+		$is_unsubscribed = self::is_contact_unsubscribe( $contact );
+		$is_unsubscribed = is_array( $is_unsubscribed ) && count( $is_unsubscribed ) > 0;
+
+		if ( $is_unsubscribed ) {
+			return __( 'Unsubscribed', 'wp-marketing-automations' );
+		}
+
+		if ( BWFCRM_Contact::$STATUS_BOUNCED === $status ) {
+			return __( 'Bounced', 'wp-marketing-automations' );
+		}
+
+		if ( BWFCRM_Contact::$STATUS_SOFT_BOUNCED === $status ) {
+			return __( 'Soft Bounced', 'wp-marketing-automations' );
+		}
+
+		if ( BWFCRM_Contact::$STATUS_COMPLAINT === $status ) {
+			return __( 'Complaint', 'wp-marketing-automations' );
+		}
+
+		if ( BWFCRM_Contact::$STATUS_NOT_OPTED_IN === $status ) {
+			return __( 'Unverified', 'wp-marketing-automations' );
+		}
+
+		return __( 'Subscribed', 'wp-marketing-automations' );
 	}
 }
 

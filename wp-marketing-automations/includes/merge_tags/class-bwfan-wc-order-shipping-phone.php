@@ -53,7 +53,24 @@ class BWFAN_WC_Order_Shipping_Phone extends BWFAN_Merge_Tag {
 	 * @return string
 	 */
 	public function get_dummy_preview() {
-		return '18460001234';
+		$number = apply_filters( 'bwfan_order_shipping_phone_number_preview', '' );
+		if ( ! empty( $number ) ) {
+			return $number;
+		}
+
+		$contact = $this->get_contact_data();
+		$number  = '8451001000';
+		/** check for contact instance and the contact id */
+		if ( ! $contact instanceof WooFunnels_Contact || 0 === intval( $contact->get_id() ) ) {
+			return $number;
+		}
+
+		/** If empty */
+		if ( empty( $contact->get_contact_no() ) ) {
+			return $number;
+		}
+
+		return $contact->get_contact_no();
 	}
 }
 

@@ -11781,11 +11781,12 @@ class BWFAN_Common {
 		}
 
 		/** Checking by cleaned url */
-		$cleaned_url = BWFAN_Core()->conversation->get_cleaned_url( urldecode( $link ) );
+		$cleaned_url = BWFAN_Core()->conversation->get_cleaned_url( $link );
 
 		/** Checking by l_hash & clean url */
 		if ( ! empty( $l_hash ) ) {
 			$is_link_exists = BWFAN_Model_Links::is_link_hash_exists( $cleaned_url, $l_hash );
+
 			// if link entry not found return home url
 			if ( empty( $is_link_exists ) ) {
 				return home_url();
@@ -12010,5 +12011,55 @@ class BWFAN_Common {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get wp terms id and name array from ids, static query
+	 *
+	 * @param $term_ids
+	 *
+	 * @return array|object|stdClass[]|null
+	 */
+	public static function get_wp_term( $term_ids ) {
+		if ( empty( $term_ids ) ) {
+			return [];
+		}
+
+		global $wpdb;
+
+		$placeholder = array_fill( 0, count( $term_ids ), '%d' );
+		$placeholder = implode( ', ', $placeholder );
+
+		$query = "SELECT `term_id` AS `id`,`name` FROM {$wpdb->prefix}terms WHERE `term_id` IN ($placeholder)";
+		//phpcs:ignore WordPress.DB.PreparedSQL
+		$query = $wpdb->prepare( $query, $term_ids );
+
+		//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
+		return $wpdb->get_results( $query, ARRAY_A );
+	}
+
+	/**
+	 * Get product names and id from ids, static query
+	 *
+	 * @param $product_ids
+	 *
+	 * @return array|object|stdClass[]|null
+	 */
+	public static function get_products_name( $product_ids ) {
+		if ( empty( $product_ids ) ) {
+			return [];
+		}
+
+		global $wpdb;
+
+		$placeholder = array_fill( 0, count( $product_ids ), '%d' );
+		$placeholder = implode( ', ', $placeholder );
+
+		$query = "SELECT `ID` AS `id`, `post_title` AS `name`, `post_parent` FROM {$wpdb->prefix}posts WHERE `ID` IN ($placeholder)";
+		//phpcs:ignore WordPress.DB.PreparedSQL
+		$query = $wpdb->prepare( $query, $product_ids );
+
+		//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
+		return $wpdb->get_results( $query, ARRAY_A );
 	}
 }

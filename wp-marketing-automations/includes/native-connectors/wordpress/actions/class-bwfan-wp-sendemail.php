@@ -564,10 +564,7 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 		/** Send Email */
 		$global_settings = BWFAN_Common::get_global_settings();
 		$emails          = explode( ',', $to );
-		$emails          = array_map( function ( $email ) {
-			return trim( $email );
-		}, $emails );
-
+		$emails          = array_filter( array_map( 'trim', $emails ), 'is_email' );
 		/** Include extra class before send mail process */
 		BWFAN_Common::bwfan_before_send_mail( isset( $this->data['template'] ) ? $this->data['template'] : '' );
 

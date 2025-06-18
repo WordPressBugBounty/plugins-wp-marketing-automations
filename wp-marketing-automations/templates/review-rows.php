@@ -8,7 +8,15 @@ $reviewable_products = [];
 if ( is_array( $products ) ) {
 	/** Filter products to include only those with reviews allowed */
 	$reviewable_products = array_filter( $products, function ( $product ) {
-		return $product instanceof WC_Product && $product->get_reviews_allowed();
+		if ( ! $product instanceof WC_Product ) {
+			return false;
+		}
+		$parent_product_id = $product->get_parent_id();
+		if ( ! empty( $parent_product_id ) ) {
+			$product = wc_get_product( $parent_product_id );
+		}
+
+		return $product->get_reviews_allowed();
 	} );
 }
 if ( empty( $reviewable_products ) ) {
@@ -51,7 +59,14 @@ $order            = $this->order instanceof WC_Order ? $this->order : null;
 			if ( ! $product instanceof WC_Product ) {
 				continue;
 			}
-			$review_link = apply_filters( 'bwfan_product_review_link', $product->get_permalink() . $review_hash_path, $product, $order );
+			$parent_product_id = $product->get_parent_id();
+			$review_link       = $product->get_permalink();
+			if ( ! empty( $parent_product_id ) ) {
+				$parent_product = wc_get_product( $parent_product_id );
+				$review_link    = $parent_product->get_permalink();
+			}
+
+			$review_link = apply_filters( 'bwfan_product_review_link', $review_link . $review_hash_path, $product, $order );
 			?>
             <tr>
                 <td class="image" width="100">
@@ -67,7 +82,8 @@ $order            = $this->order instanceof WC_Order ? $this->order : null;
                         <!--[if mso]>
 						<i style="letter-spacing: 25px;mso-font-width:-100%;mso-text-raise:30pt" hidden>&nbsp;</i>
 						<![endif]-->
-                        <span style="mso-text-raise:15pt;"><?php echo apply_filters( 'bwfan_email_review_button_text', esc_html__( 'Leave a review', 'wp-marketing-automations' ), $product, $order ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+                        <span style="mso-text-raise:15pt;"><?php echo apply_filters( 'bwfan_email_review_button_text', esc_html__( 'Leave a review', 'wp-marketing-automations' ), $product, $order ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+							?></span>
                         <!--[if mso]>
 						<i style="letter-spacing: 25px;mso-font-width:-100%" hidden>&nbsp;</i>
 						<![endif]-->

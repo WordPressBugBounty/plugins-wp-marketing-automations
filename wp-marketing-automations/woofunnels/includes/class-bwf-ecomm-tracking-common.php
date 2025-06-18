@@ -750,9 +750,9 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				}
 				$lastId = 0;
 
-                $conv_table = $wpdb->prefix . $this->conv_table;
-				$get_id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$conv_table} WHERE type = 2 AND source = %d", $args['source'] ) ); //phpcs:ignore
-                if ( ! empty( $get_id ) && absint( $get_id ) > 0 ) {
+				$conv_table = $wpdb->prefix . $this->conv_table;
+				$get_id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$conv_table} WHERE type = %d AND source = %d", intval($args['type']), $args['source'] ) ); //phpcs:ignore
+				if ( ! empty( $get_id ) && absint( $get_id ) > 0 ) {
 					$lastId = $get_id;
 					$wpdb->update( $conv_table, $args, [ 'id' => $get_id ] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				} else {
@@ -1061,7 +1061,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				return;
 			}
 			?>
-            <style>
+			<style>
                 .bwf-utm-box-data {
                     margin: 10px 0;
                 }
@@ -1086,20 +1086,22 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
                     border-bottom: 1px solid #eee;
                     margin-bottom: 10px;
                 }
-            </style>
-            <div class="bwf-utm-box-data">
-                <div class="bwf-utm-data-gap"></div>
+			</style>
+			<div class="bwf-utm-box-data">
+				<div class="bwf-utm-data-gap"></div>
 				<?php
 				foreach ( $data as $item ) {
 					?>
+
                     <div>
                         <span class="bwf-utm-lable"><?php echo esc_html($item['name']) . ': '; ?></span>
                         <span class="bwf-utm-text"><?php echo $item['value']; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
                     </div>
+
 					<?php
 				}
 				?>
-            </div>
+			</div>
 			<?php
 		}
 

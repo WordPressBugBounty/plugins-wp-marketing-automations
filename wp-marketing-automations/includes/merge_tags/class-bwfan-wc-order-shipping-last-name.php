@@ -59,7 +59,19 @@ class BWFAN_WC_Order_Shipping_Last_Name extends BWFAN_Merge_Tag {
 	 * @return string
 	 */
 	public function get_dummy_preview() {
-		return 'Wright';
+		$contact   = $this->get_contact_data();
+		$last_name = 'Wright';
+		/** check for contact instance and the contact id */
+		if ( ! $contact instanceof WooFunnels_Contact || 0 === absint( $contact->get_id() ) ) {
+			return $last_name;
+		}
+
+		/** If empty */
+		if ( empty( $contact->get_l_name() ) ) {
+			return $last_name;
+		}
+
+		return ucfirst( $contact->get_l_name() );
 	}
 }
 

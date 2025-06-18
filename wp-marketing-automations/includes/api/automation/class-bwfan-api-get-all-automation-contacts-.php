@@ -60,6 +60,9 @@ class BWFAN_API_Get_All_Automation_Contacts extends BWFAN_API_Base {
 			if ( ! empty( $automation_obj->error ) ) {
 				continue;
 			}
+			if( ! empty( $contact['error_msg'] ) && is_array( $contact['error_msg'] ) ) {
+				$contact['error_msg'] = $this->get_error_message( $contact['error_msg'] );
+			}
 
 			$title            = isset( $automation_obj->automation_data['title'] ) && ! empty( $automation_obj->automation_data['title'] ) ? $automation_obj->automation_data['title'] : '';
 			$event_slug       = isset( $automation_obj->automation_data['event'] ) && ! empty( $automation_obj->automation_data['event'] ) ? $automation_obj->automation_data['event'] : '';
@@ -81,6 +84,14 @@ class BWFAN_API_Get_All_Automation_Contacts extends BWFAN_API_Base {
 		];
 
 		return $this->success_response( $contacts_data, $message );
+	}
+
+	public function get_error_message( $res = '' ) {
+		if ( is_array( $res ) ) {
+			$res = $this->get_error_message( array_values( $res )[0] );
+		}
+
+		return $res;
 	}
 
 }

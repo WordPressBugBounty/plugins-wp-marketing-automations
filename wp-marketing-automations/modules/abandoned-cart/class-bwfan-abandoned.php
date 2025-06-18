@@ -438,11 +438,12 @@ class BWFAN_Abandoned_Cart {
 		/** Redirect to shop page if cart restore failed. */
 		$shop_url = wc_get_page_permalink( 'shop' );
 		$url      = ! empty( $shop_url ) ? $shop_url : home_url();
-
-		if ( false === $restored ) {
-			$global_settings = BWFAN_Common::get_global_settings();
-			if ( ! empty( $global_settings['bwfan_ab_restore_cart_message_failure'] ) ) {
-				wc_add_notice( $global_settings['bwfan_ab_restore_cart_message_failure'], 'notice' );
+		if ( false === $restored || 'item_not_added' === $restored ) {
+			if ( false === $restored ) {
+				$global_settings = BWFAN_Common::get_global_settings();
+				if ( ! empty( $global_settings['bwfan_ab_restore_cart_message_failure'] ) ) {
+					wc_add_notice( $global_settings['bwfan_ab_restore_cart_message_failure'], 'notice' );
+				}
 			}
 
 			$url = add_query_arg( array(
@@ -551,6 +552,7 @@ class BWFAN_Abandoned_Cart {
 			remove_action( 'woocommerce_add_to_cart', array( WFCH_Public::get_instance(), 'woocommerce_add_to_cart' ), 99 );
 		}
 
+		$item_added = false;
 		foreach ( $cart_items as $item_key => $item_data ) {
 			/**
 			 * Exclude cart items to restore for devs
@@ -592,7 +594,12 @@ class BWFAN_Abandoned_Cart {
 			$item_data = apply_filters( 'bwfan_abandoned_modify_cart_item_data', $item_data );
 			try {
 				$hash = WC()->cart->add_to_cart( $product_id, $quantity, $variation_id, $variation_data, $item_data );
-			} catch ( Error $e ) {
+				if ( empty( $hash ) ) {
+					/** product item not added to the cart */
+					continue;
+				}
+				$item_added = true;
+			} catch ( Error|Exception $e ) {
 				BWFAN_Common::log_test_data( array(
 					'Error'          => $e->getMessage(),
 					'Product ID'     => $product_id,
@@ -602,12 +609,19 @@ class BWFAN_Abandoned_Cart {
 					'Item Data'      => $item_data
 				), 'cart-restore-error', true );
 				continue;
-
 			}
 
 			if ( isset( $item_data['_wfacp_product_key'] ) ) {
 				$this->aero_product_data[ $item_data['_wfacp_product_key'] ] = $hash;
 			}
+		}
+
+		if ( false === $item_added ) {
+			if ( ! ( isset( WC()->session ) && WC()->session instanceof WC_Session && WC()->session->has_session() ) ) {
+				WC()->session->set_customer_session_cookie( true );
+			}
+
+			return 'item_not_added';
 		}
 
 		/** Restore coupons */
@@ -1187,7 +1201,7 @@ class BWFAN_Abandoned_Cart {
 			$data['cookie_key'] = $tracking_cookie;
 			if ( is_array( $checkout_fields_data ) && count( $checkout_fields_data ) > 0 ) {
 				$data['checkout_data']    = $checkout_fields_data;
-				$data['checkout_page_id'] = $checkout_fields_data['current_page_id'];
+				$data['checkout_page_id'] = $checkout_fields_data['current_page_id'] ?? 0;
 			}
 
 			if ( ! apply_filters( 'execute_cart_abandonment_for_email', true, $email, $cart_details ) ) {

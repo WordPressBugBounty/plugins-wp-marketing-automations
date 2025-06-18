@@ -52,7 +52,8 @@ return apply_filters( 'bwf_settings_config', array(
 				'key'   => 'funnelkit_google_map_key',
 				'type'  => 'text',
 				'label' => 'Google Map API Key',
-				'hint'  => __( 'Enter the Google Maps API key for Google Address AutoComplete on Checkout. <a href="https://funnelkit.com/google-address-autocomplete-for-woocommerce/?utm_source=WordPress&utm_campaign=Lite+Plugin&utm_medium=Settings+Google+Map+Api+Key" target="_blank">Learn More</a>', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				'hint'  => __( 'Enter the Google Maps API key for Google Address AutoComplete on Checkout. <a href="https://funnelkit.com/google-address-autocomplete-for-woocommerce/?utm_source=WordPress&utm_campaign=FB+Lite+Plugin&utm_medium=Settings+Google+Map+Api+Key" target="_blank">Learn More</a>', 'woofunnels' ),
 				'value' => '',
 			)
 		),
@@ -75,7 +76,8 @@ return apply_filters( 'bwf_settings_config', array(
 				'key'    => 'is_fb_purchase_conversion_api',
 				'type'   => 'checklist',
 				'label'  => '',
-				'hint'   => __( 'Send events directly from server to Facebook through the Conversion API. An access token is required to use the server-side API. <a target="_blank" href="https://funnelkit.com/docs/funnel-builder/global-settings/facebook-conversion-api/">Generate Access Token</a>', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				'hint'   => __( 'Send events directly from server to Facebook through the Conversion API. An access token is required to use the server-side API. <a target="_blank" href="https://funnelkit.com/docs/funnel-builder/global-settings/facebook-conversion-api/?utm_source=WordPress&utm_campaign=FB+Lite+Plugin&utm_medium=Generate+Access+Token">Generate Access Token</a>', 'woofunnels' ),
 				'values' => array(
 					array(
 						'name'  => __( 'Enable Conversion API', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch

@@ -4,7 +4,7 @@ Tags: cart abandonment, follow up emails, email marketing, newsletter, marketing
 Requires at least: 5.0
 Tested up to: 6.8.1
 Requires PHP: 7.0
-Stable tag: 3.6.2
+Stable tag: 3.6.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -416,12 +416,24 @@ FunnelKit Automations is 100% self-hosted and fully GDPR compliant.
 
 == Change log ==
 
+= 3.6.3 (Jun 18, 2025) =
+* Added: Cart capturing improved. Tracking more carts if contact has already interacted with any of the site's emails.
+* Fixed: PHP notice on block based checkout, fixed. (#4059)
+* Fixed: Verifying authenticity of email links, issue found with URL containing Greek characters. (#4077)
+* Fixed: Uploads directory path missing, fixed. (#4075)
+* Fixed: WooCommerce Single Order page: Quick contact information displaying. (#4070)
+* Fixed: Contact Activity API call, code improved. (#4069)
+* Fixed: Automation Merge tag: Order Review Items: Issue with variation product, fixed. (#4067)
+* Fixed: Cart Restoration: Error notice if unable to restore the cart due to items unavailability. (#4061)
+* Fixed: Pro: Automation Rules: User roles rule search wasn't working. (#4082)
+* Dev: Filter hook 'bwfan_order_billing_phone_number_preview' added to alter billing phone merge tag value in preview mode. (#4063)
+
 = 3.6.2 (Jun 11, 2025) =
 * Improved: Automation Delay Step: Enhanced readability of option labels for better understanding and clarity.
 * Fixed: Email Rendering: Resolved issue in Emogrify library causing hidden elements to display incorrectly on PHP versions > 8.0.3. (#4052)
 * Fixed: Language Compatibility: Added support for language switching with the GTranslate plugin. (#4055)
 
-= 3.6.1 (Jun 09, 2025) =
+= 3.6.1 (Jun 10, 2025) =
 * Security: Redirect Handling: Now using native wp_safe_redirect() for enhanced security. (#4041)
 * Improved: Deprecated Hook Handling: Replaced usage of deprecated woocommerce_before_cart_item_quantity_zero hook. (#4031)
 * Improved: Logs Screen: Added search functionality to enhance user experience. (#4033)

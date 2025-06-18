@@ -448,15 +448,15 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 					$this->customer = bwf_get_customer( $this->contact );
 				}
 			}
-
-			$wc_data = array(
+			$purchased_products = array_unique( $this->customer->get_purchased_products() );
+			$wc_data            = array(
 				'id'                    => $this->customer->get_id(),
 				'l_order_date'          => $this->customer->get_l_order_date(),
 				'f_order_date'          => $this->customer->get_f_order_date(),
 				'aov'                   => $this->customer->get_aov(),
 				'total_order_count'     => $this->customer->get_total_order_count(),
 				'total_order_value'     => $this->customer->get_total_order_value(),
-				'total_purchased_items' => is_array( $this->customer->get_purchased_products() ) && ! empty( $this->customer->get_purchased_products() ) ? count( $this->customer->get_purchased_products() ) : 0,
+				'total_purchased_items' => is_array( $purchased_products ) && ! empty( $purchased_products ) ? count( $purchased_products ) : 0,
 			);
 
 			if ( true === $slim_data ) {
@@ -464,39 +464,30 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			}
 
 			/** Get Purchased Products titles */
-			$purchased_products            = array_map( function ( $product_id ) {
-				$product = wc_get_product( $product_id );
+			$purchased_products            = BWFAN_Common::get_products_name( $purchased_products );
+			$purchased_products            = array_map( function ( $product ) {
+				return [
+					'id'   => ! empty( $product['post_parent'] ) ? $product['post_parent'] : $product['id'],
+					'name' => wp_strip_all_tags( $product['name'] )
+				];
+			}, $purchased_products );
+			$wc_data['purchased_products'] = array_values( array_filter( $purchased_products ) );
 
-				return $product instanceof WC_Product && ! $product->is_type( 'variable' ) ? array(
-					'id'   => $product->is_type( 'variation' ) ? $product->get_parent_id() : $product->get_id(),
-					'name' => wp_strip_all_tags( $product->get_name( 'edit' ) ),
-				) : false;
-			}, array_unique( $this->customer->get_purchased_products() ) );
-			$purchased_products            = array_values( array_filter( $purchased_products ) );
-			$wc_data['purchased_products'] = $purchased_products;
+			/** Get Purchased Products Cats & Tags */
+			$purchased_products_cats = array_unique( $this->customer->get_purchased_products_cats() );
+			$purchased_products_tags = array_unique( $this->customer->get_purchased_products_tags() );
+			$terms                   = BWFAN_Common::get_wp_term( array_merge( $purchased_products_cats, $purchased_products_tags ) );
 
-			/** Get Purchased Products Cats */
-			$purchased_products_cats            = array_map( function ( $term_id ) {
-				$cat = get_term( absint( $term_id ) );
+			$purchased_products_cats = array_filter( $terms, function ( $tags ) use ( $purchased_products_cats ) {
+				return in_array( intval( $tags['id'] ), $purchased_products_cats, true );
+			} );
+			$purchased_products_tags = array_filter( $terms, function ( $tags ) use ( $purchased_products_tags ) {
+				return in_array( intval( $tags['id'] ), $purchased_products_tags, true );
+			} );
 
-				return $cat instanceof WP_Term ? array(
-					'id'   => $cat->term_id,
-					'name' => wp_strip_all_tags( $cat->name ),
-				) : false;
-			}, array_unique( $this->customer->get_purchased_products_cats() ) );
-			$purchased_products_cats            = array_values( array_filter( $purchased_products_cats ) );
+			$purchased_products_cats            = array_values( $purchased_products_cats );
+			$purchased_products_tags            = array_values( $purchased_products_tags );
 			$wc_data['purchased_products_cats'] = $purchased_products_cats;
-
-			/** Get Purchased Products Tags */
-			$purchased_products_tags            = array_map( function ( $term_id ) {
-				$tag = get_term( absint( $term_id ) );
-
-				return $tag instanceof WP_Term ? array(
-					'id'   => $tag->term_id,
-					'name' => wp_strip_all_tags( $tag->name ),
-				) : false;
-			}, array_unique( $this->customer->get_purchased_products_tags() ) );
-			$purchased_products_tags            = array_values( array_filter( $purchased_products_tags ) );
 			$wc_data['purchased_products_tags'] = $purchased_products_tags;
 
 			/** Coupons and AOV data */

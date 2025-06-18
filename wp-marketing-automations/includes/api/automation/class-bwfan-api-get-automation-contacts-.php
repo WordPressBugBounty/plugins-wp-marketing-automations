@@ -66,14 +66,34 @@ class BWFAN_API_Get_Automation_Contacts extends BWFAN_API_Base {
 			$all += intval( $data );
 		}
 		$countdata['all'] = $all;
+		$final_contacts = [];
+		if( 'failed' === $type ) {
+			foreach ( $contacts['contacts'] as $contact ) {
+				if( ! empty( $contact['error_msg'] ) && is_array( $contact['error_msg'] ) ) {
+					$contact['error_msg'] = $this->get_error_message( $contact['error_msg'] );
+				}
+				$final_contacts[] = $contact;
+			}
+		} else {
+			$final_contacts = $contacts['contacts'];
+		}
+
 		$contacts_data    = [
 			'total'           => isset( $contacts['total'] ) ? $contacts['total'] : 0,
-			'data'            => $contacts['contacts'],
+			'data'            => $final_contacts,
 			'automation_data' => $automation_obj->automation_data,
 			'count_data'      => $countdata
 		];
 
 		return $this->success_response( $contacts_data, $message );
+	}
+
+	public function get_error_message( $res = '' ) {
+		if ( is_array( $res ) ) {
+			$res = $this->get_error_message( array_values( $res )[0] );
+		}
+
+		return $res;
 	}
 
 	/**

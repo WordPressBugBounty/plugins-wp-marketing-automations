@@ -104,12 +104,13 @@ if ( ! class_exists( 'BWFAN_Model_Links' ) ) {
 			global $wpdb;
 			$query = "SELECT `ID` FROM {$wpdb->prefix}bwfan_links WHERE `clean_url` = %s AND `tid` = %d AND `oid` = %d AND `type`=%d ORDER BY `ID` DESC LIMIT 1";
 
+			//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 			return $wpdb->get_var( $wpdb->prepare( $query, [
 				$cleaned_url,
 				$tid,
 				$oid,
 				$type
-			] ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
+			] ) );
 		}
 	}
 }
