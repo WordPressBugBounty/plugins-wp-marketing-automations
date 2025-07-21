@@ -134,21 +134,12 @@
                     inputName: 'fb_pixel_key',
                 },
 
-                {
-                    type: "checklist",
-                    listBox: true,
-                    styleClasses: "wfocu_gsettings_sec_chlist",
-                    model: "is_fb_purchase_conversion_api",
-                    inputName: 'is_fb_purchase_conversion_api',
 
-                },
                 {
                     type: "textArea",
                     model: "conversion_api_access_token",
                     inputName: 'conversion_api_access_token',
-                    visible: function (modal) {
-                        return (modal.is_fb_purchase_conversion_api.length > 0);
-                    }
+
                 },
 
                 {
@@ -157,9 +148,7 @@
                     styleClasses: "wfocu_gsettings_sec_chlist",
                     model: "is_fb_conv_enable_test",
                     inputName: 'is_fb_conv_enable_test',
-                    visible: function (modal) {
-                        return (modal.is_fb_purchase_conversion_api.length > 0);
-                    }
+
                 },
                 {
                     type: "input",
@@ -176,9 +165,7 @@
                     styleClasses: "wfocu_gsettings_sec_chlist",
                     model: "is_fb_conversion_api_log",
                     inputName: 'is_fb_conversion_api_log',
-                    visible: function (modal) {
-                        return (modal.is_fb_purchase_conversion_api.length > 0);
-                    }
+
                 },
 
                 {

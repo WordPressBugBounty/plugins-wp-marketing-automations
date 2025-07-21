@@ -41,6 +41,11 @@ abstract class BWFAN_Source {
 			BWFAN_Load_Sources::$all_events[ $this->get_name() ][ $event_obj->get_slug() ] = $event_obj->get_name();
 
 			$event_obj->load_hooks();
+			if ( method_exists( $event_obj, 'admin_enqueue_assets' ) && is_admin() && BWFAN_Common::is_automation_v1_active() && BWFAN_Common::is_autonami_page() ) {
+				// Add action to avoid enqueueing assets on every admin page load
+				add_action( 'admin_enqueue_scripts', array( $event_obj, 'admin_enqueue_assets' ), 98 );
+			}
+
 			$event_obj->set_source_type( $this->get_slug() );
 			BWFAN_Load_Sources::register_events( $event_obj );
 		}

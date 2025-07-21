@@ -3,14 +3,14 @@
  * Plugin Name: FunnelKit Automations
  * Plugin URI: https://funnelkit.com/wordpress-marketing-automation-autonami/
  * Description: Recover lost revenue with Abandoned Cart Recovery for WooCommerce. Increase retention with Post Purchase Follow-Up Emails. Send beautiful Newsletters.
- * Version: 3.6.3
+ * Version: 3.6.4
  * Author: FunnelKit
  * Author URI: https://funnelkit.com
  * License: GPLv3 or later
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain: wp-marketing-automations
  * Requires at least: 5.0
- * Tested up to: 6.8.1
+ * Tested up to: 6.8.2
  * WooFunnels: true
  *
  * FunnelKit Automations is free software.
@@ -179,12 +179,12 @@ final class BWFAN_Core {
 	 * Defining constants
 	 */
 	public function define_plugin_properties() {
-		define( 'BWFAN_VERSION', '3.6.3' );
-		define( 'BWFAN_MIN_PRO_VERSION', '3.6.3' );
+		define( 'BWFAN_VERSION', '3.6.4' );
+		define( 'BWFAN_MIN_PRO_VERSION', '3.6.4' );
 		define( 'BWFAN_MIN_WC_VERSION', '5.0' );
 		define( 'BWFAN_SLUG', 'bwfan' );
 		define( 'BWFAN_FULL_NAME', 'FunnelKit Automations' );
-		define( 'BWFAN_BWF_VERSION', '1.10.12.60' );
+		define( 'BWFAN_BWF_VERSION', '1.10.12.65' );
 		define( 'BWFAN_PLUGIN_FILE', __FILE__ );
 		define( 'BWFAN_PLUGIN_DIR', __DIR__ );
 		define( 'BWFAN_TEMPLATE_DIR', plugin_dir_path( BWFAN_PLUGIN_FILE ) . 'templates' );
@@ -367,13 +367,16 @@ final class BWFAN_Core {
 		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-subscribe-link-handler.php';
 
 		/** Remove duplicate contacts */
-		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-dev-get-broadcast-timing.php';
 		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-dev-remove-cfields-duplicate-records.php';
 
-		/** Load cart helper file */
-		require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-recoverable-carts.php';
+		if ( bwfan_is_woocommerce_active() ) {
+			/** Load cart helper file */
+			require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-recoverable-carts.php';
+		}
 
 		if ( bwfan_is_autonami_pro_active() ) {
+			require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-dev-get-broadcast-timing.php';
+
 			/** Added export handler */
 			require BWFAN_PLUGIN_DIR . '/includes/class-bwfan-exporter-handler.php';
 		}

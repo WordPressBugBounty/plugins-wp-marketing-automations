@@ -129,7 +129,7 @@ final class BWFAN_WC_Comment_Post extends BWFAN_Event {
 			?>
             <li>
                 <strong><?php esc_html_e( 'Email:', 'wp-marketing-automations' ); ?> </strong>
-				<?php echo esc_html( $global_data['email'] ); ?>
+				<?php echo $global_data['email']; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
             </li>
 			<?php
 		}

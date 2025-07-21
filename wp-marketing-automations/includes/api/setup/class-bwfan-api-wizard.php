@@ -173,7 +173,7 @@ class BWFAN_API_Wizard extends BWFAN_API_Base {
 
 		$api_params = array(
 			'action' => 'woofunnelsapi_email_optin',
-			'data'   => array( 'email' => $op_email, 'site' => home_url(), 'product' => 'FKA', 'step' => '3' ),
+			'data'   => array( 'email' => $op_email, 'site' => home_url(), 'product' => 'FKA', 'step' => '3', 'locale' => get_locale() ),
 		);
 
 		$request_args = WooFunnels_API::get_request_args( array(
@@ -275,7 +275,7 @@ class BWFAN_API_Wizard extends BWFAN_API_Base {
 
 			// Pass through the error from WP_Filesystem if one was raised.
 			if ( $wp_filesystem instanceof WP_Filesystem_Base && is_wp_error( $wp_filesystem->errors ) && $wp_filesystem->errors->has_errors() ) {
-				$resp['msg'] = esc_html( $wp_filesystem->errors->get_error_message() );
+				$resp['msg'] = $wp_filesystem->errors->get_error_message(); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 
 			return $resp;

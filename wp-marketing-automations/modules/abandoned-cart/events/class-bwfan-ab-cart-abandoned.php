@@ -81,6 +81,10 @@ final class BWFAN_AB_Cart_Abandoned extends BWFAN_Event {
 			/** Status 3 - No automation found */
 			BWFAN_Common::update_abandoned_rows( $ids, 3 );
 
+			foreach ( $active_abandoned_carts as $active_abandoned_cart ) {
+				BWFAN_Common::maybe_create_abandoned_contact( $active_abandoned_cart ); // create contact at the time of abandonment
+			}
+
 			return;
 		}
 
@@ -353,7 +357,7 @@ final class BWFAN_AB_Cart_Abandoned extends BWFAN_Event {
 
         <li>
             <strong><?php esc_html_e( 'Abandoned Email:', 'wp-marketing-automations' ); ?> </strong>
-			<?php echo "<a href='" . site_url( 'wp-admin/admin.php?page=autonami&path=/carts/recoverable/' . $global_data['cart_abandoned_id'] . '/tasks' ) . "'>" . esc_html( $global_data['email'] ) . '</a>'; //phpcs:ignore WordPress.Security.EscapeOutput ?>
+			<?php echo "<a href='" . site_url( 'wp-admin/admin.php?page=autonami&path=/carts/recoverable/' . $global_data['cart_abandoned_id'] . '/tasks' ) . "'>" . $global_data['email'] . '</a>'; //phpcs:ignore WordPress.Security.EscapeOutput ?>
         </li>
 		<?php
 		if ( isset( $global_data['phone'] ) && ! empty( $global_data['phone'] ) ) { ?>

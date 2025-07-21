@@ -150,12 +150,6 @@ if ( ! class_exists( 'WooFunnels_API' ) ) :
 		 * @return mixed|void
 		 */
 		public static function get_request_args( $args ) {
-			$username        = 'woofxl';
-			$password        = 'onevoice123';
-			$args['headers'] = array(
-				'Authorization' => 'Basic ' . base64_encode( $username . ':' . $password ),
-			);
-
 			return apply_filters( 'woofunnels_api_call_request_args', $args );
 		}
 

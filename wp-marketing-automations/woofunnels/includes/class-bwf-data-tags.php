@@ -9,6 +9,9 @@ if ( ! class_exists( 'BWF_Data_Tags' ) ) {
 
 		);
 
+		// The pattern to match restricted cookies 'wordpress_*', '_fk_contact_uid', 'wp-settings-*', 'PHPSESSID', 'wordpress_logged_in_*', 'wp_woocommerce_session_*'
+		public $restricted_cookie_pattern = "/^(wordpress_.*|_fk_contact_uid|wp-settings-.*|PHPSESSID|wordpress_logged_in_.*|wp_woocommerce_session_.*)$/";
+
 		public function __construct() {
 			foreach ( $this->shortcodes as $code ) {
 				add_shortcode( 'wf_' . $code, array( $this, $code ) );
@@ -46,6 +49,11 @@ if ( ! class_exists( 'BWF_Data_Tags' ) ) {
 			), $attr );
 
 			if ( empty( $attr['key'] ) ) {
+				return '';
+			}
+
+			// Check if the cookie key is restricted
+			if (preg_match($this->restricted_cookie_pattern, $attr['key'])) {
 				return '';
 			}
 

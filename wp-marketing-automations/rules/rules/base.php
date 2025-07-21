@@ -165,7 +165,7 @@ class BWFAN_Rule_Base {
 			return ob_get_clean();
 		}
 
-		echo '<div class="clearfix bwfan_field_desc">' . esc_html( $this->description ) . '</div>';
+		echo '<div class="clearfix bwfan_field_desc">' . $this->description . '</div>'; //phpcs:ignore WordPress.Security.EscapeOutput
 
 		return ob_get_clean();
 	}

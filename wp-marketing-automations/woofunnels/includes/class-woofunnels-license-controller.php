@@ -19,6 +19,7 @@ if ( ! class_exists( 'WooFunnels_License_Controller' ) ) {
 			'sslverify' => false,
 		);
 		private static $plugin_update_check_data;
+		private static $cached_site_url = null;
 		private $license_data = array();
 		private $request_body = false;
 
@@ -34,6 +35,18 @@ if ( ! class_exists( 'WooFunnels_License_Controller' ) ) {
 		}
 
 		/**
+		 * Get cached site URL to avoid duplicate database calls
+		 * @return string|null
+		 */
+		private static function get_cached_site_url() {
+			if ( self::$cached_site_url === null ) {
+				global $wpdb;
+				self::$cached_site_url = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s", 'siteurl' ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			}
+			return self::$cached_site_url;
+		}
+
+		/**
 		 * Run a batch request to check license status of all the plugin
 		 * Then trigger handle license check response of child class so that they can process their data.
 		 */
@@ -41,6 +54,7 @@ if ( ! class_exists( 'WooFunnels_License_Controller' ) ) {
 			$parse_data            = [];
 			$parse_data['plugins'] = [];
 			$plugins_to_send       = [];
+			
 			foreach ( self::$plugins as $hash => $plugin ) {
 				$data = $plugin->get_data();
 				if ( empty( $data['plugin_slug'] ) ) {
@@ -57,11 +71,9 @@ if ( ! class_exists( 'WooFunnels_License_Controller' ) ) {
 				}
 
 				if ( ! empty( $data['domain'] ) ) {
-					global $wpdb;
-					$db_domain = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s", 'siteurl' ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-
-					if ( ! empty( $db_domain ) && $db_domain !== $data['domain'] ) {
-						$data['db_domain'] = rtrim( $db_domain, '/' );
+					$cached_site_url = self::get_cached_site_url();
+					if ( ! empty( $cached_site_url ) && $cached_site_url !== $data['domain'] ) {
+						$data['db_domain'] = rtrim( $cached_site_url, '/' );
 					}
 				}
 				$parse_data['plugins'][ $hash ] = $plugins_to_send[ $hash ] = $data;
@@ -139,17 +151,16 @@ if ( ! class_exists( 'WooFunnels_License_Controller' ) ) {
 			$parse_data['plugins'] = [];
 			$plugins_to_send       = [];
 			$prepare_dummy         = [];
+			
 			foreach ( self::$plugins as $hash => $plugin ) {
 				$data = $plugin->get_data();
 				if ( empty( $data['plugin_slug'] ) ) {
 					continue;
 				}
 				if ( ! empty( $data['domain'] ) ) {
-					global $wpdb;
-					$db_domain = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = %s", 'siteurl' ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-
-					if ( ! empty( $db_domain ) && $db_domain !== $data['domain'] ) {
-						$data['db_domain'] = rtrim( $db_domain, '/' );
+					$cached_site_url = self::get_cached_site_url();
+					if ( ! empty( $cached_site_url ) && $cached_site_url !== $data['domain'] ) {
+						$data['db_domain'] = rtrim( $cached_site_url, '/' );
 					}
 				}
 				$parse_data['plugins'][ $hash ] = $plugins_to_send[ $hash ] = $data;

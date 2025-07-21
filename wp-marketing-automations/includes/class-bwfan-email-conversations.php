@@ -249,14 +249,13 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 		 */
 		public function insert_automation_conversation( $data, $body, $mode ) {
 			$automation_id   = ! empty( $data['automation_id'] ) ? $data['automation_id'] : 0;
-			$task_id         = ! empty( $data['task_id'] ) ? $data['task_id'] : 0;
 			$step_id         = ! empty( $data['step_id'] ) ? $data['step_id'] : 0;
 			$email           = isset( $data['email'] ) ? $data['email'] : '';
 			$phone           = isset( $data['phone'] ) ? $data['phone'] : '';
 			$template_type   = isset( $data['template'] ) ? $data['template'] : '';
 			$is_track_enable = self::is_automation_open_click_track( $automation_id );
 			$send_to         = in_array( $mode, [ self::$MODE_SMS, self::$MODE_WHATSAPP ] ) ? $phone : $email;
-			$hash_code       = md5( time() . $send_to . $task_id );
+			$hash_code       = md5( microtime( true ) . $send_to . $step_id );
 			$contact_email   = '';
 			$cid             = 0;
 			if ( isset( $data['contact_id'] ) && ! empty( $data['contact_id'] ) ) {
@@ -298,7 +297,24 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 			);
 
 			/** Insert Conversation, (Before adding merge tags) */
-			BWFAN_Model_Engagement_Tracking::insert_ignore( $insert_data );
+			BWFAN_Model_Engagement_Tracking::insert_ignore( $insert_data, [
+				'%d', // cid
+				'%s', // hash_code
+				'%s', // created_at
+				'%s', // updated_at
+				'%d', // mode
+				'%s', // send_to
+				'%d', // type
+				'%d', // open
+				'%d', // click
+				'%d', // oid
+				'%d', // sid
+				'%d', // author_id
+				'%d', // tid
+				'%s', // o_interaction
+				'%s', // c_interaction
+				'%d', // c_status
+			] );
 			$this->track_id = BWFAN_Model_Engagement_Tracking::insert_id();
 
 			/** Fetch Merge tags and add to Conversation Meta, for quick uses */
@@ -702,7 +718,8 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 		 * @return void
 		 */
 		public function maybe_subscribe_contact( $contact ) {
-			if ( ! in_array( intval( $contact->status ), [ 2, 4 ], true ) ) {
+			$allowed_status = apply_filters( 'bwfan_contact_status_to_resubscribe', [ 2, 4 ] );
+			if ( ! is_array( $allowed_status ) ||  ! in_array( intval( $contact->status ), $allowed_status, true ) ) {
 				return;
 			}
 

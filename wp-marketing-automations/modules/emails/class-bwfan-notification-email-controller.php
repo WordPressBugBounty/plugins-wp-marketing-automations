@@ -53,7 +53,7 @@ class BWFAN_Notification_Email_Controller {
 			], $upgrade_link );
 		}
 
-		$get_total_orders = BWFAN_Dashboards::get_total_orders( '', '', '', '' );
+		$get_total_orders = bwfan_is_woocommerce_active() ? BWFAN_Dashboards::get_total_orders( '', '', '', '' ) : [];
 		$total_revenue    = ! isset( $get_total_orders[0]['total_revenue'] ) ? 0 : $get_total_orders[0]['total_revenue'];
 		$total_revenue    = floatval( $total_revenue );
 

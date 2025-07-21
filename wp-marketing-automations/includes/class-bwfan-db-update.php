@@ -221,9 +221,7 @@ class BWFAN_DB_Update {
 		}
 
 		/** If memory exceeds */
-		$ins = BWF_AS::instance();
-
-		return ! $ins->memory_exceeded();
+		return ! BWFAN_Common::memory_exceeded();
 	}
 
 	/**

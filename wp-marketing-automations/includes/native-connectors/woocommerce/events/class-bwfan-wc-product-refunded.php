@@ -125,12 +125,12 @@ final class BWFAN_WC_Product_Refunded extends BWFAN_Event {
             <li>
                 <strong><?php esc_html_e( 'Order:', 'wp-marketing-automations' ); ?> </strong>
                 <a target="_blank" href="<?php echo get_edit_post_link( $global_data['order_id'] ); //phpcs:ignore WordPress.Security.EscapeOutput
-				?>"><?php echo '#' . esc_html( $global_data['order_id'] . ' ' . $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() ); ?></a>
+				?>"><?php echo '#' . wp_strip_all_tags( $global_data['order_id'] . ' ' . $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() );//phpcs:ignore WordPress.Security.EscapeOutput ?></a>
             </li>
 		<?php } ?>
         <li>
             <strong><?php esc_html_e( 'Email:', 'wp-marketing-automations' ); ?> </strong>
-			<?php echo esc_html( $global_data['email'] ); ?>
+			<?php echo $global_data['email']; //phpcs:ignore WordPress.Security.EscapeOutput ?>
         </li>
 		<?php
 		return ob_get_clean();

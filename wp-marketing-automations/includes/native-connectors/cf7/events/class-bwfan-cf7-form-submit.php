@@ -43,7 +43,6 @@ final class BWFAN_CF7_Form_Submit extends BWFAN_Event {
 	}
 
 	public function load_hooks() {
-		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_assets' ), 98 );
 		add_action( 'wp_ajax_bwfan_get_cf7_form_fields', array( $this, 'bwfan_get_cf7_form_fields' ) );
 		add_action( 'wpcf7_submit', array( $this, 'process' ), 10, 2 );
 		add_filter( 'bwfan_all_event_js_data', array( $this, 'add_form_data' ), 10, 2 );

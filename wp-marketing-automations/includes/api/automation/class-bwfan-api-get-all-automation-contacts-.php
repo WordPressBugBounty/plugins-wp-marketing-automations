@@ -60,7 +60,7 @@ class BWFAN_API_Get_All_Automation_Contacts extends BWFAN_API_Base {
 			if ( ! empty( $automation_obj->error ) ) {
 				continue;
 			}
-			if( ! empty( $contact['error_msg'] ) && is_array( $contact['error_msg'] ) ) {
+			if ( ! empty( $contact['error_msg'] ) && is_array( $contact['error_msg'] ) ) {
 				$contact['error_msg'] = $this->get_error_message( $contact['error_msg'] );
 			}
 

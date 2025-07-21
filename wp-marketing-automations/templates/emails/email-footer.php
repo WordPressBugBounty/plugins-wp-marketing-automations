@@ -1,7 +1,7 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 
-$business_details = '<u style="text-decoration: underline;"><a rel="noreferrer noopener" style="text-decoration-line: none; background-color: rgba(0, 0, 0, 0); color: #236fa1;" href="' . esc_url( get_home_url() ) . '" target="_blank">' . esc_html( $business_name ) . '</a></u>';
+$business_details = '<u style="text-decoration: underline;"><a rel="noreferrer noopener" style="text-decoration-line: none; background-color: rgba(0, 0, 0, 0); color: #236fa1;" href="' . esc_url( get_home_url() ) . '" target="_blank">' . wp_strip_all_tags( $business_name ) . '</a></u>'; //phpcs:ignore WordPress.Security.EscapeOutput
 $settings_text    = '<u style="text-decoration: underline;"><a rel="noreferrer noopener" style="text-decoration-line: none; background-color: rgba(0, 0, 0, 0); color: #236fa1;" href="' . esc_url( admin_url( 'admin.php?page=autonami&path=/settings/notifications' ) ) . '"  target="_blank">' . esc_html( __( 'Click here', 'wp-marketing-automations' ) ) . '</a></u>';
 ?>
 <table cellpadding="0" cellspacing="0" border="0" bgcolor="" align="center" role="presentation"

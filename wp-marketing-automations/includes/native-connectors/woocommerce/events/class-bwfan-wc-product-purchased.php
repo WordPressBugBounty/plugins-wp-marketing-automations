@@ -41,9 +41,6 @@ final class BWFAN_WC_Product_Purchased extends BWFAN_Event {
 		// event trigger hooks
 		add_action( 'woocommerce_new_order', [ $this, 'new_order' ], 11 );
 		add_action( 'bwfan_wc_order_status_changed', array( $this, 'order_status_changed' ), 11, 3 );
-
-		// this action localizes the data which will be used in script template for making the UI of the event
-		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_assets' ), 98 );
 		add_filter( 'bwfan_wc_event_order_status_' . $this->get_slug(), array( $this, 'modify_order_statuses' ), 10, 1 );
 		add_filter( 'bwfan_before_making_logs', array( $this, 'check_if_bulk_process_executing' ), 10, 1 );
 	}
@@ -307,12 +304,12 @@ final class BWFAN_WC_Product_Purchased extends BWFAN_Event {
             <li>
                 <strong><?php esc_html_e( 'Order', 'wp-marketing-automations' ); ?> </strong>
                 <a target="_blank" href="<?php echo get_edit_post_link( $global_data['order_id'] ); //phpcs:ignore WordPress.Security.EscapeOutput
-				?>"><?php echo '#' . esc_html( $global_data['order_id'] . ' ' . $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() ); ?></a>
+				?>"><?php echo '#' . wp_strip_all_tags( $global_data['order_id'] . ' ' . $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() ); //phpcs:ignore WordPress.Security.EscapeOutput ?></a>
             </li>
 		<?php } ?>
         <li>
             <strong><?php esc_html_e( 'Email:', 'wp-marketing-automations' ); ?> </strong>
-			<?php echo esc_html( $global_data['email'] ); ?>
+			<?php echo $global_data['email']; //phpcs:ignore WordPress.Security.EscapeOutput ?>
         </li>
 		<?php
 		return ob_get_clean();

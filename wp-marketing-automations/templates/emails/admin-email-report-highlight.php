@@ -59,7 +59,7 @@ if ( 'dark' === $theme ) {
                                                                         <span
                                                                             style="mso-line-height-alt: 150%; font-size: 16px;"
                                                                             class="has-font-size">
-                                                                            <?php echo esc_html( $date ); ?>
+                                                                            <?php echo $date; //phpcs:ignore WordPress.Security.EscapeOutput ?>
                                                                         </span>
                                                                     </strong>
                                                                 </span>
@@ -81,7 +81,7 @@ if ( 'dark' === $theme ) {
                                                                     class="has-inline-color"><span
                                                                         style="mso-line-height-alt: 150%; font-size: 36px;"
                                                                         class="has-font-size">
-                                                                        <strong><?php echo esc_html( $title ); ?></strong>
+                                                                        <strong><?php echo wp_strip_all_tags( $title ); //phpcs:ignore WordPress.Security.EscapeOutput ?></strong>
                                                                     </span>
                                                                 </span>
                                                 </p>
@@ -102,7 +102,7 @@ if ( 'dark' === $theme ) {
                                                         class="has-inline-color">
                                                         <span
                                                             style="mso-line-height-alt: 150%; font-size: 16px;"
-                                                            class="has-font-size"><?php echo esc_html( $subtitle ); ?>
+                                                            class="has-font-size"><?php echo wp_strip_all_tags( $subtitle );//phpcs:ignore WordPress.Security.EscapeOutput ?>
                                                         </span>
                                                     </span>
                                                 </p>
@@ -128,7 +128,7 @@ if ( 'dark' === $theme ) {
                                                             href="<?php echo esc_url( $button_url ); ?>" target="_blank"
                                                             class="bwfbe-block-btn-content"
                                                             style="line-height: 1.5; text-decoration: none; padding: 10px 20px; padding: 10px 24px 10px 24px; mso-padding-alt: 0; background-color: <?php echo esc_html( $btn_bg_color ); ?>; font-size: 16px; font-family: arial,helvetica,sans-serif; display: inline-block; text-decoration: none; text-transform: none; color: <?php echo esc_html( $btn_text_color ) ?>; border-radius: 8px;">
-                                                            <strong><?php echo esc_html( $button_text ); ?></strong>
+                                                            <strong><?php echo wp_strip_all_tags( $button_text ); //phpcs:ignore WordPress.Security.EscapeOutput ?></strong>
                                                         </a>
                                                     </td>
                                                 </tr>

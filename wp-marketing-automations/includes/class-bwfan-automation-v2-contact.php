@@ -58,11 +58,10 @@ final class BWFAN_Automation_V2_Contact {
 			$ins = new BWFAN_Automation_Controller();
 			$ins->set_automation_data( $result );
 			$ins->start();
-
 		} catch ( Error $e ) {
 			$msg = "Error occurred with message {$e->getMessage()} for action id {$action_id}";
 			BWFAN_Common::log_test_data( $msg, 'automation_contact_execution_fail', true );
-			throw new Exception( esc_html( $msg ), 1 );
+			throw new Exception( wp_strip_all_tags( $msg ), 1 ); //phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 		}
 	}
 

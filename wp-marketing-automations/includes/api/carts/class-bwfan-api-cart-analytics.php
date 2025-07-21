@@ -37,6 +37,8 @@ class BWFAN_API_Cart_Analytics extends BWFAN_API_Base {
 	}
 
 	public function prepare_data_for_analytics( $is_interval = '' ) {
+		require_once BWFAN_PLUGIN_DIR . '/includes/class-bwfan-cart-analytics.php';
+
 		$start_date        = ( isset( $this->args['after'] ) && '' !== $this->args['after'] ) ? $this->args['after'] : BWFAN_Cart_Analytics::default_date( WEEK_IN_SECONDS )->format( BWFAN_Cart_Analytics::$sql_datetime_format );
 		$end_date          = ( isset( $this->args['before'] ) && '' !== $this->args['before'] ) ? $this->args['before'] : BWFAN_Cart_Analytics::default_date()->format( BWFAN_Cart_Analytics::$sql_datetime_format );
 		$intervals_request = ( isset( $this->args['interval'] ) && '' !== $this->args['interval'] ) ? $this->args['interval'] : 'week';

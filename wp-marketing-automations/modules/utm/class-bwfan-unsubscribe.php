@@ -18,6 +18,8 @@ class BWFAN_unsubscribe {
 
 	protected $unsubscribe_page = false;
 
+	protected $unsubscribe_redirect = null;
+
 	public function __construct() {
 		add_action( 'bwfan_db_1_0_tables_created', array( $this, 'create_unsubscribe_sample_page' ) );
 		add_action( 'wp', array( $this, 'unsubscribe_page_non_crawlable' ) );
@@ -177,7 +179,7 @@ class BWFAN_unsubscribe {
 
 		echo sprintf( "<h2>%s</h2>", esc_html__( 'Successfully Unsubscribed', 'wp-marketing-automations' ) );
 		if ( isset( $settings['bwfan_unsubscribe_data_success'] ) && ! empty( $settings['bwfan_unsubscribe_data_success'] ) ) {
-			echo esc_html( sprintf( "<p>%s</p>", $settings['bwfan_unsubscribe_data_success'] ) );
+			echo sprintf( "<p>%s</p>", ( $settings['bwfan_unsubscribe_data_success'] ) ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 		exit;
 	}
@@ -207,7 +209,7 @@ class BWFAN_unsubscribe {
 		do_action( 'bwfan_print_custom_data', $this->contact );
 		$this->print_unsubscribe_lists();
 
-		echo '<a id="bwfan_unsubscribe" class="button-primary button" href="#">' . esc_html( $attr['label'] ) . '</a>';
+		echo '<a id="bwfan_unsubscribe" class="button-primary button" href="#">' . $attr['label'] . '</a>'; //phpcs:ignore WordPress.Security.EscapeOutput
 		$aid = filter_input( INPUT_GET, 'automation_id', FILTER_SANITIZE_NUMBER_INT );
 		if ( ! empty( $aid ) ) {
 			echo '<input type="hidden" id="bwfan_automation_id" value="' . esc_attr( $aid ) . '" name="automation_id">';
@@ -559,6 +561,14 @@ class BWFAN_unsubscribe {
 
 		$one_click = filter_input( INPUT_POST, 'one_click' );
 		if ( true === $post || 1 === intval( $one_click ) ) {
+			$one_click_get = filter_input( INPUT_POST, 'one_click_get' );
+			if ( 1 === intval( $one_click_get ) ) {
+				/** remove list from contact */
+				$redirect_url = apply_filters( 'fka_redirect_confirm_unsubscribed', '', $this->contact );
+				if ( ! empty( $redirect_url ) ) {
+					$this->unsubscribe_redirect = $redirect_url;
+				}
+			}
 			$this->mark_unsubscribe();
 
 			return;
@@ -574,6 +584,10 @@ class BWFAN_unsubscribe {
 		/** Maybe complete unsubscribe - all case */
 		if ( true === $this->unsubscribe_all ) {
 			/** remove list from contact */
+			$redirect_url = apply_filters( 'fka_redirect_confirm_unsubscribed', '', $this->contact );
+			if ( ! empty( $redirect_url ) ) {
+				$this->unsubscribe_redirect = $redirect_url;
+			}
 			$this->unsubscribe_all_lists();
 
 			/** Will return from the function itself */
@@ -687,6 +701,10 @@ class BWFAN_unsubscribe {
 	 */
 	protected function maybe_subscribe_or_unsubscribe() {
 		if ( true === $this->unsubscribe_all ) {
+			$redirect_url = apply_filters( 'fka_redirect_confirm_unsubscribed', '', $this->contact );
+			if ( ! empty( $redirect_url ) ) {
+				$this->unsubscribe_redirect = $redirect_url;
+			}
 			$this->mark_unsubscribe();
 
 			return;
@@ -1013,13 +1031,23 @@ class BWFAN_unsubscribe {
 				'message' => __( 'Sorry! We are unable to update preferences as no contact found.', 'wp-marketing-automations' ),
 			) );
 		}
+
 		if ( in_array( intval( $type ), array( 2, 3, 4, 5, 6 ), true ) && ( isset( $page_exist ) && $page_exist['status'] !== 3 ) ) {
 			$global_settings = $this->get_global_settings();
-			wp_send_json( array(
+			$return_array    = array(
 				'success' => 1,
 				'message' => $global_settings['bwfan_unsubscribe_data_success'],
-			) );
+			);
+			if ( ! empty( $this->unsubscribe_redirect ) ) {
+				$return_array['redirect']     = true;
+				$return_array['redirect_url'] = esc_url_raw( $this->unsubscribe_redirect );
+
+				$this->unsubscribe_redirect = null;
+			}
+
+			wp_send_json( $return_array );
 		}
+
 		if ( 7 === absint( $type ) ) {
 			wp_send_json( array(
 				'success' => 0,

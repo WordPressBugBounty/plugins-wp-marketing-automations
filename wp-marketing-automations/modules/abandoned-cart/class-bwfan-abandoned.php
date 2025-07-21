@@ -438,6 +438,7 @@ class BWFAN_Abandoned_Cart {
 		/** Redirect to shop page if cart restore failed. */
 		$shop_url = wc_get_page_permalink( 'shop' );
 		$url      = ! empty( $shop_url ) ? $shop_url : home_url();
+
 		if ( false === $restored || 'item_not_added' === $restored ) {
 			if ( false === $restored ) {
 				$global_settings = BWFAN_Common::get_global_settings();
@@ -485,26 +486,32 @@ class BWFAN_Abandoned_Cart {
 			}
 		}
 
+		$url = wc_get_checkout_url();
+
+		/** If DOB fields exist */
+		if ( ! empty( $checkout_data['fields']['dob_fields']['bwfan_birthday_date_yy'] ) && ! empty( $checkout_data['fields']['dob_fields']['bwfan_birthday_date_mm'] ) && ! empty( $checkout_data['fields']['dob_fields']['bwfan_birthday_date_dd'] ) ) {
+			WC()->session->set( 'bwfan_birthday_date_yy', $checkout_data['fields']['dob_fields']['bwfan_birthday_date_yy'] );
+			WC()->session->set( 'bwfan_birthday_date_dd', $checkout_data['fields']['dob_fields']['bwfan_birthday_date_dd'] );
+			WC()->session->set( 'bwfan_birthday_date_mm', $checkout_data['fields']['dob_fields']['bwfan_birthday_date_mm'] );
+		}
+
 		do_action( 'bwfan_ab_handle_checkout_data_externally', $checkout_data );
 
 		if ( is_array( $checkout_data ) ) {
 			$page_id = isset( $checkout_data['current_page_id'] ) ? intval( $checkout_data['current_page_id'] ) : 0;
 			do_action( 'bwfanac_checkout_data', $page_id, $checkout_data, $this->restored_cart_details );
-			if ( $page_id > 0 ) {
+
+			$is_global_checkout = $checkout_data['aero_data']['wfacp_is_checkout_override'] ?? false;
+			if ( 1 === intval( $is_global_checkout ) ) {
+				// keep global checkout url
+			} elseif ( $page_id > 0 ) {
 				$url = get_permalink( $page_id );
 			}
 		}
 
-		$is_checkout_override = isset( $checkout_data['aero_data'] ) && isset( $checkout_data['aero_data']['wfacp_is_checkout_override'] ) ? $checkout_data['aero_data']['wfacp_is_checkout_override'] : false;
-
 		$global_settings = BWFAN_Common::get_global_settings();
 		if ( ! empty( $global_settings['bwfan_ab_restore_cart_message_success'] ) ) {
 			wc_add_notice( $global_settings['bwfan_ab_restore_cart_message_success'] );
-		}
-
-		/** if checkout override then passed native checkout page url **/
-		if ( $is_checkout_override ) {
-			$url = wc_get_checkout_url();
 		}
 
 		/** @var $url_utm_args - passing utm parameter if available in cart recovery link */
@@ -927,7 +934,7 @@ class BWFAN_Abandoned_Cart {
 	public function insert_abandoned_cart() {
 		BWFAN_Common::check_nonce();
 
-		$email = sanitize_email( $_POST['email'] ); //phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
+		$email = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : ''; //phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
 		if ( empty( $email ) ) {
 			wp_send_json( array(
 				'success' => false,
@@ -977,7 +984,7 @@ class BWFAN_Abandoned_Cart {
 
 		$exclude_checkout_fields = apply_filters( 'bwfan_ab_exclude_checkout_fields', array() );
 		$data                    = [
-			'fields'               => isset( $_POST['checkout_fields_data'] ) ? $_POST['checkout_fields_data'] : [],
+			'fields'               => isset( $_POST['checkout_fields_data'] ) && is_array( $_POST['checkout_fields_data'] ) ? array_map( 'sanitize_text_field', $_POST['checkout_fields_data'] ) : [],
 			//phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
 			'current_page_id'      => isset( $_POST['current_page_id'] ) ? sanitize_text_field( $_POST['current_page_id'] ) : '',
 			//phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
@@ -1019,7 +1026,18 @@ class BWFAN_Abandoned_Cart {
 
 		/** Remove empty fields */
 		$data['fields'] = array_filter( $data['fields'] );
+		$dob_fields     = [];
+		if ( ! empty( $data['fields']['bwfan_birthday_date_yy'] ) && ! empty( $data['fields']['bwfan_birthday_date_mm'] ) && ! empty( $data['fields']['bwfan_birthday_date_dd'] ) && checkdate( intval( $data['fields']['bwfan_birthday_date_mm'] ), intval( $data['fields']['bwfan_birthday_date_dd'] ), intval( $data['fields']['bwfan_birthday_date_yy'] ) ) ) {
+			$dob_fields = [
+				'dob_fields' => [
+					'bwfan_birthday_date_yy' => $data['fields']['bwfan_birthday_date_yy'],
+					'bwfan_birthday_date_dd' => $data['fields']['bwfan_birthday_date_dd'],
+					'bwfan_birthday_date_mm' => $data['fields']['bwfan_birthday_date_mm'],
+				],
+			];
+		}
 		$data['fields'] = array_intersect_key( $data['fields'], self::get_woocommerce_default_checkout_nice_names() );
+		$data['fields'] = array_merge( $data['fields'], $dob_fields );
 
 		/**
 		 * Set AeroCheckout session keys
@@ -1276,41 +1294,10 @@ class BWFAN_Abandoned_Cart {
 			$data['checkout_data'] = wp_json_encode( $details['checkout_data'] );
 		}
 
-		/** Maybe create contact */
-		$contact          = new WooFunnels_Contact( $data['user_id'], $data['email'] );
-		$checkout_data    = $details['checkout_data'];
-		$pushengage_token = $checkout_data['pushengage_token'] ?? '';
-		if ( empty( $contact->get_id() ) ) {
-			$f_name     = is_array( $checkout_data ) && isset( $checkout_data['fields']['billing_first_name'] ) ? $checkout_data['fields']['billing_first_name'] : '';
-			$l_name     = is_array( $checkout_data ) && isset( $checkout_data['fields']['billing_last_name'] ) ? $checkout_data['fields']['billing_last_name'] : '';
-			$contact_no = is_array( $checkout_data ) && isset( $checkout_data['fields']['billing_phone'] ) ? $checkout_data['fields']['billing_phone'] : '';
-			$state      = is_array( $checkout_data ) && isset( $checkout_data['fields']['billing_state'] ) ? $checkout_data['fields']['billing_state'] : '';
-			$country    = is_array( $checkout_data ) && isset( $checkout_data['fields']['shipping_country'] ) ? $checkout_data['fields']['shipping_country'] : '';
-
-			$contact->set_email( $data['email'] );
-
-			if ( ! empty( $f_name ) ) {
-				$contact->set_f_name( $f_name );
-			}
-			if ( ! empty( $l_name ) ) {
-				$contact->set_l_name( $l_name );
-			}
-			if ( ! empty( $data['user_id'] ) ) {
-				$contact->set_wpid( $data['user_id'] );
-			}
-			if ( ! empty( $contact_no ) ) {
-				$contact->set_contact_no( $contact_no );
-			}
-			if ( ! empty( $state ) ) {
-				$contact->set_state( $state );
-			}
-			if ( ! empty( $country ) ) {
-				$contact->set_country( $country );
-			}
-
-			$contact->save();
+		$checkout_id = $details['checkout_data']['aerocheckout_page_id'] ?? false;
+		if ( intval( $checkout_id ) > 0 ) {
+			$data['checkout_page_id'] = intval( $checkout_id );
 		}
-		$this->update_pushengage_token( $contact->get_id(), $pushengage_token );
 
 		BWFAN_Model_Abandonedcarts::insert( $data );
 
@@ -1367,6 +1354,11 @@ class BWFAN_Abandoned_Cart {
 
 		if ( isset( $old_cart_details['checkout_data'] ) && is_array( $old_cart_details['checkout_data'] ) && count( $old_cart_details['checkout_data'] ) > 0 ) {
 			$data['checkout_data'] = wp_json_encode( $old_cart_details['checkout_data'] );
+		}
+
+		$checkout_id = $old_cart_details['checkout_data']['aerocheckout_page_id'] ?? false;
+		if ( intval( $checkout_id ) > 0 ) {
+			$data['checkout_page_id'] = intval( $checkout_id );
 		}
 
 		$where = array(
@@ -1674,35 +1666,6 @@ class BWFAN_Abandoned_Cart {
 		}
 
 		return in_array( $product_id, $free_products, true );
-	}
-
-	/**
-	 * @param $contact_id
-	 * @param $pushengage_token
-	 *
-	 * @return void
-	 */
-	public function update_pushengage_token( $contact_id, $pushengage_token ) {
-		if ( empty( $contact_id ) || empty( $pushengage_token ) ) {
-			return;
-		}
-		$field = BWFAN_Model_Fields::get_field_by_slug( 'push-engage-token' );
-		if ( ! isset( $field['ID'] ) || empty( $field['ID'] ) ) {
-			return;
-		}
-
-		$field_id      = 'f' . $field['ID'];
-		$field_values  = BWF_Model_Contact_Fields::get_contact_field_by_id( $contact_id );
-		$token_value   = $field_values[ $field_id ] ?? '';
-		$token_value   = ! empty( $token_value ) ? json_decode( $token_value, true ) : [];
-		$token_value[] = $pushengage_token;
-		if ( empty( $field_values ) || ! is_array( $field_values ) ) {
-			BWF_Model_Contact_Fields::insert_ignore( array( 'cid' => $contact_id, $field_id => json_encode( $token_value ) ) );
-
-			return;
-		}
-
-		BWF_Model_Contact_Fields::update( [ $field_id => json_encode( $token_value ) ], [ 'cid' => $contact_id ] );
 	}
 
 	/**

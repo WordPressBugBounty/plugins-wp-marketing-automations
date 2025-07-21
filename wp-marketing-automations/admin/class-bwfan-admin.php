@@ -1394,6 +1394,9 @@ class BWFAN_Admin {
 	}
 
 	function bwfan_add_contact_profile_link( $user ) {
+		if ( ! current_user_can( $this->menu_cap() ) ) {
+			return;
+		}
 		if ( $user && $user instanceof WP_User ) {
 			$editingUserVars = null;
 			$urlBase         = admin_url( 'admin.php?page=autonami' );

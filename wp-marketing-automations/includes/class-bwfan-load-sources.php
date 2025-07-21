@@ -203,7 +203,6 @@ class BWFAN_Load_Sources {
 		if ( ! method_exists( $event, 'get_instance' ) ) {
 			return;
 		}
-		$all_event_list    = self::get_all_event_list();
 		$temp_source       = $event->get_source();
 		$event_slug        = $event->get_slug();
 		$optgroup          = $event->get_optgroup_label();
@@ -240,7 +239,6 @@ class BWFAN_Load_Sources {
 			'available' => 'yes',
 		];
 
-//		if ( ! isset( $all_event_list[ $event_slug ] ) ) {
 		self::$dynamic_register_events['list'][ $event_slug ] = [
 			'event_name' => $event->get_name(),
 			'lock'       => true,
@@ -255,7 +253,6 @@ class BWFAN_Load_Sources {
 		if ( $event->is_contact_add_to_automation_allowed() ) {
 			self::$events_to_add_contact_manually[] = $event_slug;
 		}
-//		}
 	}
 
 	/**

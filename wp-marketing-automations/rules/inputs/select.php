@@ -1,5 +1,6 @@
 <?php
 
+#[AllowDynamicProperties]
 class bwfan_Input_Select {
 
 	public function __construct() {

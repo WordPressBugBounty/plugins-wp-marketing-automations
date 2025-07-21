@@ -33,7 +33,7 @@ class BWFAN_API_Email_Activity extends BWFAN_API_Base {
 		$filter_list   = isset( $this->args['filter_list'] ) ? $this->args['filter_list'] : '';
 		$filters       = isset( $this->args['filters'] ) ? $this->args['filters'] : [];
 		$filters       = BWFAN_Common::is_json( $filters ) ? json_decode( $filters, true ) : [];
-		$activity_data = BWFAN_Model_Engagement_Tracking::get_engagements_activity( $filter_list, $search, $filters, $offset, $limit, 1 );
+		$activity_data = BWFAN_Model_Engagement_Tracking::get_engagements_activity( $search, $filters, $offset, $limit, 1 );
 
 		$this->total_count = $activity_data['total'];
 
@@ -60,7 +60,6 @@ class BWFAN_API_Email_Activity extends BWFAN_API_Base {
 	 * @return array
 	 */
 	public static function email_activity_filter_array( $filter_list ) {
-
 		if ( empty( $filter_list ) ) {
 			return array();
 		}
@@ -69,6 +68,7 @@ class BWFAN_API_Email_Activity extends BWFAN_API_Base {
 		];
 		if ( bwfan_is_autonami_pro_active() ) {
 			$operators[2] = __( 'Broadcast', 'wp-marketing-automations' );
+			$operators[6] = __( 'Form Feeds', 'wp-marketing-automations' );
 			$operators[9] = __( 'Transactional', 'wp-marketing-automations' );
 		}
 
@@ -100,7 +100,6 @@ class BWFAN_API_Email_Activity extends BWFAN_API_Base {
 						'title'         => __( 'Status', 'wp-marketing-automations' ),
 						'type'          => 'select',
 						'options'       => [
-							1 => __( 'Draft', 'wp-marketing-automations' ),
 							2 => __( 'Completed', 'wp-marketing-automations' ),
 							3 => __( 'Failed', 'wp-marketing-automations' ),
 							4 => __( 'Bounced', 'wp-marketing-automations' ),

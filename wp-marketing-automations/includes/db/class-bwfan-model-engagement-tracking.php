@@ -491,7 +491,6 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 		/**
 		 * Get email activity by filters
 		 *
-		 * @param array $filter_list
 		 * @param string $search
 		 * @param array $filters
 		 * @param int $offset
@@ -501,7 +500,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 		 * @return array
 		 *
 		 */
-		public static function get_engagements_activity( $filter_list, $search = '', $filters = [], $offset = 0, $limit = 10, $mode = 0 ) {
+		public static function get_engagements_activity( $search = '', $filters = [], $offset = 0, $limit = 10, $mode = 0 ) {
 			global $wpdb;
 			$table        = self::_table();
 			$query        = "SELECT `ID`,`cid`,`created_at`,`type`,`send_to`,`open`,`click`,`oid`,`author_id`,`tid`,`c_status`,`mode` FROM {$table} WHERE 1=1";
@@ -519,7 +518,10 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 				$filter_query .= $wpdb->prepare( " AND send_to LIKE %s", "%" . esc_sql( $search ) . "%" );
 			}
 
-			//filter data if there is any filtered value pass
+			/** Default status filter query to exclude drafts */
+			$status_filter_query = $wpdb->prepare( " AND c_status != %d", 1 );
+
+			/** Filters passed */
 			foreach ( $filters as $filter ) {
 				switch ( $filter['filter'] ) {
 					case 'source':
@@ -542,6 +544,9 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 									$filter_query .= " AND type = 2";
 								}
 								break;
+							case 6:
+								$filter_query .= " AND type = 6";
+								break;
 							case 9:
 								$filter_query .= " AND type = 9";
 								break;
@@ -550,10 +555,9 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 					case 'status':
 						$status = ! empty( $filter['data'] ) ? $filter['data'] : '';
 						if ( ! empty( $status ) ) {
-							$filter_query .= " AND c_status = '{$status}'";
+							$status_filter_query = $wpdb->prepare( " AND c_status = %d", $status );
 						}
 						break;
-
 					case 'period':
 						$start_date = ! empty( $filter['data']['after'] ) ? $filter['data']['after'] : '';
 						$end_date   = ! empty( $filter['data']['before'] ) ? $filter['data']['before'] : '';
@@ -564,10 +568,14 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 				}
 			}
 
-			$query   .= $filter_query;
-			$query   .= " ORDER BY ID DESC LIMIT {$limit} OFFSET {$offset}";
-			$results = $wpdb->get_results( $query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			/** Append Status filter query */
+			$filter_query .= $status_filter_query;
 
+			$query .= $filter_query;
+			$query .= $wpdb->prepare( " ORDER BY ID DESC LIMIT %d OFFSET %d", $limit, $offset );
+
+			//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$results = $wpdb->get_results( $query, ARRAY_A );
 			if ( empty( $results ) ) {
 				return array(
 					'data'  => [],
@@ -575,19 +583,16 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 				);
 			}
 
-			// Get contact details
+			/** All Contact IDs */
 			$cids = array_unique( array_column( $results, 'cid' ) );
 
 			$con_query    = $wpdb->prepare( "SELECT ID, f_name, email, l_name FROM {$wpdb->prefix}bwf_contact WHERE ID IN (" . implode( ',', array_map( 'absint', $cids ) ) . ")" );
 			$contact_data = $wpdb->get_results( $con_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
-			// Map contact details by ID
-			$contact_map = [];
-			foreach ( $contact_data as $contact ) {
-				$contact_map[ $contact['ID'] ] = $contact;
-			}
+			/** Contact array with ID as key */
+			$contact_map = array_column( $contact_data, null, 'ID' );
 
-			// Get subjects in one query
+			/** Single Template IDs array */
 			$tids              = [];
 			$message_track_ids = [];
 			foreach ( $results as $result ) {
@@ -601,7 +606,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 			$template      = $wpdb->prepare( "SELECT ct.ID, ct.subject, ct.title, ct.mode FROM {$wpdb->prefix}bwfan_templates AS ct WHERE ct.ID IN (" . implode( ',', array_map( 'absint', $tids ) ) . ")" );
 			$template_data = $wpdb->get_results( $template, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
-			// Map subjects by ID
+			/** Map subjects by ID */
 			$template_map       = [];
 			$transactional_data = [];
 			foreach ( $template_data as $template ) {
@@ -638,7 +643,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 				$con_data[ $key ]['mode'] = $val['mode'];
 				$con_data[ $key ]['type'] = $val['type'];
 
-				// Retrieve contact details from map
+				/** Retrieve contact details from map */
 				$contact = $contact_map[ $val['cid'] ] ?? array();
 
 				$con_data[ $key ]['contact'] = [];
@@ -652,7 +657,7 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 					);
 				}
 
-				// Get source data
+				/** Get source data */
 				$source = $con_class->get_source( [
 					'oid'       => $val['oid'],
 					'type'      => $val['type'],
@@ -663,14 +668,14 @@ if ( ! class_exists( 'BWFAN_Model_Engagement_Tracking' ) && BWFAN_Common::is_pro
 					$con_data[ $key ]['source'] = $source;
 				}
 
-				// Set sent status and sent date
+				/** Set sent status and sent date */
 				$con_data[ $key ]['c_status'] = $val['c_status'];
 				$con_data[ $key ]['sent_on']  = $val['created_at'];
 				$con_data[ $key ]['open']     = $val['open'];
 				$con_data[ $key ]['click']    = $val['click'];
 				$con_data[ $key ]['send_to']  = $val['send_to'];
 
-				// Retrieve subject from map
+				/** Retrieve subject from map */
 				$subject                     = ! empty( $val['tid'] ) && isset( $template_map[ $val['tid'] ] ) && $template_map[ $val['tid'] ]['subject'] ? $template_map[ $val['tid'] ]['subject'] : '';
 				$subject                     = empty( $subject ) && isset( $message_data[ $val['ID'] ] ) ? $message_data[ $val['ID'] ] : $subject;
 				$con_data[ $key ]['subject'] = ! empty( $subject ) ? $subject : __( 'No Subject', 'wp-marketing-automations' );

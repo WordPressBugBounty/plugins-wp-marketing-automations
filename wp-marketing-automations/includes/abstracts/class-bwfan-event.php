@@ -133,10 +133,10 @@ abstract class BWFAN_Event {
 	public function get_validation_html( $unique_slug, $section_label, $field_label ) {
 		?>
         <div class="bwfan-col-sm-12 bwfan-pl-0 bwfan_mt15">
-        <label for="" class="bwfan-label-title"><?php echo esc_html( $section_label ); ?></label>
-        <input type="checkbox" name="event_meta[validate_event]" id="bwfan-validate_event" value="1" class="validate_event_1 <?php echo esc_html( $unique_slug ); ?>-validate_event" {{is_validated}}/>
-        <label for="bwfan-validate_event" class="bwfan-checkbox-label"><?php echo esc_html( $field_label ); ?></label>
-        <div class="clearfix bwfan_field_desc"><?php echo wp_kses_post( 'This setting is useful to <u>verify time-delayed Actions</u>. For instance, you can create a follow-up Action that runs after 30 days of placing an order. That Action won\'t trigger if the above selected Order Statuses are not matched to the order.', 'wp-marketing-automations' ); ?></label>
+            <label for="" class="bwfan-label-title"><?php echo $section_label; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></label>
+            <input type="checkbox" name="event_meta[validate_event]" id="bwfan-validate_event" value="1" class="validate_event_1 <?php echo esc_html( $unique_slug ); ?>-validate_event" {{is_validated}}/>
+            <label for="bwfan-validate_event" class="bwfan-checkbox-label"><?php echo $field_label; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></label>
+            <div class="clearfix bwfan_field_desc"><?php echo __( 'This setting is useful to <u>verify time-delayed Actions</u>. For instance, you can create a follow-up Action that runs after 30 days of placing an order. That Action won\'t trigger if the above selected Order Statuses are not matched to the order.', 'wp-marketing-automations' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
         </div>
 		<?php
 	}

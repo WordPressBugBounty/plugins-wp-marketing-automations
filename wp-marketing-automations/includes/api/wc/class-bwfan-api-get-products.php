@@ -421,8 +421,8 @@ class BWFAN_Api_Get_Products extends BWFAN_API_Base {
 			$product    = wc_get_product( $pid );
 			$products[] = [
 				'id'                => $product->get_id(),
-				'name'              => strip_tags( $product->get_name() ),
-				'short_description' => strip_tags( $product->get_short_description() ),
+				'name'              => wp_strip_all_tags( $product->get_name() ),
+				'short_description' => wp_strip_all_tags( $product->get_short_description() ),
 				'type'              => $product->get_type(),
 				'status'            => $product->get_status(),
 				'downloadable'      => $product->is_downloadable(),

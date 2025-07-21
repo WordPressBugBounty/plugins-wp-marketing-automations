@@ -186,7 +186,7 @@ class BWFAN_Tasks {
 				BWFAN_Core()->logger->log( 'Connector settings has been deleted for the task. Task ID - ' . $task_id . ', Automation ID- ' . $task_details['automation_id'], $this->log_type );
 			}
 		} catch ( Error $e ) {
-			throw new Exception( esc_html( "Error occurred with message {$e->getMessage()} for task id {$task_id}" ), 1 );
+			throw new Exception( wp_strip_all_tags( "Error occurred with message {$e->getMessage()} for task id {$task_id}" ), 1 ); //phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 		}
 	}
 

@@ -217,7 +217,6 @@ abstract class BWFAN_Model {
 	/**
 	 * Insert query with Ignore
 	 *
-	 * @param $table
 	 * @param $data
 	 * @param $format
 	 *
@@ -226,6 +225,11 @@ abstract class BWFAN_Model {
 	static function insert_ignore( $data, $format = null ) {
 		if ( empty( $data ) || ! is_array( $data ) ) {
 			return false;
+		}
+
+		// Validate format if provided
+		if ( ! is_null( $format ) && count( $format ) !== count( $data ) ) {
+			$format = null; // Reset format if it doesn't match data count
 		}
 
 		$placeholders = is_null( $format ) ? array_fill( 0, count( $data ), '%s' ) : $format;
@@ -246,10 +250,10 @@ abstract class BWFAN_Model {
 			$warnings = $wpdb->get_results( "SHOW WARNINGS", ARRAY_A );//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			if ( ! empty( $warnings ) ) {
 				foreach ( $warnings as $warning ) {
-					if ( empty( $warning['Message'] ) || false === strpos( $warning['message'], 'Duplicate entry' ) ) {
+					if ( empty( $warning['Message'] ) || false === strpos( $warning['Message'], 'Duplicate entry' ) ) {
 						continue;
 					}
-					BWFAN_Common::log_test_data( 'WP db error in ' . $table . ' : ' . $warning['message'], 'fka-db-duplicate-error', true );
+					BWFAN_Common::log_test_data( 'WP db error in ' . $table . ' : ' . $warning['Message'], 'fka-db-duplicate-error', true );
 					BWFAN_Common::log_test_data( $data, 'fka-db-duplicate-error', true );
 				}
 			}

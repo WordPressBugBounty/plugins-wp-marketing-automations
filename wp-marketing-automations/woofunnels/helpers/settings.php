@@ -66,37 +66,24 @@ return apply_filters( 'bwf_settings_config', array(
 		'fields'   => array(
 			array(
 				'key'         => 'fb_pixel_key',
-				'label'       => __( 'Pixel ID', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-				'type'        => 'input',
+				'label'       => __( 'Pixel ID & Access Token', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				'type'        => 'tracking_id',
 				'placeholder' => __( '294123501257422', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-				'hint'        => __( 'Log into your Facebook ads account to find your Pixel ID. <a target="_blank" href="https://funnelkit.com/docs/funnel-builder/how-to/configure-facebook-conversion-api/#step-4-go-to-settings">Learn More</a>', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-			),
-
-			array(
-				'key'    => 'is_fb_purchase_conversion_api',
-				'type'   => 'checklist',
-				'label'  => '',
-				// phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-				'hint'   => __( 'Send events directly from server to Facebook through the Conversion API. An access token is required to use the server-side API. <a target="_blank" href="https://funnelkit.com/docs/funnel-builder/global-settings/facebook-conversion-api/?utm_source=WordPress&utm_campaign=FB+Lite+Plugin&utm_medium=Generate+Access+Token">Generate Access Token</a>', 'woofunnels' ),
-				'values' => array(
+				'input_hint'        => __( 'Log into your Facebook ads account to find your Pixel ID.', 'woofunnels' ) . ' <a target="_blank" href="https://funnelkit.com/docs/funnel-builder/how-to/set-up-facebook-pixel/">' . __( 'Learn More', 'woofunnels' ) . '</a>', // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				'secondary_fields' => array(
 					array(
-						'name'  => __( 'Enable Conversion API', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-						'value' => 'yes',
+						'key'         => 'conversion_api_access_token',
+						'type'        => 'textarea',
+						'label'       => '',
+						'placeholder' => __( 'Enter Access Token', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+						'hint'        => __( 'Send events directly from server to Facebook through the Conversion API. An access token is required to use the server-side API.', 'woofunnels' ) . '<a target="_blank" href="https://funnelkit.com/docs/funnel-builder/global-settings/facebook-conversion-api/">' . __( 'Generate Access Token', 'woofunnels' ) . '</a>', // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 					),
-				),
-
+				)
 			),
 			array(
 				'key'         => 'conversion_api_access_token',
-				'type'        => 'textArea',
-				'label'       => '',
-				'placeholder' => __( 'EAAJkZC3UfZBwBAJm8ZAqFmZAjOZA4eZBZAfdZAkZCZA3hCZAjBZCpZA5ZAjVZBmZA0ZBZAaZAfLZA2eZA5ZBZBZCZA4ZAuVZB4ZAfPZAejZAjMeZAjHZCZAfLZAkZAjZAZCZA1ZAjBZA3ZCZAeZAf9ZAkZAgZDZD', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-				'toggler'     => array(
-					'key'   => 'is_fb_purchase_conversion_api',
-					'value' => array( 'yes' ),
-				),
+				'type'        => 'hidden',
 			),
-
 
 			array(
 				'key'   => 'is_fb_conv_enable_test',
@@ -108,12 +95,8 @@ return apply_filters( 'bwf_settings_config', array(
 					array(
 						'name'  => __( 'Test server events via test_event_code', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 						'value' => 'yes',
-					),
-				),
-				'toggler' => array(
-					'key'   => 'is_fb_purchase_conversion_api',
-					'value' => array( 'yes' ),
-				),
+					)
+				)
 			),
 
 
@@ -126,7 +109,7 @@ return apply_filters( 'bwf_settings_config', array(
 				'toggler'     => array(
 					'key'   => 'is_fb_conv_enable_test',
 					'value' => array( 'yes' ),
-				),
+				)
 			),
 			array(
 				'key'     => 'is_fb_conversion_api_log',
@@ -138,11 +121,7 @@ return apply_filters( 'bwf_settings_config', array(
 						'name'  => __( 'Enable Purchase Event Logs', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 						'value' => 'yes',
 					),
-				),
-				'toggler' => array(
-					'key'   => 'is_fb_purchase_conversion_api',
-					'value' => array( 'yes' ),
-				),
+				)
 			),
 
 			array(
@@ -443,10 +422,10 @@ return apply_filters( 'bwf_settings_config', array(
 		'fields'   => array(
 			array(
 				'key'         => 'ga_key',
-				'type'        => 'input',
+				'type'        => 'tracking_id',
 				'label'       => __( 'Analytics ID', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'placeholder' => __( 'G-9F3K2TGHH4', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-				'hint'        => __( 'Log into your Google Analytics account to find your Analytics ID. <a target="_blank" href="https://funnelkit.com/docs/funnel-builder/how-to/set-up-google-analytics-4-property/">Learn More</a>', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				'input_hint'        => __( 'Log into your Google Analytics account to find your Analytics ID. <a target="_blank" href="https://funnelkit.com/docs/funnel-builder/how-to/set-up-google-analytics-4-property/">Learn More</a>', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			),
 
 			array(
@@ -674,21 +653,11 @@ return apply_filters( 'bwf_settings_config', array(
 		'fields'   => array(
 			array(
 				'key'         => 'gad_key',
-				'type'        => 'input',
+				'type'        => 'tracking_id',
 				'label'       => __( 'Conversion ID', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'placeholder' => __( 'AW-837491263', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-				'hint'        => __( 'Log into your Google Ads account to find your Conversion ID. <a target="_blank" href="https://funnelkit.com/docs/funnel-builder/global-settings/google-ads/#step-1-go-to-your-google-ads-account">Learn More</a>', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				'input_hint'        => __( 'Log into your Google Ads account to find your Conversion ID. <a target="_blank" href="https://funnelkit.com/docs/funnel-builder/global-settings/google-ads/#step-1-go-to-your-google-ads-account">Learn More</a>', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			),
-
-			array(
-				'key'         => 'gad_conversion_label',
-				'type'        => 'input',
-				'label'       => __( 'Conversion Label', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-				'placeholder' => __( 'LkP4CIKm59UBEP7n3t4C', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-				'hint'        => __( 'Log into your Google Ads account to find your conversion label. <a target="_blank" href="https://funnelkit.com/docs/funnel-builder/global-settings/google-ads/#step-4-set-up-the-conversion-for-your-google-ads-account">Learn More</a>', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-
-			),
-
 			array(
 				'type'         => 'label',
 				'key'          => 'label_section_head_ga',
@@ -707,6 +676,13 @@ return apply_filters( 'bwf_settings_config', array(
 				'label' => __( 'Enable AddtoCart Event', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'type'  => "checkbox",
 				'hint'  => __( 'Use this option to fire AddtoCart event when customer add items to the cart', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			),
+			array(
+				'key'         => 'gad_addtocart_global_conversion_label',
+				'type'        => 'tracking_id_dependent',
+				'tracking_id_key' => 'gad_key',
+				'label'       => '',
+				'placeholder' => __( 'Enter Conversion Label (Optional)', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			),
 			array(
 				'key'   => 'is_gad_view_item_global',
@@ -747,6 +723,13 @@ return apply_filters( 'bwf_settings_config', array(
 					),
 				),
 			),
+			array(
+				'key'         => 'gad_lead_conversion_label',
+				'type'        => 'tracking_id_dependent',
+				'tracking_id_key' => 'gad_key',
+				'label'       => '',
+				'placeholder' => __( 'Enter Conversion Label (Optional)', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			),
 
 
 			array(
@@ -763,6 +746,13 @@ return apply_filters( 'bwf_settings_config', array(
 				'label'        => __( 'Enable AddtoCart Event', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'hint'         => __( 'This event will fire when user accepts the order bump', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'styleClasses' => [ 'wfacp_checkbox_wrap', 'wfacp_setting_track_and_events_end', 'bwf_remove_lft_pad' ],
+			),
+			array(
+				'key'         => 'gad_addtocart_bump_conversion_label',
+				'type'        => 'tracking_id_dependent',
+				'tracking_id_key' => 'gad_key',
+				'label'       => '',
+				'placeholder' => __( 'Enter Conversion Label (Optional)', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			),
 			array(
 				'key'   => 'is_gad_custom_bump',
@@ -794,6 +784,13 @@ return apply_filters( 'bwf_settings_config', array(
 
 			),
 			array(
+				'key'         => 'gad_addtocart_checkout_conversion_label',
+				'type'        => 'tracking_id_dependent',
+				'tracking_id_key' => 'gad_key',
+				'label'       => '',
+				'placeholder' => __( 'Enter Conversion Label (Optional)', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			),
+			array(
 				'key'    => 'is_gad_pageview_event',
 				'type'   => 'checklist',
 				'label'  => __( 'Purchase Events', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
@@ -815,8 +812,13 @@ return apply_filters( 'bwf_settings_config', array(
 					),
 				),
 			),
-
-
+			array(
+				'key'         => 'gad_conversion_label',
+				'type'        => 'tracking_id_dependent',
+				'tracking_id_key' => 'gad_key',
+				'label'       => __( 'Conversion Label', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				'placeholder' => __( 'Enter Conversion Label (Optional)', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			),
 			array(
 				'type'         => 'label',
 				'key'          => 'label_section_head_ga',
@@ -905,11 +907,11 @@ return apply_filters( 'bwf_settings_config', array(
 		'slug'    => 'pinterest',
 		'fields'  => array(
 			array(
-				'type'        => 'input',
+				'type'        => 'tracking_id',
 				'key'         => 'pint_key',
 				'label'       => __( 'Tag ID', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'placeholder' => __( '2614535298742', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-				'hint'        => __( 'Log into your Pinterest Ads Manager Account and find Pixel ID. <a target="_blank" href="https://funnelkit.com/docs/funnel-builder/global-settings/pinterest/">Learn More</a>', 'woofunnels' ) // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				'input_hint'        => __( 'Log into your Pinterest Ads Manager Account and find Pixel ID. <a target="_blank" href="https://funnelkit.com/docs/funnel-builder/global-settings/pinterest/">Learn More</a>', 'woofunnels' ) // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 			),
 
 			array(
@@ -1136,10 +1138,10 @@ return apply_filters( 'bwf_settings_config', array(
 		'fields'   => array(
 			array(
 				'key'         => 'tiktok_pixel',
-				'type'        => 'input',
+				'type'        => 'tracking_id',
 				'label'       => __( 'TikTok ID', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'placeholder' => __( 'D4L9N62FLPENAMTU4HG9', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-				'hint'        => __( 'Log into your Tiktok Business Account and find TikTok ID. <a target="_blank" href="https://funnelkit.com/docs/funnel-builder/global-settings/tiktok/">Learn More</a>', 'woofunnels' ) // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				'input_hint'        => __( 'Log into your Tiktok Business Account and find TikTok ID. <a target="_blank" href="https://funnelkit.com/docs/funnel-builder/global-settings/tiktok/">Learn More</a>', 'woofunnels' ) // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 
 			),
 
@@ -1281,10 +1283,10 @@ return apply_filters( 'bwf_settings_config', array(
 		'fields'   => array(
 			array(
 				'key'         => 'snapchat_pixel',
-				'type'        => 'input',
+				'type'        => 'tracking_id',
 				'label'       => __( 'Pixel ID', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 				'placeholder' => __( '7fc81b23-8e1c-4fde-b2bf-e3f67a19d2fa', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-				'hint'        => __( 'Log into your Snapchat Business Account and find Pixel ID. <a target="_blank" href="https://funnelkit.com/docs/funnel-builder/global-settings/snapchat/">Learn More</a>', 'woofunnels' ) // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				'input_hint'        => __( 'Log into your Snapchat Business Account and find Pixel ID. <a target="_blank" href="https://funnelkit.com/docs/funnel-builder/global-settings/snapchat/">Learn More</a>', 'woofunnels' ) // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
 
 			),
 

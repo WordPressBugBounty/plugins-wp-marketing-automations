@@ -9,7 +9,7 @@ class BWFAN_Contact_Password_Setup_Link extends BWFAN_Merge_Tag {
 		$this->tag_description = __( 'Contact User Password Setup Link', 'wp-marketing-automations' );
 
 		add_shortcode( 'bwfan_contact_password_setup_link', array( $this, 'parse_shortcode' ) );
-		$this->priority = 14;
+		$this->priority = 14.5;
 	}
 
 	public static function get_instance() {

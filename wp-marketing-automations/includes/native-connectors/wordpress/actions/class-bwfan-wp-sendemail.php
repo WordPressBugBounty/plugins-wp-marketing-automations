@@ -31,10 +31,6 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 		return self::$ins;
 	}
 
-	public function load_hooks() {
-		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_assets' ), 98 );
-	}
-
 	/**
 	 * Localize data for html fields for the current action.
 	 */

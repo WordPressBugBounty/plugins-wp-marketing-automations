@@ -153,7 +153,8 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 					$filters['c']  = array_filter( $filters['c'], function ( $v ) {
 						return ( 'status' !== $v['key'] || 3 !== absint( $v['value'] ) );
 					}, ARRAY_FILTER_USE_BOTH );
-					if ( isset( $additional_info['include_unsubscribe'] ) ) {
+
+					if ( isset( $additional_info['include_unsubscribe'] ) && empty( $additional_info['include_unsubscribe'] ) ) {
 						unset( $additional_info['include_unsubscribe'] );
 					}
 				}

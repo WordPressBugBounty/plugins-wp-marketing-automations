@@ -175,6 +175,11 @@ if ( ! class_exists( 'BWF_Model_Contact_Fields' ) && BWFAN_Common::is_pro_3_0() 
 				return false;
 			}
 
+			// Validate format if provided
+			if ( ! is_null( $format ) && count( $format ) !== count( $data ) ) {
+				$format = null; // Reset format if it doesn't match data count
+			}
+
 			$columns      = array_keys( $data );
 			$placeholders = is_null( $format ) ? array_fill( 0, count( $data ), '%s' ) : $format;
 			$table        = self::_table();

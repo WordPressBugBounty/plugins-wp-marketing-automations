@@ -50,9 +50,6 @@ final class BWFAN_WC_New_Order extends BWFAN_Event {
 
 		add_action( 'bwfan_wc_order_status_changed', array( $this, 'bwfan_order_status_changed' ), 11, 3 );
 
-		// this action localizes the data which will be used in script template for making the UI of the event
-		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_assets' ), 98 );
-
 		add_filter( 'bwfan_wc_event_order_status_' . $this->get_slug(), array( $this, 'modify_order_statuses' ), 10, 1 );
 
 		// this filter tells if the logs should be made during sync process for the current event
@@ -387,7 +384,7 @@ final class BWFAN_WC_New_Order extends BWFAN_Event {
 		<?php } ?>
         <li>
             <strong><?php echo esc_html__( 'Email:', 'wp-marketing-automations' ); ?> </strong>
-			<?php echo esc_html( $global_data['email'] ); ?>
+			<?php echo $global_data['email']; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
         </li>
 		<?php
 		return ob_get_clean();

@@ -70,6 +70,10 @@ abstract class BWFAN_Integration {
 					 */
 					$action_obj = $action_class::get_instance();
 					$action_obj->load_hooks();
+					if ( method_exists( $action_obj, 'admin_enqueue_assets' ) && is_admin() && BWFAN_Common::is_automation_v1_active() && BWFAN_Common::is_autonami_page() ) {
+						// Add action to avoid enqueueing assets on every admin page load
+						add_action( 'admin_enqueue_scripts', array( $action_obj, 'admin_enqueue_assets' ), 98 );
+					}
 					$action_obj->set_integration_type( $this->get_slug() );
 					BWFAN_Load_Integrations::register_actions( $action_obj );
 					$this->do_after_action_registration( $action_obj );

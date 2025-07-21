@@ -445,7 +445,15 @@ class BWFAN_Automation_Controller {
 			'data'   => json_encode( $this->automation_contact_data ),
 			'trail'  => empty( $this->trail_id ) && isset( $this->automation_contact['trail'] ) ? $this->automation_contact['trail'] : $this->trail_id,
 		);
-		BWFAN_Model_Automation_Complete_Contact::insert_ignore( $data );
+		BWFAN_Model_Automation_Complete_Contact::insert_ignore( $data, [
+			'%d',// cid
+			'%d',// aid
+			'%s',// event
+			'%s',// s_date
+			'%s',// c_date
+			'%s',// data
+			'%s',// trail
+		] );
 
 		/** Delete the row from automation contact table */
 		BWFAN_Model_Automation_Contact::delete( $this->automation_contact['ID'] );

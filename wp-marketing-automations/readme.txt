@@ -2,9 +2,9 @@
 Contributors: xlplugins, amans2k
 Tags: cart abandonment, follow up emails, email marketing, newsletter, marketing automation
 Requires at least: 5.0
-Tested up to: 6.8.1
+Tested up to: 6.8.2
 Requires PHP: 7.0
-Stable tag: 3.6.3
+Stable tag: 3.6.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -415,6 +415,32 @@ FunnelKit Automations is 100% self-hosted and fully GDPR compliant.
 
 
 == Change log ==
+
+= 3.6.4 (Jul 21, 2025) =
+* Added: Compatibility with CleanTalk Security & Malware Scan plugin to ensure proper REST API handling. (#4131)
+* Added: New merge tag contact_hash_uid for generating unique contact identifiers. (#4122)
+* Added: Dynamic text support added for the 'Leave a review' button in the WooCommerce order reviews merge tag. (#4160)
+* Improved: UI and functionality enhancements in Audit and Test Email components. (#4113)
+* Improved: Engagement meta record deletion logic simplified and memory management improved. (#4127)
+* Improved: Cart recovery link and capturing logic improved to handle deleted dedicated checkout pages. (#4107)
+* Improved: Cart subtotal and total calculation refined to correctly handle inclusive and exclusive taxes. (#4087)
+* Improved: Sanitization improved for confirmation text and code formatting for better security and readability. (#4089)
+* Improved: Billing and shipping field sanitization enhanced during cart tracking. (#4104)
+* Improved: Engagement link tracking now passes noindex and nofollow headers. (#4102)
+* Improved: Updated sanitization and logic for PHP 8.2 compatibility.
+* Improved: Database schema updates for bwf_contact and bwf_wc_customers tables to improve performance and ensure data integrity. (#4157)
+* Improved: Enhanced data capture and contact management in the abandoned cart module. (#4150)
+* Improved: Improved query string management in automation nodes for smoother navigation and better state handling. (#4146)
+* Fixed: Pro: Global Email History page – Form Feeds as Source option added. (#4134)
+* Fixed: Removed admin_enqueue_scripts action and refactored styling for layout and performance improvements. (#4129)
+* Fixed: DOB field was not saving during cart capturing and restoring – issue fixed. (#4111)
+* Fixed: Prevented blank UTM parameters from being appended to URLs. (#4120)
+* Fixed: Enhanced data insertion logic with format validation and improved error logging for database operations. (#4091)
+* Fixed: Automation Merge Tag: Cart billing state merge tag was not returning the value in a case. Fallback code added. (#4150)
+* Fixed: Pro: Correct handling of the include_unsubscribe parameter in contact retrieval logic to avoid incorrect filtering. (#4137)
+* Fixed: Pro: Retry action on failed contacts in automation now properly skips the failed action step. (#4140)
+* Dev: New filter hook 'bwfan_contact_status_to_resubscribe' added to prevent status changes for bounce and soft bounce contacts on email open or click. (#4118)
+* Dev: New filter hook 'fka_redirect_confirm_unsubscribed' added to manage redirect behavior on contact unsubscribes. (#4094)
 
 = 3.6.3 (Jun 18, 2025) =
 * Added: Cart capturing improved. Tracking more carts if contact has already interacted with any of the site's emails.

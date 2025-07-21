@@ -1976,7 +1976,7 @@ class BWFAN_Common {
 			}
 		}
 
-		return sprintf( '%s (#%d) %s', $product->get_title(), $product->get_id(), ( count( $arguments ) > 0 ) ? '(' . implode( ',', $arguments ) . ')' : '' );
+		return sprintf( '%s (#%d)%s', strip_tags( $product->get_title() ), $product->get_id(), ( count( $arguments ) > 0 ) ? ' (' . implode( ',', $arguments ) . ')' : '' );
 	}
 
 	public static function get_variation_attribute( $variation ) {
@@ -3764,8 +3764,11 @@ class BWFAN_Common {
 
 	public static function wc_get_cart_recovery_url( $token, $coupon = '', $lang = '', $data = [] ) {
 		$checkout_id = get_option( 'woocommerce_checkout_page_id' );
-		if ( isset( $data['aero_data']['wfacp_is_checkout_override'] ) && true === $data['aero_data']['wfacp_is_checkout_override'] && isset( $data['aero_data']['wfacp_id'] ) && intval( $data['aero_data']['wfacp_id'] ) > 0 && 'publish' === get_post_status( $data['aero_data']['wfacp_id'] ) ) {
-			$checkout_id = $data['aero_data']['wfacp_id'];
+		if ( isset( $data['aerocheckout_page_id'] ) && intval( $data['aerocheckout_page_id'] ) > 0 && 'publish' === get_post_status( $data['aerocheckout_page_id'] ) ) {
+			$is_global_checkout = $data['aero_data']['wfacp_is_checkout_override'] ?? false;
+			if ( empty( $is_global_checkout ) ) {
+				$checkout_id = $data['aerocheckout_page_id'];
+			}
 		}
 
 		/**
@@ -3803,6 +3806,7 @@ class BWFAN_Common {
 	public static function get_permalink_by_language( $post_id, $lang = '' ) {
 
 		$url = get_permalink( $post_id );
+		$url = empty( $url ) ? home_url() : $url;
 
 		if ( defined( 'ICL_SITEPRESS_VERSION' ) ) {
 			global $sitepress;
@@ -6852,25 +6856,32 @@ class BWFAN_Common {
 		}
 
 		$abandoned_checkout_data = json_decode( $abandoned_data['checkout_data'], true );
+		$pushengage_token        = $abandoned_checkout_data['pushengage_token'] ?? '';
 
-		$f_name      = is_array( $abandoned_checkout_data ) && isset( $abandoned_checkout_data['fields'] ) && isset( $abandoned_checkout_data['fields']['billing_first_name'] ) ? $abandoned_checkout_data['fields']['billing_first_name'] : '';
-		$l_name      = is_array( $abandoned_checkout_data ) && isset( $abandoned_checkout_data['fields'] ) && isset( $abandoned_checkout_data['fields']['billing_last_name'] ) ? $abandoned_checkout_data['fields']['billing_last_name'] : '';
-		$contact_no  = is_array( $abandoned_checkout_data ) && isset( $abandoned_checkout_data['fields'] ) && isset( $abandoned_checkout_data['fields']['billing_phone'] ) ? $abandoned_checkout_data['fields']['billing_phone'] : '';
-		$state       = is_array( $abandoned_checkout_data ) && isset( $abandoned_checkout_data['fields']['billing_state'] ) ? $abandoned_checkout_data['fields']['billing_state'] : '';
-		$country     = is_array( $abandoned_checkout_data ) && isset( $abandoned_checkout_data['fields']['shipping_country'] ) ? $abandoned_checkout_data['fields']['shipping_country'] : '';
-		$address_1   = is_array( $abandoned_checkout_data ) && isset( $abandoned_checkout_data['fields']['billing_address_1'] ) ? $abandoned_checkout_data['fields']['billing_address_1'] : '';
-		$address_2   = is_array( $abandoned_checkout_data ) && isset( $abandoned_checkout_data['fields']['billing_address_2'] ) ? $abandoned_checkout_data['fields']['billing_address_2'] : '';
-		$postcode    = is_array( $abandoned_checkout_data ) && isset( $abandoned_checkout_data['fields']['billing_postcode'] ) ? $abandoned_checkout_data['fields']['billing_postcode'] : '';
-		$timezone    = is_array( $abandoned_checkout_data ) && isset( $abandoned_checkout_data['fields']['timezone'] ) ? $abandoned_checkout_data['fields']['timezone'] : '';
 		$bwf_contact = new WooFunnels_Contact( $abandoned_user_id, $abandoned_email );
-		if ( ! empty( $bwf_contact->get_id() ) ) {
-			$bwf_contact->set_email( $abandoned_email );
-		}
-		$bwf_contact->set_f_name( $f_name );
-		$bwf_contact->set_l_name( $l_name );
-		$bwf_contact->set_contact_no( $contact_no );
 		if ( ! empty( $abandoned_user_id ) ) {
 			$bwf_contact->set_wpid( $abandoned_user_id );
+		}
+
+		$f_name     = self::get_field_with_fallback( $abandoned_checkout_data, 'first_name' );
+		$l_name     = self::get_field_with_fallback( $abandoned_checkout_data, 'last_name' );
+		$contact_no = self::get_field_with_fallback( $abandoned_checkout_data, 'phone' );
+		$state      = self::get_field_with_fallback( $abandoned_checkout_data, 'state' );
+		$country    = self::get_field_with_fallback( $abandoned_checkout_data, 'country' );
+		$address_1  = self::get_field_with_fallback( $abandoned_checkout_data, 'address_1' );
+		$address_2  = self::get_field_with_fallback( $abandoned_checkout_data, 'address_2' );
+		$city       = self::get_field_with_fallback( $abandoned_checkout_data, 'city' );
+		$postcode   = self::get_field_with_fallback( $abandoned_checkout_data, 'postcode' );
+		$timezone   = $abandoned_checkout_data['fields']['timezone'] ?? '';
+
+		if ( ! empty( $f_name ) ) {
+			$bwf_contact->set_f_name( $f_name );
+		}
+		if ( ! empty( $l_name ) ) {
+			$bwf_contact->set_l_name( $l_name );
+		}
+		if ( ! empty( $contact_no ) ) {
+			$bwf_contact->set_contact_no( $contact_no );
 		}
 		if ( ! empty( $timezone ) ) {
 			$bwf_contact->set_timezone( $timezone );
@@ -6891,10 +6902,61 @@ class BWFAN_Common {
 		if ( ! empty( $address_2 ) ) {
 			$bwfcrm_contact->set_field_by_slug( 'address-2', $address_2 );
 		}
+		if ( ! empty( $city ) ) {
+			$bwfcrm_contact->set_field_by_slug( 'city', $city );
+		}
 		if ( ! empty( $postcode ) ) {
 			$bwfcrm_contact->set_field_by_slug( 'postcode', $postcode );
 		}
+		if ( ! empty( $pushengage_token ) ) {
+			$subs_tokens = $bwfcrm_contact->get_field_by_slug( 'push-engage-token' );
+			$subs_tokens = json_decode( $subs_tokens, true );
+			if ( empty( $subs_tokens ) || ! is_array( $subs_tokens ) ) {
+				$subs_tokens = array();
+			}
+
+			if ( empty( $subs_tokens ) || ! in_array( $pushengage_token, $subs_tokens, true ) ) {
+				$subs_tokens[] = $pushengage_token;
+				$bwfcrm_contact->set_field_by_slug( 'push-engage-token', wp_json_encode( $subs_tokens ) );
+			}
+		}
+
+		$year  = (int) ( $abandoned_checkout_data['fields']['dob_fields']['bwfan_birthday_date_yy'] ?? 0 );
+		$month = (int) ( $abandoned_checkout_data['fields']['dob_fields']['bwfan_birthday_date_mm'] ?? 0 );
+		$day   = (int) ( $abandoned_checkout_data['fields']['dob_fields']['bwfan_birthday_date_dd'] ?? 0 );
+		$dob   = '';
+		if ( $year >= 1900 && $year <= 2100 && $month >= 1 && $month <= 12 && $day >= 1 && $day <= 31 && checkdate( $month, $day, $year ) ) {
+			$dob = sprintf( '%04d-%02d-%02d', $year, $month, $day );
+		}
+
+		if ( ! empty( $dob ) ) {
+			$bwfcrm_contact->set_field_by_slug( 'dob', $dob );
+		}
+
 		$bwfcrm_contact->save();
+		if ( ! empty( $city ) || ! empty( $address_1 ) || ! empty( $address_2 ) || ! empty( $postcode ) || ! empty( $pushengage_token ) || ! empty( $dob ) ) {
+			$bwfcrm_contact->save_fields();
+		}
+	}
+
+	/**
+	 * Get field value of checkout form field with fallback to shipping if billing is not available
+	 *
+	 * @param $cart_data
+	 * @param $key
+	 *
+	 * @return mixed|string
+	 */
+	public static function get_field_with_fallback( $cart_data, $key ) {
+		if ( empty( $cart_data ) || ! is_array( $cart_data ) || empty( $key ) ) {
+			return '';
+		}
+		$value = $cart_data['fields'][ 'billing_' . $key ] ?? '';
+		if ( ! empty( $value ) ) {
+			return $value;
+		}
+
+		return $cart_data['fields'][ 'shipping_' . $key ] ?? '';
 	}
 
 	/**
@@ -8380,7 +8442,15 @@ class BWFAN_Common {
 				'trail'  => $automation_contact['trail'],
 			];
 
-			BWFAN_Model_Automation_Complete_Contact::insert_ignore( $data );
+			BWFAN_Model_Automation_Complete_Contact::insert_ignore( $data, [
+				'%d', // cid
+				'%d', // aid
+				'%s', // event
+				'%s', // s_date
+				'%s', // c_date
+				'%s', // data
+				'%s', // trail
+			] );
 
 			/** Update status as success for any step trail where status was waiting */
 			BWFAN_Model_Automation_Contact_Trail::update_all_step_trail_status_complete( $automation_contact['trail'] );
@@ -9888,14 +9958,32 @@ class BWFAN_Common {
 		return ( false !== strpos( $value, "'" ) ) ? str_replace( "'", "\'", $value ) : $value;
 	}
 
+	/**
+	 * Get store average order value
+	 *
+	 * @return float|int
+	 */
 	public static function get_store_aov() {
+		$store_aov_key = 'bwfan_store_aov';
+
+		/** Get store aov from transient */
+		$store_aov = get_transient( $store_aov_key );
+		if ( ! empty( $store_aov ) ) {
+			return floatval( $store_aov );
+		}
+
+		/** Transient expiration time */
+		$exp = 12 * HOUR_IN_SECONDS;
+
 		global $wpdb;
 		$sql    = "SELECT count(`order_id`) as `orders`, SUM(`total_sales`) as `total` FROM {$wpdb->prefix}wc_order_stats WHERE `status` NOT IN('wc-failed', 'wc-pending', 'wc-cancelled', 'wc-refunded') ";
 		$result = $wpdb->get_results( $sql, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 		$aov    = 0;
-		if ( isset( $result[0]['orders'] ) && ! empty( $result[0]['orders'] ) && isset( $result[0]['total'] ) && ! empty( $result[0]['total'] ) ) {
+		if ( ! empty( $result[0]['orders'] ) && ! empty( $result[0]['total'] ) ) {
 			$aov = ( floatval( $result[0]['total'] ) / absint( $result[0]['orders'] ) );
 		}
+
+		set_transient( $store_aov_key, $aov, $exp );
 
 		return $aov;
 	}
@@ -10646,6 +10734,11 @@ class BWFAN_Common {
 			return $allowed_hosts;
 		}, 10, 2 );
 
+
+		if ( ! headers_sent() ) {
+			header( 'X-Robots-Tag: noindex, nofollow', true );
+		}
+
 		wp_safe_redirect( $link );
 		exit;
 	}
@@ -11309,8 +11402,8 @@ class BWFAN_Common {
 	 * @return array|int[]|mixed
 	 */
 	public static function validate_core_worker( $force = false ) {
-		$transient_val = get_transient( 'bwfan_core_worker_asyc' );
-		if ( false === $force && ! is_null( $transient_val ) ) {
+		$transient_val = get_transient( 'bwfan_core_worker_async' );
+		if ( false === $force && false !== $transient_val ) {
 			return $transient_val;
 		}
 
@@ -11335,12 +11428,12 @@ class BWFAN_Common {
 		$status_code = wp_remote_retrieve_response_code( $request );
 		if ( ! empty( $status_code ) && $status_code != 200 ) {
 			$data['response_code'] = $status_code;
-			set_transient( 'bwfan_core_worker_asyc', $data, 6 * HOUR_IN_SECONDS );
+			set_transient( 'bwfan_core_worker_async', $data, 6 * HOUR_IN_SECONDS );
 
 			return [ 'response_code' => $status_code ];
 		}
 
-		set_transient( 'bwfan_core_worker_asyc', $data, 6 * HOUR_IN_SECONDS );
+		set_transient( 'bwfan_core_worker_async', $data, 6 * HOUR_IN_SECONDS );
 
 		return $data;
 	}
@@ -11486,52 +11579,40 @@ class BWFAN_Common {
 	}
 
 	/**
-	 * This function deletes engagement table meta records from the "Tools" tab.
+	 * This function deletes engagement meta table's merge tag data from the "Tools" tab.
+	 *
+	 * @return void
 	 */
 	public static function delete_engagement_tracking_meta_tool_action() {
+		$datetime = new DateTime( 'now', new DateTimeZone( 'UTC' ) );
+
+		/** Fetched the last engagement ID of engagements from one day ago. */
+		$datetime->modify( '-1 day' );
+		$one_day_old = $datetime->format( 'Y-m-d H:i:s' );
+
 		global $wpdb;
+		$query = "SELECT MAX(`ID`) FROM {$wpdb->prefix}bwfan_engagement_tracking WHERE `created_at` < %s";
+
+		//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
+		$last_id = $wpdb->get_var( $wpdb->prepare( $query, $one_day_old ) );
+		if ( empty( $last_id ) ) {
+			bwf_unschedule_actions( 'bwfan_delete_engagement_tracking_meta_tool_action' );
+
+			return;
+		}
 
 		$start_time = time();
-
-		$last_id_query = $wpdb->prepare( "SELECT MIN(`ID`) FROM {$wpdb->prefix}bwfan_engagement_tracking WHERE `c_status` NOT IN (2, 3)" );
-
-		$last_id = $wpdb->get_var( $last_id_query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
-
 		do {
-			$rows_affected_first = 0;
+			$query = "DELETE FROM {$wpdb->prefix}bwfan_engagement_trackingmeta WHERE `eid` <= %d AND `meta_key` = %s LIMIT 500";
+			//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
+			$rows_affected = $wpdb->query( $wpdb->prepare( $query, $last_id, 'merge_tags' ) );
 
-			// Only run the first query if we have a valid last_id
-			if ( $last_id ) {
-				$query = $wpdb->prepare( "DELETE FROM {$wpdb->prefix}bwfan_engagement_trackingmeta WHERE `eid` <= %d AND `meta_key` = %s LIMIT 500", $last_id, 'merge_tags' );
-
-				$rows_affected_first = $wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
+			/** If no rows deleted, we're done */
+			if ( $rows_affected === 0 ) {
+				bwf_unschedule_actions( 'bwfan_delete_engagement_tracking_meta_tool_action' );
+				break;
 			}
-
-			// If the first query didn't delete anything, delete from second query
-			if ( $rows_affected_first === 0 ) {
-				$query = $wpdb->prepare( "DELETE FROM {$wpdb->prefix}bwfan_engagement_trackingmeta 
-                WHERE ID IN (
-                    SELECT ID FROM (
-                        SELECT etm.ID
-                        FROM {$wpdb->prefix}bwfan_engagement_trackingmeta etm
-                        INNER JOIN {$wpdb->prefix}bwfan_engagement_tracking et 
-                            ON etm.eid = et.ID
-                        WHERE etm.meta_key = %s
-                        AND et.c_status IN (2, 3)
-                        LIMIT 500
-                    ) as t
-                )", 'merge_tags' );
-
-				$rows_affected_second = $wpdb->query( $query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
-
-				// If neither query deleted anything, we're done
-				if ( $rows_affected_second === 0 ) {
-					bwf_unschedule_actions( 'bwfan_delete_engagement_tracking_meta_tool_action' );
-					break;
-				}
-			}
-
-		} while ( ( time() - $start_time ) < 20 );
+		} while ( ( time() - $start_time ) < 15 && ! BWFAN_Common::memory_exceeded() );
 	}
 
 	/**
@@ -11789,6 +11870,8 @@ class BWFAN_Common {
 
 			// if link entry not found return home url
 			if ( empty( $is_link_exists ) ) {
+				do_action( 'bwfan_invalid_tracking_link', $link );
+
 				return home_url();
 			}
 
@@ -11814,7 +11897,13 @@ class BWFAN_Common {
 			return $link;
 		}
 
-		return $link_host === $site_url_host ? $link : home_url();
+		if ( $link_host !== $site_url_host ) {
+			do_action( 'bwfan_invalid_tracking_link', $link );
+
+			return home_url();
+		}
+
+		return $link;
 	}
 
 	/**
@@ -12061,5 +12150,162 @@ class BWFAN_Common {
 
 		//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 		return $wpdb->get_results( $query, ARRAY_A );
+	}
+
+	/**
+	 * Check server memory limit.
+	 * Using 75% max
+	 *
+	 * @return bool
+	 */
+	public static function memory_exceeded() {
+		$memory_limit   = self::get_memory_limit() * 0.9;
+		$current_memory = memory_get_usage( true );
+
+		return ( $current_memory >= $memory_limit );
+	}
+
+	/**
+	 * Get the memory limit in bytes.
+	 * If the memory limit is set to -1 or 'unlimited', it will return 32GB.
+	 *
+	 * @return int|mixed
+	 */
+	public static function get_memory_limit() {
+		if ( function_exists( 'ini_get' ) ) {
+			$memory_limit = ini_get( 'memory_limit' );
+		} else {
+			$memory_limit = '128M'; // Sensible default, and minimum required by WooCommerce
+		}
+
+		if ( ! $memory_limit || - 1 === $memory_limit || '-1' === $memory_limit ) {
+			// Unlimited, set to 32GB.
+			$memory_limit = '32G';
+		}
+
+		return self::convert_hr_to_bytes( $memory_limit );
+	}
+
+	/**
+	 * Converts a shorthand byte value to an integer byte value.
+	 *
+	 * @param $value
+	 *
+	 * @return int|mixed
+	 */
+	public static function convert_hr_to_bytes( $value ) {
+		if ( function_exists( 'wp_convert_hr_to_bytes' ) ) {
+			return wp_convert_hr_to_bytes( $value );
+		}
+
+		$value = strtolower( trim( $value ) );
+		$bytes = (int) $value;
+
+		if ( false !== strpos( $value, 'g' ) ) {
+			$bytes *= GB_IN_BYTES;
+		} elseif ( false !== strpos( $value, 'm' ) ) {
+			$bytes *= MB_IN_BYTES;
+		} elseif ( false !== strpos( $value, 'k' ) ) {
+			$bytes *= KB_IN_BYTES;
+		}
+
+		// Deal with large (float) values which run into the maximum integer size.
+		return min( $bytes, PHP_INT_MAX );
+	}
+
+	/**
+	 * Get a list of attach actions/filters hook
+	 *
+	 * @param $hook
+	 *
+	 * @return array
+	 * @throws ReflectionException
+	 */
+	final public static function get_list_of_attach_actions( $hook ) {
+		global $wp_filter;
+		if ( ! isset( $wp_filter[ $hook ] ) || ! $wp_filter[ $hook ] instanceof WP_Hook ) {
+			return [];
+		}
+		$output = [];
+		$hooks  = $wp_filter[ $hook ]->callbacks;
+		foreach ( $hooks as $priority => $reference ) {
+			if ( ! is_array( $reference ) || 0 === count( $reference ) ) {
+				continue;
+			}
+			foreach ( $reference as $index => $calls ) {
+				if ( isset( $calls['function'] ) && is_array( $calls['function'] ) && count( $calls['function'] ) > 0 ) {
+					if ( is_object( $calls['function'][0] ) ) {
+						$cls_name = get_class( $calls['function'][0] );
+						$output[] = [
+							'type'       => 'class',
+							'class'      => $cls_name,
+							'function'   => $calls['function'][1],
+							'class_path' => self::get_class_path( $cls_name ),
+							'index'      => $index,
+							'priority'   => $priority,
+						];
+					} else {
+						$output[] = [
+							'type'       => 'static_class',
+							'class'      => $calls['function'][0],
+							'function'   => $calls['function'][1],
+							'class_path' => self::get_class_path( $calls['function'][0] ),
+							'index'      => $index,
+							'priority'   => $priority,
+						];
+					}
+				} else {
+					$output[] = [
+						'type'          => 'function',
+						'function'      => $calls['function'],
+						'function_path' => self::get_function_path( $calls['function'] ),
+						'index'         => $index,
+						'priority'      => $priority,
+					];
+				}
+			}
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Get a class path
+	 *
+	 * @param $class
+	 *
+	 * @return string
+	 * @throws ReflectionException
+	 */
+	public static function get_class_path( $class = 'BWFAN_Core' ) {
+		$reflector = new ReflectionClass( $class );
+		$file_name = $reflector->getFileName();
+
+		return dirname( $file_name );
+	}
+
+	/**
+	 * Get a function path
+	 *
+	 * @param $function
+	 *
+	 * @return array|string|string[]
+	 */
+	public static function get_function_path( $function = '' ) {
+		if ( empty( $function ) ) {
+			return '';
+		}
+		try {
+			$reflector = new ReflectionFunction( $function );
+			$file_name = $reflector->getFileName();
+			$directory = dirname( $file_name );
+			if ( defined( 'WP_CONTENT_DIR' ) ) {
+				$directory = str_replace( WP_CONTENT_DIR, '', $directory );
+			}
+		} catch ( ReflectionException $exception ) {
+			$directory = $exception->getMessage();
+		}
+
+		return $directory;
 	}
 }

@@ -55,21 +55,23 @@ class BWFAN_WC_Cart_Shipping_State extends Cart_Merge_Tag {
 	}
 
 	public function post_value_check( $field_value ) {
-		$country = ( isset( $this->checkout_data['shipping_country'] ) && ! empty( $this->checkout_data['shipping_country'] ) ) ? $this->checkout_data['shipping_country'] : '';
+		if ( empty( $field_value ) ) {
+			return '';
+		}
+		$country = $this->checkout_data['shipping_country'] ?? '';
 
 		/** getting shipping country from checkout fields in case empty */
 		if ( empty( $country ) ) {
-			$country = ( isset( $this->checkout_data['fields']['shipping_country'] ) && ! empty( $this->checkout_data['fields']['shipping_country'] ) ) ? $this->checkout_data['fields']['shipping_country'] : '';
+			$country = $this->checkout_data['fields']['shipping_country'] ?? '';
 		}
 
-		if ( empty( $country ) || empty( $field_value ) ) {
-			return '';
+		if ( empty( $country ) ) {
+			return $field_value;
 		}
 
 		$states = WC()->countries->get_states( $country );
-		$state  = ! empty( $states[ $field_value ] ) ? $states[ $field_value ] : '';
 
-		return $state;
+		return $states[ $field_value ] ?? $field_value;
 	}
 }
 

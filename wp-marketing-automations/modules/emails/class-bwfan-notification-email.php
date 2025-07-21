@@ -259,7 +259,7 @@ class BWFAN_Notification_Email {
 	 * @return bool True if the email was sent, false otherwise.
 	 */
 	public function mail_sent( $frequency ) {
-		$today = new DateTime();
+		$today = new DateTime( 'now', wp_timezone() );
 
 		/** Check if the last execution time for the given frequency is not set */
 		if ( ! isset( $this->executed_last[ $frequency ] ) || empty( $this->executed_last[ $frequency ] ) ) {
@@ -268,6 +268,7 @@ class BWFAN_Notification_Email {
 
 		try {
 			$last_sent = new DateTime( $this->executed_last[ $frequency ] );
+			$last_sent->setTimezone( wp_timezone() );
 		} catch ( Exception $e ) {
 			BWFAN_Common::log_test_data( "Frequency {$frequency} and value {$this->executed_last[ $frequency ]}", 'notification-error', true );
 			BWFAN_Common::log_test_data( "Exception {$e->getMessage()}", 'notification-error', true );
@@ -434,6 +435,7 @@ class BWFAN_Notification_Email {
 	public static function format_date( $date_string ) {
 		/** Convert date string to a DateTime object */
 		$date = new DateTime( $date_string );
+		$date->setTimezone( wp_timezone() );
 
 		return $date->format( 'F j' );
 	}

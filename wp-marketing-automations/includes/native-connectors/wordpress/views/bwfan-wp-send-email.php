@@ -23,8 +23,7 @@ $wc_enabled  = apply_filters( 'bwfan_enable_wc_email_template', false );
         email_sub = 'We\'re still holding the cart for you';
         email_body = '<p>Hi {{cart_billing_first_name}},</p>' +
         "<p>I noticed that you were trying to purchase but could not complete the process.</p>" +
-        '<p>{{cart_items
-            template = "cart-table"}}</p>'+
+        '<p>{{cart_items template = "cart-table"}}</p>'+
         '<p>We have reserved the cart for you, <a href="{{cart_recovery_link}}">Click here</a> to complete your purchase.</p>' +
         '<p>If you have any questions, feel free to get in touch with us.</p>' +
         '<p>Hit reply and I\'ll be happy to answer your questions.</p>' +
@@ -93,7 +92,7 @@ $wc_enabled  = apply_filters( 'bwfan_enable_wc_email_template', false );
 				<?php esc_html_e( 'To', 'wp-marketing-automations' ); ?>
 				<?php
 				$message = __( 'Receiver email address', 'wp-marketing-automations' );
-				echo $this->add_description( esc_html( $message ), 'xl', 'right' ); //phpcs:ignore WordPress.Security.EscapeOutput
+				echo $this->add_description( $message, 'xl', 'right' ); //phpcs:ignore WordPress.Security.EscapeOutput
 				?>
 				<?php echo $this->inline_merge_tag_invoke(); //phpcs:ignore WordPress.Security.EscapeOutput ?>
             </label>
@@ -104,7 +103,7 @@ $wc_enabled  = apply_filters( 'bwfan_enable_wc_email_template', false );
 				<?php esc_html_e( 'Subject', 'wp-marketing-automations' ); ?>
 				<?php
 				$message = __( 'Email subject', 'wp-marketing-automations' );
-				echo $this->add_description( esc_html( $message ), 'm', 'right' ); //phpcs:ignore WordPress.Security.EscapeOutput
+				echo $this->add_description( $message, 'm', 'right' ); //phpcs:ignore WordPress.Security.EscapeOutput
 				?>
 				<?php echo $this->inline_merge_tag_invoke(); //phpcs:ignore WordPress.Security.EscapeOutput ?>
             </label>
@@ -115,7 +114,7 @@ $wc_enabled  = apply_filters( 'bwfan_enable_wc_email_template', false );
 				<?php esc_html_e( 'Pre Header', 'wp-marketing-automations' ); ?>
 				<?php
 				$message = __( 'Email pre header', 'wp-marketing-automations' );
-				echo $this->add_description( esc_html( $message ), 'm', 'right' ); //phpcs:ignore WordPress.Security.EscapeOutput
+				echo $this->add_description( $message, 'm', 'right' ); //phpcs:ignore WordPress.Security.EscapeOutput
 				?>
 				<?php echo $this->inline_merge_tag_invoke(); //phpcs:ignore WordPress.Security.EscapeOutput ?>
             </label>
@@ -168,7 +167,7 @@ $wc_enabled  = apply_filters( 'bwfan_enable_wc_email_template', false );
 					<?php
 					esc_html_e( 'Mark as Promotional', 'wp-marketing-automations' );
 					$message = __( "Email marked as promotional will not be send to the unsubscribers.", 'wp-marketing-automations' );
-					echo $this->add_description( esc_html( $message ), 'xl' ); //phpcs:ignore WordPress.Security.EscapeOutput
+					echo $this->add_description( $message, 'xl' ); //phpcs:ignore WordPress.Security.EscapeOutput
 					?>
                 </label>
             </div>

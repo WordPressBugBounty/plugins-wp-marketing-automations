@@ -80,8 +80,31 @@ class BWFAN_WC_Cart_Items extends Merge_Tag_Abstract_Product_Display {
 			$this->products_quantity = $product_qty;
 			$this->products_sku      = $product_sku;
 			$this->products_price    = $product_price;
-			$this->data              = [
-				'total' => $total,
+			$shipping_total          = 10.00;
+			$discount_total          = 15.00;
+			$fees                    = [
+				(object) [
+					'name'  => 'Taxes',
+					'total' => 5.00,
+				]
+			];
+
+			$coupons    = [
+				[
+					'code'              => 'PREVIEW15',
+					'discount_incl_tax' => $discount_total,
+					'discount_excl_tax' => $discount_total,
+					'discount_tax'      => 0
+				]
+			];
+			$this->data = [
+				'coupons'            => $coupons,
+				'fees'               => $fees,
+				'shipping_total'     => $shipping_total,
+				'shipping_tax_total' => 0,
+				'total'              => $total,
+				'currency'           => get_woocommerce_currency(),
+				'lang'               => get_locale()
 			];
 
 			$result = $this->process_shortcode( $attr );

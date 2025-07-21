@@ -322,7 +322,7 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			}
 
 			/** get cart abandoned data only when cart is enable */
-			if ( true === $get_abandoned_data && false === $slim_data ) {
+			if ( class_exists( 'WooCommerce' ) && true === $get_abandoned_data && false === $slim_data ) {
 				$cart_enabled    = true;
 				$global_settings = BWFAN_Common::get_global_settings();
 				if ( empty( $global_settings['bwfan_ab_enable'] ) ) {
@@ -1348,6 +1348,7 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			}
 
 			$field_array = array();
+			$format      = [];
 			foreach ( $this->fields as $field_id => $field_value ) {
 				$field_value = is_string( $field_value ) ? trim( $field_value ) : $field_value;
 
@@ -1361,6 +1362,7 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 					$field_value = $this->get_field_values( $field_value, $field_meta[ $field_id ], $field_types[ $field_id ] );
 
 					$field_array[ 'f' . $field_id ] = $field_value;
+					$format[]                       = '%s';
 					continue;
 				}
 
@@ -1373,6 +1375,7 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 					/** If date field value is empty */
 					if ( empty( $field_value ) ) {
 						$field_array[ 'f' . $field_id ] = null;
+						$format[]                       = '%s';
 						continue;
 					}
 					$field_value = self::get_date_value( $field_value );
@@ -1380,11 +1383,12 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 
 				/** Else fields case */
 				$field_array[ 'f' . $field_id ] = $field_value;
+				$format[]                       = '%s';
 			}
 
 			if ( empty( $contact_field ) || ! is_array( $contact_field ) ) {
 				$data = array_replace( array( 'cid' => $contact_id ), $field_array );
-				BWF_Model_Contact_Fields::insert_ignore( $data );
+				BWF_Model_Contact_Fields::insert_ignore( $data, array_merge( [ '%d' ], $format ) );
 
 				return;
 			}

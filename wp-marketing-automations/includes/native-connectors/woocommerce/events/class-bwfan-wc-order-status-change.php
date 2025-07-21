@@ -33,7 +33,6 @@ final class BWFAN_WC_Order_Status_Change extends BWFAN_Event {
 
 	public function load_hooks() {
 		add_action( 'bwfan_wc_order_status_changed', array( $this, 'order_status_changed' ), 11, 3 );
-		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_assets' ), 98 );
 	}
 
 	public static function get_instance() {
@@ -285,20 +284,20 @@ final class BWFAN_WC_Order_Status_Change extends BWFAN_Event {
             <li>
                 <strong><?php esc_html_e( 'Order:', 'wp-marketing-automations' ); ?> </strong>
                 <a target="_blank" href="<?php echo get_edit_post_link( $global_data['order_id'] ); //phpcs:ignore WordPress.Security.EscapeOutput
-				?>"><?php echo '#' . esc_html( $global_data['order_id'] . ' ' . $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() ); ?></a>
+				?>"><?php echo '#' . wp_strip_all_tags( $global_data['order_id'] . ' ' . $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() ); //phpcs:ignore WordPress.Security.EscapeOutput ?></a>
             </li>
 		<?php } ?>
         <li>
             <strong><?php esc_html_e( 'Email:', 'wp-marketing-automations' ); ?> </strong>
-			<?php echo esc_html( $global_data['email'] ); ?>
+			<?php echo $global_data['email']; //phpcs:ignore WordPress.Security.EscapeOutput ?>
         </li>
         <li>
             <strong><?php esc_html_e( 'From Status:', 'wp-marketing-automations' ); ?> </strong>
-			<?php echo esc_html( $global_data['from'] ); ?>
+			<?php echo $global_data['from']; //phpcs:ignore WordPress.Security.EscapeOutput ?>
         </li>
         <li>
             <strong><?php esc_html_e( 'To Status:', 'wp-marketing-automations' ); ?> </strong>
-			<?php echo esc_html( $global_data['to'] ); ?>
+			<?php echo $global_data['to']; //phpcs:ignore WordPress.Security.EscapeOutput ?>
         </li>
 		<?php
 		return ob_get_clean();

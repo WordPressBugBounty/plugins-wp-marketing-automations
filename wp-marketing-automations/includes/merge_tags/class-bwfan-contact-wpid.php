@@ -9,7 +9,7 @@ if ( ! bwfan_is_autonami_pro_active() || version_compare( BWFAN_PRO_VERSION, '2.
 			$this->tag_description = __( 'Contact User ID', 'wp-marketing-automations' );
 			add_shortcode( 'bwfan_contact_user_id', array( $this, 'parse_shortcode' ) );
 			add_shortcode( 'bwfan_customer_user_id', array( $this, 'parse_shortcode' ) );
-			$this->priority = 22;
+			$this->priority = 14.2;
 		}
 
 		public static function get_instance() {

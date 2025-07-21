@@ -21,10 +21,6 @@ final class BWFAN_WC_Create_Coupon extends BWFAN_Action {
 		return self::$ins;
 	}
 
-	public function load_hooks() {
-		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_assets' ), 98 );
-	}
-
 	/**
 	 * Localize data for html fields for the current action.
 	 */
@@ -138,7 +134,7 @@ final class BWFAN_WC_Create_Coupon extends BWFAN_Action {
 					<?php esc_html_e( 'Select Coupon', 'wp-marketing-automations' ); ?>
 					<?php
 					$message = __( "The selected Coupon data will be used to generate a new coupon", 'wp-marketing-automations' );
-					echo $this->add_description( esc_html( $message ), '2xl', 'right' ); //phpcs:ignore WordPress.Security.EscapeOutput
+					echo $this->add_description( $message, '2xl', 'right' ); //phpcs:ignore WordPress.Security.EscapeOutput
 					?>
                 </label>
                 <select required id="" data-search="coupon"

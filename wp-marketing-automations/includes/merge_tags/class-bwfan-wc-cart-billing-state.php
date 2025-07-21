@@ -56,15 +56,24 @@ class BWFAN_WC_Cart_Billing_State extends Cart_Merge_Tag {
 	}
 
 	public function post_value_check( $field_value ) {
-		$country = ( isset( $this->checkout_data['billing_country'] ) && ! empty( $this->checkout_data['billing_country'] ) ) ? $this->checkout_data['billing_country'] : '';
-		if ( empty( $country ) || empty( $field_value ) ) {
+		if ( empty( $field_value ) ) {
 			return '';
 		}
 
-		$states = WC()->countries->get_states( $country );
-		$state  = ! empty( $states[ $field_value ] ) ? $states[ $field_value ] : '';
+		$country = $this->checkout_data['billing_country'] ?? '';
 
-		return $state;
+		/** getting billing country from checkout fields in case empty */
+		if ( empty( $country ) ) {
+			$country = $this->checkout_data['fields']['billing_country'] ?? '';
+		}
+
+		if ( empty( $country ) ) {
+			return $field_value;
+		}
+
+		$states = WC()->countries->get_states( $country );
+
+		return $states[ $field_value ] ?? $field_value;
 	}
 }
 

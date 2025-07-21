@@ -240,14 +240,17 @@ class BWFAN_Conversation {
 			return array();
 		}
 
-		/** Map the keys to the new format, checking both variations */
-		return array(
+		$utm_data = array(
 			'utm_source'   => $utm_data['utm_source'] ?? $utm_data['source'] ?? '',
 			'utm_medium'   => $utm_data['utm_medium'] ?? $utm_data['medium'] ?? '',
 			'utm_campaign' => $utm_data['utm_campaign'] ?? $utm_data['name'] ?? '',
 			'utm_term'     => $utm_data['utm_term'] ?? $utm_data['term'] ?? '',
 			'utm_content'  => $utm_data['utm_content'] ?? $utm_data['content'] ?? '',
 		);
+
+		return array_filter( $utm_data, function ( $value ) {
+			return ! empty( trim( $value ) );
+		} );
 	}
 
 	/**
@@ -389,7 +392,7 @@ class BWFAN_Conversation {
 		}
 
 		$to          = BWFAN_Email_Conversations::$MODE_SMS === intval( $conversation_mode ) ? $contact->contact->get_contact_no() : $contact->contact->get_email();
-		$hash_code   = md5( time() . $to );
+		$hash_code   = md5( microtime( true ) . $to );
 		$type        = ( true === $is_single ? ( BWFAN_Email_Conversations::$MODE_SMS === absint( $conversation_mode ) ? BWFAN_Email_Conversations::$TYPE_SMS : BWFAN_Email_Conversations::$TYPE_EMAIL ) : BWFAN_Email_Conversations::$TYPE_CAMPAIGN );
 		$type        = ( true === $is_single && ! empty( $single_type ) ? $single_type : $type );
 		$create_time = current_time( 'mysql', 1 );
@@ -411,7 +414,23 @@ class BWFAN_Conversation {
 			'c_status'      => $status,
 		);
 
-		BWFAN_Model_Engagement_Tracking::insert_ignore( $insert_data );
+		BWFAN_Model_Engagement_Tracking::insert_ignore( $insert_data, [
+			'%d',// cid
+			'%s',// hash_code
+			'%s',// created_at
+			'%s',// updated_at
+			'%d',// mode
+			'%s',// send_to
+			'%d',// type
+			'%d',// open
+			'%d',// click
+			'%d',// oid
+			'%d',// author_id
+			'%d',// tid
+			'%s',// o_interaction
+			'%s',// c_interaction
+			'%d',// c_status
+		] );
 		$conversation_id = BWFAN_Model_Engagement_Tracking::insert_id();
 
 		if ( empty( $template ) && ! empty( $template_id ) ) {

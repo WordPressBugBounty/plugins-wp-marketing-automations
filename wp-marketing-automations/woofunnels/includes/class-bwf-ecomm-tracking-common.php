@@ -1378,12 +1378,12 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
                                 ORDER BY p.post_date DESC LIMIT 0, 10", 'shop_order' );
 					}
 
-					$wfacp_results = $wpdb->get_results( $wfacp_query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+					$wfacp_results = $wpdb->get_results( $wfacp_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 					if ( is_array( $wfacp_results ) && count( $wfacp_results ) > 0 ) {
 						$wfacp_report = WFACP_Reporting::get_instance();
 						foreach ( $wfacp_results as $result ) {
-							$post_id = isset( $result['post_id'] ) ? absint( $result['post_id'] ) : ( isset( $result['order_id'] ) ? absint( $result['order_id'] ) : 0 );
+							$post_id = isset( $result['ID'] ) ? absint( $result['ID'] ) : ( isset( $result['ID'] ) ? absint( $result['ID'] ) : 0 );
 
 							if ( ( WFOCU_Common::time_exceeded() || WFOCU_Common::memory_exceeded() ) ) {
 								break;
@@ -1427,14 +1427,14 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
                                 ORDER BY p.post_date DESC LIMIT 0, 10", 'shop_order' );
 					}
 
-					$ob_results = $wpdb->get_results( $ob_query ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+					$ob_results = $wpdb->get_results( $ob_query, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 					if ( is_array( $ob_results ) && count( $ob_results ) > 0 ) {
 						$ob_report = WFOB_Reporting::get_instance();
 						foreach ( $ob_results as $ob_result ) {
 							if ( ( WFOCU_Common::time_exceeded() || WFOCU_Common::memory_exceeded() ) ) {
 								break;
 							}
-							$ob_id    = isset( $ob_result['post_id'] ) ? absint( $ob_result['post_id'] ) : ( isset( $ob_result['order_id'] ) ? absint( $ob_result['order_id'] ) : 0 );
+							$ob_id    = isset( $ob_result['ID'] ) ? absint( $ob_result['ID'] ) : ( isset( $ob_result['ID'] ) ? absint( $ob_result['ID'] ) : 0 );
 							$ob_order = wc_get_order( $ob_id );
 							if ( $ob_order instanceof WC_Order ) {
 								if ( $this->is_order_renewal( $ob_order ) ) {
@@ -1449,6 +1449,8 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 					}
 				}
 			} catch ( Error|Exception $e ) {
+				WFOCU_Core()->log->log( 'Upsell schedule Error occurred on insert funnel analytics - order id # error ' . $e->getMessage() );
+
 				if ( isset( $ob_order ) ) {
 					$ob_order->delete_meta_data( '_wfob_report_data' );
 					$ob_order->delete_meta_data( '_wfob_report_needs_normalization' );

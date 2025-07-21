@@ -114,6 +114,34 @@ class BWFAN_WC_Order_Review extends Merge_Tag_Abstract_Product_Display {
 
 		return apply_filters( 'bwfan_alter_email_body', $response, $products, $this->template, $products_quantity );
 	}
+
+	/**
+	 * @return array[]
+	 * Field schema for tag
+	 */
+	public function get_setting_schema() {
+		return [
+			[
+				'id'       => 'button_label',
+				'label'    => __( 'Review Button Label', 'wp-marketing-automations' ),
+				'type'     => 'text',
+				'class'    => '',
+				'hint'     => '<p>' . __( 'Using multiple languages? Use the filter below to translate this text based on the selected language.', 'wp-marketing-automations' ) . ' <a href="https://funnelkit.com/docs/autonami-2/troubleshooting/request-reviews-in-the-customers-language/" target="_blank">' . __( 'Learn more', 'wp-marketing-automations' ) . '</a></p>',
+				'required' => false,
+				'toggler'  => array(),
+			],
+		];
+	}
+
+	/**
+	 * @return array
+	 * Added default text
+	 */
+	public function get_default_values() {
+		return [
+			'button_label' => __( 'Leave a review', 'wp-marketing-automations' ),
+		];
+	}
 }
 
 /**

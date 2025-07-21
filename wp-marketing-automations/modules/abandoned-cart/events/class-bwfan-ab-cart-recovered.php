@@ -156,7 +156,7 @@ final class BWFAN_AB_Cart_Recovered extends BWFAN_Event {
 		<?php } ?>
         <li>
             <strong><?php echo esc_html__( 'Email:', 'wp-marketing-automations' ); ?> </strong>
-            <span><?php echo esc_html( $global_data['email'] ); ?></span>
+            <span><?php echo $global_data['email']; //phpcs:ignore WordPress.Security.EscapeOutput ?></span>
         </li>
 		<?php
 		return ob_get_clean();

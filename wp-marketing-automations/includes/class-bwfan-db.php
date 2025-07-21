@@ -302,6 +302,7 @@ class BWFAN_DB {
 			'3.4.3'    => '3_4_3',
 			'3.4.4'    => '3_4_4',
 			'3.5.0'    => '3_5_0',
+			'3.5.1'    => '3_5_1',
 		);
 		$db_version = get_option( 'bwfan_db', '2.0' );
 
@@ -1623,6 +1624,100 @@ class BWFAN_DB {
 		if ( ! bwf_has_action_scheduled( 'bwfan_store_template_links' ) ) {
 			$time = BWFAN_Common::get_store_time( '01', '30' );
 			bwf_schedule_recurring_action( $time, 60, 'bwfan_store_template_links' );
+		}
+
+		/** Updating version key */
+		update_option( 'bwfan_db', $version_key, true );
+	}
+
+	public function db_update_3_5_1( $version_key ) {
+		if ( is_array( $this->method_run ) && in_array( '1.0.0', $this->method_run, true ) ) {
+			update_option( 'bwfan_db', $version_key, true );
+			$this->method_run[] = $version_key;
+
+			return;
+		}
+
+		global $wpdb;
+		$db_errors = [];
+
+		/** Alter Contact table */
+		$contact_table = $wpdb->prefix . 'bwf_contact';
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '$contact_table'" ) === $contact_table ) { //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+
+			/** Alter status column */
+			$column_info = $wpdb->get_row( "DESCRIBE {$contact_table} `status`", ARRAY_A );
+			if ( false === strpos( $column_info['Type'], 'tinyint' ) ) {
+				$wpdb->query( "ALTER TABLE $contact_table MODIFY `status` tinyint unsigned NOT NULL DEFAULT 1;" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+			}
+			if ( ! empty( $wpdb->last_error ) ) {
+				$db_errors[] = 'bwf_contact modify status column - ' . $wpdb->last_error;
+			}
+
+			/** Get indexed columns */
+			$table_cols = $wpdb->get_results( "SHOW INDEX FROM $contact_table" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$index_cols = [];
+			foreach ( $table_cols as $index ) {
+				$index_cols[] = $index->Column_name;
+			}
+
+			/** Add indexes if not exists */
+			if ( ! in_array( 'status', $index_cols ) ) {
+				$wpdb->query( "ALTER TABLE $contact_table ADD INDEX `status` (`status`);" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+				if ( ! empty( $wpdb->last_error ) ) {
+					$db_errors[] = 'bwf_contact add index `status` - ' . $wpdb->last_error;
+				}
+			}
+			if ( ! in_array( 'contact_no', $index_cols ) ) {
+				$wpdb->query( "ALTER TABLE $contact_table ADD INDEX `contact_no` (`contact_no`);" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+				if ( ! empty( $wpdb->last_error ) ) {
+					$db_errors[] = 'bwf_contact add index `contact_no` - ' . $wpdb->last_error;
+				}
+			}
+			if ( ! in_array( 'last_modified', $index_cols ) ) {
+				$wpdb->query( "ALTER TABLE $contact_table ADD INDEX `last_modified` (`last_modified`);" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+				if ( ! empty( $wpdb->last_error ) ) {
+					$db_errors[] = 'bwf_contact add index `last_modified` - ' . $wpdb->last_error;
+				}
+			}
+			if ( ! in_array( 'creation_date', $index_cols ) ) {
+				$wpdb->query( "ALTER TABLE $contact_table ADD INDEX `creation_date` (`creation_date`);" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+				if ( ! empty( $wpdb->last_error ) ) {
+					$db_errors[] = 'bwf_contact add index `creation_date` - ' . $wpdb->last_error;
+				}
+			}
+		}
+
+		/** Alter Customer table */
+		$customer_table = $wpdb->prefix . 'bwf_wc_customers';
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '$customer_table'" ) === $customer_table ) { //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$customer_col = $wpdb->get_row( "SHOW COLUMNS FROM $customer_table LIKE 'total_order_count'", ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+
+			if ( $customer_col ) {
+				/** Check if column already has type int(7) unsigned NOT NULL */
+				if ( false === strpos( $customer_col['Type'], 'unsigned' ) || $customer_col['Null'] !== 'NO' || $customer_col['Default'] !== 'NULL' ) {
+					do {
+						//phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+						$count = $wpdb->query( $wpdb->prepare( "UPDATE $customer_table SET total_order_count = 0 WHERE total_order_count < 0 OR total_order_count > 9999999 LIMIT 500" ) );
+					} while ( $count > 0 );
+
+					if ( ! empty( $wpdb->last_error ) ) {
+						$db_errors[] = 'bwf_wc_customers total_order_count column value data update failed error - ' . $wpdb->last_error;
+					}
+
+					/** Alter column */
+					$wpdb->query( "ALTER TABLE $customer_table MODIFY `total_order_count` int(7) unsigned NOT NULL;" ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+
+					if ( ! empty( $wpdb->last_error ) ) {
+						$db_errors[] = 'bwf_wc_customers modify total_order_count column - ' . $wpdb->last_error;
+					}
+				}
+			}
+		}
+
+		/** Log if any mysql errors */
+		if ( ! empty( $db_errors ) ) {
+			BWFAN_Common::log_test_data( array_merge( [ __FUNCTION__ ], $db_errors ), 'db-creation-errors' );
 		}
 
 		/** Updating version key */

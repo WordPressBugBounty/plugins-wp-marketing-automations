@@ -65,7 +65,7 @@ class Automation extends Base {
 			$existing_data = is_array( $existing_data ) ? $existing_data : [];
 		}
 		$batch_limit = 10;
-		while ( ( time() - $start_time ) < 30 && ! \BWFCRM_Common::memory_exceeded() ) {
+		while ( ( time() - $start_time ) < 30 && ! \BWFAN_Common::memory_exceeded() ) {
 			$batch_automations = BWFAN_Core()->automations->get_json( '', 2, $current_pos, $batch_limit, $status, $search );
 			if ( empty( $batch_automations ) ) {
 				break;

@@ -51,7 +51,10 @@ var BWFAN_Public;
                 'shipping_phone',
                 'ship_to_different_address',
                 'shipping_same_as_billing',
-                'billing_same_as_shipping'
+                'billing_same_as_shipping',
+                'bwfan_birthday_date_mm',
+                'bwfan_birthday_date_dd',
+                'bwfan_birthday_date_yy',
             ];
 
             if (bwfanParamspublic.bwfan_custom_checkout_field != undefined && bwfanParamspublic.bwfan_custom_checkout_field != null) {
@@ -424,6 +427,9 @@ var BWFAN_Public;
 
             var bwfan_nonce = $('#bwfan_unsubscribe_nonce');
 
+            var oneClickArgs = urlParams.get('List-Unsubscribe');
+            oneClickArgs = (oneClickArgs == 'One-Click') ? 1 : 0;
+
             if (uid == undefined && recipient == undefined) {
                 if ($(".bwfan_response").length === 0) {
                     $this.after("<div class='bwfan_response'>" + bwfanParamspublic.message_no_contact + "</div>");
@@ -447,8 +453,14 @@ var BWFAN_Public;
                 method: 'post',
                 dataType: 'json',
                 url: bwfanParamspublic.ajax_url,
-                data: $('#bwfan_unsubscribe_fields').serialize() + "&action=bwfan_unsubscribe_user" + "&recipient=" + recipient + "&sid=" + sid + "&unsubscribe_lists=" + lists + "&_nonce=" + bwfan_nonce.val() + "&one_click=" + oneClick,
+                data: $('#bwfan_unsubscribe_fields').serialize() + "&action=bwfan_unsubscribe_user" + "&recipient=" + recipient + "&sid=" + sid + "&unsubscribe_lists=" + lists + "&_nonce=" + bwfan_nonce.val() + "&one_click=" + oneClick + "&one_click_get=" + oneClickArgs,
                 success: function (result) {
+                    // Add the redirect handling here
+                    if (result.redirect && result.redirect_url) {
+                        window.location.href = result.redirect_url;
+                        return;
+                    }
+
                     $this.removeClass('bwfan_loading');
 
                     var response_generated = $this.parent().find('.bwfan_response').html();
@@ -552,6 +564,7 @@ var BWFAN_Public;
         BWFAN_Public.abandoned_cart();
         BWFAN_Public.unsubscribe_event();
         BWFAN_Public.bwfan_check_for_checkout_fields();
+        BWFAN_Public.bwfan_capture_data_on_page_load();
         $(document.body).on('wfacp_step_switching', function (e, v) {
             BWFAN_Public.current_step = v.current_step;
             var email = $('#billing_email').val();
@@ -582,7 +595,7 @@ var BWFAN_Public;
         });
 
         var interval = null;
-        $(document).on('blur change', '#billing_email,.input-text,.input-checkbox', function () {
+        $(document).on('blur change', '#billing_email,.input-text,.input-checkbox, select', function () {
             if (interval !== null) {
                 clearTimeout(interval);
             }

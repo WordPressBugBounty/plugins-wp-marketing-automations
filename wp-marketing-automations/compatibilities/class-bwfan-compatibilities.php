@@ -49,6 +49,7 @@ class BWFAN_Compatibilities {
 			'rest/class-bwfan-compatibility-with-wp-rocket.php'                        => function_exists( 'rocket_clean_home' ),
 			'rest/class-bwfan-compatibility-with-image-optimisation.php'               => defined( 'IMAGE_OPTIMIZATION_VERSION' ),
 			'rest/class-bwfan-compatibility-with-atom-stock-manager.php'               => defined( 'ATUM_VERSION' ),
+			'rest/class-bwfan-compatibility-with-security-by-cleantalk.php'            => defined( 'SPBC_VERSION' ),
 
 			// other files
 			'class-bwfan-compatibility-with-wp-oauth.php'                              => ( defined( 'WPOAUTH_VERSION' ) && class_exists( 'WO_SERVER' ) ),
@@ -69,7 +70,7 @@ class BWFAN_Compatibilities {
 				include_once $dir . '/' . $file;
 			}
 		} catch ( Exception|Error $e ) {
-			BWF_Logger::get_instance()->log( 'Error while loading compatibility files: ' . $e->getMessage(), 'compatibilities-load-error', 'autonami' );
+			BWF_Logger::get_instance()->log( 'Error while loading compatibility files: ' . $e->getMessage(), 'compatibilities-load-error', 'fka-files-load-error' );
 		}
 	}
 }

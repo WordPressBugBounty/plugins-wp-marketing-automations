@@ -120,7 +120,7 @@ final class BWFAN_WP_User_Login extends BWFAN_Event {
         </li>
         <li>
             <strong><?php esc_html_e( 'Email:', 'wp-marketing-automations' ); ?> </strong>
-            <span><?php echo esc_html( $global_data['email'] ); ?></span>
+            <span><?php echo $global_data['email']; //phpcs:ignore WordPress.Security.EscapeOutput ?></span>
         </li>
 		<?php
 		return ob_get_clean();

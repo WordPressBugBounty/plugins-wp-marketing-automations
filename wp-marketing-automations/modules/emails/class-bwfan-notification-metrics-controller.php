@@ -220,6 +220,8 @@ class BWFAN_Notification_Metrics_Controller {
 	 * @return array
 	 */
 	private function get_total_carts() {
+		require_once BWFAN_PLUGIN_DIR . '/includes/class-bwfan-cart-analytics.php';
+
 		$captured_cart          = BWFAN_Cart_Analytics::get_captured_cart( $this->date_params['from_date'], $this->date_params['to_date'] );
 		$previous_captured_cart = BWFAN_Cart_Analytics::get_captured_cart( $this->date_params['from_date_previous'], $this->date_params['to_date_previous'] );
 
