@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Bwfan Notification Email
+ *
+ * @since 1.0.0
+ */
 #[AllowDynamicProperties]
 class BWFAN_Notification_Email {
 	/**
@@ -345,7 +350,7 @@ class BWFAN_Notification_Email {
 	 * @return array The recipients for the email.
 	 */
 	private function get_recipients() {
-		$recipients = array( get_option( 'admin_email' ) );
+		$recipients = [];
 
 		if ( isset( $this->global_settings['bwf_notification_user_selector'] ) && is_array( $this->global_settings['bwf_notification_user_selector'] ) ) {
 			foreach ( $this->global_settings['bwf_notification_user_selector'] as $user ) {
@@ -365,6 +370,9 @@ class BWFAN_Notification_Email {
 				}
 			}
 		}
+		if ( empty( $recipients ) ) {
+			$recipients[] = get_option( 'admin_email' );
+		}
 
 		/** Filter array */
 		$recipients = array_filter( $recipients, function ( $email ) {
@@ -376,7 +384,12 @@ class BWFAN_Notification_Email {
 			sort( $recipients );
 		}
 
-		return $recipients;
+		/**
+		 * Filter the email recipients before returning
+		 *
+		 * @param array $recipients Array of email addresses
+		 */
+		return apply_filters( 'bwfan_notification_recipients', $recipients );
 	}
 
 	/**
@@ -437,7 +450,7 @@ class BWFAN_Notification_Email {
 		$date = new DateTime( $date_string );
 		$date->setTimezone( wp_timezone() );
 
-		return $date->format( 'F j' );
+		return $date->format( 'F j, Y' );
 	}
 
 	/**
@@ -450,7 +463,8 @@ class BWFAN_Notification_Email {
 		if ( ! isset( $_GET['bwfan_email_preview'] ) ) {
 			return;
 		}
-		$mode = filter_input( INPUT_GET, 'bwfan_mode', FILTER_SANITIZE_STRING );
+		$mode = filter_input( INPUT_GET, 'bwfan_mode' );
+		$mode = $mode ? sanitize_text_field( $mode ) : '';
 		$mode = empty( $mode ) ? 'weekly' : $mode;
 
 		switch ( $mode ) {
@@ -492,7 +506,8 @@ class BWFAN_Notification_Email {
 			wp_send_json_error( __( 'You do not have permission to perform this action.', 'wp-marketing-automations' ) );
 		}
 
-		$mode = filter_input( INPUT_GET, 'bwfan_mode', FILTER_SANITIZE_STRING );
+		$mode = filter_input( INPUT_GET, 'bwfan_mode' );
+		$mode = $mode ? sanitize_text_field( $mode ) : '';
 		$mode = empty( $mode ) ? 'weekly' : $mode;
 
 		switch ( $mode ) {

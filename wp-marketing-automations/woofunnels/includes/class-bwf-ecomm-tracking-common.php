@@ -134,7 +134,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 		 * @return void
 		 */
 		public function update_conversion_table() {
-
+			require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 			global $wpdb;
 			$charset_collate = '';
 			if ( $wpdb->has_cap( 'collation' ) ) {
@@ -203,6 +203,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 						`source_id` bigint(20) unsigned NOT NULL default 0 COMMENT 'save checkout revenue source',
 						`automation_id` bigint(20) unsigned NOT NULL default 0,
 						`source` bigint(20) unsigned NOT NULL default 0,
+						`order_number` varchar(100) NOT NULL DEFAULT '' COMMENT 'stores sequential/custom order number',
 						`type` tinyint(2) unsigned COMMENT '1- optin 2- wc_order 3- edd_order',
 						`country` char(2),
 						`value` double DEFAULT 0 NOT NULL,
@@ -240,24 +241,25 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 						KEY `source_id` (`source_id`),
 						KEY `utm_source` (utm_source($max_index_length)),
 						KEY `utm_medium` (utm_medium($max_index_length)),
-						KEY `utm_campaign` (utm_campaign($max_index_length)),    
+						KEY `utm_campaign` (utm_campaign($max_index_length)),
 						KEY `utm_term` (utm_term($max_index_length)),
 						KEY `utm_content` (utm_content($max_index_length)),
 						KEY `utm_source_last` (utm_source_last($max_index_length)),
 						KEY `utm_medium_last` (utm_medium_last($max_index_length)),
-						KEY `utm_campaign_last` (utm_campaign_last($max_index_length)),    
+						KEY `utm_campaign_last` (utm_campaign_last($max_index_length)),
 						KEY `utm_term_last` (utm_term_last($max_index_length)),
 						KEY `utm_content_last` (utm_content_last($max_index_length)),
 						KEY `bump_accepted` (`bump_accepted`),
 						KEY `bump_rejected` (`bump_rejected`),
-						KEY `offer_accepted` (`offer_accepted`),    
+						KEY `offer_accepted` (`offer_accepted`),
 						KEY `offer_rejected` (`offer_rejected`),
 						KEY `value` (`value`),
 						KEY `source` (`source`),
+						KEY `order_number` (`order_number`),
 						KEY `first_landing_url` (`first_landing_url`),
 						KEY `referrer` (`referrer`),
 						KEY `referrer_last` (`referrer_last`),
-						KEY `timestamp` (`timestamp`)			
+						KEY `timestamp` (`timestamp`)
 						) {table_collate};";
 		}
 
@@ -414,6 +416,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				'funnel_id'      => $funnel_id,
 				'automation_id'  => 0,
 				'source'         => $new_order->get_id(),
+				'order_number'   => $new_order->get_order_number(),
 				'country'        => $new_order->get_billing_country(),
 				'timestamp'      => empty( $date_created ) ? current_time( 'mysql' ) : $date_created,
 				'checkout_total' => 0,
@@ -623,6 +626,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				'funnel_id'      => ! ( empty( $funnel_id ) ) ? $funnel_id : 0,
 				'automation_id'  => 0,
 				'source'         => $order->get_id(),
+				'order_number'   => $order->get_order_number(),
 				'country'        => $order->get_billing_country(),
 				'timestamp'      => empty( $date_created ) ? current_time( 'mysql' ) : $date_created,
 				'checkout_total' => $checkout_total,
@@ -694,11 +698,11 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 			$source_id = class_exists( 'WFFN_Core' ) ? WFFN_Core()->data->get( 'source_id', 0 ) : 0;
 
 			$args = [
-				'utm_source'        => isset( $get_data['wffn_utm_source'] ) ? $this->string_length( bwf_clean( $get_data['wffn_utm_source'] ) ) : '',
-				'utm_medium'        => isset( $get_data['wffn_utm_medium'] ) ? $this->string_length( bwf_clean( $get_data['wffn_utm_medium'] ) ) : '',
-				'utm_campaign'      => isset( $get_data['wffn_utm_campaign'] ) ? $this->string_length( bwf_clean( $get_data['wffn_utm_campaign'] ) ) : '',
-				'utm_term'          => isset( $get_data['wffn_utm_term'] ) ? $this->string_length( bwf_clean( $get_data['wffn_utm_term'] ) ) : '',
-				'utm_content'       => isset( $get_data['wffn_utm_content'] ) ? $this->string_length( bwf_clean( $get_data['wffn_utm_content'] ) ) : '',
+				'utm_source'        => isset( $get_data['wffn_utm_source'] ) ? $this->string_length( $this->strip_emojis( bwf_clean( $get_data['wffn_utm_source'] ) ) ) : '',
+				'utm_medium'        => isset( $get_data['wffn_utm_medium'] ) ? $this->string_length( $this->strip_emojis( bwf_clean( $get_data['wffn_utm_medium'] ) ) ) : '',
+				'utm_campaign'      => isset( $get_data['wffn_utm_campaign'] ) ? $this->string_length( $this->strip_emojis( bwf_clean( $get_data['wffn_utm_campaign'] ) ) ) : '',
+				'utm_term'          => isset( $get_data['wffn_utm_term'] ) ? $this->string_length( $this->strip_emojis( bwf_clean( $get_data['wffn_utm_term'] ) ) ) : '',
+				'utm_content'       => isset( $get_data['wffn_utm_content'] ) ? $this->string_length( $this->strip_emojis( bwf_clean( $get_data['wffn_utm_content'] ) ) ) : '',
 				'first_landing_url' => isset( $get_data['wffn_fl_url'] ) ? bwf_clean( $get_data['wffn_fl_url'] ) : '',
 				'browser'           => isset( $get_data['wffn_browser'] ) ? bwf_clean( $get_data['wffn_browser'] ) : '',
 				'first_click'       => isset( $get_data['wffn_flt'] ) ? bwf_clean( $get_data['wffn_flt'] ) : '',
@@ -720,6 +724,119 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 		}
 
 		/**
+		 * Get referrer domain based on known UTM sources
+		 *
+		 * This method maps common UTM sources to their corresponding referrer domains.
+		 * It helps populate the referrer field when document.referrer is unavailable
+		 * but we have UTM source information from tracking parameters.
+		 *
+		 * @param string $utm_source The UTM source parameter
+		 *
+		 * @return string The corresponding referrer domain or empty string if no match
+		 */
+		public function get_referrer_from_utm_source( $utm_source ) {
+			if ( empty( $utm_source ) ) {
+				return '';
+			}
+
+		$utm_source = strtolower( trim( $utm_source ) );
+
+		// Map of known UTM sources to their referrer domains (only known URLs)
+		// Split into short keys (≤4 letters) and long keys (>4 letters) for different matching logic
+		$utm_to_referrer_map_short = array(
+			// Short keys (≤4 letters): Allow partial matches with delimiters
+			'fb'               => 'facebook.com',
+			'ig'               => 'instagram.com',
+			'tw'               => 'twitter.com',
+			'yt'               => 'youtube.com',
+			'pin'              => 'pinterest.com',
+			'snap'             => 'snapchat.com',
+			'gclid'            => 'google.com',
+			'bing'             => 'bing.com',
+		);
+
+		$utm_to_referrer_map_long = array(
+			// Long keys (>4 letters): Must be exact whole word match
+			'google'           => 'google.com',
+			'googleads'        => 'google.com',
+			'facebook'         => 'facebook.com',
+			'fbclid'           => 'facebook.com',
+			'instagram'        => 'instagram.com',
+			'twitter'          => 'twitter.com',
+			'linkedin'         => 'linkedin.com',
+			'youtube'          => 'youtube.com',
+			'tiktok'           => 'tiktok.com',
+			'pinterest'        => 'pinterest.com',
+			'snapchat'         => 'snapchat.com',
+			'reddit'           => 'reddit.com',
+			'quora'            => 'quora.com',
+			'yahoo'            => 'yahoo.com',
+			'duckduckgo'       => 'duckduckgo.com',
+			'whatsapp'         => 'whatsapp.com',
+		);
+
+		// Check for exact match first in both maps
+		if ( isset( $utm_to_referrer_map_short[ $utm_source ] ) ) {
+			return $utm_to_referrer_map_short[ $utm_source ];
+		}
+		if ( isset( $utm_to_referrer_map_long[ $utm_source ] ) ) {
+			return $utm_to_referrer_map_long[ $utm_source ];
+		}
+
+		// For short keys (≤4 letters): Allow partial matches with delimiters
+		// Match if key appears at start, end, or surrounded by delimiters (hyphen, underscore, space, or word boundary)
+		// This prevents false matches (e.g., "activecampaign" matching "ig") while allowing valid cases like "fb_mob"
+		foreach ( $utm_to_referrer_map_short as $utm_key => $referrer ) {
+			$escaped_key = preg_quote( $utm_key, '/' );
+			// Match: (start of string OR delimiter OR word boundary) + key + (delimiter OR word boundary OR end of string)
+			// Delimiters: hyphen, underscore, space
+			$pattern = '/(?:^|[-_\s]|\b)' . $escaped_key . '(?:[-_\s]|\b|$)/';
+			if ( preg_match( $pattern, $utm_source ) ) {
+				return $referrer;
+			}
+		}
+
+		// For long keys (>4 letters): Must be exact whole word match
+		// Match only if key is surrounded by spaces or at start/end of string
+		// This allows "mobile facebook" but prevents "facebook-ads" or "facebook_ads"
+		foreach ( $utm_to_referrer_map_long as $utm_key => $referrer ) {
+			$escaped_key = preg_quote( $utm_key, '/' );
+			// Match: (start of string OR space) + key + (space OR end of string)
+			// This ensures it's a standalone word, not part of a compound with delimiters
+			$pattern = '/(?:^|\s)' . $escaped_key . '(?:\s|$)/';
+			if ( preg_match( $pattern, $utm_source ) ) {
+				return $referrer;
+			}
+		}
+
+		return '';
+		}
+
+		/**
+		 * Populate referrer from UTM source if referrer is empty
+		 *
+		 * This method automatically populates the referrer field based on UTM source
+		 * when the original referrer is empty. This helps improve analytics data
+		 * when document.referrer is unavailable but UTM tracking is present.
+		 *
+		 * @param array $args The tracking data array
+		 *
+		 * @return array Modified tracking data array
+		 */
+		public function maybe_populate_referrer_from_utm( $args ) {
+			// Only populate if referrer is empty and we have a UTM source
+			if ( empty( $args['referrer'] ) && ! empty( $args['utm_source'] ) ) {
+				$referrer_from_utm = $this->get_referrer_from_utm_source( $args['utm_source'] );
+
+				if ( ! empty( $referrer_from_utm ) ) {
+					$args['referrer'] = $referrer_from_utm;
+				}
+			}
+
+			return $args;
+		}
+
+		/**
 		 * Insert tracking data
 		 *
 		 * @param $args
@@ -731,6 +848,9 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 
 			try {
 				$args = apply_filters( 'bwf_insert_conversion_tracking_data', $args );
+
+				// Populate referrer from UTM source if referrer is empty
+				$args = $this->maybe_populate_referrer_from_utm( $args );
 
 				// Ensure the necessary keys exist
 				if ( isset( $args['checkout_total'], $args['bump_total'], $args['offer_total'], $args['value'] ) ) {
@@ -845,8 +965,8 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 			}
 			$order_id = 0;
 
-			if ( isset( $_GET['id'] ) ) {
-				$order_id = $_GET['id'];
+			if ( isset( $_GET['id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verification not required for admin page identification
+				$order_id = absint( wp_unslash( $_GET['id'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verification not required for admin page identification
 			}
 
 			if ( 0 === absint( $order_id ) && $post instanceof WP_Post ) {
@@ -1109,6 +1229,27 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 			return ( strlen( $string ) > $length ) ? substr( $string, 0, $length ) : $string;
 		}
 
+		/**
+		 * Remove emojis and 4-byte UTF-8 characters from string
+		 * Uses a single efficient regex pattern
+		 *
+		 * @param string $string The string to clean
+		 * @return string Cleaned string without emojis
+		 */
+		public function strip_emojis( $string ) {
+			if ( empty( $string ) ) {
+				return $string;
+			}
+
+			// Remove emojis and 4-byte UTF-8 characters in one go
+			$string = preg_replace( '/[\x{1F600}-\x{1F64F}\x{1F300}-\x{1F5FF}\x{1F680}-\x{1F6FF}\x{1F1E0}-\x{1F1FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{1F900}-\x{1F9FF}\x{1FA70}-\x{1FAFF}\x{10000}-\x{10FFFF}]/u', '', $string );
+
+			// Clean up extra spaces
+			$string = preg_replace( '/\s+/', ' ', trim( $string ) );
+
+			return $string;
+		}
+
 
 		/**
 		 * remove query param from url
@@ -1221,7 +1362,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 			}
 
 			if ( $total_refund > 0 ) {
-				$get_totals = $wpdb->get_row( "SELECT value, checkout_total, bump_total, offer_total FROM " . $wpdb->prefix . $this->conv_table . " WHERE type = 2 AND source = " . $order_id, ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
+				$get_totals = $wpdb->get_row( $wpdb->prepare( "SELECT value, checkout_total, bump_total, offer_total FROM {$wpdb->prefix}{$this->conv_table} WHERE type = 2 AND source = %d", absint( $order_id ) ), ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 				if ( is_array( $get_totals ) && count( $get_totals ) > 0 ) {
 					/**
@@ -1244,7 +1385,7 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 						$update_args['checkout_total'] = $update_args['value'];
 					}
 
-					$wpdb->update( $wpdb->prefix . $this->conv_table, $update_args, [ 'type' => 2, 'source' => $order_id ] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+					$wpdb->update( $wpdb->prefix . $this->conv_table, $update_args, [ 'type' => 2, 'source' => absint( $order_id ) ] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 				}
 			}
@@ -1294,14 +1435,14 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 				$query            = $wpdb->prepare( "SELECT ord.id as ID FROM {$order_table} ord
                                 INNER JOIN {$order_meta_table} om ON (ord.id = om.order_id AND om.meta_key = '_wffn_tracking_data')
                                 WHERE ord.type = %s
-                                AND ord.status IN ({$status_in}) 
+                                AND ord.status IN ({$status_in})
                                 ORDER BY ord.date_created_gmt DESC LIMIT 0, 10", 'shop_order' );
 
 			} else {
 				$query = $wpdb->prepare( "SELECT p.ID FROM {$wpdb->posts} p
                                 INNER JOIN {$wpdb->postmeta} pm ON (p.ID = pm.post_id AND pm.meta_key = '_wffn_tracking_data')
-                                WHERE p.post_type = %s 
-                                AND p.post_status IN ({$status_in}) 
+                                WHERE p.post_type = %s
+                                AND p.post_status IN ({$status_in})
                                 ORDER BY p.post_date DESC LIMIT 0, 10", 'shop_order' );
 			}
 
@@ -1367,14 +1508,14 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 						$wfacp_query      = $wpdb->prepare( "SELECT ord.id as ID FROM {$order_table} ord
                                 INNER JOIN {$order_meta_table} om ON (ord.id = om.order_id AND om.meta_key = '_wfacp_report_data')
                                 WHERE ord.type = %s
-                                AND ord.status IN ({$status_in}) 
+                                AND ord.status IN ({$status_in})
                                 ORDER BY ord.date_created_gmt DESC LIMIT 0, 10", 'shop_order' );
 
 					} else {
 						$wfacp_query = $wpdb->prepare( "SELECT p.ID FROM {$wpdb->posts} p
                                 INNER JOIN {$wpdb->postmeta} pm ON (p.ID = pm.post_id AND pm.meta_key = '_wfacp_report_data')
-                                WHERE p.post_type = %s 
-                                AND p.post_status IN ({$status_in}) 
+                                WHERE p.post_type = %s
+                                AND p.post_status IN ({$status_in})
                                 ORDER BY p.post_date DESC LIMIT 0, 10", 'shop_order' );
 					}
 
@@ -1416,14 +1557,14 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 						$ob_query         = $wpdb->prepare( "SELECT ord.id as ID FROM {$order_table} ord
                                 INNER JOIN {$order_meta_table} om ON (ord.id = om.order_id AND om.meta_key = '_wfob_report_data')
                                 WHERE ord.type = %s
-                                AND ord.status IN ({$status_in}) 
+                                AND ord.status IN ({$status_in})
                                 ORDER BY ord.date_created_gmt DESC LIMIT 0, 10", 'shop_order' );
 
 					} else {
 						$ob_query = $wpdb->prepare( "SELECT p.ID FROM {$wpdb->posts} p
                                 INNER JOIN {$wpdb->postmeta} pm ON (p.ID = pm.post_id AND pm.meta_key = '_wfob_report_data')
-                                WHERE p.post_type = %s 
-                                AND p.post_status IN ({$status_in}) 
+                                WHERE p.post_type = %s
+                                AND p.post_status IN ({$status_in})
                                 ORDER BY p.post_date DESC LIMIT 0, 10", 'shop_order' );
 					}
 

@@ -27,12 +27,31 @@ if ( ! class_exists( 'BWFAN_DB_Table_Conversions' ) && BWFAN_Common::is_pro_3_0(
 			];
 		}
 
-		/**
-		 * Get query for create table
-		 *
-		 * @return string
-		 */
-		public function get_create_table_query() {
+	/**
+	 * Get primary key and indexes definition
+	 *
+	 * @return array
+	 */
+	public function get_indexes() {
+		return [
+			'primary_key' => 'ID',
+			'indexes'    => [
+				'cid'     => [ 'cid' ],
+				'oid'     => [ 'oid' ],
+				'trackid' => [ 'trackid' ],
+				'otype'   => [ 'otype' ],
+				'date'    => [ 'date' ],
+			],
+			'unique_keys' => [],
+		];
+	}
+
+	/**
+	 * Get a query for create table
+	 *
+	 * @return string
+	 */
+	public function get_create_table_query() {
 			global $wpdb;
 			$collate = $this->get_collation();
 
@@ -48,6 +67,7 @@ if ( ! class_exists( 'BWFAN_DB_Table_Conversions' ) && BWFAN_Common::is_pro_3_0(
 			PRIMARY KEY (`ID`),
 			KEY `cid` (`cid`),
 			KEY `oid` (`oid`),
+			KEY `trackid` (`trackid`),
 			KEY `otype` (`otype`),
 			KEY `date` (`date`)
 		) $collate;";

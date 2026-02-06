@@ -21,6 +21,9 @@ abstract class BWFAN_AJAX_Controller {
 	}
 
 	public static function bwfan_select2ajax() {
+		// Verify nonce for read-only operations
+		BWFAN_Common::check_nonce();
+
 		$callback = apply_filters( 'bwfan_select2_ajax_callable', '', $_POST ); //phpcs:ignore WordPress.Security.NonceVerification
 		if ( ! is_callable( $callback ) ) {
 			wp_send_json( [] );
@@ -297,6 +300,15 @@ abstract class BWFAN_AJAX_Controller {
 	public static function test_email() {
 		BWFAN_Common::check_nonce();
 		// phpcs:disable WordPress.Security.NonceVerification
+
+		/** Check if user has manage_options permission */
+		if ( ! current_user_can( BWFAN_admin::menu_cap() ) ) {
+			wp_send_json( array(
+				'status' => false,
+				'msg'    => __( 'You are not authorized to perform this action', 'wp-marketing-automations' ),
+			) );
+		}
+
 		$result = array(
 			'status' => false,
 			'msg'    => __( 'Error', 'wp-marketing-automations' ),
@@ -350,9 +362,19 @@ abstract class BWFAN_AJAX_Controller {
 
 		$post['event_data']['event_slug'] = $post['event'];
 		$action_object                    = BWFAN_Core()->integration->get_action( 'wp_sendemail' );
-		$action_object->is_preview        = true;
-		$data_to_set                      = $action_object->make_data( '', $post );
-		$data_to_set['test']              = true;
+		if ( null === $action_object && class_exists( 'BWFAN_Wp_Sendemail' ) ) {
+			/** Try to get the instance directly */
+			$action_object = BWFAN_Wp_Sendemail::get_instance();
+		}
+		if ( null === $action_object ) {
+			$result['msg']    = __( 'Email action not found.', 'wp-marketing-automations' );
+			$result['status'] = false;
+
+			return $result;
+		}
+		$action_object->is_preview = true;
+		$data_to_set               = $action_object->make_data( '', $post );
+		$data_to_set['test']       = true;
 
 		$action_object->set_data( $data_to_set );
 		$response = $action_object->send_email();
@@ -375,6 +397,15 @@ abstract class BWFAN_AJAX_Controller {
 
 	public static function test_sms() {
 		BWFAN_Common::check_nonce();
+
+		/** If FKA pro is not active */
+		if ( ! bwfan_is_autonami_pro_active() ) {
+			return array(
+				'status' => false,
+				'msg'    => __( 'FunnelKit Automations Pro is not active', 'wp-marketing-automations' ),
+			);
+		}
+
 		// phpcs:disable WordPress.Security.NonceVerification
 		$result = array(
 			'status' => false,
@@ -399,10 +430,8 @@ abstract class BWFAN_AJAX_Controller {
 			$sms_provider = isset( $post['data']['sms_provider'] ) ? $post['data']['sms_provider'] : '';
 		}
 
-		$sms_body = BWFAN_Common::decode_merge_tags( $sms_body );
-
 		/** Append UTM parameters */
-		if ( bwfan_is_autonami_pro_active() && class_exists( 'BWFAN_UTM_Tracking' ) ) {
+		if ( class_exists( 'BWFAN_UTM_Tracking' ) ) {
 			$utm = BWFAN_UTM_Tracking::get_instance();
 			if ( version_compare( BWFAN_PRO_VERSION, '2.0.4', '>' ) ) {
 				$sms_body = $utm->maybe_add_utm_parameters( $sms_body, $post, 'sms' );
@@ -412,7 +441,7 @@ abstract class BWFAN_AJAX_Controller {
 		}
 
 		/** Media handling */
-		if ( isset( $post['data']['attach_custom_img'] ) && ! empty( $post['data']['attach_custom_img'] ) ) {
+		if ( ! empty( $post['data']['attach_custom_img'] ) ) {
 			$img = stripslashes( $post['data']['attach_custom_img'] );
 			$img = json_decode( $img, true );
 			if ( is_array( $img ) && count( $img ) > 0 ) {
@@ -425,12 +454,7 @@ abstract class BWFAN_AJAX_Controller {
 			'is_preview' => true,
 		) );
 
-		if ( ! class_exists( 'BWFCRM_Common' ) ) {
-			return array(
-				'status' => false,
-				'msg'    => __( 'Automation Pro is not active', 'wp-marketing-automations' ),
-			);
-		}
+		$sms_body        = BWFAN_Common::decode_merge_tags( $sms_body );
 		$send_sms_result = BWFCRM_Common::send_sms( array(
 			'to'           => $sms_to,
 			'body'         => $sms_body,
