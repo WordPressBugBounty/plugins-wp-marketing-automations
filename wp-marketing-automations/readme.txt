@@ -4,7 +4,7 @@ Tags: cart abandonment, follow up emails, email marketing, newsletter, marketing
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.0
-Stable tag: 3.7.2
+Stable tag: 3.7.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -415,6 +415,14 @@ FunnelKit Automations is 100% self-hosted and fully GDPR compliant.
 
 
 == Change log ==
+
+= 3.7.3 (Feb 09, 2026) =
+* Added: Cart item meta data (variations, custom fields) is now displayed in abandoned cart email templates, enhancing personalization. (#4445)
+* Added: Contact field labels on the manage profile page to improve translation support and accessibility. (#4443)
+* Improved: Background task processing now sends HTTP responses immediately, preventing worker timeout errors for more efficient performance. (#4447)
+* Improved: The Automation visual builder now allows further zooming out, improving management of large workflows. (#4453)
+* Fixed: Contact fields and status are now correctly saved during contact import for new contacts, ensuring data accuracy. (#4456)
+* Fixed: Import directory validation now works smoothly, even when the directory does not yet exist, improving the import process. (#4441)
 
 = 3.7.2 (Jan 30, 2026) =
 * Fixed: Broken confirmation redirect link in email tracking URLs. (#4436)
