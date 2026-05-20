@@ -10,7 +10,7 @@ if ( ! class_exists( 'WooFunnels_License_check' ) ) {
 		private $request_body = false;
 		private $request_args = array(
 			'timeout'   => 30,
-			'sslverify' => false,
+			'sslverify' => true,
 		);
 		private $plugin_hash_key = '';
 		private $human_name = '';
@@ -243,9 +243,12 @@ if ( ! class_exists( 'WooFunnels_License_check' ) ) {
 							return $body;
 						}
 					} else {
-						$object = maybe_unserialize( $body );
-						if ( is_object( $object ) && count( get_object_vars( $object ) ) > 0 ) {
-							return $object;
+						/** Restrict deserialization to stdClass only — blocks POP gadget chains in case TLS verification is bypassed. */
+						if ( is_serialized( $body ) ) {
+							$object = unserialize( $body, array( 'allowed_classes' => array( 'stdClass' ) ) );
+							if ( is_object( $object ) && count( get_object_vars( $object ) ) > 0 ) {
+								return $object;
+							}
 						}
 
 						return false;

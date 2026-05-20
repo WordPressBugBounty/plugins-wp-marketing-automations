@@ -685,7 +685,7 @@ class BWFAN_Automations {
 
 		/** Unique Keys for Webhook Received Events */
 		if ( isset( $automation_meta['event_meta']['bwfan_unique_key'] ) ) {
-			$automation_meta['event_meta']['bwfan_unique_key'] = md5( uniqid( time(), true ) );
+			$automation_meta['event_meta']['bwfan_unique_key'] = wp_generate_password( 32, false );
 		}
 
 		$post['meta'] = array(
@@ -978,6 +978,12 @@ class BWFAN_Automations {
 			if ( ! empty( $tips ) ) {
 				$import_data['meta']['tips'] = $tips;
 			}
+
+			/** Unique Keys for Webhook Received Events */
+			if ( isset( $import_data['meta']['event_meta']['bwfan_unique_key'] ) ) {
+				$import_data['meta']['event_meta']['bwfan_unique_key'] = md5( uniqid( time(), true ) );
+			}
+
 			$benchmark_data = [];
 			if ( ! empty( $import_data['meta'] ) ) {
 				foreach ( $import_data['meta'] as $key => $auto_meta ) {

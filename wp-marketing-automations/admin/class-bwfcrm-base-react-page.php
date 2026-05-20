@@ -96,6 +96,7 @@ abstract class BWFCRM_Base_React_Page {
 		$this->page_data['first_bulk_action_id']  = $first_bulk_action_id;
 		$this->page_data['first_audience_id']     = $first_audience_id;
 		$this->page_data['bwfan_nonce']           = get_option( 'bwfan_unique_secret', '' );
+		$this->page_data['rest_nonce']            = wp_create_nonce( 'wp_rest' );
 		$this->page_data['wp_version']            = get_bloginfo( 'version' );
 		$this->page_data['is_rtl']                = is_rtl();
 		$this->page_data['is_site_rtl']           = BWFAN_Common::is_site_rtl();

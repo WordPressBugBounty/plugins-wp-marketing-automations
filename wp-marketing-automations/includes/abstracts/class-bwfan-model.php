@@ -60,6 +60,52 @@ abstract class BWFAN_Model {
 		return $wpdb->query( $wpdb->prepare( $sql, $value ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 	}
 
+	/**
+	 * Whether the last DB error indicates an InnoDB deadlock.
+	 *
+	 * @param string $last_error wpdb last_error string.
+	 * @return bool
+	 */
+	protected static function is_deadlock_error( $last_error ) {
+		if ( '' === $last_error ) {
+			return false;
+		}
+
+		return false !== stripos( $last_error, 'deadlock' ) || false !== stripos( $last_error, 'lock wait timeout' );  
+	}
+
+	/**
+	 * Run a pre-prepared write query with InnoDB deadlock detection and retry.
+	 *
+	 * Callers may use the literal `{table_name}` placeholder; it is substituted
+	 * with the late-static-bound table name. Use for raw UPDATE/DELETE/INSERT
+	 * statements that bypass `$wpdb->update/insert`.
+	 *
+	 * @param string $sql     Pre-prepared SQL statement.
+	 * @param string $context Short label included in retry log lines.
+	 * @return int|false Rows affected, or false on non-deadlock failure / retry exhaustion.
+	 */
+	public static function query_with_retry( $sql, $context = 'query' ) {
+		global $wpdb;
+		$sql         = str_replace( '{table_name}', self::_table(), $sql );
+		$max_retries = 3;
+
+		for ( $attempt = 0; $attempt <= $max_retries; $attempt++ ) {
+			if ( $attempt > 0 ) {
+				BWFAN_Common::log_test_data( 'BWFAN: Deadlock on ' . $context . ', retry attempt ' . $attempt . ' of ' . $max_retries, 'fka-db-deadlock', true );
+				usleep( $attempt * 100000 );
+			}
+
+			$result = $wpdb->query( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+
+			if ( false !== $result || ! self::is_deadlock_error( $wpdb->last_error ) ) {
+				return $result;
+			}
+		}
+
+		return false;
+	}
+
 	static function insert_id() {
 		global $wpdb;
 

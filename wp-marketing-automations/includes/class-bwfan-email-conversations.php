@@ -344,7 +344,7 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 			$template_type   = isset( $data['template'] ) ? $data['template'] : '';
 			$is_track_enable = self::is_automation_open_click_track( $automation_id );
 			$send_to         = in_array( $mode, [ self::$MODE_SMS, self::$MODE_WHATSAPP ], true ) ? $phone : $email;
-			$hash_code       = md5( microtime( true ) . $send_to . $step_id );
+			$hash_code       = wp_generate_password( 32, false );
 			$contact_email   = '';
 			$cid             = 0;
 			if ( isset( $data['contact_id'] ) && ! empty( $data['contact_id'] ) ) {
@@ -647,6 +647,11 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 				return $url;
 			}
 
+			/** Skip tracking for URLs whose clean form exceeds the DB column size */
+			if ( strlen( BWFAN_Core()->conversation->get_cleaned_url( $url ) ) > 190 ) {
+				return $url;
+			}
+
 			$is_link_trigger = apply_filters( 'bwfan_is_link_trigger_url', false, $url );
 			$home_url        = $url;
 			if ( false === $is_link_trigger ) {
@@ -919,7 +924,7 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 				return;
 			}
 
-			$link   = filter_input( INPUT_GET, 'bwfan-link', FILTER_SANITIZE_URL );
+			$link   = filter_input( INPUT_GET, 'bwfan-link' );
 			$l_hash = filter_input( INPUT_GET, 'l_hash', FILTER_UNSAFE_RAW );
 			$l_hash = $l_hash ? sanitize_text_field( $l_hash ) : '';
 			if ( empty( $link ) && empty( $l_hash ) ) {
@@ -985,7 +990,7 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 		public function modify_unsubscribe_link() {
 			$track_id = filter_input( INPUT_GET, 'bwfan-track-id', FILTER_UNSAFE_RAW );
 			$track_id = $track_id ? sanitize_text_field( $track_id ) : '';
-			$link     = filter_input( INPUT_GET, 'bwfan-link', FILTER_SANITIZE_URL );
+			$link     = filter_input( INPUT_GET, 'bwfan-link' );
 			if ( empty( $track_id ) || empty( $link ) ) {
 				return;
 			}

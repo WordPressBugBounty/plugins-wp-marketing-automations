@@ -334,15 +334,22 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			/** Default NOT EXISTS approach */
 			$exclude_unsub_query = "  NOT EXISTS ";
 			$include_unsub_query = " EXISTS ";
-			$email_query         = "(SELECT 1 FROM {$unsubscribe_table} AS unsub WHERE c.email = unsub.recipient )";
-			$contact_no_query    = "(SELECT 1 FROM {$unsubscribe_table} AS unsub1 WHERE c.contact_no = unsub1.recipient )";
+
+			$email_query      = "(SELECT 1 FROM {$unsubscribe_table} AS unsub WHERE c.email = unsub.recipient )";
+			$contact_no_query = "(SELECT 1 FROM {$unsubscribe_table} AS unsub1 WHERE c.contact_no = unsub1.recipient )";
 
 			if ( true === $exclude_unsubs ) {
 				return "AND " . "( $exclude_unsub_query  $email_query AND $exclude_unsub_query $contact_no_query )";
 			}
 
 			if ( ! empty( $additional_info['include_unsubscribe'] ) ) {
-				return "OR " . "( $include_unsub_query  $email_query AND $exclude_unsub_query $contact_no_query )";
+				/**
+				 * Include contacts unsubscribed via email OR phone. The earlier
+				 * "EXISTS email AND NOT EXISTS contact_no" form was a typo — it
+				 * dropped contacts unsubscribed through both channels. Matches
+				 * the symmetric OR pattern used for rule='is' / value=3 below.
+				 */
+				return "OR " . "( $include_unsub_query  $email_query OR $include_unsub_query $contact_no_query )";
 			}
 
 			$is_broadcast = isset( $additional_info['is_broadcast'] ) && ! empty( $additional_info['is_broadcast'] );
@@ -386,9 +393,8 @@ if ( ! class_exists( 'BWFCRM_Model_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			$unsubscribe_table = $wpdb->prefix . 'bwfan_message_unsubscribe';
 			$where_query       = '';
 
-			/** Add LEFT JOINs for unsubscribe table */
-			$join_query = "LEFT JOIN {$unsubscribe_table} AS unsub_email ON c.email = unsub_email.recipient ";
-			$join_query .= "LEFT JOIN {$unsubscribe_table} AS unsub_phone ON c.contact_no = unsub_phone.recipient ";
+			$join_query = " LEFT JOIN {$unsubscribe_table} AS unsub_email ON c.email = unsub_email.recipient ";
+			$join_query .= " LEFT JOIN {$unsubscribe_table} AS unsub_phone ON c.contact_no = unsub_phone.recipient ";
 
 			if ( true === $exclude_unsubs ) {
 				$where_query = "AND unsub_email.recipient IS NULL AND unsub_phone.recipient IS NULL";

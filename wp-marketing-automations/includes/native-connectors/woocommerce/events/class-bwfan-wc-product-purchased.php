@@ -465,7 +465,7 @@ final class BWFAN_WC_Product_Purchased extends BWFAN_Event {
 	 * @return bool
 	 */
 	public function validate_event_order_items( $automation_data, $product_selected, $item ) {
-		if ( ! $item instanceof WC_Order_Item ) {
+		if ( ! $item instanceof WC_Order_Item_Product ) {
 			return false;
 		}
 
@@ -484,9 +484,9 @@ final class BWFAN_WC_Product_Purchased extends BWFAN_Event {
 			}
 
 			$category_ids = array_column( $get_selected_categories, 'id' );
-			$product      = wc_get_product( $item->get_product_id() );
+			$product      = $item->get_product();
 			if ( $product instanceof WC_Product ) {
-				$product_categories = $product->get_category_ids();
+				$product_categories = BWFAN_Common::get_wc_product_category_ids_for_order_line( $product );
 				return ! empty( array_intersect( $category_ids, $product_categories ) );
 			}
 

@@ -1011,6 +1011,14 @@ class BWFAN_Rule_Order_Category extends BWFAN_Rule_Term_Taxonomy {
 
 	/** v2 Methods: END */
 
+	public function get_possible_rule_operators() {
+		return array(
+			'any'  => __( 'matches any of', 'wp-marketing-automations' ),
+			'all'  => __( 'matches all of ', 'wp-marketing-automations' ),
+			'none' => __( 'matches none of ', 'wp-marketing-automations' ),
+		);
+	}
+
 	public function get_term_ids( $automation_data = [] ) {
 		$all_terms = array();
 		if ( ! empty( $automation_data ) && isset( $automation_data['global'] ) && is_array( $automation_data['global'] ) ) {
@@ -1033,23 +1041,7 @@ class BWFAN_Rule_Order_Category extends BWFAN_Rule_Term_Taxonomy {
 				continue;
 			}
 
-			$product_id = $product->get_id();
-
-			$terms = wp_get_object_terms( $product_id, $this->taxonomy_name, array(
-				'fields' => 'ids',
-			) );
-			if ( $terms instanceof WP_Error || empty( $terms ) ) {
-				$terms = [];
-			}
-
-			if ( ! empty( $product->get_parent_id() ) ) {
-				$parent_terms = wp_get_object_terms( $product->get_parent_id(), $this->taxonomy_name, array(
-					'fields' => 'ids',
-				) );
-				if ( ! $parent_terms instanceof WP_Error && count( $parent_terms ) > 0 ) {
-					$terms = array_merge( $terms, $parent_terms );
-				}
-			}
+			$terms     = BWFAN_Common::get_wc_product_category_ids_for_order_line( $product );
 			$all_terms = array_merge( $all_terms, $terms );
 		}
 
@@ -1093,6 +1085,14 @@ class BWFAN_Rule_Order_Tags extends BWFAN_Rule_Term_Taxonomy {
 
 	/** v2 Methods: END */
 
+	public function get_possible_rule_operators() {
+		return array(
+			'any'  => __( 'matches any of', 'wp-marketing-automations' ),
+			'all'  => __( 'matches all of ', 'wp-marketing-automations' ),
+			'none' => __( 'matches none of ', 'wp-marketing-automations' ),
+		);
+	}
+
 	public function get_term_ids( $automation_data = [] ) {
 		$all_terms = array();
 		if ( ! empty( $automation_data ) && isset( $automation_data['global'] ) && is_array( $automation_data['global'] ) ) {
@@ -1111,17 +1111,12 @@ class BWFAN_Rule_Order_Tags extends BWFAN_Rule_Term_Taxonomy {
 				if ( ! $product instanceof WC_Product ) {
 					continue;
 				}
-
-				$product_id = $product->get_id();
-				$product_id = ( $product->get_parent_id() ) ? $product->get_parent_id() : $product_id;
-				$terms      = wp_get_object_terms( $product_id, $this->taxonomy_name, array(
-					'fields' => 'ids',
-				) );
-				$all_terms  = array_merge( $all_terms, $terms );
+				$ids       = BWFAN_Common::get_wc_product_tag_ids_for_order_line( $product );
+				$all_terms = array_merge( $all_terms, $ids );
 			}
 		}
 
-		return $all_terms;
+		return array_map( 'intval', array_filter( array_unique( $all_terms ) ) );
 	}
 
 	public function ui_view() {

@@ -184,6 +184,8 @@ class BWFAN_DB {
 		/** Auto global settings */
 		if ( BWFAN_Plugin_Dependency::woocommerce_active_check() ) {
 			$global_option['bwfan_ab_enable'] = true;
+			$global_option['bwfan_ab_capture_ip_address'] = true;
+			$global_option['bwfan_ab_capture_device'] = true;
 			update_option( 'bwfan_global_settings', $global_option, true );
 		}
 

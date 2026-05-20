@@ -441,6 +441,13 @@ if ( ! class_exists( 'BWF_Admin_General_Settings' ) ) {
 		}
 
 		public function update_general_settings() {
+			if ( ! current_user_can( 'manage_woocommerce' ) ) {
+				wp_send_json( array(
+					'status' => false,
+					'msg'    => __( 'You do not have permission to perform this action.', 'woofunnels' ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+					'data'   => '',
+				), 403 );
+			}
 			check_admin_referer( 'bwf_general_settings_update', '_nonce' );
 			$options = isset( $_POST['data'] ) ? bwf_clean( $_POST['data'] ) : 0; //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash
 			$resp    = $this->update_global_settings_fields( $options );

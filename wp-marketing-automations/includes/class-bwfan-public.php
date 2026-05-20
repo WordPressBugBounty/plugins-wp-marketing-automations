@@ -88,6 +88,7 @@ class BWFAN_Public {
 		$data['ajax_url']               = admin_url( 'admin-ajax.php' );
 		$data['wc_ajax_url']            = class_exists( 'WC_AJAX' ) ? WC_AJAX::get_endpoint( '%%endpoint%%' ) : '';
 		$data['ajax_nonce']             = wp_create_nonce( 'bwfan-action-public' );
+		$data['unsubscribe_nonce']      = wp_create_nonce( 'bwfan-unsubscribe-nonce' );
 		$data['message_no_contact']     = __( 'Sorry! We are unable to update preferences as no contact found.', 'wp-marketing-automations' );
 
 		global $post;

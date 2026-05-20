@@ -4,7 +4,7 @@ Tags: cart abandonment, follow up emails, email marketing, newsletter, marketing
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 7.0
-Stable tag: 3.8.0
+Stable tag: 3.8.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -415,6 +415,34 @@ FunnelKit Automations is 100% self-hosted and fully GDPR compliant.
 
 
 == Change log ==
+
+= 3.8.1 (May 20, 2026) =
+* Added: Optional Capture IP Address and Capture Device settings under Cart Abandonment to help admins identify bot and fraudulent checkouts.
+* Added: Hook to add a default rule group, reducing manual setup steps. (#4617)
+* Added: Multi search filter component for rules. (#4208)
+* Added: `bwfan_search_product_post_types` filter to let integrations extend the Order Created product picker to additional post types. (#4621)
+* Added: Filter hook to disable the WooFunnels worker ping. (#4682)
+* Improved: Automation Builder event picker search now also matches integration and group names for easier discovery. (#4619)
+* Improved: Contact list query performance by optimizing filtered contact queries. (#4629, #4642)
+* Improved: Updated abandoned cart processing to improve protection. (#4664)
+* Improved: Order Product Tag and Order Product Category rules now support "matches any of / all of / none of" operators. (#4680)
+* Improved: Rule saving now enforces capability checks, nonce verification, and automation ID validation to prevent unauthorized modifications.
+* Improved: Validate DNS/MX email domain validation by default to prevent spam. (#4599)
+* Fixed: Email click-tracking now redirects correctly when URLs contain non-ASCII characters such as Cyrillic, Chinese, or Arabic. (#4602)
+* Fixed: Order status change events now respect from/to status validation when category filters are selected. (#4608)
+* Fixed: RTL display issues in contact filters, text-with-affix inputs, and conditional rules sidebar for RTL languages. (#4613)
+* Fixed: Reduced unnecessary WooCommerce status warnings and deprecated product item notices in debug logs. (#4625)
+* Fixed: Contacts now load correctly when filtering by custom fields with left join enabled. (#4644)
+* Fixed: Variation products now inherit parent product categories correctly when evaluating automation rules. (#4648)
+* Fixed: Email preheader text now displays decoded characters correctly in inbox previews. (#4658)
+* Fixed: Automation builder layout now remains stable for conditional nodes in saved or imported automations. (#4671)
+* Fixed: Payment method selection now remains unchanged after abandoned cart capture runs on checkout. (#4640)
+* Fixed: Improved abandoned cart processing reliability during high-concurrency database updates. (#4636)
+* Fixed: Regenerate unique key for imported webhook events. (#4649)
+* Fixed: Wrong date/time on "Completed Contacts" step modal. (#4678)
+* Fixed: PHP warning in the WordPress Send Email action. (#4675)
+* Fixed: WPML order language is now detected on checkout even when WooCommerce Multilingual (WCML) is not active. (#4654)
+* Fixed: Email click tracking for long URLs (e.g. Google Maps) no longer redirects recipients to the site homepage; oversized links are now delivered as-is instead of failing silently. (#4646)
 
 = 3.8.0 (Apr 09, 2026) =
 * Security: Hardened plug-in security for legacy automation actions. (#4592)

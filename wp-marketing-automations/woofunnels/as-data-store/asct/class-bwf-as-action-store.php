@@ -163,7 +163,7 @@ if ( ! class_exists( 'BWF_AS_Action_Store' ) ) {
 		 * @return bool
 		 */
 		protected function action_is_recurring( $data ) {
-			if ( ! is_object( $data ) ) {
+			if ( ! is_object( $data ) || ! isset( $data->recurring_interval ) ) {
 				return false;
 			}
 			if ( (int) $data->recurring_interval < 1 ) {

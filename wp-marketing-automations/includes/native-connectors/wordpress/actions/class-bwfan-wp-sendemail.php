@@ -305,7 +305,7 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 		$result      = preg_replace( $pattern, $replacement, $content );
 
 		// Only return result if preg_replace succeeded
-		if ( !empty( $result ) ) {
+		if ( ! empty( $result ) ) {
 			return $result;
 		}
 
@@ -453,8 +453,8 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 		$lang          = $this->data['current_language'];
 
 		if ( empty( $lang ) ) {
-			$lang = BWFAN_PRO_Common::passing_event_language( $this->data );
-			$lang = $lang['language'];
+			$lang_result = BWFAN_PRO_Common::passing_event_language( $this->data );
+			$lang        = ( is_array( $lang_result ) && isset( $lang_result['language'] ) ) ? $lang_result['language'] : '';
 		}
 		if ( $lang === $selected_lang ) {
 			return true;
@@ -620,9 +620,9 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 				$conversations[ $email ]['conversation_id']   = isset( $this->data['conversation_id'] ) ? $this->data['conversation_id'] : '';
 				$conversations[ $email ]['hash_code']         = isset( $this->data['hash_code'] ) ? $this->data['hash_code'] : '';
 				$conversations[ $email ]['subject_merge_tag'] = isset( $this->data['subject_merge_tag'] ) ? $this->data['subject_merge_tag'] : '';
-				$ruleData = BWFAN_Merge_Tag_Loader::get_data( 'conditional_set' );
+				$ruleData                                     = BWFAN_Merge_Tag_Loader::get_data( 'conditional_set' );
 				if ( ! empty( $ruleData ) ) {
-					$conversations[ $email ]['conditional_set']     = $ruleData;
+					$conversations[ $email ]['conditional_set'] = $ruleData;
 				}
 			}
 		} else {
@@ -637,10 +637,10 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 				$this->data['body'] = html_entity_decode( $this->data['body'] );
 				$this->data['body'] = BWFAN_Core()->conversations->bwfan_modify_email_body_data( $this->data['body'], $data_for_engagement );
 
-				$this->data['body'] = apply_filters( 'bwfan_before_send_email_body', $this->data['body'], $this->data );
-				$this->data['body'] = $this->email_content( $this->data );
-				$this->data['body'] = BWFAN_Common::bwfan_correct_protocol_url( $this->data['body'] );
-				$this->data['body'] = $this->append_to_email_body( $this->data['body'], $this->data['preheading'] );
+				$this->data['body']     = apply_filters( 'bwfan_before_send_email_body', $this->data['body'], $this->data );
+				$this->data['body']     = $this->email_content( $this->data );
+				$this->data['body']     = BWFAN_Common::bwfan_correct_protocol_url( $this->data['body'] );
+				$this->data['body']     = $this->append_to_email_body( $this->data['body'], $this->data['preheading'] );
 				$autonami_integrations  = BWFAN_Core()->integration->get_integrations();
 				$selected_email_service = $global_settings['bwfan_email_service'];
 				$this->set_log( 'before_email: ' . $email );
@@ -659,7 +659,7 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 				$conversations[ $email ]['conversation_id']   = isset( $this->data['conversation_id'] ) ? $this->data['conversation_id'] : '';
 				$conversations[ $email ]['hash_code']         = isset( $this->data['hash_code'] ) ? $this->data['hash_code'] : '';
 				$conversations[ $email ]['subject_merge_tag'] = isset( $this->data['subject_merge_tag'] ) ? $this->data['subject_merge_tag'] : '';
-				$ruleData = BWFAN_Merge_Tag_Loader::get_data( 'conditional_set' );
+				$ruleData                                     = BWFAN_Merge_Tag_Loader::get_data( 'conditional_set' );
 				if ( ! empty( $ruleData ) ) {
 					$conversations[ $email ]['conditional_set'] = $ruleData;
 				}
@@ -702,17 +702,18 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 
 		/** it will add the space after the pre-header to not show the email body content */
 		if ( ! empty( $pre_header ) ) {
-			$pre_header .= '<div style="display: none; max-height: 0; overflow: hidden;">' . str_repeat( '&#847;&zwnj;&nbsp;', apply_filters( 'bwfan_email_pre_header_space', 100 ) ) . '</div>'; // Adding 70 instances to create enough hidden space
+			$pre_header_space = min( absint( apply_filters( 'bwfan_email_pre_header_space', 100 ) ), 500 );
+			$pre_header       .= '<div style="display: none; max-height: 0; overflow: hidden;">' . str_repeat( html_entity_decode( '&#847;&zwnj;&nbsp;', ENT_HTML5, 'UTF-8' ), $pre_header_space ) . '</div>';
 		}
 
 		$appended_body = $pre_header . ' ' . $body;
 		if ( false !== strpos( $body, '</body>' ) ) {
 			$pattern     = '/<body([^>]*)>/is';
 			$replacement = '<body$1>' . $pre_header;
-			$result      = preg_replace($pattern, $replacement, $body);
+			$result      = preg_replace( $pattern, $replacement, $body );
 
 			// Only update if preg_replace succeeded
-			if ( !empty( $result ) ) {
+			if ( ! empty( $result ) ) {
 				$appended_body = $result;
 			}
 		}

@@ -70,6 +70,7 @@ class BWFAN_WC_Dynamic_Coupon extends BWFAN_Merge_Tag {
 	 * will return the title of create coupon action in single automation
 	 */
 	public function bwfan_get_automation_wc_dynamic_coupon() {
+		BWFAN_Common::check_nonce();
 
 		$finalarr     = [];
 		$automationId = absint( sanitize_text_field( $_POST['automationId'] ) );

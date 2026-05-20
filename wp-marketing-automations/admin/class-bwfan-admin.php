@@ -119,13 +119,6 @@ class BWFAN_Admin {
 	function bwfan_migrate_automation() {
 		BWFAN_Common::check_nonce();
 
-		if ( ! current_user_can( BWFAN_admin::menu_cap() ) ) {
-			wp_send_json( array(
-				'status' => false,
-				'msg'    => __( 'You are not authorized to perform this action', 'wp-marketing-automations' ),
-			) );
-		}
-
 		// phpcs:disable WordPress.Security.NonceVerification
 		if ( empty( $_POST['automation_id'] ) ) {
 			$resp = array(
@@ -718,7 +711,7 @@ class BWFAN_Admin {
 		// all event js data and then set localized unique key
 		$all_event_js_data = BWFAN_Core()->admin->get_events_js_data();
 		foreach ( $all_event_js_data as $key => $data ) {
-			$all_event_js_data[ $key ]['localized_automation_key'] = md5( uniqid( time(), true ) );
+			$all_event_js_data[ $key ]['localized_automation_key'] = wp_generate_password( 32, false );
 		}
 		$all_event_js_data = apply_filters( 'bwfan_all_event_js_data', $all_event_js_data, $automation_meta, $automation_id );
 
@@ -1396,7 +1389,7 @@ class BWFAN_Admin {
 			}
 
 			?>
-            <a href="<?php echo $href; //phpcs:ignore WordPress.Security.EscapeOutput ?>"
+            <a href="<?php echo esc_url( $href ); ?>"
                class="<?php echo esc_attr( implode( ' ', $class ) ); ?>"<?php echo esc_attr( implode( ' ', $attr ) ); ?>><?php echo esc_html( $val['name'] ); ?></a>
 			<?php
 		}

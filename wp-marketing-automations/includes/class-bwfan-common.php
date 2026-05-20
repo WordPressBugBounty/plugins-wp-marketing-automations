@@ -782,6 +782,16 @@ class BWFAN_Common {
 
 			return $current_language;
 		}
+
+		/** GTranslate */
+		if ( function_exists( 'bwfan_is_gtranslate_active' ) && bwfan_is_gtranslate_active() && class_exists( 'BWFAN_Compatibility_With_GTRANSLATE' ) ) {
+			return BWFAN_Compatibility_With_GTRANSLATE::get_gtranslate_language();
+		}
+
+		/** Linguise */
+		if ( function_exists( 'bwfan_is_linguise_active' ) && bwfan_is_linguise_active() && class_exists( '\Linguise\WordPress\Helper' ) ) {
+			return \Linguise\WordPress\Helper::getLanguage();
+		}
 	}
 
 	/**
@@ -1887,15 +1897,17 @@ class BWFAN_Common {
 	 * @param bool $secure Whether the cookie should be served only over https.
 	 * @param bool $httponly Whether the cookie is only accessible over HTTP, not scripting languages like JavaScript. @since 3.6.0.
 	 */
-	public static function set_cookie( $name, $value, $expire = 0, $secure = false, $httponly = false ) {
+	public static function set_cookie( $name, $value, $expire = 0, $secure = null, $httponly = true ) {
 		if ( self::is_cli() || self::is_cron() || self::is_rest() ) {
 			return;
 		}
 		if ( headers_sent() ) {
 			return;
 		}
-		$domain = apply_filters( 'bwfan_cookie_domain', COOKIE_DOMAIN );
-		setcookie( $name, $value, $expire, COOKIEPATH ? COOKIEPATH : '/', $domain, $secure, apply_filters( 'bwfan_cookie_httponly', $httponly, $name, $value, $expire, $secure ) ); //phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.cookies_setcookie
+		$domain   = apply_filters( 'bwfan_cookie_domain', COOKIE_DOMAIN );
+		$secure   = ( null === $secure ) ? is_ssl() : (bool) $secure;
+		$httponly = apply_filters( 'bwfan_cookie_httponly', $httponly, $name, $value, $expire, $secure );
+		setcookie( $name, $value, $expire, COOKIEPATH ? COOKIEPATH : '/', $domain, $secure, $httponly ); //phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.cookies_setcookie
 	}
 
 	/**
@@ -2129,28 +2141,52 @@ class BWFAN_Common {
 	}
 
 	/**
-	 * Check nonce.
+	 * Verify CSRF nonce AND admin capability for an AJAX request.
+	 *
+	 * Why: the old version OR'd nonce with capability, which let a logged-in
+	 * admin's browser be CSRF'd into any handler that called this helper.
+	 * Now both are required (AND), so this is the single authorization gate
+	 * for all admin AJAX handlers that previously did their own cap check.
 	 */
 	public static function check_nonce() {
+		if ( self::is_rest() || wp_is_rest_endpoint() ) {
+			// REST endpoints handle nonces via X-WP-Nonce / app passwords / JWT,
+			// but we still require WP to have resolved an authenticated user here
+			// so an unauthenticated REST route can't bypass the cap check below.
+			if ( is_user_logged_in() ) {
+				$permissions = method_exists( 'BWFAN_Common', 'access_capabilities' ) ? self::access_capabilities() : array( 'manage_options' );
+				foreach ( $permissions as $permission ) {
+					if ( current_user_can( $permission ) ) {
+						return;
+					}
+				}
+			}
+			wp_send_json( array(
+				'msg'    => __( 'Invalid request, security validation failed.', 'wp-marketing-automations' ),
+				'status' => false,
+			) );
+
+		}
         $nonce     = ( isset( $_REQUEST['_wpnonce'] ) ) ? sanitize_text_field( $_REQUEST['_wpnonce'] ) : ''; //phpcs:ignore WordPress.Security.NonceVerification
         $bwf_nonce = ( isset( $_REQUEST['bwf_nonce'] ) ) ? sanitize_text_field( $_REQUEST['bwf_nonce'] ) : '';//phpcs:ignore WordPress.Security.NonceVerification
-        if ( wp_verify_nonce( $bwf_nonce, 'bwf_secure_key' ) || wp_verify_nonce( $nonce, 'bwfan-action-admin' ) ) {
-            return;
+        // Some callers (custom addons, internal React components) post the bwfan-action-admin nonce under the key `nonce` instead of `_wpnonce`. Accept both.
+        $alt_nonce = ( isset( $_REQUEST['nonce'] ) ) ? sanitize_text_field( $_REQUEST['nonce'] ) : ''; //phpcs:ignore WordPress.Security.NonceVerification
+        if ( ! wp_verify_nonce( $bwf_nonce, 'bwf_secure_key' ) && ! wp_verify_nonce( $nonce, 'bwfan-action-admin' ) && ! wp_verify_nonce( $alt_nonce, 'bwfan-action-admin' ) ) {
+            wp_send_json( array(
+                'msg'    => __( 'Invalid request, security validation failed.', 'wp-marketing-automations' ),
+                'status' => false,
+            ) );
         }
-        /** check if current user has the permission or not */
-        $default_permissions = array( 'manage_options' );
-        $permissions         = method_exists( 'BWFAN_Common', 'access_capabilities' ) ? BWFAN_Common::access_capabilities() : $default_permissions;
+        $permissions = method_exists( 'BWFAN_Common', 'access_capabilities' ) ? self::access_capabilities() : array( 'manage_options' );
         foreach ( $permissions as $permission ) {
             if ( current_user_can( $permission ) ) {
                 return;
             }
         }
-        // This nonce is not valid.
-        $resp = array(
-            'msg'    => __( 'Invalid request, security validation failed.', 'wp-marketing-automations' ),
+        wp_send_json( array(
+            'msg'    => __( 'You are not authorized to perform this action', 'wp-marketing-automations' ),
             'status' => false,
-        );
-        wp_send_json( $resp );
+        ) );
     }
 
 	/**
@@ -2184,8 +2220,19 @@ class BWFAN_Common {
 			'publish',
 			'draft',
 		) : array( 'publish', 'draft' );
-		$product_type  = [ 'product' ];
-		if ( true === $include_variations ) {
+		/**
+		 * Filter the post types searched by the product picker.
+		 *
+		 * Extensions that register course/membership/etc. post types sold via WooCommerce
+		 * can add them to this list so they appear in the Order Created product selector.
+		 *
+		 * @param array  $post_types         Default post types included in the search.
+		 * @param string $term               The search term.
+		 * @param bool   $include_variations Whether product variations are included.
+		 */
+		$product_type = apply_filters( 'bwfan_search_product_post_types', [ 'product' ], $term, $include_variations );
+		$product_type = is_array( $product_type ) && ! empty( $product_type ) ? array_values( array_unique( array_map( 'sanitize_key', $product_type ) ) ) : [ 'product' ];
+		if ( true === $include_variations && ! in_array( 'product_variation', $product_type, true ) ) {
 			$product_type[] = 'product_variation';
 		}
 		$query = $wpdb->prepare( "SELECT DISTINCT posts.ID FROM {$wpdb->posts} AS posts LEFT JOIN {$wpdb->wc_product_meta_lookup} AS wc_product_meta_lookup ON posts.ID = wc_product_meta_lookup.product_id WHERE (posts.post_title LIKE %s OR wc_product_meta_lookup.sku LIKE %s OR posts.ID LIKE %s) AND posts.post_status IN ('" . implode( "','", $post_statuses ) . "') AND posts.post_type IN ('" . implode( "','", $product_type ) . "') ORDER BY posts.post_parent ASC, posts.post_title ASC", $like_term, $like_term, $like_term ); //phpcs:ignore WordPress.DB.PreparedSQL,WordPress.DB.PreparedSQLPlaceholders
@@ -2605,11 +2652,6 @@ class BWFAN_Common {
 		register_rest_route( 'autonami/v1', '/update-generated-increment', array(
 			'methods'             => WP_REST_Server::CREATABLE,
 			'callback'            => array( __CLASS__, 'update_generated_increment' ),
-			'permission_callback' => '__return_true',
-		) );
-		register_rest_route( 'autonami/v1', '/wc-add-to-cart', array(
-			'methods'             => WP_REST_Server::CREATABLE,
-			'callback'            => array( __CLASS__, 'wc_add_to_cart' ),
 			'permission_callback' => '__return_true',
 		) );
 		/** v2 autonami endpoint */
@@ -3482,171 +3524,8 @@ class BWFAN_Common {
 		}
 	}
 
-	public static function wc_add_to_cart( WP_REST_Request $request ) {
-		self::nocache_headers();
-		$post_parameters = $request->get_body_params();
-		if ( false === is_array( $post_parameters ) || 0 === count( $post_parameters ) ) {
-			return;
-		}
-		if ( ! isset( $post_parameters['id'] ) || ! isset( $post_parameters['coupon_data'] ) || ! isset( $post_parameters['items'] ) || ! isset( $post_parameters['fees'] ) || ! isset( $post_parameters['bwfan_visitor'] ) ) {
-			return;
-		}
-		/**
-		 * Check Unique key security
-		 */
-		$unique_key = get_option( 'bwfan_u_key', false );
-		if ( false === $unique_key || ! isset( $post_parameters['unique_key'] ) || ! hash_equals( $unique_key, $post_parameters['unique_key'] ) ) {
-			return;
-		}
-
-		/** Before abandoned cart when wc add to cart */
-		do_action( 'bwfan_before_abandoned_wc_add_to_cart', $post_parameters );
-
-		$user_id       = $post_parameters['id'];
-		$email         = '';
-		$abandoned_obj = BWFAN_Abandoned_Cart::get_instance();
-		if ( ! empty( $post_parameters['fk_uid'] ) ) {
-			$uid     = $post_parameters['fk_uid'];
-			$contact = new WooFunnels_Contact( '', '', '', '', $uid );
-			$email   = $contact->get_email();
-			$user_id = ! empty( $contact->get_wpid() ) ? $contact->get_wpid() : $user_id;
-		}
-		if ( empty( $email ) && ! empty( $user_id ) ) {
-			$wp_user = get_user_by( 'id', $user_id );
-			if ( $wp_user instanceof WP_User ) {
-				$email = $wp_user->user_email;
-			}
-		}
-		$coupon_data  = $post_parameters['coupon_data'];
-		$items        = $post_parameters['items'];
-		$fees         = $post_parameters['fees'];
-		$cart_details = $abandoned_obj->get_cart_by_key( 'cookie_key', $post_parameters['bwfan_visitor'], '%s' );
-		$cart_details = empty( $cart_details ) && ! empty( $email ) ? $abandoned_obj->get_cart_by_key( 'email', $email, '%s' ) : $cart_details;
-
-		if ( ! empty( $email ) && empty( $cart_details ) ) {
-			self::create_abandoned_cart( array(
-				'user_id'    => $user_id,
-				'email'      => $email,
-				'coupons'    => $coupon_data,
-				'items'      => $items,
-				'fees'       => $fees,
-				'cookie_key' => $post_parameters['bwfan_visitor'] ?? '',
-			) );
-
-			/** After insert abandoned cart when wc add to cart */
-			do_action( 'bwfan_after_insert_abandoned_wc_add_to_cart', $post_parameters );
-
-			return;
-		}
-
-		/** If cart details is not found, then return */
-		if ( empty( $cart_details ) || ! isset( $cart_details['ID'] ) ) {
-			return;
-		}
-
-		$cart_details['coupons'] = $coupon_data;
-		if ( ! empty( $items ) ) {
-			$cart_details['items'] = $items;
-		}
-		$cart_details['fees']  = $fees;
-		$data                  = self::get_abandoned_totals( $cart_details );
-		$data['user_id']       = $user_id;
-		$data['last_modified'] = current_time( 'mysql', 1 );
-		$cart_id               = $cart_details['ID'] ?? 0;
-
-		if ( empty( $cart_id ) ) {
-			return;
-		}
-
-		/** If status lost and others */
-		$cart_status = isset( $cart_details['status'] ) ? intval( $cart_details['status'] ) : 0;
-		if ( in_array( $cart_status, array( 2, 3, 4 ), true ) ) {
-			$data['status']       = 0;
-			$data['created_time'] = current_time( 'mysql', 1 );
-		}
-
-		$where = array(
-			'ID' => $cart_id,
-		);
-
-		BWFAN_Model_Abandonedcarts::update( $data, $where );
-		do_action( 'bwfan_after_update_abandoned_wc_add_to_cart', $post_parameters, $data );
-	}
-
-	private static function create_abandoned_cart( $data ) {
-		if ( empty( $data['items'] ) || ! isset( $data['user_id'] ) ) {
-			return;
-		}
-
-		$customer      = new WC_Customer( $data['user_id'] );
-		$checkout_data = array(
-			'fields' => array(
-				'billing_first_name'  => $customer->get_billing_first_name(),
-				'billing_last_name'   => $customer->get_billing_last_name(),
-				'billing_company'     => $customer->get_billing_company(),
-				'billing_country'     => $customer->get_billing_country(),
-				'billing_address_1'   => $customer->get_billing_address_1(),
-				'billing_address_2'   => $customer->get_billing_address_2(),
-				'billing_city'        => $customer->get_billing_city(),
-				'billing_state'       => $customer->get_billing_state(),
-				'billing_postcode'    => $customer->get_billing_postcode(),
-				'billing_phone'       => $customer->get_billing_phone(),
-				'billing_email'       => $customer->get_billing_email(),
-				'shipping_first_name' => $customer->get_shipping_first_name(),
-				'shipping_last_name'  => $customer->get_shipping_last_name(),
-				'shipping_company'    => $customer->get_shipping_company(),
-				'shipping_country'    => $customer->get_shipping_country(),
-				'shipping_address_1'  => $customer->get_shipping_address_1(),
-				'shipping_address_2'  => $customer->get_shipping_address_2(),
-				'shipping_city'       => $customer->get_shipping_city(),
-				'shipping_state'      => $customer->get_shipping_state(),
-				'shipping_postcode'   => $customer->get_shipping_postcode(),
-			),
-		);
-
-		$data['status']        = 0;
-		$data['created_time']  = current_time( 'mysql', 1 );
-		$data['last_modified'] = current_time( 'mysql', 1 );
-		$data['token']         = self::create_token( 32 );
-		$data['checkout_data'] = wp_json_encode( $checkout_data );
-		$data['currency']      = get_woocommerce_currency();
-		$data                  = self::get_abandoned_totals( $data );
-
-		BWFAN_Model_Abandonedcarts::insert( $data );
-	}
-
 	public static function create_token( $length = 25 ) {
 		return wp_generate_password( $length, false );
-	}
-
-	private static function get_abandoned_totals( $data ) {
-		$coupon_data = maybe_unserialize( $data['coupons'] ?? [] );
-		$coupon_data = is_array( $coupon_data ) ? $coupon_data : [];
-
-		$items = maybe_unserialize( $data['items'] ?? [] );
-		$items = is_array( $items ) ? $items : [];
-
-		$fees = maybe_unserialize( $data['fees'] ?? [] );
-		$fees = is_array( $fees ) ? $fees : [];
-
-		$calculated_total = 0;
-		foreach ( $items as $item ) {
-			$line_subtotal_tax = isset( $item['line_subtotal_tax'] ) ? floatval( $item['line_subtotal_tax'] ) : 0;
-			$line_subtotal     = isset( $item['line_subtotal'] ) ? floatval( $item['line_subtotal'] ) : 0;
-			$calculated_total  += $line_subtotal + $line_subtotal_tax;
-		}
-		foreach ( $coupon_data as $coupon ) {
-			$calculated_total -= $coupon['discount_incl_tax'];
-		}
-		foreach ( $fees as $fee ) {
-			$calculated_total += ( $fee->total + $fee->tax );
-		}
-
-		$calculated_total   = wc_format_decimal( $calculated_total, wc_get_price_decimals() );
-		$data['total']      = $calculated_total;
-		$data['total_base'] = BWF_Plugin_Compatibilities::get_fixed_currency_price_reverse( $calculated_total, get_woocommerce_currency() );
-
-		return $data;
 	}
 
 	/**
@@ -3787,15 +3666,20 @@ class BWFAN_Common {
 	 * @param $status
 	 */
 	public static function update_abandoned_rows( $ids, $status ) {
+		if ( ! is_array( $ids ) || count( $ids ) === 0 ) {
+			return;
+		}
+
 		global $wpdb;
 		$ids                    = array_map( 'absint', $ids );
 		$status                 = absint( $status );
 		$automationCount        = count( $ids );
 		$stringPlaceholders     = array_fill( 0, $automationCount, '%d' );
 		$placeholdersautomation = implode( ', ', $stringPlaceholders );
-		$sql_query              = $wpdb->prepare( "Update {table_name} Set status = %d WHERE ID IN ($placeholdersautomation)", array_merge( array( $status ), $ids ) );// phpcs:ignore WordPress.DB.PreparedSQL
+		$params                 = array_merge( array( $status ), $ids );
+		$sql_query              = $wpdb->prepare( "Update {table_name} Set status = %d WHERE ID IN ($placeholdersautomation)", ...$params );// phpcs:ignore WordPress.DB.PreparedSQL
 
-		BWFAN_Model_Abandonedcarts::get_results( $sql_query );
+		BWFAN_Model_Abandonedcarts::query_with_retry( $sql_query, 'update_abandoned_rows' );
 	}
 
 	/**
@@ -3831,19 +3715,39 @@ class BWFAN_Common {
 
 			return;
 		}
+
 		$global_settings = self::get_global_settings();
 		if ( empty( $global_settings['bwfan_ab_enable'] ) ) {
 			return;
 		}
 
-		/** Maybe run */
-		if ( false === BWFAN_Model_Abandonedcarts::maybe_run( $global_settings['bwfan_ab_init_wait_time'] ) ) {
+		/**
+		 * Best-effort reentrancy guard against redundant work and double-processing:
+		 * `get_eligible_abandoned_rows()` SELECTs by status without claiming rows up front,
+		 * so two concurrent workers would otherwise process the same carts twice (duplicate
+		 * automations, duplicate recovery emails). Deadlock retry at the model layer recovers
+		 * from row-level contention but does not prevent that duplicate work.
+		 *
+		 * Not a distributed mutex: get_transient + set_transient are not atomic, and the 120s
+		 * TTL self-heals if processing crashes or exceeds the window.
+		 */
+		if ( false !== get_transient( 'bwfan_ab_cart_processing' ) ) {
 			return;
 		}
+		set_transient( 'bwfan_ab_cart_processing', 1, 120 );
 
-		$all_sources = BWFAN_Load_Sources::get_all_sources_obj();
-		$all_sources['wc']['ab_cart_abandoned']->load_hooks();
-		$all_sources['wc']['ab_cart_abandoned']->get_eligible_abandoned_rows();
+		try {
+			/** Maybe run */
+			if ( false === BWFAN_Model_Abandonedcarts::maybe_run( $global_settings['bwfan_ab_init_wait_time'] ) ) {
+				return;
+			}
+
+			$all_sources = BWFAN_Load_Sources::get_all_sources_obj();
+			$all_sources['wc']['ab_cart_abandoned']->load_hooks();
+			$all_sources['wc']['ab_cart_abandoned']->get_eligible_abandoned_rows();
+		} finally {
+			delete_transient( 'bwfan_ab_cart_processing' );
+		}
 	}
 
 	/**
@@ -5994,6 +5898,41 @@ class BWFAN_Common {
 								),
 							)
 						), $ab_email_consent_message_fields, array(
+							array(
+								'id'            => 'bwfan_ab_capture_ip_address',
+								'label'         => __( 'Capture IP Address', 'wp-marketing-automations' ),
+								'type'          => 'checkbox',
+								'checkboxlabel' => __( 'Store the visitor\'s IP address with abandoned cart data for fraud and bot analysis', 'wp-marketing-automations' ),
+								'class'         => 'bwfan_ab_capture_ip_address',
+								'required'      => false,
+								'toggler'       => array(
+									'fields'   => array(
+										array(
+											'id'    => 'bwfan_ab_enable',
+											'value' => true,
+										),
+									),
+									'relation' => 'OR',
+								),
+							),
+							array(
+								'id'            => 'bwfan_ab_capture_device',
+								'label'         => __( 'Capture Device', 'wp-marketing-automations' ),
+								'type'          => 'checkbox',
+								'checkboxlabel' => __( 'Store the visitor\'s device, browser and language with abandoned cart data', 'wp-marketing-automations' ),
+								'class'         => 'bwfan_ab_capture_device',
+								'required'      => false,
+								'toggler'       => array(
+									'fields'   => array(
+										array(
+											'id'    => 'bwfan_ab_enable',
+											'value' => true,
+										),
+									),
+									'relation' => 'OR',
+								),
+							)
+						), array(
 							array(
 								'id'          => 'bwfan_ab_tag_selector',
 								'label'       => __( 'Add Tag', 'wp-marketing-automations' ),
@@ -10809,6 +10748,11 @@ class BWFAN_Common {
 	}
 
 	public static function ping_woofunnels_worker() {
+		/** Allow site owners to suppress the WooFunnels-core worker loopback/self-request. */
+		if ( true === apply_filters( 'bwfan_stop_ping_woofunnels_worker', false ) ) {
+			return;
+		}
+
 		$url  = rest_url( '/woofunnels/v1/worker' ) . '?' . time();
 		$args = array(
 			'method'    => 'GET',
@@ -11102,6 +11046,65 @@ class BWFAN_Common {
 	}
 
 	/**
+	 * product_cat term IDs for automation/order "category of product" matching.
+	 * Order line items often reference a {@see WC_Product_Variation}; `product_cat` is stored on
+	 * the parent, so `WC_Product::get_category_ids()` can be empty. Fall back to the parent.
+	 *
+	 * @param WC_Product|null $product Line product from `WC_Order_Item_Product::get_product()`.
+	 * @return int[] Term IDs (list may be empty).
+	 */
+	public static function get_wc_product_category_ids_for_order_line( $product ) {
+		if ( ! $product instanceof WC_Product ) {
+			return array();
+		}
+		$ids = $product->get_category_ids();
+		if ( ! empty( $ids ) && is_array( $ids ) ) {
+			return $ids;
+		}
+		if ( self::is_variation( $product ) ) {
+			$parent_id = $product->get_parent_id();
+			if ( $parent_id ) {
+				$parent = wc_get_product( $parent_id );
+				if ( $parent instanceof WC_Product ) {
+					$ids = $parent->get_category_ids();
+					return ( ! empty( $ids ) && is_array( $ids ) ) ? $ids : array();
+				}
+			}
+		}
+
+		return array();
+	}
+
+	/**
+	 * product_tag term IDs for a line product. Variations often have no tags; the parent variable product holds `product_tag`.
+	 * Same parent merge pattern as {@see get_wc_product_category_ids_for_order_line()}.
+	 *
+	 * @param WC_Product|null $product Line product from `WC_Order_Item_Product::get_product()`.
+	 * @return int[] Term IDs (list may be empty).
+	 */
+	public static function get_wc_product_tag_ids_for_order_line( $product ) {
+		if ( ! $product instanceof WC_Product ) {
+			return array();
+		}
+		$ids = $product->get_tag_ids();
+		if ( ! empty( $ids ) && is_array( $ids ) ) {
+			return $ids;
+		}
+		if ( self::is_variation( $product ) ) {
+			$parent_id = $product->get_parent_id();
+			if ( $parent_id ) {
+				$parent = wc_get_product( $parent_id );
+				if ( $parent instanceof WC_Product ) {
+					$ids = $parent->get_tag_ids();
+					return ( ! empty( $ids ) && is_array( $ids ) ) ? $ids : array();
+				}
+			}
+		}
+
+		return array();
+	}
+
+	/**
 	 * Validate create new order settings
 	 *
 	 * @param $data
@@ -11148,7 +11151,7 @@ class BWFAN_Common {
 					continue;
 				}
 
-				$product_categories = $product->get_category_ids();
+				$product_categories = self::get_wc_product_category_ids_for_order_line( $product );
 				if ( is_array( $product_categories ) && ! empty( $product_categories ) ) {
 					$order_product_categories = array_merge( $order_product_categories, $product_categories );
 				}
@@ -12940,7 +12943,7 @@ class BWFAN_Common {
 			$lang = $lang && is_string( $lang ) ? $lang : '';
 		} else {
 			$meta_key = '';
-			if ( class_exists( 'woocommerce_wpml' ) ) {
+			if ( class_exists( 'woocommerce_wpml' ) || defined( 'ICL_SITEPRESS_VERSION' ) ) {
 				$meta_key = 'wpml_language';
 			} elseif ( bwfan_is_translatepress_active() ) {
 				$meta_key = 'trp_language';
@@ -12950,6 +12953,14 @@ class BWFAN_Common {
 				$meta_key = 'linguise_language';
 			}
 			$lang = $meta_key ? $order->get_meta( $meta_key ) : '';
+		}
+
+		if ( empty( $lang ) && defined( 'ICL_SITEPRESS_VERSION' ) ) {
+			// Belt-and-suspenders: only resolves when shop_order is registered with WPML's translation system (typically via WCML).
+			$language_details = apply_filters( 'wpml_post_language_details', null, $order->get_id() );
+			if ( ! empty( $language_details ) && ! is_wp_error( $language_details ) && ! empty( $language_details['language_code'] ) ) {
+				$lang = $language_details['language_code'];
+			}
 		}
 
 		return apply_filters( 'bwfan_order_language', $lang, $order );
@@ -14357,5 +14368,259 @@ class BWFAN_Common {
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Get the real client IP address.
+	 * Trusts CF-Connecting-IP only when CF-RAY is also present (Cloudflare always sends both).
+	 *
+	 * @return string
+	 */
+	public static function get_client_ip() {
+		if ( ! empty( $_SERVER['HTTP_CF_RAY'] ) && ! empty( $_SERVER['HTTP_CF_CONNECTING_IP'] ) ) {
+			return sanitize_text_field( $_SERVER['HTTP_CF_CONNECTING_IP'] );
+		}
+
+		return sanitize_text_field( $_SERVER['REMOTE_ADDR'] ?? '' );
+	}
+
+	/**
+	 * Detect which code path is creating the abandoned cart.
+	 *
+	 * @return string
+	 */
+	public static function detect_cart_entry_point() {
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			$route = $_SERVER['REQUEST_URI'] ?? '';
+			if ( false !== strpos( $route, 'wc/store' ) ) {
+				return 'store_api';
+			}
+
+			return 'rest_other';
+		}
+		if ( wp_doing_ajax() ) {
+			return 'wc_ajax';
+		}
+
+		return 'unknown';
+	}
+
+	/**
+	 * Collect visitor fingerprint for forensic analysis.
+	 * Field set is gated by the GDPR Consent settings:
+	 *   - bwfan_ab_capture_ip_address controls IP / IP-country / forwarded-for / Cloudflare scores
+	 *   - bwfan_ab_capture_device controls user-agent, browser hints and language signals
+	 * Returns an empty array when both settings are off; callers must skip writing in that case.
+	 *
+	 * @param string|null $entry_point Optional caller-supplied label (e.g. 'wc_add_to_cart').
+	 *                                 Falls back to detect_cart_entry_point() when omitted.
+	 *
+	 * @return array
+	 */
+	public static function get_visitor_fingerprint( $entry_point = null ) {
+		$settings       = self::get_global_settings();
+		$capture_ip     = ! empty( $settings['bwfan_ab_capture_ip_address'] );
+		$capture_device = ! empty( $settings['bwfan_ab_capture_device'] );
+
+		if ( ! $capture_ip && ! $capture_device ) {
+			return array();
+		}
+
+		$data = array(
+			'entry_point'    => ! empty( $entry_point ) ? sanitize_key( $entry_point ) : self::detect_cart_entry_point(),
+			'tracked_at'     => current_time( 'mysql', 1 ),
+			'request_method' => sanitize_text_field( $_SERVER['REQUEST_METHOD'] ?? '' ),
+		);
+
+		if ( $capture_ip ) {
+			$data['ip']              = self::get_client_ip();
+			$data['ip_country']      = sanitize_text_field( $_SERVER['HTTP_CF_IPCOUNTRY'] ?? '' );
+			$data['forwarded_for']   = sanitize_text_field( $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '' );
+			$data['cf_bot_score']    = sanitize_text_field( $_SERVER['HTTP_CF_BOT_SCORE'] ?? '' );
+			$data['cf_threat_score'] = sanitize_text_field( $_SERVER['HTTP_CF_THREAT_SCORE'] ?? '' );
+		}
+
+		if ( $capture_device ) {
+			$data['user_agent']      = sanitize_text_field( $_SERVER['HTTP_USER_AGENT'] ?? '' );
+			$data['accept_encoding'] = sanitize_text_field( $_SERVER['HTTP_ACCEPT_ENCODING'] ?? '' );
+			$data['accept_language'] = sanitize_text_field( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '' );
+			$data['ch_ua']           = sanitize_text_field( $_SERVER['HTTP_SEC_CH_UA'] ?? '' );
+			$data['ch_ua_mobile']    = sanitize_text_field( $_SERVER['HTTP_SEC_CH_UA_MOBILE'] ?? '' );
+			$data['ch_ua_platform']  = sanitize_text_field( $_SERVER['HTTP_SEC_CH_UA_PLATFORM'] ?? '' );
+			$data['sec_fetch_mode']  = sanitize_text_field( $_SERVER['HTTP_SEC_FETCH_MODE'] ?? '' );
+			$data['sec_fetch_dest']  = sanitize_text_field( $_SERVER['HTTP_SEC_FETCH_DEST'] ?? '' );
+			$data['sec_fetch_site']  = sanitize_text_field( $_SERVER['HTTP_SEC_FETCH_SITE'] ?? '' );
+			$data['referer']         = sanitize_text_field( $_SERVER['HTTP_REFERER'] ?? '' );
+			$data['origin']          = sanitize_text_field( $_SERVER['HTTP_ORIGIN'] ?? '' );
+			$data['content_type']    = sanitize_text_field( $_SERVER['CONTENT_TYPE'] ?? '' );
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Parse a User-Agent string into device and browser info.
+	 *
+	 * @param string $ua Raw User-Agent string.
+	 *
+	 * @return array { 'device' => string, 'browser' => string }
+	 */
+	public static function parse_user_agent( $ua ) {
+		$result = [ 'device' => '', 'browser' => '' ];
+		if ( empty( $ua ) ) {
+			return $result;
+		}
+
+		/**
+		 * Device / OS — extract from the parenthesized section.
+		 */
+		if ( preg_match( '/\(([^)]+)\)/', $ua, $m ) ) {
+			$raw = $m[1];
+
+			if ( false !== strpos( $raw, 'Android' ) ) {
+				// "Linux; Android 14; Pixel 8" → "Android 14 - Pixel 8"
+				if ( preg_match( '/Android\s*([\d.]+)/', $raw, $v ) ) {
+					$device = 'Android ' . $v[1];
+					// Device model comes after the version and semicolon
+					$parts = explode( ';', $raw );
+					if ( count( $parts ) >= 3 ) {
+						$model  = trim( end( $parts ) );
+						$model  = str_replace( ' Build', '', $model );
+						$device .= ' - ' . $model;
+					}
+					$result['device'] = $device;
+				}
+			} elseif ( false !== strpos( $raw, 'iPhone' ) ) {
+				// "iPhone; CPU iPhone OS 17_0 like Mac OS X" → "iPhone iOS 17.0"
+				if ( preg_match( '/iPhone OS ([\d_]+)/', $raw, $v ) ) {
+					$result['device'] = 'iPhone iOS ' . str_replace( '_', '.', $v[1] );
+				} else {
+					$result['device'] = 'iPhone';
+				}
+			} elseif ( false !== strpos( $raw, 'iPad' ) ) {
+				if ( preg_match( '/CPU OS ([\d_]+)/', $raw, $v ) ) {
+					$result['device'] = 'iPad iOS ' . str_replace( '_', '.', $v[1] );
+				} else {
+					$result['device'] = 'iPad';
+				}
+			} elseif ( false !== strpos( $raw, 'Windows NT' ) ) {
+				// "Windows NT 10.0; Win64; x64" → "Windows 10"
+				$win_map = [
+					'10.0' => '10/11',
+					'6.3'  => '8.1',
+					'6.2'  => '8',
+					'6.1'  => '7',
+				];
+				if ( preg_match( '/Windows NT ([\d.]+)/', $raw, $v ) ) {
+					$ver              = $win_map[ $v[1] ] ?? $v[1];
+					$result['device'] = 'Windows ' . $ver;
+				}
+			} elseif ( false !== strpos( $raw, 'Mac OS X' ) || false !== strpos( $raw, 'Macintosh' ) ) {
+				// "Macintosh; Intel Mac OS X 10_15_7" → "Mac OS X 10.15.7"
+				if ( preg_match( '/Mac OS X ([\d_]+)/', $raw, $v ) ) {
+					$result['device'] = 'Mac OS X ' . str_replace( '_', '.', $v[1] );
+				} else {
+					$result['device'] = 'Mac';
+				}
+			} elseif ( false !== strpos( $raw, 'Linux' ) ) {
+				// "X11; Linux x86_64" → "Linux x86_64"
+				if ( preg_match( '/Linux\s*(\S+)?/', $raw, $v ) ) {
+					$result['device'] = 'Linux' . ( ! empty( $v[1] ) ? ' ' . $v[1] : '' );
+				}
+			} elseif ( false !== strpos( $raw, 'CrOS' ) ) {
+				$result['device'] = 'Chrome OS';
+			}
+		}
+
+		/**
+		 * Browser — match tokens in priority order (most specific first).
+		 */
+		$browsers = [
+			'EdgA/'            => 'Edge',
+			'Edg/'             => 'Edge',
+			'OPR/'             => 'Opera',
+			'Opera/'           => 'Opera',
+			'SamsungBrowser/'  => 'Samsung Browser',
+			'UCBrowser/'       => 'UC Browser',
+			'FxiOS/'           => 'Firefox',
+			'CriOS/'           => 'Chrome',
+			'Firefox/'         => 'Firefox',
+		];
+
+		$found_browser = false;
+		foreach ( $browsers as $token => $name ) {
+			if ( false !== strpos( $ua, $token ) ) {
+				$version = '';
+				if ( preg_match( '/' . preg_quote( $token, '/' ) . '([\d.]+)/', $ua, $v ) ) {
+					// Major version only
+					$version = strtok( $v[1], '.' );
+				}
+				$result['browser'] = $name . ( ! empty( $version ) ? ' ' . $version : '' );
+				$found_browser     = true;
+				break;
+			}
+		}
+
+		if ( ! $found_browser ) {
+			// Chrome must be checked after Edge/Opera since those UAs also contain "Chrome/"
+			if ( false !== strpos( $ua, 'Chrome/' ) ) {
+				if ( preg_match( '/Chrome\/([\d.]+)/', $ua, $v ) ) {
+					$result['browser'] = 'Chrome ' . strtok( $v[1], '.' );
+				}
+			} elseif ( false !== strpos( $ua, 'Safari/' ) && false !== strpos( $ua, 'Version/' ) ) {
+				// Safari: "Version/17.0 Safari/605.1.15" → "Safari 17"
+				if ( preg_match( '/Version\/([\d.]+)/', $ua, $v ) ) {
+					$result['browser'] = 'Safari ' . strtok( $v[1], '.' );
+				}
+			}
+		}
+
+		return $result;
+	}
+
+	public static function add_visitor_info_to_others( $fingerprint ) {
+		if ( empty( $fingerprint ) || ! is_array( $fingerprint ) ) {
+			return [];
+		}
+
+		/** Parse user_agent into device + browser */
+		$parsed = self::parse_user_agent( $fingerprint['user_agent'] ?? '' );
+
+		/** Device — prefer Client Hints when available, fall back to parsed UA */
+		$device = '';
+		if ( ! empty( $fingerprint['ch_ua_platform'] ) ) {
+			$device = trim( $fingerprint['ch_ua_platform'], '\\"' );
+		}
+		if ( empty( $device ) && ! empty( $parsed['device'] ) ) {
+			$device = $parsed['device'];
+		}
+
+		$labels = [
+			'ip'         => __( 'IP Address', 'wp-marketing-automations' ),
+			'ip_country' => __( 'IP Country', 'wp-marketing-automations' ),
+		];
+
+		$visitor_info = [];
+		foreach ( $labels as $key => $label ) {
+			if ( ! empty( $fingerprint[ $key ] ) ) {
+				$visitor_info[ $label ] = stripslashes_deep( $fingerprint[ $key ] );
+			}
+		}
+
+		if ( ! empty( $device ) ) {
+			$visitor_info[ __( 'Device', 'wp-marketing-automations' ) ] = $device;
+		}
+
+		if ( ! empty( $parsed['browser'] ) ) {
+			$visitor_info[ __( 'Browser', 'wp-marketing-automations' ) ] = $parsed['browser'];
+		}
+
+		if ( ! empty( $fingerprint['accept_language'] ) ) {
+			/** Show just the primary language, e.g. "en-US" from "en-US,en;q=0.9" */
+			$lang = strtok( $fingerprint['accept_language'], ',' );
+			$visitor_info[ __( 'Language', 'wp-marketing-automations' ) ] = $lang;
+		}
+
+		return $visitor_info;
 	}
 }

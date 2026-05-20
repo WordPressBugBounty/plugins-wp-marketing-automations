@@ -1170,7 +1170,12 @@ abstract class BWFAN_Event {
 	 */
 	public function get_rule_group() {
 		$rule_groups = $this->event_rule_groups;
-		$rule_groups = array_merge( $rule_groups, [ 'bwf_automation', 'languages', 'bwf_date_time', 'bwf_pushengage' ] );
+		$default_groups = [ 'bwf_automation', 'languages', 'bwf_date_time', 'bwf_pushengage' ];
+		$default_rule_groups = apply_filters( 'bwfan_default_rule_groups', $default_groups );
+		$default_rule_groups = is_array( $default_rule_groups ) && ! empty( $default_rule_groups ) ? $default_rule_groups : $default_groups;
+
+		$rule_groups = array_merge( $rule_groups, $default_rule_groups );
+		$rule_groups = array_values( array_unique( $rule_groups ) );
 
 		return apply_filters( 'bwfan_event_' . $this->get_slug() . '_rules_group', $rule_groups, $this );
 	}

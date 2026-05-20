@@ -3,6 +3,41 @@
 class BWFAN_Model_Automation_Contact extends BWFAN_Model {
 	static $primary_key = 'ID';
 
+	/**
+	 * Override BWFAN_Model::update() to retry on InnoDB deadlocks.
+	 *
+	 * `wp_bwfan_automation_contact` rows are written from up to 5 concurrent
+	 * Action Scheduler workers (controller progression, claim release, status
+	 * sweeps, goal updates), which causes recurring deadlocks under load.
+	 * Retry up to 3 times with 100/200/300ms backoff; non-deadlock errors
+	 * return immediately. Other models keep the abstract's raw $wpdb->update.
+	 *
+	 * @param array $data
+	 * @param array $where
+	 * @return int|false Rows affected, or false on non-deadlock failure / retry exhaustion.
+	 */
+	public static function update( $data, $where ) {
+		global $wpdb;
+
+		$table       = self::_table();
+		$max_retries = 3;
+
+		for ( $attempt = 0; $attempt <= $max_retries; $attempt++ ) {
+			if ( $attempt > 0 ) {
+				BWFAN_Common::log_test_data( 'BWFAN: Deadlock on automation_contact update, retry attempt ' . $attempt . ' of ' . $max_retries, 'fka-db-deadlock', true );
+				usleep( $attempt * 100000 );
+			}
+
+			$result = $wpdb->update( $table, $data, $where ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQLPlaceholders, WordPress.DB.PreparedSQL
+
+			if ( false !== $result || ! self::is_deadlock_error( $wpdb->last_error ) ) {
+				return $result;
+			}
+		}
+
+		return false;
+	}
+
 	public static function get_data( $id ) {
 		global $wpdb;
 

@@ -13,6 +13,7 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_WPML' ) ) {
 			add_action( 'bwfan_email_setup_locale', [ $this, 'translate_email_body' ] );
 			add_filter( 'wffn_wfty_filter_page_ids', [ $this, 'translate_checkout_post_id_for_funnel_lookup' ], 5, 2 );
 			add_filter( 'wffn_wfty_filter_page_ids', [ $this, 'restore_checkout_post_id_after_funnel_lookup' ], 11, 2 );
+			add_action( 'woocommerce_checkout_order_created', [ $this, 'maybe_save_order_language' ], 999 );
 		}
 
 		/**
@@ -73,6 +74,29 @@ if ( ! class_exists( 'BWFAN_Compatibility_With_WPML' ) ) {
 			}
 
 			return $thankyou_page_ids;
+		}
+
+		/**
+		 * Save wpml_language meta on order creation when WPML is active and meta is absent.
+		 *
+		 * @param WC_Order $order
+		 */
+		public function maybe_save_order_language( $order ) {
+			if ( ! $order instanceof WC_Order ) {
+				return;
+			}
+
+			if ( ! defined( 'ICL_LANGUAGE_CODE' ) ) {
+				return;
+			}
+
+			$existing = $order->get_meta( 'wpml_language' );
+			if ( ! empty( $existing ) ) {
+				return;
+			}
+
+			$order->update_meta_data( 'wpml_language', ICL_LANGUAGE_CODE );
+			$order->save_meta_data();
 		}
 
 		/**

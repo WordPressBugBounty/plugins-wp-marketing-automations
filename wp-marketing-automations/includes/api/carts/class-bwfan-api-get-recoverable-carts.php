@@ -271,6 +271,11 @@ class BWFAN_API_Get_Recoverable_Carts extends BWFAN_API_Base {
 
 		add_filter( 'woocommerce_formatted_address_force_country_display', '__return_false' );
 
+		/** Visitor fingerprint — each field as its own row */
+		if ( is_array( $checkout_data ) && isset( $checkout_data['_visitor_fingerprint'] ) && is_array( $checkout_data['_visitor_fingerprint'] ) ) {
+			$data['user_info'] = BWFAN_Common::add_visitor_info_to_others( $checkout_data['_visitor_fingerprint'] );
+		}
+
 		$data['others']   = $others;
 		$data['products'] = $products;
 		$coupon_data      = maybe_unserialize( $item->coupons );
@@ -296,6 +301,10 @@ class BWFAN_API_Get_Recoverable_Carts extends BWFAN_API_Base {
 		$data['shipping_total']     = ! empty( $shipping_total ) ? number_format( $shipping_total, 2, '.', '' ) : 0;
 		$data['shipping_tax_total'] = ! empty( $shipping_tax_value ) ? number_format( $shipping_tax_value, 2, '.', '' ) : 0;
 
+		/** Visitor fingerprint for analysis */
+		if ( is_array( $checkout_data ) && isset( $checkout_data['_visitor_fingerprint'] ) && is_array( $checkout_data['_visitor_fingerprint'] ) ) {
+			$data['visitor_info'] = $checkout_data['_visitor_fingerprint'];
+		}
 
 		return $data;
 	}

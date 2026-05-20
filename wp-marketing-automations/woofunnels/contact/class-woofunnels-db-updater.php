@@ -483,33 +483,67 @@ if ( ! class_exists( 'WooFunnels_DB_Updater' ) ) {
 		}
 
 		/**
-		 * Create nonce for rest request using wp_hash method which is unique for each site
+		 * Sign a loopback request with a per-call HMAC. The signature covers the action,
+		 * a fresh timestamp, and a random nonce, so each call produces a unique token
+		 * with a 5-minute validity window.
 		 *
-		 * @param $action
+		 * @param string $action
 		 *
-		 * @return false|string
+		 * @return array Keys: _ts, _rnonce, _sig
 		 */
-		public static function create_nonce( $action = '' ) {
-			return substr( wp_hash( $action, 'nonce' ), - 12, 10 );
+		public static function sign_request( $action = '' ) {
+			$ts     = time();
+			$rnonce = bin2hex( random_bytes( 8 ) );
+			$sig    = hash_hmac( 'sha256', $action . '|' . $ts . '|' . $rnonce, wp_salt( 'nonce' ) );
+
+			return array(
+				'_ts'     => $ts,
+				'_rnonce' => $rnonce,
+				'_sig'    => $sig,
+			);
 		}
 
 		/**
-		 * verify nonce in rest calls
+		 * Verify an HMAC-signed loopback request. Rejects tokens outside the 5-minute window,
+		 * with malformed metadata, with mismatched signatures, or whose rnonce has already
+		 * been consumed (replay defence).
 		 *
-		 * @param $nonce
-		 * @param $action
+		 * @param string $action
+		 * @param array  $posted_data
 		 *
 		 * @return bool
-		 * @see validate()
 		 */
-		public static function verify_nonce( $nonce, $action ) {
-			$expected = self::create_nonce( $action );
-
-			if ( empty( $expected ) || empty( $nonce ) ) {
+		public static function verify_signature( $action, $posted_data ) {
+			if ( empty( $action ) || ! is_array( $posted_data ) ) {
+				return false;
+			}
+			if ( empty( $posted_data['_sig'] ) || empty( $posted_data['_ts'] ) || empty( $posted_data['_rnonce'] ) ) {
 				return false;
 			}
 
-			return ( hash_equals( $expected, $nonce ) );
+			$ts = absint( $posted_data['_ts'] );
+			if ( $ts <= 0 || abs( time() - $ts ) > 300 ) {
+				return false;
+			}
+
+			$rnonce = $posted_data['_rnonce'];
+			if ( ! is_string( $rnonce ) || 16 !== strlen( $rnonce ) || ! ctype_xdigit( $rnonce ) ) {
+				return false;
+			}
+
+			$expected = hash_hmac( 'sha256', $action . '|' . $ts . '|' . $rnonce, wp_salt( 'nonce' ) );
+			if ( ! hash_equals( $expected, (string) $posted_data['_sig'] ) ) {
+				return false;
+			}
+
+			/** Replay defence: each rnonce may only be consumed once within its validity window. */
+			$replay_key = 'bwf_sig_replay_' . $rnonce;
+			if ( false !== get_transient( $replay_key ) ) {
+				return false;
+			}
+			set_transient( $replay_key, 1, 600 );
+
+			return true;
 		}
 
 		/**
@@ -534,12 +568,14 @@ if ( ! class_exists( 'WooFunnels_DB_Updater' ) ) {
 			$extra_data = apply_filters( 'fk_before_sending_order_status_change_async_request', [], $order_id, $from, $to );
 
 			/** Send async call */
-			$data = array(
-				'order_id'     => $order_id,
-				'from'         => $from,
-				'to'           => $to,
-				'_nonce'       => self::create_nonce( 'bwf_rest_order_status_changed' ),
-				'nonce_action' => 'bwf_rest_order_status_changed'
+			$data = array_merge(
+				array(
+					'order_id'     => $order_id,
+					'from'         => $from,
+					'to'           => $to,
+					'nonce_action' => 'bwf_rest_order_status_changed',
+				),
+				self::sign_request( 'bwf_rest_order_status_changed' )
 			);
 			if ( ! empty( $extra_data ) && is_array( $extra_data ) ) {
 				$data = array_merge( $extra_data, $data );
@@ -562,9 +598,12 @@ if ( ! class_exists( 'WooFunnels_DB_Updater' ) ) {
 
 				if ( ( $end_time - $start_time ) > 0.2 ) {
 					/** Curl took minimum 0.2 secs */
-					$flag_saved_val = get_transient( 'bwfan_stop_async_call' );
-					if ( empty( $flag_saved_val ) ) {
-						set_transient( 'bwfan_stop_async_call', 1, WEEK_IN_SECONDS );
+					/** Allow site owners to opt out of the sync-fallback on slow loopbacks (e.g. hosts where the loopback is always >200ms but reachable). */
+					if ( false === apply_filters( 'bwf_skip_stop_async_call_transient', false, ( $end_time - $start_time ), $data ) ) {
+						$flag_saved_val = get_transient( 'bwfan_stop_async_call' );
+						if ( empty( $flag_saved_val ) ) {
+							set_transient( 'bwfan_stop_async_call', 1, WEEK_IN_SECONDS );
+						}
 					}
 				}
 
@@ -647,8 +686,14 @@ if ( ! class_exists( 'WooFunnels_DB_Updater' ) ) {
 		 */
 		public static function validate( $request ) {
 			$posted_data = $request->get_body_params();
+			$action      = isset( $posted_data['nonce_action'] ) ? sanitize_key( $posted_data['nonce_action'] ) : '';
 
-			return self::verify_nonce( $posted_data['_nonce'], $posted_data['nonce_action'] );
+			$allowed_actions = array( 'bwf_rest_order_status_changed', 'bwf_rest_offer_accepted' );
+			if ( ! in_array( $action, $allowed_actions, true ) ) {
+				return false;
+			}
+
+			return self::verify_signature( $action, $posted_data );
 		}
 
 		/**
@@ -690,12 +735,14 @@ if ( ! class_exists( 'WooFunnels_DB_Updater' ) ) {
 				$total       = isset( $get_package['total'] ) ? $get_package['total'] : 0;
 				$product_ids = array_unique( $product_ids );
 
-				$data = array(
-					'products'     => $product_ids,
-					'total'        => $total,
-					'order_id'     => $order_id,
-					'_nonce'       => self::create_nonce( 'bwf_rest_offer_accepted' ),
-					'nonce_action' => 'bwf_rest_offer_accepted'
+				$data = array_merge(
+					array(
+						'products'     => $product_ids,
+						'total'        => $total,
+						'order_id'     => $order_id,
+						'nonce_action' => 'bwf_rest_offer_accepted',
+					),
+					self::sign_request( 'bwf_rest_offer_accepted' )
 				);
 				$url  = home_url() . '/?rest_route=/woofunnel_customer/v1/offer_accepted';
 				$args = bwf_get_remote_rest_args( $data );
@@ -1457,17 +1504,6 @@ if ( ! class_exists( 'WooFunnels_DB_Updater' ) ) {
 			$this->schedule_order_reindex_action( $order_id );
 		}
 
-		/**
-		 * Truncate the contact meta table
-		 * Run when BWF_DB_VERSION is 1.0.3
-		 */
-		protected function empty_contact_meta_table() {
-			global $wpdb;
-			$result = $wpdb->get_results( "SHOW TABLES LIKE '{$wpdb->prefix}bwf_contact_meta'", ARRAY_A ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			if ( is_array( $result ) && count( $result ) > 0 ) {
-				$wpdb->query( "TRUNCATE TABLE `{$wpdb->prefix}bwf_contact_meta`" );
-			}
-		}
 	}
 }
 

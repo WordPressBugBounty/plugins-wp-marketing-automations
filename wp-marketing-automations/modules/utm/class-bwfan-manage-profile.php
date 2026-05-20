@@ -175,9 +175,11 @@ class BWFAN_Manage_Profile {
     public function bwfan_manage_profile() {
         BWFAN_Common::nocache_headers();
 
-        // Security check
-        $nonce = filter_input( INPUT_POST, '_nonce' );
-        if ( ! wp_verify_nonce( $nonce, 'bwfan-manage_profile-nonce' ) ) {
+        // Security check: nonce must be bound to the submitted uid (NF-2).
+        $nonce         = filter_input( INPUT_POST, '_nonce' );
+        $submitted_uid = sanitize_key( (string) filter_input( INPUT_POST, 'uid' ) );
+        $nonce_action  = ! empty( $submitted_uid ) ? 'bwfan-manage_profile-nonce-' . $submitted_uid : 'bwfan-manage_profile-nonce';
+        if ( ! wp_verify_nonce( $nonce, $nonce_action ) ) {
             $this->return_message( 7 );
         }
 
@@ -516,7 +518,9 @@ class BWFAN_Manage_Profile {
         }
         echo '<a id="bwfan_manage_profile_update" class="button-primary button" href="#">' . esc_html( $button_label ) . '</a>';
 
-        echo '<input type="hidden" id="bwfan_manage_profile_nonce" value="' . esc_attr( wp_create_nonce( 'bwfan-manage_profile-nonce' ) ) . '" name="bwfan_manage_profile_nonce">';
+        // Bind the nonce action to the uid so a nonce minted on one contact's page cannot be replayed to overwrite another contact.
+        $nonce_action = ! empty( $uid ) ? 'bwfan-manage_profile-nonce-' . $uid : 'bwfan-manage_profile-nonce';
+        echo '<input type="hidden" id="bwfan_manage_profile_nonce" value="' . esc_attr( wp_create_nonce( $nonce_action ) ) . '" name="bwfan_manage_profile_nonce">';
         echo '</form></div>';
 
         $output = ob_get_clean();

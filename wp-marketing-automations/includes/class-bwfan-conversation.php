@@ -196,7 +196,8 @@ class BWFAN_Conversation {
 
 		/** it will add the space after the pre-header to not show the email body content */
 		if ( ! empty( $pre_header ) ) {
-			$pre_header .= '<div style="display: none; max-height: 0; overflow: hidden;">' . str_repeat( '&#847;&zwnj;&nbsp;', apply_filters( 'bwfan_email_pre_header_space', 100 ) ) . '</div>'; // Adding 70 instances to create enough hidden space
+			$pre_header_space = min( absint( apply_filters( 'bwfan_email_pre_header_space', 100 ) ), 500 );
+			$pre_header      .= '<div style="display: none; max-height: 0; overflow: hidden;">' . str_repeat( html_entity_decode( '&#847;&zwnj;&nbsp;', ENT_HTML5, 'UTF-8' ), $pre_header_space ) . '</div>';
 		}
 
 		$appended_body = $pre_header . $pixel . $body;
@@ -385,6 +386,11 @@ class BWFAN_Conversation {
 	 * @since 1.0.0
 	 */
 	public function convert_link_to_track_link( $url, $track_id, $uid, $l_hash = '' ) {
+		/** Skip tracking for URLs whose clean form exceeds the DB column size */
+		if ( strlen( $this->get_cleaned_url( $url ) ) > 190 ) {
+			return $url;
+		}
+
 		$args = [
 			'bwfan-uid'      => $uid,
 			'bwfan-track-id' => $track_id,
@@ -442,7 +448,7 @@ class BWFAN_Conversation {
 		}
 
 		$to          = BWFAN_Email_Conversations::$MODE_SMS === intval( $conversation_mode ) ? $contact->contact->get_contact_no() : $contact->contact->get_email();
-		$hash_code   = md5( microtime( true ) . $to );
+		$hash_code   = wp_generate_password( 32, false );
 		$type        = ( true === $is_single ? ( BWFAN_Email_Conversations::$MODE_SMS === absint( $conversation_mode ) ? BWFAN_Email_Conversations::$TYPE_SMS : BWFAN_Email_Conversations::$TYPE_EMAIL ) : BWFAN_Email_Conversations::$TYPE_CAMPAIGN );
 		$type        = ( true === $is_single && ! empty( $single_type ) ? $single_type : $type );
 		$create_time = current_time( 'mysql', 1 );
@@ -1259,7 +1265,11 @@ class BWFAN_Conversation {
 		if ( ! empty( $l_hash ) ) {
 			return $l_hash;
 		}
-		$link_hash = md5( $cleaned_url . $oid . $tid . $type . $sid );
+		// HMAC-signed so the link hash cannot be pre-computed from public inputs (URL + numeric IDs).
+		// Delimited payload prevents boundary collisions (e.g. oid=1,tid=23 vs oid=12,tid=3).
+		// HMAC-SHA1 produces exactly 40 hex chars — fits the existing varchar(40) column natively.
+		// HMAC's security does not depend on the underlying hash's collision resistance, so SHA-1's collision deprecation is not relevant here.
+		$link_hash = hash_hmac( 'sha1', $cleaned_url . '|' . $oid . '|' . $tid . '|' . $type . '|' . $sid, wp_salt( 'nonce' ) );
 
 		$data = [
 			'url'        => $link,

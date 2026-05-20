@@ -315,7 +315,11 @@ var BWFAN_Public;
             }
 
             var pushengage_token = await BWFAN_Public.getPushToken();
-            BWFAN_Public.capture_email_xhr = $.post(bwfanParamspublic.wc_ajax_url.toString().replace('%%endpoint%%', 'bwfan_insert_abandoned_cart'), {
+            BWFAN_Public.capture_email_xhr = $.ajax({
+                url: bwfanParamspublic.wc_ajax_url.toString().replace('%%endpoint%%', 'bwfan_insert_abandoned_cart'),
+                type: 'POST',
+                global: false,
+                data: {
                     'email': email,
                     'action': 'bwfan_insert_abandoned_cart',
                     'checkout_fields_data': BWFAN_Public.checkout_fields_data,
@@ -326,15 +330,17 @@ var BWFAN_Public;
                     'aerocheckout_page_id': aero_id,
                     'pushengage_token': pushengage_token,
                     '_wpnonce': bwfanParamspublic.ajax_nonce
-                }, function (res) {
+                },
+                success: function (res) {
                     if (parseInt(res.id) > 0 && 0 === $('#bwfan_cart_id').length) {
                         var cartIdHtml = '<input type="hidden" id="bwfan_cart_id" name="bwfan_cart_id" value="' + res.id + '" />';
                         $('#billing_email_field').after(cartIdHtml);
                         console.log('Cart ID: ' + res.id + ' captured.');
                     }
-                    BWFAN_Public.capture_email_xhr = null;
                 }
-            );
+            }).always(function () {
+                BWFAN_Public.capture_email_xhr = null;
+            });
         },
 
         union_arrays: function (x, y) {
@@ -1092,6 +1098,26 @@ var BWFAN_Public;
 
         var interval = null;
         $(document).on('blur change', '#billing_email,.input-text,.input-checkbox, select', function () {
+            var field_name = $(this).attr('name');
+            if (!field_name) {
+                return;
+            }
+
+            var field_value = $(this).val();
+
+            /** for checking checkbox fields **/
+            if ($(this).attr('type') == 'checkbox') {
+                field_value = $(this).prop('checked') ? 1 : 0;
+            }
+
+            if (BWFAN_Public.checkout_fields.indexOf(field_name) === -1) {
+                return;
+            }
+
+            if (BWFAN_Public.checkout_fields_data[field_name] === field_value) {
+                return;
+            }
+
             if (interval !== null) {
                 clearTimeout(interval);
             }
@@ -1218,7 +1244,7 @@ var BWFAN_Public;
             broadcast_id: broadcast_id ? broadcast_id : 0,
             form_feed_id: form_feed_id ? form_feed_id : 0,
             sid: sid ? sid : 0,
-            form_not_exist: 1,
+            _nonce: bwfanParamspublic.unsubscribe_nonce,
             one_click: 1,
         },
         success: function (response) {

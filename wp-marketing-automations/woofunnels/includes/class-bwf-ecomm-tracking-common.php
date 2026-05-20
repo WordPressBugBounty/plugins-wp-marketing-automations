@@ -21,6 +21,8 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 			add_action( 'add_meta_boxes', array( $this, 'add_single_order_meta_box' ), 50, 2 );
 
 			add_action( 'woocommerce_checkout_create_order', array( $this, 'add_tracking_data_in_order_meta' ), 12, 1 );
+			// Block-based checkout (Cart/Checkout blocks via Store API) does not fire
+			add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'add_tracking_data_in_order_meta' ), 12, 1 );
 			add_action( 'wfocu_offer_accepted_and_processed', array( $this, 'insert_tracking_data_in_upsell_order' ), 10, 4 );
 			add_action( 'woocommerce_thankyou', array( $this, 'insert_tracking_data_from_order_meta' ), 9, 1 );
 			add_action( 'woocommerce_order_status_changed', array( $this, 'maybe_insert_pending_tracking_data' ), 9, 4 );

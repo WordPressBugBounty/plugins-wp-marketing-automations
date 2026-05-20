@@ -178,7 +178,9 @@ abstract class BWFAN_API_Base {
 	public function rest_permission_callback( WP_REST_Request $request ) {
 		if ( 0 === get_current_user_id() ) {
 			$query_params = $request->get_query_params();
-			if ( isset( $query_params['bwf-nonce'] ) && $query_params['bwf-nonce'] === get_option( 'bwfan_unique_secret', '' ) ) {
+			$expected     = (string) get_option( 'bwfan_unique_secret', '' );
+			$provided     = isset( $query_params['bwf-nonce'] ) ? (string) $query_params['bwf-nonce'] : '';
+			if ( '' !== $expected && hash_equals( $expected, $provided ) ) {
 				return true;
 			}
 		}
