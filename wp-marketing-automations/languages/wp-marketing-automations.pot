@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv3 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: FunnelKit Automations 3.8.1\n"
+"Project-Id-Version: FunnelKit Automations 3.8.1.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wp-marketing-automations\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-20T13:09:21+00:00\n"
+"POT-Creation-Date: 2026-05-22T07:34:34+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: wp-marketing-automations\n"
@@ -64,7 +64,7 @@ msgstr ""
 #: admin/frontend/dist/745.6a9125eea7946db5.js:1
 #: admin/frontend/dist/836.1dd5d9760c40510a.js:1
 #: admin/frontend/dist/943.b233290d1d501ee2.js:1
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/1996.a15bee989148f183.js:1
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
 #: admin/frontend/dist/2919.9762bc16b5dc571f.js:1
@@ -80,7 +80,7 @@ msgstr ""
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:2
 #: admin/frontend/dist/lists.4316d496ad4e260c.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 #: admin/frontend/dist/tags.42a57255944484a3.js:1
 msgid "Contacts"
 msgstr ""
@@ -93,7 +93,7 @@ msgstr ""
 #: admin/frontend/dist/950.f4c4b08d856cf6a0.js:1
 #: admin/frontend/dist/1476.e6a4ec1573059633.js:1
 #: admin/frontend/dist/9873.b02adcc24a029693.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Carts"
 msgstr ""
 
@@ -111,7 +111,7 @@ msgstr ""
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
 #: admin/frontend/dist/3714.060d6b234bf8b226.js:1
 #: admin/frontend/dist/3947.fb4ec40bf0383722.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Automations"
 msgstr ""
 
@@ -130,7 +130,7 @@ msgstr ""
 #: admin/frontend/dist/836.1dd5d9760c40510a.js:1
 #: admin/frontend/dist/1996.a15bee989148f183.js:1
 #: admin/frontend/dist/7347.571b3e5450280978.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Emails"
 msgstr ""
 
@@ -166,14 +166,14 @@ msgstr ""
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
 #: admin/frontend/dist/9702.1e35f3c6cfe23a22.js:1
 #: admin/frontend/dist/information.414a2f130f0f7f57.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Link Triggers"
 msgstr ""
 
 #: admin/class-bwfan-admin.php:370
 #: admin/includes/class-bwfan-header.php:230
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Email Setup"
 msgstr ""
 
@@ -187,9 +187,9 @@ msgstr ""
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
 #: admin/frontend/dist/8609.6d6c31d3965b75f7.js:1
 #: admin/frontend/dist/9610.fbc0c4bf4959827a.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Settings"
 msgstr ""
 
@@ -205,20 +205,20 @@ msgstr ""
 
 #: admin/class-bwfan-admin.php:492
 #: rules/views/rules-basic.php:88
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/3701.3c7abdd0f11fb6b5.js:1
 #: admin/frontend/dist/5684.674a3022aca1e243.js:1
 #: admin/frontend/dist/8660.4728ba629122fb89.js:1
 #: admin/frontend/dist/bulk-action-step-three.7da49c8826b2d8a7.js:1
 #: admin/frontend/dist/bulk-action-step-two.841535e4ccc3069d.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "OR"
 msgstr ""
 
 #: admin/class-bwfan-admin.php:494
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Remove"
 msgstr ""
 
@@ -235,8 +235,8 @@ msgstr ""
 #: includes/class-bwfcrm-automations.php:139
 #: includes/class-bwfcrm-automations.php:140
 #: admin/frontend/dist/3714.060d6b234bf8b226.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Not Found"
 msgstr ""
 
@@ -261,13 +261,13 @@ msgstr ""
 
 #: admin/class-bwfan-admin.php:866
 #: admin/view/integrations.php:169
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 msgid "hours"
 msgstr ""
 
 #: admin/class-bwfan-admin.php:867
 #: admin/view/integrations.php:171
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "days"
 msgstr ""
 
@@ -488,7 +488,7 @@ msgstr ""
 #: includes/class-bwfan-common.php:6605
 #: admin/frontend/dist/2899.a309d9dfdc96d237.js:1
 #: admin/frontend/dist/5199.5a2ede2fd999a372.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Unsubscribers"
 msgstr ""
 
@@ -507,7 +507,7 @@ msgstr ""
 #: admin/frontend/dist/bulk-action-step-three.7da49c8826b2d8a7.js:1
 #: admin/frontend/dist/bulk-action-step-two.841535e4ccc3069d.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:2
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Actions"
 msgstr ""
 
@@ -538,9 +538,9 @@ msgstr ""
 #: admin/frontend/dist/bulk-action-step-one.9e2e774d468e7a4a.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 #: admin/frontend/dist/information.414a2f130f0f7f57.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Email"
 msgstr ""
 
@@ -573,8 +573,8 @@ msgstr ""
 #: admin/frontend/dist/9115.44a602d722247747.js:1
 #: admin/frontend/dist/9873.b02adcc24a029693.js:1
 #: admin/frontend/dist/bulk-action-step-two.841535e4ccc3069d.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Automation"
 msgstr ""
 
@@ -615,7 +615,7 @@ msgid "No Contact Mapped"
 msgstr ""
 
 #: admin/class-bwfan-admin.php:1720
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Resync Orders"
 msgstr ""
 
@@ -635,24 +635,24 @@ msgid "View Contact"
 msgstr ""
 
 #: admin/class-bwfan-admin.php:1885
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Automatically sync orders"
 msgstr ""
 
 #: admin/class-bwfan-admin.php:1928
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Order(s)"
 msgstr ""
 
 #: admin/class-bwfan-admin.php:1932
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Total Spend"
 msgstr ""
 
 #: admin/class-bwfan-admin.php:1936
 #: admin/frontend/dist/1996.a15bee989148f183.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "AOV"
 msgstr ""
 
@@ -713,7 +713,7 @@ msgstr ""
 #: includes/merge_tags/class-bwfan-contact-status.php:53
 #: admin/frontend/dist/4886.d3083478db3e12f4.js:1
 #: admin/frontend/dist/emails.f7e8f59b42ec47ce.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Bounced"
 msgstr ""
 
@@ -795,7 +795,7 @@ msgstr ""
 #: admin/frontend/dist/6531.9a59e5b891053f40.js:1
 #: admin/frontend/dist/7347.571b3e5450280978.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 #: admin/frontend/dist/order.e8d1d6764caf86f2.js:1
 msgid "Orders"
 msgstr ""
@@ -807,7 +807,7 @@ msgstr ""
 #: includes/class-bwfan-common.php:6616
 #: includes/class-bwfan-common.php:6620
 #: includes/class-bwfan-common.php:6621
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Tools"
 msgstr ""
 
@@ -819,14 +819,14 @@ msgstr ""
 #: admin/frontend/dist/1996.a15bee989148f183.js:1
 #: admin/frontend/dist/3989.b4101787bece5727.js:1
 #: admin/frontend/dist/6531.9a59e5b891053f40.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "SMS"
 msgstr ""
 
 #: admin/includes/class-bwfan-header.php:274
 #: admin/includes/class-bwfan-header.php:411
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Engagement"
 msgstr ""
 
@@ -856,7 +856,7 @@ msgstr ""
 
 #: admin/includes/class-bwfan-header.php:314
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "All Contacts"
 msgstr ""
 
@@ -866,7 +866,7 @@ msgstr ""
 #: admin/frontend/dist/7511.1a07bc8593b077ee.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 #: admin/frontend/dist/form-setup.669e893336a893b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #: admin/frontend/dist/manage-fields.13e5ce1ad1e13d0d.js:1
 msgid "Fields"
 msgstr ""
@@ -890,8 +890,8 @@ msgstr ""
 #: includes/class-bwfan-common.php:5803
 #: includes/class-bwfan-common.php:5804
 #: admin/frontend/dist/3989.b4101787bece5727.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "WhatsApp"
 msgstr ""
 
@@ -949,14 +949,14 @@ msgstr ""
 #: includes/merge_tags/class-bwfan-store-name.php:39
 #: includes/merge_tags/class-bwfan-wc-myaccount-page.php:41
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "General"
 msgstr ""
 
 #: admin/includes/class-bwfan-header.php:493
 #: includes/class-bwfan-common.php:6631
 #: includes/class-bwfan-common.php:6632
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Logs"
 msgstr ""
 
@@ -971,8 +971,8 @@ msgstr ""
 #: admin/frontend/dist/8609.6d6c31d3965b75f7.js:1
 #: admin/frontend/dist/9702.1e35f3c6cfe23a22.js:1
 #: admin/frontend/dist/forms-list.d3fda3f6f5e7664f.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "All"
 msgstr ""
 
@@ -992,8 +992,8 @@ msgstr ""
 #: admin/frontend/dist/8609.6d6c31d3965b75f7.js:1
 #: admin/frontend/dist/9702.1e35f3c6cfe23a22.js:1
 #: admin/frontend/dist/forms-list.d3fda3f6f5e7664f.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #: admin/frontend/dist/sms.361e5a228aaa367b.js:1
 msgid "Active"
 msgstr ""
@@ -1011,8 +1011,8 @@ msgstr ""
 #: admin/frontend/dist/8609.6d6c31d3965b75f7.js:1
 #: admin/frontend/dist/9702.1e35f3c6cfe23a22.js:1
 #: admin/frontend/dist/forms-list.d3fda3f6f5e7664f.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Inactive"
 msgstr ""
 
@@ -1026,13 +1026,13 @@ msgstr ""
 #: admin/frontend/dist/1650.edd9d566f24f9be2.js:1
 #: admin/frontend/dist/2007.2d686a11f510c761.js:1
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Templates"
 msgstr ""
 
 #: admin/includes/class-bwfan-header.php:530
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Global Styles"
 msgstr ""
 
@@ -1045,7 +1045,7 @@ msgstr ""
 #: admin/frontend/dist/3989.b4101787bece5727.js:1
 #: admin/frontend/dist/4627.8ba2b3b9fa266c51.js:1
 #: admin/frontend/dist/bulk-action-step-three.7da49c8826b2d8a7.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Ongoing"
 msgstr ""
 
@@ -1064,7 +1064,7 @@ msgstr ""
 #: admin/frontend/dist/9115.44a602d722247747.js:1
 #: admin/frontend/dist/bulk-action-step-three.7da49c8826b2d8a7.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #: admin/frontend/dist/sms.361e5a228aaa367b.js:1
 msgid "Completed"
 msgstr ""
@@ -1079,7 +1079,7 @@ msgstr ""
 #: admin/frontend/dist/4627.8ba2b3b9fa266c51.js:1
 #: admin/frontend/dist/9115.44a602d722247747.js:1
 #: admin/frontend/dist/bulk-action-step-three.7da49c8826b2d8a7.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #: admin/frontend/dist/sms.361e5a228aaa367b.js:1
 msgid "Paused"
 msgstr ""
@@ -1134,8 +1134,8 @@ msgstr ""
 #: admin/frontend/dist/8609.6d6c31d3965b75f7.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 #: admin/frontend/dist/information.414a2f130f0f7f57.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Update"
 msgstr ""
 
@@ -1156,7 +1156,7 @@ msgstr ""
 
 #: admin/view/automation-builder-view.php:382
 #: admin/frontend/dist/2007.2d686a11f510c761.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "My Templates"
 msgstr ""
 
@@ -1169,7 +1169,7 @@ msgid "Template Name"
 msgstr ""
 
 #: admin/view/automation-builder-view.php:539
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Enter Template Name"
 msgstr ""
 
@@ -1187,8 +1187,8 @@ msgstr ""
 #: admin/frontend/dist/forms-list.d3fda3f6f5e7664f.js:1
 #: admin/frontend/dist/information.414a2f130f0f7f57.js:1
 #: admin/frontend/dist/lists.4316d496ad4e260c.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #: admin/frontend/dist/notes.5ea5b5715ae80b92.js:1
 #: admin/frontend/dist/tags.42a57255944484a3.js:1
 msgid "Add"
@@ -1264,7 +1264,7 @@ msgid "High"
 msgstr ""
 
 #: admin/view/integrations.php:306
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Medium"
 msgstr ""
 
@@ -1305,8 +1305,8 @@ msgstr ""
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
 #: admin/frontend/dist/4886.d3083478db3e12f4.js:1
 #: admin/frontend/dist/9115.44a602d722247747.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select"
 msgstr ""
 
@@ -1325,7 +1325,7 @@ msgstr ""
 #: admin/view/tasks-page-filter.php:29
 #: admin/frontend/dist/9115.44a602d722247747.js:1
 #: admin/frontend/dist/bulk-action-step-two.841535e4ccc3069d.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Select Action"
 msgstr ""
 
@@ -1454,7 +1454,7 @@ msgstr ""
 #: admin/frontend/dist/affwp.a994ab3a70fc9290.js:1
 #: admin/frontend/dist/bulk-action-step-one.9e2e774d468e7a4a.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Details"
 msgstr ""
 
@@ -1474,7 +1474,7 @@ msgstr ""
 #: admin/frontend/dist/1476.e6a4ec1573059633.js:1
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
 #: admin/frontend/dist/9115.44a602d722247747.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Notes"
 msgstr ""
 
@@ -1535,7 +1535,7 @@ msgid "Default Resource Message"
 msgstr ""
 
 #: includes/abstracts/class-bwfan-ajax-controller.php:171
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Automation Updated"
 msgstr ""
 
@@ -1548,7 +1548,7 @@ msgstr ""
 #: admin/frontend/dist/4886.d3083478db3e12f4.js:1
 #: admin/frontend/dist/5343.508087636014ec5b.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Error"
 msgstr ""
 
@@ -1756,8 +1756,8 @@ msgstr ""
 #: admin/frontend/dist/1996.a15bee989148f183.js:1
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Days"
 msgstr ""
 
@@ -1980,8 +1980,8 @@ msgstr ""
 #: includes/native-connectors/wordpress/actions/class-bwfan-wp-sendemail.php:46
 #: admin/frontend/dist/2007.2d686a11f510c761.js:1
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "WooCommerce"
 msgstr ""
 
@@ -2465,8 +2465,8 @@ msgstr ""
 #: admin/frontend/dist/9734.aeebf1398d239c7a.js:1
 #: admin/frontend/dist/bulk-action-step-one.9e2e774d468e7a4a.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Contact"
 msgstr ""
 
@@ -2741,7 +2741,7 @@ msgstr ""
 
 #: includes/api/autonami/class-bwfan-api-get-task-history.php:29
 #: admin/frontend/dist/9115.44a602d722247747.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Search"
 msgstr ""
 
@@ -3145,7 +3145,7 @@ msgstr ""
 #: includes/api/setup/class-bwfan-api-wizard.php:169
 #: modules/utm/class-bwfan-manage-profile.php:224
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Email is not valid"
 msgstr ""
 
@@ -3503,7 +3503,7 @@ msgstr ""
 #: includes/class-bwfan-email-conversations.php:1414
 #: includes/class-bwfan-email-conversations.php:1422
 #: includes/class-bwfcrm-contacts.php:2443
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
 #: admin/frontend/dist/4919.2210aae6fa14363e.js:1
 #: admin/frontend/dist/6531.9a59e5b891053f40.js:1
@@ -3529,7 +3529,7 @@ msgstr ""
 #: admin/frontend/dist/7511.1a07bc8593b077ee.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:2
 #: admin/frontend/dist/emails.f7e8f59b42ec47ce.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Source"
 msgstr ""
 
@@ -3550,7 +3550,7 @@ msgstr ""
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:2
 #: admin/frontend/dist/forms-list.d3fda3f6f5e7664f.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #: admin/frontend/dist/order.e8d1d6764caf86f2.js:1
 #: admin/frontend/dist/wlm.0d7c995e24fa1efd.js:1
 msgid "Status"
@@ -3577,7 +3577,7 @@ msgstr ""
 #: admin/frontend/dist/9115.44a602d722247747.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 #: admin/frontend/dist/emails.f7e8f59b42ec47ce.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #: admin/frontend/dist/sms.361e5a228aaa367b.js:1
 msgid "Failed"
 msgstr ""
@@ -3887,13 +3887,13 @@ msgstr ""
 
 #: includes/api/importer/class-bwfan-importer-listing.php:135
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Affiliate WP"
 msgstr ""
 
 #: includes/api/importer/class-bwfan-importer-listing.php:136
 #: includes/importers/class-csv-importer.php:31
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "CSV"
 msgstr ""
 
@@ -3934,7 +3934,7 @@ msgstr ""
 #: admin/frontend/dist/5684.674a3022aca1e243.js:1
 #: admin/frontend/dist/6132.75e6b7e68f21423f.js:1
 #: admin/frontend/dist/lists.4316d496ad4e260c.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 #: admin/frontend/dist/tags.42a57255944484a3.js:1
 msgid "Name is required"
 msgstr ""
@@ -4230,8 +4230,8 @@ msgstr ""
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 #: admin/frontend/dist/forms-list.d3fda3f6f5e7664f.js:1
 #: admin/frontend/dist/lists.4316d496ad4e260c.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #: admin/frontend/dist/manage-fields.13e5ce1ad1e13d0d.js:1
 #: admin/frontend/dist/notes.5ea5b5715ae80b92.js:1
 #: admin/frontend/dist/tags.42a57255944484a3.js:1
@@ -4263,7 +4263,7 @@ msgid "This will schedule the process to  run now all the queued tasks."
 msgstr ""
 
 #: includes/api/settings/class-bwfan-api-get-tools-setting.php:80
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 msgid "Schedule"
 msgstr ""
 
@@ -4595,7 +4595,7 @@ msgstr ""
 #: admin/frontend/dist/3827.f231bb0ff5a98955.js:1
 #: admin/frontend/dist/7723.fa3952129b0668db.js:1
 #: admin/frontend/dist/8660.4728ba629122fb89.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Unsubscribe"
 msgstr ""
 
@@ -4887,7 +4887,7 @@ msgstr ""
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:2
 #: admin/frontend/dist/information.414a2f130f0f7f57.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Add Tags"
 msgstr ""
 
@@ -5055,7 +5055,7 @@ msgstr ""
 #: includes/class-bwfan-common.php:8804
 #: includes/class-bwfan-load-integrations.php:191
 #: includes/class-bwfan-load-integrations.php:213
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Send SMS"
 msgstr ""
 
@@ -5231,10 +5231,10 @@ msgid "Set the maximum emails allowed per 24 hours. Once this limit is reached, 
 msgstr ""
 
 #: includes/class-bwfan-common.php:5303
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
 #: admin/frontend/dist/8660.4728ba629122fb89.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "From Name"
 msgstr ""
 
@@ -5243,7 +5243,7 @@ msgstr ""
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
 #: admin/frontend/dist/6132.75e6b7e68f21423f.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Enter Name"
 msgstr ""
 
@@ -5252,10 +5252,10 @@ msgid "Name that will be used to send emails"
 msgstr ""
 
 #: includes/class-bwfan-common.php:5313
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
 #: admin/frontend/dist/8660.4728ba629122fb89.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "From Email"
 msgstr ""
 
@@ -5281,7 +5281,7 @@ msgid "Footer Text"
 msgstr ""
 
 #: includes/class-bwfan-common.php:5337
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Footer"
 msgstr ""
 
@@ -5490,7 +5490,7 @@ msgid "It logs the received data on a 'URL Shortening' operation. Logs are captu
 msgstr ""
 
 #: includes/class-bwfan-common.php:5791
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Email Settings"
 msgstr ""
 
@@ -5524,7 +5524,7 @@ msgstr ""
 #: includes/merge_tags/class-bwfan-wc-create-coupon-code.php:144
 #: admin/frontend/dist/1996.a15bee989148f183.js:1
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Minutes"
 msgstr ""
 
@@ -5553,8 +5553,8 @@ msgstr ""
 
 #: includes/class-bwfan-common.php:5884
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Notice"
 msgstr ""
 
@@ -5781,7 +5781,7 @@ msgstr ""
 
 #: includes/class-bwfan-common.php:6334
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Redirect URL"
 msgstr ""
 
@@ -6003,7 +6003,7 @@ msgid "The time gap between messages in seconds"
 msgstr ""
 
 #: includes/class-bwfan-common.php:7073
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "WhatsApp service is not configured yet."
 msgstr ""
 
@@ -6054,7 +6054,7 @@ msgstr ""
 
 #: includes/class-bwfan-common.php:7506
 #: includes/class-bwfan-common.php:7820
-#: admin/frontend/dist/main-3.8.1.js:5
+#: admin/frontend/dist/main-3.8.1.1.js:5
 msgid "Page"
 msgstr ""
 
@@ -6211,7 +6211,7 @@ msgid "Lists Heading"
 msgstr ""
 
 #: includes/class-bwfan-common.php:7770
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Button"
 msgstr ""
 
@@ -6489,8 +6489,8 @@ msgstr ""
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
 #: admin/frontend/dist/5343.508087636014ec5b.js:1
 #: admin/frontend/dist/emails.f7e8f59b42ec47ce.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Send Email"
 msgstr ""
 
@@ -6571,7 +6571,7 @@ msgstr ""
 
 #: includes/class-bwfan-common.php:10646
 #: includes/class-bwfan-common.php:10652
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/8660.4728ba629122fb89.js:1
 msgid "Segments"
 msgstr ""
@@ -6587,7 +6587,7 @@ msgstr ""
 #: admin/frontend/dist/6531.9a59e5b891053f40.js:1
 #: admin/frontend/dist/7347.571b3e5450280978.js:1
 #: admin/frontend/dist/7723.fa3952129b0668db.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Total Revenue"
 msgstr ""
 
@@ -6761,8 +6761,8 @@ msgid "NOT EXISTS"
 msgstr ""
 
 #: includes/class-bwfan-email-conversations.php:1413
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "-"
 msgstr ""
 
@@ -6773,7 +6773,7 @@ msgstr ""
 #: includes/class-bwfan-email-conversations.php:1432
 #: includes/class-bwfan-email-conversations.php:1443
 #: includes/class-bwfan-email-conversations.php:1450
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Note"
 msgstr ""
 
@@ -7055,7 +7055,7 @@ msgid "BulkGate"
 msgstr ""
 
 #: includes/class-bwfan-load-integrations.php:706
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "WishList Member"
 msgstr ""
 
@@ -7251,7 +7251,7 @@ msgstr ""
 
 #: includes/class-bwfan-recipe-loader.php:85
 #: includes/importers/class-affwp-importer.php:19
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "AffiliateWP"
 msgstr ""
 
@@ -7276,8 +7276,8 @@ msgstr ""
 #: includes/native-connectors/wordpress/events/class-bwfan-wp-user-login.php:10
 #: rules/rules/users.php:281
 #: rules/rules/wc-customer.php:319
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "User"
 msgstr ""
 
@@ -7573,11 +7573,11 @@ msgid "Order"
 msgstr ""
 
 #: includes/class-bwfan-rules.php:263
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/6683.175a0891276ad581.js:1
 #: admin/frontend/dist/7963.a64a54568eed5a75.js:1
 #: admin/frontend/dist/9734.aeebf1398d239c7a.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 #: admin/frontend/dist/order.e8d1d6764caf86f2.js:1
 msgid "Total"
 msgstr ""
@@ -7675,7 +7675,7 @@ msgstr ""
 #: admin/frontend/dist/9096.bec1c08e43f936a0.js:1
 #: admin/frontend/dist/form-setup.669e893336a893b3.js:1
 #: admin/frontend/dist/forms-list.d3fda3f6f5e7664f.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Form"
 msgstr ""
 
@@ -7692,8 +7692,8 @@ msgstr ""
 #: includes/class-bwfcrm-contacts.php:2448
 #: admin/frontend/dist/4919.2210aae6fa14363e.js:1
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Link Trigger"
 msgstr ""
 
@@ -8015,14 +8015,14 @@ msgstr ""
 #: includes/importers/class-ac-importer.php:67
 #: includes/importers/class-kit-importer.php:70
 #: includes/importers/class-mailchimp-importer.php:70
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "View Docs"
 msgstr ""
 
 #: includes/importers/class-ac-importer.php:72
 #: includes/importers/class-kit-importer.php:65
 #: includes/importers/class-mailchimp-importer.php:65
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "API Key"
 msgstr ""
 
@@ -8047,7 +8047,7 @@ msgstr ""
 #: modules/utm/class-bwfan-manage-profile.php:999
 #: admin/frontend/dist/bulk-action-step-one.9e2e774d468e7a4a.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 #: admin/frontend/dist/order.e8d1d6764caf86f2.js:1
 msgid "Phone"
 msgstr ""
@@ -8143,7 +8143,7 @@ msgstr ""
 #: includes/importers/class-wlm-importer.php:436
 #: admin/frontend/dist/371.aff1c8cd20c0695f.js:1
 #: admin/frontend/dist/943.b233290d1d501ee2.js:1
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/1388.2458f3f40f82e02b.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 msgid "Information"
@@ -8228,8 +8228,8 @@ msgstr ""
 #: admin/frontend/dist/1996.a15bee989148f183.js:1
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
 #: admin/frontend/dist/6531.9a59e5b891053f40.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #: admin/frontend/dist/sms.361e5a228aaa367b.js:1
 msgid "Message"
 msgstr ""
@@ -8346,7 +8346,7 @@ msgstr ""
 
 #: includes/merge_tags/class-bwfan-cf7-form-field.php:29
 #: includes/merge_tags/class-bwfan-cf7-form-field.php:124
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Select Field"
 msgstr ""
 
@@ -8462,7 +8462,7 @@ msgid "Contact State"
 msgstr ""
 
 #: includes/merge_tags/class-bwfan-contact-status.php:10
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Contact Status"
 msgstr ""
 
@@ -8560,8 +8560,8 @@ msgstr ""
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
 #: admin/frontend/dist/2853.3fa6be333ec23233.js:1
 #: admin/frontend/dist/9115.44a602d722247747.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Date"
 msgstr ""
 
@@ -8788,7 +8788,7 @@ msgstr ""
 #: admin/frontend/dist/7511.1a07bc8593b077ee.js:1
 #: admin/frontend/dist/7723.fa3952129b0668db.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Yes"
 msgstr ""
 
@@ -8808,7 +8808,7 @@ msgstr ""
 #: admin/frontend/dist/7511.1a07bc8593b077ee.js:1
 #: admin/frontend/dist/7723.fa3952129b0668db.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "No"
 msgstr ""
 
@@ -8904,8 +8904,8 @@ msgstr ""
 #: admin/frontend/dist/1996.a15bee989148f183.js:1
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Hours"
 msgstr ""
 
@@ -9271,14 +9271,14 @@ msgstr ""
 
 #: includes/merge_tags/class-bwfan-wc-order-shipping-method.php:27
 #: includes/merge_tags/class-bwfan-wc-order-shipping-method.php:132
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
 #: admin/frontend/dist/7511.1a07bc8593b077ee.js:1
 #: admin/frontend/dist/8660.4728ba629122fb89.js:1
 #: admin/frontend/dist/bulk-action-step-three.7da49c8826b2d8a7.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #: admin/frontend/dist/notes.5ea5b5715ae80b92.js:1
 msgid "Title"
 msgstr ""
@@ -9310,7 +9310,7 @@ msgstr ""
 #: includes/merge_tags/class-bwfan-wc-order-status.php:58
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:2
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Processing"
 msgstr ""
 
@@ -9450,7 +9450,7 @@ msgstr ""
 
 #: includes/native-connectors/cf7/events/class-bwfan-cf7-form-submit.php:116
 #: includes/native-connectors/cf7/events/class-bwfan-cf7-form-submit.php:643
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select Email Field"
 msgstr ""
 
@@ -9475,17 +9475,17 @@ msgid "Field "
 msgstr ""
 
 #: includes/native-connectors/cf7/events/class-bwfan-cf7-form-submit.php:544
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select First Name"
 msgstr ""
 
 #: includes/native-connectors/cf7/events/class-bwfan-cf7-form-submit.php:567
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select Last Name"
 msgstr ""
 
 #: includes/native-connectors/cf7/events/class-bwfan-cf7-form-submit.php:590
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select Phone"
 msgstr ""
 
@@ -9815,24 +9815,24 @@ msgstr ""
 #: includes/native-connectors/wordpress/actions/class-bwfan-wp-sendemail.php:44
 #: admin/frontend/dist/2007.2d686a11f510c761.js:1
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Rich Text"
 msgstr ""
 
 #: includes/native-connectors/wordpress/actions/class-bwfan-wp-sendemail.php:48
 #: admin/frontend/dist/2007.2d686a11f510c761.js:1
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Raw HTML"
 msgstr ""
 
 #: includes/native-connectors/wordpress/actions/class-bwfan-wp-sendemail.php:50
 #: admin/frontend/dist/2007.2d686a11f510c761.js:1
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Visual Builder"
 msgstr ""
 
@@ -9883,7 +9883,7 @@ msgstr ""
 
 #: includes/native-connectors/wordpress/actions/class-bwfan-wp-sendemail.php:890
 #: includes/native-connectors/wordpress/views/bwfan-wp-send-email.php:92
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "To"
 msgstr ""
 
@@ -9932,7 +9932,7 @@ msgstr ""
 #: admin/frontend/dist/3714.060d6b234bf8b226.js:1
 #: admin/frontend/dist/4919.2210aae6fa14363e.js:1
 #: admin/frontend/dist/9873.b02adcc24a029693.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Template"
 msgstr ""
 
@@ -9960,8 +9960,8 @@ msgstr ""
 #: admin/frontend/dist/4886.d3083478db3e12f4.js:1
 #: admin/frontend/dist/7347.571b3e5450280978.js:1
 #: admin/frontend/dist/emails.f7e8f59b42ec47ce.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Subject"
 msgstr ""
 
@@ -10003,8 +10003,8 @@ msgstr ""
 
 #: includes/native-connectors/wordpress/views/bwfan-wp-send-email.php:159
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Send"
 msgstr ""
 
@@ -10148,7 +10148,7 @@ msgstr ""
 #. translators: 1: Dynamic Data, 2: Dynamic Revenue
 #: modules/emails/class-bwfan-notification-email-controller.php:136
 #: modules/emails/class-bwfan-notification-email-controller.php:139
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "FunnelKit Automation"
 msgstr ""
 
@@ -10227,7 +10227,7 @@ msgid "You do not have permission to perform this action."
 msgstr ""
 
 #: modules/emails/class-bwfan-notification-email.php:548
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Email sent successfully."
 msgstr ""
 
@@ -10289,7 +10289,7 @@ msgstr ""
 #: admin/frontend/dist/1996.a15bee989148f183.js:1
 #: admin/frontend/dist/6531.9a59e5b891053f40.js:1
 #: admin/frontend/dist/7347.571b3e5450280978.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Total Orders"
 msgstr ""
 
@@ -10301,7 +10301,7 @@ msgstr ""
 #: modules/emails/class-bwfan-notification-metrics-controller.php:348
 #: admin/frontend/dist/1996.a15bee989148f183.js:1
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Day"
 msgstr ""
 
@@ -10396,7 +10396,7 @@ msgid "Country"
 msgstr ""
 
 #: modules/utm/class-bwfan-manage-profile.php:1002
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Timezone"
 msgstr ""
 
@@ -10437,13 +10437,13 @@ msgstr ""
 #: rules/inputs/cart-category-select.php:29
 #: rules/inputs/cart-product-select.php:36
 #: admin/frontend/dist/9873.b02adcc24a029693.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Quantity"
 msgstr ""
 
 #: rules/inputs/cart-category-select.php:30
 #: admin/frontend/dist/4919.2210aae6fa14363e.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #: admin/frontend/dist/order.e8d1d6764caf86f2.js:1
 msgid "Categories"
 msgstr ""
@@ -10460,7 +10460,7 @@ msgid "Select Product"
 msgstr ""
 
 #: rules/inputs/cart-product-select.php:37
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #: admin/frontend/dist/order.e8d1d6764caf86f2.js:1
 msgid "Products"
 msgstr ""
@@ -10556,15 +10556,15 @@ msgid "Order Items Taxonomy"
 msgstr ""
 
 #: rules/rules/abstracts.php:764
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Key"
 msgstr ""
 
 #: rules/rules/abstracts.php:775
 #: rules/rules/cf7.php:153
 #: admin/frontend/dist/bulk-action-step-two.841535e4ccc3069d.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Value"
 msgstr ""
 
@@ -10580,7 +10580,7 @@ msgstr ""
 #: rules/rules/users.php:252
 #: rules/rules/wc-customer.php:333
 #: rules/rules/wc-customer.php:539
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "is"
 msgstr ""
 
@@ -10742,7 +10742,7 @@ msgstr ""
 
 #: rules/rules/cf7.php:141
 #: admin/frontend/dist/bulk-action-step-two.841535e4ccc3069d.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Field"
 msgstr ""
 
@@ -10822,13 +10822,13 @@ msgstr ""
 
 #: rules/views/metabox-rules-rule-template-basic.php:36
 #: rules/views/rules-basic.php:74
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/3701.3c7abdd0f11fb6b5.js:1
 #: admin/frontend/dist/5684.674a3022aca1e243.js:1
 #: admin/frontend/dist/8660.4728ba629122fb89.js:1
 #: admin/frontend/dist/bulk-action-step-three.7da49c8826b2d8a7.js:1
 #: admin/frontend/dist/bulk-action-step-two.841535e4ccc3069d.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "AND"
 msgstr ""
 
@@ -10861,7 +10861,7 @@ msgid "Setup"
 msgstr ""
 
 #: templates/emails/email-footer.php:5
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Click here"
 msgstr ""
 
@@ -10907,7 +10907,7 @@ msgstr ""
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 #: admin/frontend/dist/emails.f7e8f59b42ec47ce.js:1
 #: admin/frontend/dist/forms-list.d3fda3f6f5e7664f.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #: admin/frontend/dist/order.e8d1d6764caf86f2.js:1
 #: admin/frontend/dist/sms.361e5a228aaa367b.js:1
 msgid "View"
@@ -11022,10 +11022,10 @@ msgstr ""
 
 #: admin/frontend/dist/371.aff1c8cd20c0695f.js:1
 #: admin/frontend/dist/943.b233290d1d501ee2.js:1
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
 #: admin/frontend/dist/8660.4728ba629122fb89.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Content"
 msgstr ""
 
@@ -11127,7 +11127,7 @@ msgstr ""
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 #: admin/frontend/dist/forms-list.d3fda3f6f5e7664f.js:1
 #: admin/frontend/dist/lists.4316d496ad4e260c.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #: admin/frontend/dist/manage-fields.13e5ce1ad1e13d0d.js:1
 #: admin/frontend/dist/order.e8d1d6764caf86f2.js:1
 #: admin/frontend/dist/tags.42a57255944484a3.js:1
@@ -11163,9 +11163,9 @@ msgstr ""
 #: admin/frontend/dist/forms-list.d3fda3f6f5e7664f.js:1
 #: admin/frontend/dist/information.414a2f130f0f7f57.js:1
 #: admin/frontend/dist/lists.4316d496ad4e260c.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #: admin/frontend/dist/manage-fields.13e5ce1ad1e13d0d.js:1
 #: admin/frontend/dist/tags.42a57255944484a3.js:1
 msgid "Name"
@@ -11304,7 +11304,7 @@ msgstr ""
 
 #: admin/frontend/dist/836.1dd5d9760c40510a.js:1
 #: admin/frontend/dist/3714.060d6b234bf8b226.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Data Updated"
 msgstr ""
 
@@ -11322,7 +11322,7 @@ msgstr ""
 #: admin/frontend/dist/3714.060d6b234bf8b226.js:1
 #: admin/frontend/dist/3989.b4101787bece5727.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Refresh"
 msgstr ""
 
@@ -11395,7 +11395,7 @@ msgstr ""
 
 #: admin/frontend/dist/950.f4c4b08d856cf6a0.js:1
 #: admin/frontend/dist/9873.b02adcc24a029693.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Enable Tracking"
 msgstr ""
 
@@ -11430,28 +11430,28 @@ msgstr ""
 msgid "Cart Analytics"
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 msgid "Broadcast Now"
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 msgid "Schedule For Later"
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/2919.9762bc16b5dc571f.js:1
 msgid "No Contacts are selected."
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 msgid "Given time should exceeds the current time."
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 msgid "Review & Schedule"
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/1388.2458f3f40f82e02b.js:1
 #: admin/frontend/dist/2007.2d686a11f510c761.js:1
 #: admin/frontend/dist/4886.d3083478db3e12f4.js:1
@@ -11460,13 +11460,13 @@ msgstr ""
 #: admin/frontend/dist/bulk-action-step-two.841535e4ccc3069d.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 #: admin/frontend/dist/information.414a2f130f0f7f57.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 #: admin/frontend/dist/manage-fields.13e5ce1ad1e13d0d.js:1
 #: admin/frontend/dist/notes.5ea5b5715ae80b92.js:1
 msgid "Type"
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/1996.a15bee989148f183.js:1
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
@@ -11476,63 +11476,63 @@ msgstr ""
 #: admin/frontend/dist/8660.4728ba629122fb89.js:1
 #: admin/frontend/dist/9702.1e35f3c6cfe23a22.js:1
 #: admin/frontend/dist/lists.4316d496ad4e260c.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Description"
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
 #: admin/frontend/dist/8660.4728ba629122fb89.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Reply-To Email"
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/8660.4728ba629122fb89.js:1
 msgid "Content #"
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/8660.4728ba629122fb89.js:1
 msgid "View details"
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 msgid "Something is wrong with the HTML of email body. Please review the HTML for any syntax errors."
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/8660.4728ba629122fb89.js:1
 msgid "Smart sending"
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/7511.1a07bc8593b077ee.js:1
 #: admin/frontend/dist/8660.4728ba629122fb89.js:1
 msgid "Enabled"
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Sample size (in percent)"
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 msgid "Wait Time (in hours)"
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 msgid "Pick Date and Time"
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
 msgid "Current Store Time"
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/2919.9762bc16b5dc571f.js:1
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
 #: admin/frontend/dist/bulk-action-step-two.841535e4ccc3069d.js:1
@@ -11542,16 +11542,16 @@ msgstr ""
 msgid "Previous"
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Send Now"
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 msgid "Update Broadcast"
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/3701.3c7abdd0f11fb6b5.js:1
 #: admin/frontend/dist/5684.674a3022aca1e243.js:1
 #: admin/frontend/dist/8660.4728ba629122fb89.js:1
@@ -11560,18 +11560,18 @@ msgstr ""
 msgid "New Filters are available starting from version 3.8.0. Please update to this version."
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/3701.3c7abdd0f11fb6b5.js:1
 #: admin/frontend/dist/5684.674a3022aca1e243.js:1
 #: admin/frontend/dist/8660.4728ba629122fb89.js:1
 #: admin/frontend/dist/bulk-action-step-three.7da49c8826b2d8a7.js:1
 #: admin/frontend/dist/bulk-action-step-two.841535e4ccc3069d.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Update Now"
 msgstr ""
 
-#: admin/frontend/dist/1279.35aa36306af2e76f.js:1
+#: admin/frontend/dist/1279.ea2142775f83c531.js:1
 #: admin/frontend/dist/2899.a309d9dfdc96d237.js:1
 #: admin/frontend/dist/3303.6edc7a8384e714d3.js:1
 #: admin/frontend/dist/3701.3c7abdd0f11fb6b5.js:1
@@ -11588,7 +11588,7 @@ msgid "Standard"
 msgstr ""
 
 #: admin/frontend/dist/1388.2458f3f40f82e02b.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "A/B Test"
 msgstr ""
 
@@ -11639,9 +11639,9 @@ msgstr ""
 #: admin/frontend/dist/forms-list.d3fda3f6f5e7664f.js:1
 #: admin/frontend/dist/information.414a2f130f0f7f57.js:1
 #: admin/frontend/dist/lists.4316d496ad4e260c.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #: admin/frontend/dist/manage-fields.13e5ce1ad1e13d0d.js:1
 #: admin/frontend/dist/notes.5ea5b5715ae80b92.js:1
 #: admin/frontend/dist/tags.42a57255944484a3.js:1
@@ -11656,7 +11656,7 @@ msgstr ""
 #: admin/frontend/dist/bulk-action-step-one.9e2e774d468e7a4a.js:1
 #: admin/frontend/dist/bulk-action-step-two.841535e4ccc3069d.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #: admin/frontend/dist/order.e8d1d6764caf86f2.js:1
 #: admin/frontend/dist/sms.361e5a228aaa367b.js:1
 msgid "Next"
@@ -11757,7 +11757,7 @@ msgstr ""
 #: admin/frontend/dist/8609.6d6c31d3965b75f7.js:1
 #: admin/frontend/dist/9734.aeebf1398d239c7a.js:1
 #: admin/frontend/dist/forms-list.d3fda3f6f5e7664f.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Unknown Error Occurred"
 msgstr ""
 
@@ -11775,7 +11775,7 @@ msgstr ""
 #: admin/frontend/dist/9734.aeebf1398d239c7a.js:1
 #: admin/frontend/dist/bulk-action-step-two.841535e4ccc3069d.js:1
 #: admin/frontend/dist/emails.f7e8f59b42ec47ce.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 #: admin/frontend/dist/manage-fields.13e5ce1ad1e13d0d.js:1
 #: admin/frontend/dist/sms.361e5a228aaa367b.js:1
 msgid "Action"
@@ -11783,7 +11783,7 @@ msgstr ""
 
 #: admin/frontend/dist/1476.e6a4ec1573059633.js:1
 #: admin/frontend/dist/9115.44a602d722247747.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Data"
 msgstr ""
 
@@ -11826,7 +11826,7 @@ msgstr ""
 #: admin/frontend/dist/1476.e6a4ec1573059633.js:1
 #: admin/frontend/dist/3989.b4101787bece5727.js:1
 #: admin/frontend/dist/9115.44a602d722247747.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Scheduled"
 msgstr ""
 
@@ -11887,7 +11887,7 @@ msgstr ""
 
 #: admin/frontend/dist/1650.edd9d566f24f9be2.js:1
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Launching Editor"
 msgstr ""
 
@@ -11907,9 +11907,9 @@ msgstr ""
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 #: admin/frontend/dist/information.414a2f130f0f7f57.js:1
 #: admin/frontend/dist/lists.4316d496ad4e260c.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #: admin/frontend/dist/manage-fields.13e5ce1ad1e13d0d.js:1
 #: admin/frontend/dist/notes.5ea5b5715ae80b92.js:1
 #: admin/frontend/dist/tags.42a57255944484a3.js:1
@@ -12009,8 +12009,8 @@ msgstr ""
 #: admin/frontend/dist/9873.b02adcc24a029693.js:1
 #: admin/frontend/dist/forms-list.d3fda3f6f5e7664f.js:1
 #: admin/frontend/dist/lists.4316d496ad4e260c.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #: admin/frontend/dist/tags.42a57255944484a3.js:1
 msgid "Confirm"
 msgstr ""
@@ -12231,7 +12231,7 @@ msgid "Reason"
 msgstr ""
 
 #: admin/frontend/dist/1954.931db28617bf0213.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Updating status…"
 msgstr ""
 
@@ -12258,7 +12258,7 @@ msgstr ""
 #: admin/frontend/dist/1996.a15bee989148f183.js:1
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
 #: admin/frontend/dist/3947.fb4ec40bf0383722.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #: admin/frontend/dist/sms.361e5a228aaa367b.js:1
 msgid "Condition"
 msgstr ""
@@ -12275,7 +12275,7 @@ msgstr ""
 #: admin/frontend/dist/1954.931db28617bf0213.js:1
 #: admin/frontend/dist/3947.fb4ec40bf0383722.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Delete Contact"
 msgid_plural "Delete Contacts"
 msgstr[0] ""
@@ -12307,8 +12307,8 @@ msgstr ""
 
 #: admin/frontend/dist/1996.a15bee989148f183.js:1
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Upgrade to PRO"
 msgstr ""
 
@@ -12447,29 +12447,29 @@ msgstr ""
 
 #: admin/frontend/dist/1996.a15bee989148f183.js:1
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Minute"
 msgstr ""
 
 #: admin/frontend/dist/1996.a15bee989148f183.js:1
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Hour"
 msgstr ""
 
 #: admin/frontend/dist/1996.a15bee989148f183.js:1
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Weeks"
 msgstr ""
 
 #: admin/frontend/dist/1996.a15bee989148f183.js:1
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Months"
 msgstr ""
 
@@ -12500,7 +12500,7 @@ msgstr ""
 
 #: admin/frontend/dist/1996.a15bee989148f183.js:1
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:5
+#: admin/frontend/dist/main-3.8.1.1.js:5
 msgid "of"
 msgstr ""
 
@@ -12651,8 +12651,8 @@ msgstr ""
 #: admin/frontend/dist/8660.4728ba629122fb89.js:1
 #: admin/frontend/dist/9873.b02adcc24a029693.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "View Details"
 msgstr ""
 
@@ -12727,8 +12727,8 @@ msgstr ""
 
 #: admin/frontend/dist/2007.2d686a11f510c761.js:1
 #: admin/frontend/dist/3714.060d6b234bf8b226.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Please wait…"
 msgstr ""
 
@@ -12805,7 +12805,7 @@ msgstr ""
 
 #: admin/frontend/dist/2007.2d686a11f510c761.js:1
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Visual Builder (Legacy)"
 msgstr ""
 
@@ -12832,7 +12832,7 @@ msgstr ""
 #: admin/frontend/dist/7511.1a07bc8593b077ee.js:1
 #: admin/frontend/dist/9702.1e35f3c6cfe23a22.js:1
 #: admin/frontend/dist/lists.4316d496ad4e260c.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #: admin/frontend/dist/manage-fields.13e5ce1ad1e13d0d.js:1
 #: admin/frontend/dist/tags.42a57255944484a3.js:1
 msgid "Edit"
@@ -12876,8 +12876,8 @@ msgstr ""
 #: admin/frontend/dist/2007.2d686a11f510c761.js:1
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
 #: admin/frontend/dist/8609.6d6c31d3965b75f7.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "New"
 msgstr ""
 
@@ -12913,7 +12913,7 @@ msgstr ""
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 #: admin/frontend/dist/forms-list.d3fda3f6f5e7664f.js:1
 #: admin/frontend/dist/lists.4316d496ad4e260c.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #, js-format
 msgid "(%s Result)"
 msgid_plural "(%s Results)"
@@ -12942,8 +12942,8 @@ msgstr ""
 
 #: admin/frontend/dist/2007.2d686a11f510c761.js:1
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter"
 msgstr ""
 
@@ -12994,8 +12994,8 @@ msgstr ""
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:2
 #: admin/frontend/dist/forms-list.d3fda3f6f5e7664f.js:1
 #: admin/frontend/dist/lists.4316d496ad4e260c.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #: admin/frontend/dist/tags.42a57255944484a3.js:1
 msgid "Learn More"
 msgstr ""
@@ -13048,8 +13048,8 @@ msgstr ""
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
 #: admin/frontend/dist/4886.d3083478db3e12f4.js:1
 #: admin/frontend/dist/4919.2210aae6fa14363e.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Search…"
 msgstr ""
 
@@ -13108,18 +13108,18 @@ msgid "Pro Feature"
 msgstr ""
 
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Copy Step"
 msgstr ""
 
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Copy"
 msgstr ""
 
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Move Step"
 msgstr ""
 
@@ -13247,7 +13247,7 @@ msgid "split step"
 msgstr ""
 
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Merge tag copied."
 msgstr ""
 
@@ -13256,26 +13256,26 @@ msgid "No Merge Tag Available"
 msgstr ""
 
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Configure"
 msgstr ""
 
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Merge Tags"
 msgstr ""
 
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Search by name"
 msgstr ""
 
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "This is a required field."
 msgstr ""
 
@@ -13289,12 +13289,12 @@ msgid "The required merge tags"
 msgstr ""
 
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "missing in the email body."
 msgstr ""
 
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "This is required field."
 msgstr ""
 
@@ -13532,7 +13532,7 @@ msgstr ""
 
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
 #: admin/frontend/dist/5684.674a3022aca1e243.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Please make sure all filters are filled in correctly"
 msgstr ""
 
@@ -13541,17 +13541,17 @@ msgid "Please select conditions to save."
 msgstr ""
 
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "No Condition"
 msgstr ""
 
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Add a condition to segment and make contacts flow to different branches"
 msgstr ""
 
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Add New Condition"
 msgstr ""
 
@@ -13590,7 +13590,7 @@ msgstr ""
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 #: admin/frontend/dist/information.414a2f130f0f7f57.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 #: admin/frontend/dist/notes.5ea5b5715ae80b92.js:1
 msgid "Type here …"
 msgstr ""
@@ -13675,7 +13675,7 @@ msgid "No contacts found"
 msgstr ""
 
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Add Step"
 msgstr ""
 
@@ -13726,7 +13726,7 @@ msgstr ""
 
 #: admin/frontend/dist/2099.4880dbbf321c08b3.js:1
 #: admin/frontend/dist/8609.6d6c31d3965b75f7.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Close"
 msgstr ""
 
@@ -13781,7 +13781,7 @@ msgstr ""
 #: admin/frontend/dist/2899.a309d9dfdc96d237.js:1
 #: admin/frontend/dist/5199.5a2ede2fd999a372.js:1
 #: admin/frontend/dist/bulk-action-step-two.841535e4ccc3069d.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Total Contacts"
 msgstr ""
 
@@ -13799,7 +13799,7 @@ msgstr ""
 #: admin/frontend/dist/2919.9762bc16b5dc571f.js:1
 #: admin/frontend/dist/bulk-action-step-one.9e2e774d468e7a4a.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "orders"
 msgstr ""
 
@@ -13965,7 +13965,7 @@ msgid "Notifications"
 msgstr ""
 
 #: admin/frontend/dist/3714.060d6b234bf8b226.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "contact support"
 msgstr ""
 
@@ -14005,7 +14005,7 @@ msgstr ""
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
 #: admin/frontend/dist/7511.1a07bc8593b077ee.js:1
 #: admin/frontend/dist/9096.bec1c08e43f936a0.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Deactivate"
 msgstr ""
 
@@ -14013,13 +14013,13 @@ msgstr ""
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
 #: admin/frontend/dist/7511.1a07bc8593b077ee.js:1
 #: admin/frontend/dist/9096.bec1c08e43f936a0.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Activate"
 msgstr ""
 
 #: admin/frontend/dist/3714.060d6b234bf8b226.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Updating Automation…"
 msgstr ""
 
@@ -14244,7 +14244,7 @@ msgstr ""
 
 #: admin/frontend/dist/3989.b4101787bece5727.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Cancelled"
 msgstr ""
 
@@ -14257,7 +14257,7 @@ msgid " Cancel to stop, Delete to proceed."
 msgstr ""
 
 #: admin/frontend/dist/3989.b4101787bece5727.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Once you delete this item. It will no longer available."
 msgstr ""
 
@@ -14345,109 +14345,109 @@ msgid "Unlock %s Broadcast and other awesome features."
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Select or Upload Media"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Loading Visual Builder"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Email Editor"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Failed to migrate the content. Please try again later."
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "The legacy visual builder will soon be deprecated. We recommend switching the content to the new email builder."
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Switch to New Builder"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Visually get email with drop & drop builder."
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "License Invalid"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Drag and Drop Email Editor requires an active license. Please go to "
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #, js-format
 msgid " %s > %s "
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "and add valid license keys."
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Go To Settings"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Migration"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Test mail sent successfully."
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Test mail failed to send."
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
 #: admin/frontend/dist/5343.508087636014ec5b.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Email is required."
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
 #: admin/frontend/dist/5343.508087636014ec5b.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Mail content is required field."
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
 #: admin/frontend/dist/5343.508087636014ec5b.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Preview & Test"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
 #: admin/frontend/dist/5343.508087636014ec5b.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Send Test Email"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
 #: admin/frontend/dist/5343.508087636014ec5b.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter email address…"
 msgstr ""
 
@@ -14460,77 +14460,77 @@ msgid "Select Image Position"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "This is a Pro Feature"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "We're sorry, this feature is not available on your plan. Please upgrade to the PRO plan to unlock all these awesome features."
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Go Pro"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Close editor callback is not defined"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Please add subject or content to save"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Failed to save email content"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Please add email and content to send test email"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "please add subject or content to import"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Block Editor"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Importing Template"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Failed to open Link trigger"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Failed to open Merge Tags"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Utilize our drag & drop builder to craft elegant email templates including WooCommerce Blocks."
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "New Visual Builder"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Place your HTML here"
 msgstr ""
 
@@ -14555,12 +14555,12 @@ msgid "Enter preview text"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Preview Text"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Template Type"
 msgstr ""
 
@@ -14585,97 +14585,97 @@ msgid "Content is required field."
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "No content available for preview."
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Preview and Test"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Add Unsubscribe Text"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Automatically append UTM parameters to email links"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Campaign Source"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter UTM source"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Referrer: (e.g., google, newsletter)"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Campaign Medium"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter UTM medium"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Marketing medium: (e.g., CPC, banner, email)"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Campaign Name"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter UTM name"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Product, promo code, or slogan (e.g., spring_sale)"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Campaign Term"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter UTM term"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Campaign Content"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter UTM content"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Smart Sending"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enable Smart Sending"
 msgstr ""
 
@@ -14689,17 +14689,17 @@ msgid "This broadcast will first go to %d percent of your contacts. After %d hou
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter percent"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Wait time (in hours)"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter hour difference"
 msgstr ""
 
@@ -14712,22 +14712,22 @@ msgid "{{unsubscribe_link}} are required merge tags, they must be missing from t
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Control"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Variant"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Add Variant"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Template Applied Successfully."
 msgstr ""
 
@@ -14736,17 +14736,17 @@ msgid "missing in the email body"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter From Name"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter From Email"
 msgstr ""
 
 #: admin/frontend/dist/4217.b6d3d645f2725c5a.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter Reply-To Email"
 msgstr ""
 
@@ -14784,8 +14784,8 @@ msgstr ""
 #: admin/frontend/dist/9702.1e35f3c6cfe23a22.js:1
 #: admin/frontend/dist/bulk-action-step-three.7da49c8826b2d8a7.js:1
 #: admin/frontend/dist/emails.f7e8f59b42ec47ce.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Draft"
 msgstr ""
 
@@ -14843,34 +14843,34 @@ msgid "Unlock Bulk Actions and other awesome features."
 msgstr ""
 
 #: admin/frontend/dist/4886.d3083478db3e12f4.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Start Date"
 msgstr ""
 
 #: admin/frontend/dist/4886.d3083478db3e12f4.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #, js-format
 msgid "Date input describing a selected date range's start date in format %s"
 msgstr ""
 
 #: admin/frontend/dist/4886.d3083478db3e12f4.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "to"
 msgstr ""
 
 #: admin/frontend/dist/4886.d3083478db3e12f4.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "End Date"
 msgstr ""
 
 #: admin/frontend/dist/4886.d3083478db3e12f4.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #, js-format
 msgid "Date input describing a selected date range's end date in format %s"
 msgstr ""
 
 #: admin/frontend/dist/4886.d3083478db3e12f4.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "vs."
 msgstr ""
 
@@ -14878,7 +14878,7 @@ msgstr ""
 #: admin/frontend/dist/4919.2210aae6fa14363e.js:1
 #: admin/frontend/dist/5684.674a3022aca1e243.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Apply"
 msgstr ""
 
@@ -14891,7 +14891,7 @@ msgid "Enter value"
 msgstr ""
 
 #: admin/frontend/dist/4886.d3083478db3e12f4.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Today"
 msgstr ""
 
@@ -14904,7 +14904,7 @@ msgid "This Week"
 msgstr ""
 
 #: admin/frontend/dist/4886.d3083478db3e12f4.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Last Week"
 msgstr ""
 
@@ -14913,27 +14913,27 @@ msgid "This Month"
 msgstr ""
 
 #: admin/frontend/dist/4886.d3083478db3e12f4.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Last Month"
 msgstr ""
 
 #: admin/frontend/dist/4886.d3083478db3e12f4.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Quarter to Date"
 msgstr ""
 
 #: admin/frontend/dist/4886.d3083478db3e12f4.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Last Quarter"
 msgstr ""
 
 #: admin/frontend/dist/4886.d3083478db3e12f4.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Year to Date"
 msgstr ""
 
 #: admin/frontend/dist/4886.d3083478db3e12f4.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Last Year"
 msgstr ""
 
@@ -15017,7 +15017,7 @@ msgstr ""
 
 #: admin/frontend/dist/4919.2210aae6fa14363e.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Create New"
 msgstr ""
 
@@ -15031,7 +15031,7 @@ msgid "Form Type"
 msgstr ""
 
 #: admin/frontend/dist/4949.d2792737c876bf0b.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select "
 msgstr ""
 
@@ -15044,35 +15044,35 @@ msgid "Updating link trigger…"
 msgstr ""
 
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Name is required field."
 msgstr ""
 
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Redirect URL is required field."
 msgstr ""
 
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Please fill all action values."
 msgstr ""
 
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
 #: admin/frontend/dist/9702.1e35f3c6cfe23a22.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Link copied"
 msgstr ""
 
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
 #: admin/frontend/dist/9702.1e35f3c6cfe23a22.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Enter Description"
 msgstr ""
 
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Run multiple times"
 msgstr ""
 
@@ -15081,17 +15081,17 @@ msgid "If enable then link will run multiple times"
 msgstr ""
 
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Log Actions as Contact Note"
 msgstr ""
 
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Enable Auto Login"
 msgstr ""
 
 #: admin/frontend/dist/5097.23645e3ca2eb0316.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Auto Login will expire after "
 msgstr ""
 
@@ -15734,7 +15734,7 @@ msgid "Locked"
 msgstr ""
 
 #: admin/frontend/dist/8609.6d6c31d3965b75f7.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Sync"
 msgstr ""
 
@@ -15856,7 +15856,7 @@ msgstr ""
 #: admin/frontend/dist/8661.a6e987071e070225.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:2
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Add to Lists"
 msgstr ""
 
@@ -15864,7 +15864,7 @@ msgstr ""
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:2
 #: admin/frontend/dist/information.414a2f130f0f7f57.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Search by list name"
 msgstr ""
 
@@ -15873,8 +15873,8 @@ msgstr ""
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:2
 #: admin/frontend/dist/information.414a2f130f0f7f57.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Search by tag name"
 msgstr ""
 
@@ -15917,7 +15917,7 @@ msgstr ""
 #: admin/frontend/dist/8661.a6e987071e070225.js:1
 #: admin/frontend/dist/9096.bec1c08e43f936a0.js:1
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #: admin/frontend/dist/UserSetup.0c1c5e76e41404ad.js:2
 msgid "Back"
 msgstr ""
@@ -15953,8 +15953,8 @@ msgid "Redirect After Confirmation"
 msgstr ""
 
 #: admin/frontend/dist/9096.bec1c08e43f936a0.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "URL"
 msgstr ""
 
@@ -15963,7 +15963,7 @@ msgid "File"
 msgstr ""
 
 #: admin/frontend/dist/9096.bec1c08e43f936a0.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Enter URL"
 msgstr ""
 
@@ -16243,7 +16243,7 @@ msgid "Shipping Address"
 msgstr ""
 
 #: admin/frontend/dist/9873.b02adcc24a029693.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #: admin/frontend/dist/order.e8d1d6764caf86f2.js:1
 msgid "Amount"
 msgstr ""
@@ -16445,7 +16445,7 @@ msgid "Creation Date"
 msgstr ""
 
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Last Updated"
 msgstr ""
 
@@ -16522,7 +16522,7 @@ msgid "Take to Bulk Action Screen"
 msgstr ""
 
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Please fill the empty actions to add new one."
 msgstr ""
 
@@ -16640,7 +16640,7 @@ msgid "Once you cancel the import, all progress will be lost, and the action can
 msgstr ""
 
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Send Message"
 msgstr ""
 
@@ -16666,9 +16666,9 @@ msgstr ""
 
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
 #: admin/frontend/dist/lists.4316d496ad4e260c.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #: admin/frontend/dist/manage-fields.13e5ce1ad1e13d0d.js:1
 #: admin/frontend/dist/notes.5ea5b5715ae80b92.js:1
 #: admin/frontend/dist/tags.42a57255944484a3.js:1
@@ -16696,7 +16696,7 @@ msgid "Unable to delete contacts"
 msgstr ""
 
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #: admin/frontend/dist/UserSetup.0c1c5e76e41404ad.js:1
 msgid "Email is required"
 msgstr ""
@@ -16750,7 +16750,7 @@ msgid "Cancel Export"
 msgstr ""
 
 #: admin/frontend/dist/contacts.e8d7f60a0975b779.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Confirmation"
 msgstr ""
 
@@ -17065,13 +17065,13 @@ msgid "Funnel Name"
 msgstr ""
 
 #: admin/frontend/dist/funnel.c8fc7515c2c2e8b9.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Checkout"
 msgstr ""
 
 #: admin/frontend/dist/funnel.c8fc7515c2c2e8b9.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Order Bump"
 msgstr ""
 
@@ -17096,8 +17096,8 @@ msgid "Sales"
 msgstr ""
 
 #: admin/frontend/dist/funnel.c8fc7515c2c2e8b9.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Optin"
 msgstr ""
 
@@ -17110,7 +17110,7 @@ msgid "Add Options to select here"
 msgstr ""
 
 #: admin/frontend/dist/information.414a2f130f0f7f57.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Type here"
 msgstr ""
 
@@ -17123,7 +17123,7 @@ msgid "Max 9999999999"
 msgstr ""
 
 #: admin/frontend/dist/information.414a2f130f0f7f57.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Select Option"
 msgstr ""
 
@@ -17152,7 +17152,7 @@ msgid "Please select a tag."
 msgstr ""
 
 #: admin/frontend/dist/information.414a2f130f0f7f57.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Address"
 msgstr ""
 
@@ -17290,7 +17290,7 @@ msgid "No fields Found"
 msgstr ""
 
 #: admin/frontend/dist/information.414a2f130f0f7f57.js:1
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Push Notification"
 msgstr ""
 
@@ -17375,2792 +17375,2792 @@ msgstr ""
 msgid "This description will be used on Unsubscribe page when List Management is turned on."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Template applied."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Subject "
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Created on "
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "No Templates Found"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Save As Template"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "All Automation with names that include {{query /}}"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Add new list with name {{query /}}"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Add new tag with name {{query /}}"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "All coupons with codes that include {{query /}}"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "{{query /}}"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "All products with titles that include {{query /}}"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "All categories with titles that include {{query /}}"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Set custom URL : {{query /}}"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Missing URLs"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Broken URLs"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Shortened URLs"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Shortened URLs can hurt deliverability and may be flagged as spam. Use full URLs for :"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Unsubscribe Merge Tag Missing"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Current Email Size is "
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Email Audit Details"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Following items need to be fixed"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Insert {{unsubscribe_link}} or {{mail_footer}} merge tag in your email template"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Unsubscribe Merge Tag"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Email Size"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Audit Email"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Check broken links, email size, and ensure compliance"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "No "
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid " (Optimal size: Less than 100 KB)"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Send WhatsApp"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Push Notification (By PushEngage)"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Message sent successfully"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Unable to send message."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Phone number missing from contact details."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Connect with SMS provider to send messages."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "WhatsApp configuration is missing."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Contact hasn't opted for Push Notification yet."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Please select message type."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 #, js-format
 msgid "%s are mandatory field. Kindly fill all fields"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Image url is not valid."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Please enter message body."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Please enter the subject for the message."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Title and body are mandatory field. Kindly fill all fields"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Enter Title"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Enter Message"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Image URL"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Enter Image URL"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Write your message here …"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Sending SMS"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Type to search"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Please choose automation"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Failed to add:"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "No Automations found"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 #: admin/frontend/dist/sms.361e5a228aaa367b.js:1
 msgid "Add to Automation"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Unable to add this automation"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Learn about supported automation events."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Unsubscribe Date"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Last Login"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Last Sent"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Last Open"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Last Click"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Last Abandoned"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "items"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Already upto date"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Unable to sync order."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Syncing…"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Last Ordered"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "WC Subscriptions"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Total Renewals"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Renewal Revenue"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Next Renewal"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Next Renewal Amount"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Sublium Subscriptions"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Funnels"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Bumps"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "accepted"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Upsells"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Profile"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Purchases"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Unable to update status"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Created on"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Click to Copy"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Email copied."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 #: admin/frontend/dist/sms.361e5a228aaa367b.js:1
 msgid "Adding Contacts to Automation"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "This contact is marked as a soft bounce due to reasons like a full mailbox, the recipient's email server being down, or the email message being too large. We will attempt to send the email three times. If unsuccessful, the contact will be marked as bounced."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "You are about to delete this contact. This action cannot be undone. Cancel to stop, Delete to proceed."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "No options Available"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "No field found"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Action type not found"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "No action selected"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "+ Add More Action"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "No Option found for selection"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "No options available to check"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Black"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Cyan bluish gray"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "White"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Pale pink"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Vivid red"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Luminous vivid orange"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Luminous vivid amber"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Light green cyan"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Vivid green cyan"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Pale cyan blue"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Vivid cyan blue"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Vivid purple"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Brand Colors"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Standard Colors"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Reset to default"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "Please"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "You are about to"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "This action cannot be undone. Cancel to stop"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:1
+#: admin/frontend/dist/main-3.8.1.1.js:1
 msgid "to proceed"
 msgstr ""
 
 #. translators: 1: Calendar day format, 2: Calendar event number.
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter Date & Time"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Yesterday"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Week to Date"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Month to Date"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Custom"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Previous Period"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Previous Year"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "MMM D, YYYY"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "MMM D"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #, js-format
 msgid "Week of %B %-d, %Y"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Invalid date"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select a date in the past"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Start date must be before end date"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Hi"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Test mail failed to send"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "The legacy visual builder has been retired. We recommend switching over the content to new email builder."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Failed to fetch dynamic coupons"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #: admin/frontend/dist/manage-fields.13e5ce1ad1e13d0d.js:1
 msgid "Merge Tag"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "and add valid license."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter the SMS body"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter Subject"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter Preview Text"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Mark this email as Transactional"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Contacts with status Unsubscribed will get the transactional email."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Emails such as Order Summary, Renewal Reminders, and Admin notifications are transactional emails."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Override From Name, From Email & Reply To Email"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #, js-format
 msgid "This broadcast will be sent to %d percent of your contacts. After %d hours, open rates of all the variants would be analyzed and the one with the most opens would be sent to the remaining contacts."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Some required fields are not filled, check below."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "The required merge tags "
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "are"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Seconds"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Second"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Upgrading to PRO"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "You're using FunnelKit Automation Lite. To unlock more features consider "
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "🔥 Pre Black Friday Deal: Get FunnelKit Pro for up to 55% OFF 🔥"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Claim My Discount"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "🔥 Black Friday Deal: Get FunnelKit Pro for up to 55% OFF 🔥"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "🔥 Small Business Saturday Deal: Get FunnelKit Pro for up to 55% OFF 🔥"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "🔥 Black Friday Extended Deal: Get FunnelKit Pro for up to 55% OFF 🔥"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "🔥 Cyber Monday Deal: Get FunnelKit Pro for up to 55% OFF 🔥"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "🔥 Extended Cyber Monday Deal: Get FunnelKit Pro for up to 55% OFF 🔥"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "🔥 Green Monday Deal: Get FunnelKit Pro for up to 45% OFF 🔥"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "🔥 Halloween Deal: Get FunnelKit Pro for up to 45% OFF 🔥"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "🔥 Halloween Extended Deal: Get FunnelKit Pro for up to 45% OFF 🔥"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Items Selected"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #, js-format
 msgid "%d items selected in the list"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Clear All"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Fill all the required fields"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Need help?"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Contact Now"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "View ongoing bulk actions"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "No merge tags available"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Price: "
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Stock: "
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select a Product"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Search product"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "No Products Available"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "result found"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "results found"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Equals"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Subtract"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Please ensure merge tag outputs correct email format. Ignore if correct."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "No fields found for this tab."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Copied to Clipboard"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "License Deactivated"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "License Activated"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #, js-format
 msgid "License %s Failed"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Deactivation"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Activation"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter license key here"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "This license has expired. Login to"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Your Account"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "and renew your license."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Please enter licence key"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Renews on "
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Lifetime license"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "You are currently using Automations Lite, which does not require a license."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "To access more features, consider upgrading to Automations PRO now."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Already purchased a license?"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Download the premium version from your account and activate your license keys."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Login to Funnelkit Account"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Learn how to install"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Add New"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Search all link triggers with name {{query /}}"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "All Users with names that include {{query /}}"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select Column"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Lookup Column"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Row to delete for a given column value"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Value for search"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "No sheet column found."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter Google SpreadSheet ID"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Get Sheet"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Unable to fetch sheet data."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "No worksheet found."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select Worksheet"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Unable to send data"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "No Data Found! Test Again."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "No Data Updated"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Custom Webhook URL"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Use this custom webhook URL to send requests to."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Test Your Event"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Send a request to the webhook URL."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Receive Webhook"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Data Found"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Some keys detected with '{{' or '}}' strings, which are not allowed. Kindly check the keys in the webhook data."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Received at "
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #, js-format
 msgid "Add new %s with name {{query /}}"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "New Coupon"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Existing Coupon"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Restrictions"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Limits"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Merge Tag Copied to Clipboard"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Usage Limit Per Coupon"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "How many times this coupon can be used before it is void."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Limit usage to X items"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Usage Limit Per User"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "How many times this coupon can be used by an individual user. Uses billing email for guests, and user ID for logged in users."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select Coupon Type"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Minimum Spend"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "This field allows you to set the minimum spend (subtotal) allowed to use the coupon."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Maximum Spend"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "This field allows you to set the maximum spend (subtotal) allowed when using the coupon."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Individual Use Only"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Check this box if the coupon cannot be used in conjunction with other coupons."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Exclude Sale Items"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Check this box if the coupon should not apply to items on sale. Per-item coupons will only work if the item is not on sale. Per-cart coupons will only work if there are items in the cart that are not on sale."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Restrict to Customer Email"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Products that the coupon will be applied to, or that need to be in the cart in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Exclude Products"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Products that the coupon will not be applied to, or that cannot be in the cart in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Product categories that the coupon will be applied to, or that need to be in the cart in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Exclude Categories"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Product categories that the coupon will not be applied to, or that cannot be in the cart in order for the \"Fixed cart discount\" to be applied."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Coupon Title"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Coupon title is for internal usage, visible only to admins."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter title"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "This dynamic coupon can be used in emails or other actions using merge tag : "
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Discount Type"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Value of the coupon."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "This is a required field"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Coupon Code Prefix"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "FunnelKit Automations will generate a random coupon code for each contact. By adding a prefix (like WELCOME), we'll add it to the start of each code, so instead of being for e.g., '92D3AI', it would be 'WELCOME92D3AI'."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "CODE"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Coupon Expiry"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "The coupon will expire at 00:00:00 of this date."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Expiry after Specific Time"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Expiry after Specific Days"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Expiry on Specific Date"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Never Expire"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Allow Free Shipping"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Check this box if the coupon grants free shipping. A free shipping method must be enabled in your shipping zone and be set to require \"a valid free shipping coupon\" (see the \"Free Shipping Requires\" setting)."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select Coupon Template"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "The selected coupon configuration will be used when creating the dynamic coupon"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "View Original Coupon"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "No form fields found"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select Email"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "To sync additional fields, select the `Update Fields` action and map the form fields using merge tag."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Invalid Email : "
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Please enter some emails to unsubscribe."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Bulk Unsubscribe"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter emails comma (,) separated or each in new line to unsubscribe multiple emails."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "This will unsubscribe users from all emails marked as promotional."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Delete Unsubscriber"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Unsubscriber"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Unable to delete unsubscribers"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "No unsubscribers available"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select option"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Press enter to select"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select to remove"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Press enter to remove"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Delete All Log Files"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Delete Log File"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Something went wrong, Please try again later"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Unable to delete the log file"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select Log File"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Search User"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Please select a user."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Update Key"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Add Key"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Permission"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Read"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Write"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Read / Write"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select User"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Max 200 characters"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "API Key generated successfully. Make sure to copy it as it gets hidden once you leave this page."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Last Access"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Delete API"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "View Documentation"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Create Key"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "ALL SETTINGS"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "REST API"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "No REST API found"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Rest API"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Please enter an email id"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Please enter a valid email id"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Test mail sent successfully"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Unable to sent test mail."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Test Notification"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Test the notifications to ensure that emails are arriving in your inbox"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Other Recipients"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Add Recipient"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Add External User"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Template data not found"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Location latitude"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Location longitude"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Text that will appear immediately below the generic map at the top of the message."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Address that will appear after the <NAME> value, below the generic map at the top of the message"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Body Preview"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Variable / Type"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "There are no tools to display."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Go to main site"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "HTML"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Editor"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Source Name"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Mail Pre-header"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Mail Type"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Term"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "UTM Details"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Some personalized dynamic tags in this email refer to data that has been deleted. As a result, you may see the merge tags or conditional content placeholders instead of actual data."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "The correct data was sent to the recipient during the actual email delivery."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Hide Details"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Show Details"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Large Image URL"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "First Button Title"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "First Button URL"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "First Button Image URL"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Second Button Title"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Second Button URL"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Second Button Image URL"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Activity"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "0%"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #, js-format
 msgid "%f%%"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select a date"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Choose a date"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #, js-format
 msgid "Date input describing a selected date in format %s"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Calendar"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Interact with the calendar and select start and end dates."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Clear Date"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Clear Dates"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Move backward to switch to the previous month."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Move forward to switch to the next month."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Enter key"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Right and left arrow keys"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "up and down arrow keys"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "page up and page down keys"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Home and end keys"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Escape key"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Question mark"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select the date in focus."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Move backward (left) and forward (right) by one day."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Move backward (up) and forward (down) by one week."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Switch months."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Go to the first or last day of a week."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Return to the date input field."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Press the down arrow key to interact with the calendar and select a date."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #, js-format
 msgid "Select %s as a start date."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #, js-format
 msgid "Select %s as an end date."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #, js-format
 msgid "%s is not selectable."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #, js-format
 msgid "Selected. %s"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 #, js-format
 msgid "You may select up to %d items."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "By hour"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "By day"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "By week"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "By month"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "By quarter"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "By year"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Line chart"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Bar chart"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Your requested data is loading"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Clear all"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Label"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "and"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Fetching Options…"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "For"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select a Filter"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "AND Condition"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "OR Condition"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Remove "
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid " filter match"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid " qty of "
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Unable to load filters"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Joined"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "compare to"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "select a preset period"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select date range and comparison"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select a Date Range"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Presets"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Compare to"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Reset"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "PAGE NOT FOUND"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "The page you are looking for doesn’t exist"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "GO TO DASHBOARD"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Click here to upload"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Error in uploaded file. Please check file type & size."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "uploading…"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "uploaded"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Drag or browse a CSV file"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "(Maximum file size allowed 10 MB)"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "filter report to show:"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "This is a PRO Feature"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Upgrade to PRO Now"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "Select or upload image"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:4
 msgid "You can only upload JPEG, PNG, and GIF Image"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:4
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:4
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Add Image"
 msgstr ""
 
 #. translators: %1$d is the first item index, %2$d is last item index, %3$d is total items
 #. translators: %1$d is the first item index, %2$d is the last item index, %3$d is total items
-#: admin/frontend/dist/main-3.8.1.js:5
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:5
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #, js-format
 msgid "Viewing %1$d-%2$d of %3$d results"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:5
+#: admin/frontend/dist/main-3.8.1.1.js:5
 msgid "Previous Page"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:5
+#: admin/frontend/dist/main-3.8.1.1.js:5
 msgid "Next Page"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Per Page"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #, js-format
 msgid "%1$s (%2$s of %3$s)"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Move backward for selected items"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #, js-format
 msgid "%d result found, use up and down arrow keys to navigate."
 msgid_plural "%d results found, use up and down arrow keys to navigate."
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "No results."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Choose which values to display"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Columns:"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "(scroll to see more)"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #, js-format
 msgid "Sort by %s in ascending order"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #, js-format
 msgid "Sort by %s in descending order"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "No data to display"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Top Marketing Automations:"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #, js-format
 msgid " %d+ Users, %d+ Five-Star Reviews!"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #, js-format
 msgid "We're sorry, this feature is not available on your plan. Please %s to unlock all these awesome features."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "upgrade to the premium plan"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "activate license"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "renew license"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "This is a PRO Feature!"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Unlimited Contacts"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Smart Delays"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Conditional Branching"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Drag & Drop Email Editor"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "360° Contacts View"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Audience Segmentation"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Connect with Form Plugins"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Over 60+ Integrations"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Send & Receive Webhooks"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #, js-format
 msgid "%s is a PRO feature"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "FunnelKit Automation has generated revenue worth"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #, js-format
 msgid "+%d "
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Invalid Schema or Values"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Failed to fetch products"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Failed to fetch templates"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Failed to fetch layouts"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Failed to fetch coupons"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Failed to fetch categories"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Failed to save site settings"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Failed to open media library"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "No link trigger available"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Create New Link Trigger"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Not a valid Url"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Search URL"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Save Changes ?"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Looks like you have made changes. Do you want to save these changes before you leave?"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "PRO"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Upgrading to Plus"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Upgrade to Plus"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Plus"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Upgrading to Professional"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Upgrade to Professional"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Professional"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Upgrading to Elite"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Upgrade to Elite"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Elite"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Lite"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Unable to delete current step."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Delete Step"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Deleting Step …"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Step Deleted."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Automation Updated."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Step is already in this position."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Sorry! moving steps inside Split path is not allowed. You can add a new step."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Processing step update …"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Unable to move step."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Updating Automation …"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Sorry! Split Path cannot be pasted here."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Sorry! Goal, Jump, and Exit cannot be used inside Split Path."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Step(s) Added."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Unable to fetch sync selection options"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Unable to fetch form fields"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Unable to fetch contact"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Unable to fetch subscription"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Unable to fetch conversations"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Unable to fetch notification"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Align Left"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Align Center"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Align Right"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Left"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Center"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Right"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Justify"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Vertical Top"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Vertical Middle"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Vertical Bottom"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Top"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Bottom"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #, js-format
 msgid "%s Top"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Email Safe Fonts"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Web Fonts"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Custom Fonts"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "https://"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Paragraph"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Heading 1"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Heading 2"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Heading 3"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Heading 4"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Heading 5"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Heading 6"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Circle"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Circle black"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Circle white"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Round"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Round black"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Square"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Square black"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Circle gray"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Background Color"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Text Color"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Font Size"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Auto Width"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Width( % )"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "E.g 16"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Padding"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Border Radius"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Brand Logo"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Logo"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Link"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Enter Link"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Add Color"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Typography"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Font Family"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Backup Font Family"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Link Colors"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Link Color"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Link Style"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "None"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Underline"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Overline"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Line Through"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "This is a dynamic block and content is coming form settings."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Layout"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Desktop Width (px)"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "E.g 640"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Content Position"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Content Background Color"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Body Background Color"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Social"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Style"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Icons"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "This is Heading 1"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "This is Heading 2"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "This is Heading 3"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "This is Heading 4"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "This is Heading 5"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "This is Heading 6"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Here is the style of link Color"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Button Text"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "No changes to save."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Global Setting Updated."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Error in updating Data"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "These style settings are applicable on New Visual Builder"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "NO NAME"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Select Field Type"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Text Input"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Number"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Text Area"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Drop Down"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Radio Button"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Checkboxes"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Date Time"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Time"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Select Campaign Type"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Select Campaign Status"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Halt"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "WC Order"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Direct"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "WP User"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Sorry, something went wrong. Please contact"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid " support "
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Sorry, something went wrong. Please contact support."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Sales Page"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Optin Thankyou"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "One Click Upsell"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Offer"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Thankyou"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "You're using FunnelKit Automation Lite. Sorry, to get full access to Recipe Library"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Don't miss out on atleast 10-15% additional revenue"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "We're sorry, this feature is not available on your plan. Please upgrade to the premium plan to unlock all these awesome features."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Unable to fetch connectors"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Invalid connector data provided."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Unknown error occured"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Unable to save connector"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "No step data fetched"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Unable to delete connector"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Unable to sync connector"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Oops! Something went wrong. Try Refreshing"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Refresh Page"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Still facing issues?"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Press F12 "
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "for console details. "
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Send screenshot to our support team for help "
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Contact Support"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Click Here"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Some issue occurred during scheduling the database update. Kindly contact the support."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Lite version"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Pro version"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "FunnelKit Automations Database Upgrade Required"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #, js-format
 msgid "FunnelKit Automations %s requires a database upgrade. To keep things running smoothly, we have to update the database to the newest version. The database upgrade runs in the background and may take a while depending upon the number of Contacts, so please be patient. If you need any help contact support."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Update Database"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "FunnelKit Automations Database Upgrade Started"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "The database upgrade is running in background and may take a while, so please be patient. If you need any help please contact support."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "FunnelKit Automations Database Upgrade Completed"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "The database upgrade has been completed successfully."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Dismiss"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Verify Base Tables"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Validating database tables"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Alert! Database validation failed"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Page is Missing"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "In the settings of the Contact page, the Subscribe page is no longer available. This may impact your email marketing campaigns if mandatory compliance requirements set by email service providers are not followed."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Manage Setting"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Missing Shortcode for Subscribe Page"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Subscribe Page No Longer Available"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Missing Shortcode for Contact Profile Page"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Contact Profile Page Not Exists"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #, js-format
 msgid "Alert! New PRO version %s is available for update"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Don't miss out on the latest features, bug fixes & security enhancements! Upgrade to the latest version and do not let an outdated version hold you back."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Automations Quick Setup"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Thank you for activating FunnelKit Automations. Go through a quick setup to ensure most optimal experience."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Start Wizard"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Get FunnelKit Pro"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "JSON Endpoints Blocked"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Processing Delay: WordPress CRON Jobs Running With Delay"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "FunnelKit Automations needs WordPress JSON endpoints, but they’re currently blocked, stopping automations. Next Steps: Check your firewall or security settings to unblock them."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "FunnelKit Automations depends on WordPress CRON jobs to process actions on time. Currently, delayed CRON job execution is causing automation lags. Next Steps: Check your CRON settings to ensure they’re scheduled to run more frequently."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Unblock JSON Endpoints"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Adjust CRON Timing"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Attention: Database Setup Incomplete"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Critical Issue Detected: Required FunnelKit Automation tables are missing from the database. Please verify the installation to ensure the system functions properly."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Verify Database"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Warning! FunnelKit Automations is in Sandbox Mode"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Automations and Broadcasts will not run or trigger for any contacts while this mode is active."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Change Mode"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Help"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Cart Tracking is disabled."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Click on the button below to go to Settings > Carts to enable cart tracking. Once activated, you will be able to capture emails as soon buyer enters it."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Search By Name…."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "List of data points available for filtering. Use arrow keys to cycle through the list. Click a data point for a detailed report."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Performance Indicators"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #, js-format
 msgid "Up %d%% from %s"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #, js-format
 msgid "Down %d%% from %s"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #, js-format
 msgid "No change from %s"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 #, js-format
 msgid "%d%%"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Improves email deliverability in WordPress."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Used by 2+ million websites."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Free mailers: SMTP.com, Sendinblue, Google Workspace / Gmail, Mailgun, Postmark, SendGrid."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Pro mailers: Amazon SES, Microsoft 365 / Outlook.com, Zoho Mail."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Preference Updated. Redirecting to Dashboard…"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Making Email Deliverability Easy for WordPress"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "FunnelKit Automations recommends WP Mail SMTP"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "as a preferred solution for sending emails."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Step 1"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Install and Activate WP Mail SMTP"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Install from the WordPress.org plugin repository."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Installed and Activated"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Activating"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Installing"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Install"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Step 2"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Set Up WP Mail SMTP"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Select and configure your mailer."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Setup Completed"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Start Setup"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "You are about to remove the 'Email Setup' menu item from the FunnelKit Automation admin. This action cannot be undone. Click Cancel to stop or Confirm to proceed."
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "No thanks, I have already setup another SMTP plugin"
 msgstr ""
 
-#: admin/frontend/dist/main-3.8.1.js:6
+#: admin/frontend/dist/main-3.8.1.1.js:6
 msgid "Preview - WP Mail Setup"
 msgstr ""
 

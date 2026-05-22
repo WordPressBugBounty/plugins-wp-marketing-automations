@@ -4,7 +4,7 @@ Tags: cart abandonment, follow up emails, email marketing, newsletter, marketing
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 7.0
-Stable tag: 3.8.1
+Stable tag: 3.8.1.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -415,6 +415,9 @@ FunnelKit Automations is 100% self-hosted and fully GDPR compliant.
 
 
 == Change log ==
+
+= 3.8.1.1 (May 22, 2026) =
+* Fixed: Compatibility issue with the DateTime component in WordPress 7.0 in admin app. (#4689)
 
 = 3.8.1 (May 20, 2026) =
 * Added: Optional Capture IP Address and Capture Device settings under Cart Abandonment to help admins identify bot and fraudulent checkouts.
