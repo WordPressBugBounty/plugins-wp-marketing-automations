@@ -1,5 +1,6 @@
 <?php
 
+#[\AllowDynamicProperties]
 class BWFAN_API_Get_Recoverable_Carts extends BWFAN_API_Base {
 	public static $ins;
 	public $total_count = 0;
@@ -47,8 +48,8 @@ class BWFAN_API_Get_Recoverable_Carts extends BWFAN_API_Base {
 	public function process_api_call() {
 		$search_by   = $this->get_sanitized_arg( 'search_by', 'text_field' );
 		$search_term = $this->get_sanitized_arg( 'search', 'text_field' );
-		$offset      = ! empty( $this->get_sanitized_arg( 'offset', 'text_field' ) ) ? $this->get_sanitized_arg( 'offset', 'text_field' ) : 0;
-		$limit       = ! empty( $this->get_sanitized_arg( 'limit', 'text_field' ) ) ? $this->get_sanitized_arg( 'limit', 'text_field' ) : 25;
+		$offset      = ! empty( $this->get_sanitized_arg( 'offset', 'absint' ) ) ? $this->get_sanitized_arg( 'offset', 'absint' ) : 0;
+		$limit       = ! empty( $this->get_sanitized_arg( 'limit', 'absint' ) ) ? $this->get_sanitized_arg( 'limit', 'absint' ) : 25;
 
 		$recoverable_carts = BWFAN_Recoverable_Carts::get_abandoned_carts( $search_by, $search_term, $offset, $limit );
 		if ( isset( $recoverable_carts['total_count'] ) ) {

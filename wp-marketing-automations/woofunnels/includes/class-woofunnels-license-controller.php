@@ -1,4 +1,7 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 if ( ! class_exists( 'WooFunnels_License_Controller' ) ) {
 	#[AllowDynamicProperties]
 	class WooFunnels_License_Controller {
@@ -106,7 +109,7 @@ if ( ! class_exists( 'WooFunnels_License_Controller' ) ) {
 					} else {
 						/** Restrict deserialization to stdClass only — blocks POP gadget chains in case TLS verification is bypassed. */
 						if ( is_serialized( $body ) ) {
-							$object = unserialize( $body, array( 'allowed_classes' => array( 'stdClass' ) ) );
+							$object = unserialize( $body, array( 'allowed_classes' => array( 'stdClass' ) ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize
 							if ( is_object( $object ) && count( get_object_vars( $object ) ) > 0 ) {
 								return $object;
 							}
@@ -219,29 +222,6 @@ if ( ! class_exists( 'WooFunnels_License_Controller' ) ) {
 
 			return $data['plugin_slug'];
 		}
-
-		/**
-		 * Callback method to run license check manually
-		 * @return void
-		 */
-		public static function license_check_api_call_init() {
-			try {
-				$check_transient = get_transient( 'fk_license_check_api_call_init' );
-
-				if ( ! empty( $check_transient ) ) {
-					wp_send_json( array( 'status' => 'failure', 'message' => 'lock exists' ) );
-				}
-
-				self::license_check();
-				set_transient( 'fk_license_check_api_call_init', 1, HOUR_IN_SECONDS );
-				$plugins = self::get_all_plugins();
-				wp_send_json( array( 'status' => 'success', 'message' => 'License check initiated', 'is_pro' => count( $plugins ) > 0 ? true : false ) );
-
-			} catch ( Exception|Error $e ) {
-				wp_send_json( array( 'status' => 'failure', 'message' => $e->getMessage() ) );
-			}
-		}
-
 
 	}
 }

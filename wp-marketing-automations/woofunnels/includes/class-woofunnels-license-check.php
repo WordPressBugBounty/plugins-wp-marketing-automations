@@ -1,4 +1,7 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 if ( ! class_exists( 'WooFunnels_License_check' ) ) {
 	#[AllowDynamicProperties]
 	class WooFunnels_License_check {

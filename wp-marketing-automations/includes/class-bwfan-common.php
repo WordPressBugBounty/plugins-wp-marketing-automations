@@ -1080,31 +1080,71 @@ class BWFAN_Common {
 	 * Send JSON response and close HTTP connection while keeping PHP process running
 	 * This allows background processing after the client receives the response
 	 *
+	 * NOTE: On hosts without fastcgi_finish_request/litespeed_finish_request, the REST
+	 * fallback registers a rest_pre_serve_request closure that emits $response_data as the
+	 * body and returns true (already-served). This OVERRIDES any WP_REST_Response a REST
+	 * callback might otherwise return. Do not call from a REST endpoint that needs to
+	 * deliver a meaningful response body via the normal pipeline — only from "fire-and-forget"
+	 * worker callbacks where the JSON payload here IS the entire response.
+	 *
 	 * @param array|mixed $response_data Response data to send as JSON
 	 * @param int $status_code HTTP status code (default: 200)
 	 *
-	 * @return void
+	 * @return bool True when the client connection was actually detached (FastCGI/LiteSpeed)
+	 *              and the caller may safely `exit;` after its background work. False when the
+	 *              connection could not be detached (caller should return through the normal
+	 *              REST pipeline so WordPress finishes the request without "headers already sent").
 	 */
 	public static function send_response_and_close_connection( $response_data = [], $status_code = 200 ) {
 		static $already_called = false;
 
 		// Prevent duplicate calls
 		if ( $already_called ) {
-			return;
+			return false;
 		}
 		$already_called = true;
 
 		// Check if headers already sent - function cannot work properly in this case
 		if ( headers_sent( $file, $line ) ) {
-			return;
+			return false;
 		}
 
-		// Prevent script termination if client disconnects
+		// Whether this host exposes a way to detach the client connection while PHP keeps running.
+		$can_finish_request = function_exists( 'fastcgi_finish_request' ) || function_exists( 'litespeed_finish_request' );
+
+		// Keep PHP running if the client disconnects (e.g. the loopback pinger's short timeout fires)
+		// before background work finishes. Must run BEFORE the REST fallback below, which returns
+		// without detaching the connection and would otherwise leave the worker unprotected from abort.
 		ignore_user_abort( true );
 
 		// Close session to release lock (if active)
 		if ( session_status() === PHP_SESSION_ACTIVE ) {
 			session_write_close();
+		}
+
+		/**
+		 * Fallback: in a REST context with no way to detach the connection, committing output
+		 * mid-dispatch (echo + buffer purge) flips headers_sent() true while WP_REST_Server and
+		 * host cache layers still intend to emit headers, producing "headers already sent"
+		 * warnings on every request. Instead, defer body emission to rest_pre_serve_request
+		 * (fires before core sends headers) and report that the connection was NOT closed so the
+		 * caller returns through the normal REST pipeline.
+		 */
+		if ( ! $can_finish_request && defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			add_filter( 'rest_pre_serve_request', function ( $served ) use ( $response_data, $status_code ) {
+				// status_header() is self-guarded against headers_sent(), so this is safe to call unconditionally
+				// and lets a non-200 $status_code override the 200 WP queues from a null dispatch result.
+				status_header( $status_code );
+				if ( ! headers_sent() ) {
+					header( 'Content-Type: application/json; charset=' . get_option( 'blog_charset' ) );
+				}
+				$json = wp_json_encode( $response_data );
+				echo ( false === $json ) ? '{"success":false}' : $json; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON response body.
+
+				return true; // Tell WordPress the request is already served.
+			}, 10, 1 );
+
+			return false;
 		}
 
 		// Disable compression BEFORE calculating Content-Length to ensure accurate byte count
@@ -1149,61 +1189,28 @@ class BWFAN_Common {
 		}
 
 		// Send output
-		echo $json_response;
+		echo $json_response; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON response body.
 
 		// Flush output to network
 		flush();
 
-		// Close connection - FastCGI/LiteSpeed provide the cleanest methods
+		// Close connection - FastCGI/LiteSpeed provide the cleanest methods.
+		// Returns true so the caller can `exit;` after background work: this prevents
+		// WP_REST_Server and any host cache layer from calling header() against the
+		// already-committed output (the "headers already sent" log flood).
 		if ( function_exists( 'fastcgi_finish_request' ) ) {
 			fastcgi_finish_request();
-		} elseif ( function_exists( 'litespeed_finish_request' ) ) {
+
+			return true;
+		}
+
+		if ( function_exists( 'litespeed_finish_request' ) ) {
 			litespeed_finish_request();
+
+			return true;
 		}
 
-		// Prevent WordPress REST API core from trying to send headers after we've already sent them
-		// Add filter to tell WordPress we've already served the request
-		add_filter( 'rest_pre_serve_request', function ( $served, $result, $request, $server ) {
-			return true; // Return true means "already served, don't send again"
-		}, 10, 4 );
-
-		// Clear headers in case WordPress still tries to send them
-		add_filter( 'rest_post_dispatch', function ( $response ) {
-			$response->set_headers( [] );
-
-			return $response;
-		} );
-	}
-
-	/**
-	 * Close HTTP connection to client while keeping PHP process running
-	 * This allows background processing after the client receives the response
-	 *
-	 * @return void
-	 * @deprecated Use send_response_and_close_connection() instead
-	 *
-	 */
-	public static function close_http_connection() {
-		// Prevent script termination if client disconnects
-		ignore_user_abort( true );
-
-		// Close session to release lock (if active)
-		if ( session_status() === PHP_SESSION_ACTIVE ) {
-			session_write_close();
-		}
-
-		// Flush all output buffers
-		while ( ob_get_level() > 0 ) {
-			ob_end_flush();
-		}
-		flush();
-
-		// Close connection - FastCGI/LiteSpeed provide the cleanest methods
-		if ( function_exists( 'fastcgi_finish_request' ) ) {
-			fastcgi_finish_request();
-		} elseif ( function_exists( 'litespeed_finish_request' ) ) {
-			litespeed_finish_request();
-		}
+		return false;
 	}
 
 	/**
@@ -2691,7 +2698,7 @@ class BWFAN_Common {
 			'msg'  => '',
 			'time' => time(),
 		);
-		self::send_response_and_close_connection( $resp );
+		$connection_closed = self::send_response_and_close_connection( $resp );
 
 		/** Delete row from automation events */
 		if ( isset( $post_parameters['a_e_id'] ) ) {
@@ -2702,6 +2709,14 @@ class BWFAN_Common {
 		self::capture_async_helper( $post_parameters, false );
 
 		self::event_advanced_logs( "Event endpoint callback completed" );
+
+		/**
+		 * When the connection was actually detached, terminate now so neither WP_REST_Server
+		 * nor any host cache layer emits headers against the already-committed output.
+		 */
+		if ( true === $connection_closed ) {
+			exit;
+		}
 	}
 
 	public static function capture_async_helper( $post_parameters = [], $wp_send_json = true ) {
@@ -2933,6 +2948,17 @@ class BWFAN_Common {
 
 		$v = ( isset( $_SERVER['REQUEST_URI'] ) && strpos( $_SERVER['REQUEST_URI'], 'autonami/v1/worker' ) !== false ) ? 1 : 2;// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 
+		/** Rate-limit re-entry: per-version key so v1 and v2 cooldowns are independent of each other and of WooFunnels' core worker. */
+		if ( self::is_worker_rate_limited( $v ) ) {
+			wp_send_json( array(
+				'msg'  => 'rate_limited',
+				'time' => date_i18n( 'Y-m-d H:i:s' ),
+			), 429 );
+		}
+
+		/** Stamp run start so subsequent calls within the cooldown window get 429. */
+		bwf_options_update( "bwfan_worker_let_v{$v}", time() );
+
 		self::event_advanced_logs( "V{$v} worker callback received" );
 
 		/** Logs */
@@ -2947,7 +2973,7 @@ class BWFAN_Common {
 		$resp         = array();
 		$resp['msg']  = 'success';
 		$resp['time'] = date_i18n( 'Y-m-d H:i:s' );
-		self::send_response_and_close_connection( $resp );
+		$connection_closed = self::send_response_and_close_connection( $resp );
 
 		// Now run worker tasks in background (client already received response)
 		self::worker_as_run();
@@ -2958,6 +2984,14 @@ class BWFAN_Common {
 			if ( isset( $logger_obj ) ) {
 				$logger_obj->log( date_i18n( 'Y-m-d H:i:s' ) . ' - after worker run', 'fka-cron-check-v' . $v, 'autonami' );
 			}
+		}
+
+		/**
+		 * When the connection was actually detached, terminate now so neither WP_REST_Server
+		 * nor any host cache layer emits headers against the already-committed output.
+		 */
+		if ( true === $connection_closed ) {
+			exit;
 		}
 
 		return;
@@ -2982,6 +3016,34 @@ class BWFAN_Common {
 		$result = $as_ins->run();
 
 		self::event_advanced_logs( "Actions processed: {$result}" );
+	}
+
+	/**
+	 * Returns true if the previous autonami worker run for the given version is within the rate-limit window.
+	 * Window is filterable via `bwfan_worker_rate_limit_window` (passed the version as second arg); default 20 seconds.
+	 * A non-positive window disables the limit. Timestamp key is `bwfan_worker_let_v{1|2}` —
+	 * per-version so v1 and v2 cooldowns are independent, and autonami-only so neither cross-blocks
+	 * with WooFunnels' `fk_core_worker_let`.
+	 *
+	 * @param int $version 1 or 2.
+	 *
+	 * @return bool
+	 */
+	public static function is_worker_rate_limited( $version = 2 ) {
+		if ( ! function_exists( 'bwf_options_get' ) ) {
+			return false;
+		}
+		$version  = ( 1 === (int) $version ) ? 1 : 2;
+		$last_run = absint( bwf_options_get( "bwfan_worker_let_v{$version}", '', 0 ) );
+		if ( $last_run <= 0 ) {
+			return false;
+		}
+		$window = (int) apply_filters( 'bwfan_worker_rate_limit_window', 20, $version );
+		if ( $window <= 0 ) {
+			return false;
+		}
+
+		return ( time() - $last_run ) < $window;
 	}
 
 	/**
@@ -4907,7 +4969,7 @@ class BWFAN_Common {
 		$id_query = '';
 
 		if ( ! empty( $ids ) ) {
-			$id_query = " AND ID IN(" . implode( ',', $ids ) . ") ";
+			$id_query = " AND ID IN(" . implode( ',', array_map( 'absint', $ids ) ) . ") ";
 		}
 
 		$where = $wpdb->prepare( "AND v = %d ", $version );
@@ -6935,11 +6997,87 @@ class BWFAN_Common {
 		$plugin_sha = sha1( plugin_basename( 'wp-marketing-automations-pro/wp-marketing-automations-pro.php' ) );
 		if ( ! $onlyKey && $plugin_sha !== BWFAN_PRO_ENCODE ) {
 			return [
-				'error_msg' => __( 'It appears that the original plugin folder has been renamed. Please restore the folder to its original name or reinstall the plugin to activate the license.', 'wp-marketing-automations' )
+				'error_msg' => wp_kses_post( __( 'We have detected that plugin directory has been renamed. Please restore the directory to its original name or download the latest files from', 'wp-marketing-automations' ) ) . ' <a href="' . esc_url( BWFAN_Common::get_fk_site_links( 'account' ) ) . '">' . esc_html__( 'your account', 'wp-marketing-automations' ) . '</a> ' . wp_kses_post( __( 'or', 'wp-marketing-automations' ) ) . ' <a href="' . esc_url( BWFAN_Common::get_fk_site_links( 'support' ) ) . '">' . esc_html__( 'contact support', 'wp-marketing-automations' ) . '</a> ' . wp_kses_post( __( 'for assistance.', 'wp-marketing-automations' ) )
 			];
 		}
 
 		return false;
+	}
+
+	/**
+	 * Whether the Pro plugin folder has been renamed in a way that blocks license activation.
+	 *
+	 * Detection is server/DB independent: it compares the canonical folder hash against the
+	 * live BWFAN_PRO_ENCODE. The "already activated under the live hash" guard prevents false
+	 * positives for legacy installs that were activated under a non-canonical folder slug.
+	 *
+	 * @since 3.8.2
+	 *
+	 * @return bool True when Pro is active, the live folder hash differs from the canonical
+	 *              hash, and no activated license exists under the live hash; false otherwise.
+	 */
+	public static function is_pro_folder_renamed() {
+		if ( false === bwfan_is_autonami_pro_active() || ! defined( 'BWFAN_PRO_ENCODE' ) ) {
+			return false;
+		}
+
+		$canonical_sha = sha1( plugin_basename( 'wp-marketing-automations-pro/wp-marketing-automations-pro.php' ) );
+		/* Folder is canonical (hash matches) — license can activate normally, nothing to warn about. */
+		if ( hash_equals( $canonical_sha, BWFAN_PRO_ENCODE ) ) {
+			return false;
+		}
+
+		$bwf_licenses = get_option( 'woofunnels_plugins_info', false );
+		if ( is_multisite() ) {
+			$active_plugins = get_site_option( 'active_sitewide_plugins', array() );
+			if ( is_array( $active_plugins ) && ( in_array( BWFAN_PLUGIN_BASENAME, apply_filters( 'active_plugins', $active_plugins ), true ) || array_key_exists( BWFAN_PLUGIN_BASENAME, apply_filters( 'active_plugins', $active_plugins ) ) ) && ! is_main_site() ) {
+				$bwf_licenses = get_blog_option( get_network()->site_id, 'woofunnels_plugins_info', [] );
+			}
+		}
+
+		/* Legacy non-canonical install that activated under its own hash — license works, do not warn. */
+		if ( is_array( $bwf_licenses ) && ! empty( $bwf_licenses[ BWFAN_PRO_ENCODE ]['activated'] ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Whether the Connectors plugin folder has been renamed in a way that blocks license activation.
+	 *
+	 * Mirrors {@see self::is_pro_folder_renamed()} for the autonami-connectors plugin: compares
+	 * the canonical folder hash against the live WFCO_AUTONAMI_CONNECTORS_ENCODE and exempts
+	 * legacy installs already activated under the live hash.
+	 *
+	 * @since 3.8.2
+	 *
+	 * @return bool True when Connectors is active, the live folder hash differs from canonical,
+	 *              and no activated license exists under the live hash; false otherwise.
+	 */
+	public static function is_connector_folder_renamed() {
+		if ( false === class_exists( 'BWFAN_Basic_Connector_Support' ) || ! defined( 'WFCO_AUTONAMI_CONNECTORS_ENCODE' ) ) {
+			return false;
+		}
+
+		$canonical_sha = sha1( plugin_basename( 'wp-marketing-automations-connectors/wp-marketing-automations-connectors.php' ) );
+		if ( hash_equals( $canonical_sha, WFCO_AUTONAMI_CONNECTORS_ENCODE ) ) {
+			return false;
+		}
+
+		$bwf_licenses = get_option( 'woofunnels_plugins_info', false );
+		if ( is_multisite() ) {
+			$active_plugins = get_site_option( 'active_sitewide_plugins', array() );
+			if ( is_array( $active_plugins ) && ( in_array( BWFAN_PLUGIN_BASENAME, apply_filters( 'active_plugins', $active_plugins ), true ) || array_key_exists( BWFAN_PLUGIN_BASENAME, apply_filters( 'active_plugins', $active_plugins ) ) ) && ! is_main_site() ) {
+				$bwf_licenses = get_blog_option( get_network()->site_id, 'woofunnels_plugins_info', [] );
+			}
+		}
+
+		if ( is_array( $bwf_licenses ) && ! empty( $bwf_licenses[ WFCO_AUTONAMI_CONNECTORS_ENCODE ]['activated'] ) ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -9613,6 +9751,42 @@ class BWFAN_Common {
 		return $string;
 	}
 
+	/**
+	 * Validate that a link is a well-formed http(s) URL.
+	 *
+	 * Use this for links that are stored for tracking or used as redirect targets
+	 * (not fetched server-side). Unlike wp_http_validate_url() — which is an SSRF
+	 * guard for outbound wp_remote_*() requests — this does NOT resolve DNS or
+	 * reject private/loopback IPs. That matters because an admin's own-domain link
+	 * legitimately resolves to 127.0.0.1 on hosts that loop their domain back to
+	 * themselves, which makes wp_http_validate_url() wrongly reject valid links.
+	 *
+	 * It keeps the only protection relevant here: a strict http/https protocol
+	 * whitelist (via esc_url_raw / wp_kses_bad_protocol) that blocks javascript:,
+	 * data:, etc., plus a required host.
+	 *
+	 * @param string $url
+	 *
+	 * @return bool
+	 */
+	public static function bwfan_is_valid_link( $url ) {
+		if ( ! is_string( $url ) || '' === trim( $url ) ) {
+			return false;
+		}
+
+		/** Reject disallowed protocols (javascript:, data:, …) without DNS/SSRF checks. */
+		if ( '' === esc_url_raw( $url ) ) {
+			return false;
+		}
+
+		$parsed = wp_parse_url( $url );
+		if ( empty( $parsed['scheme'] ) || empty( $parsed['host'] ) ) {
+			return false;
+		}
+
+		return in_array( strtolower( $parsed['scheme'] ), array( 'http', 'https' ), true );
+	}
+
 	public static function get_completed_contacts( $aid, $sid, $type = '', $offset = 0, $limit = 25, $path = '' ) {
 
 		/**Get active automation contacts*/
@@ -10032,8 +10206,8 @@ class BWFAN_Common {
 	 * @return void
 	 */
 	public static function bwfan_store_automation_completed_ids() {
-		$max_count = get_option( 'bwfan_max_automation_completed', 0 );
-		$processed = get_option( 'bwfan_automation_completed_processed', 0 );
+		$max_count = absint( get_option( 'bwfan_max_automation_completed', 0 ) );
+		$processed = absint( get_option( 'bwfan_automation_completed_processed', 0 ) );
 
 		global $wpdb;
 		$query       = " SELECT `cid`, GROUP_CONCAT(`aid`) AS `aid` FROM `{$wpdb->prefix}bwfan_automation_complete_contact` WHERE `ID` <= {$max_count} GROUP BY `cid` ORDER BY `cid` ASC LIMIT {$processed},20";
@@ -10102,8 +10276,8 @@ class BWFAN_Common {
 	 * @return void
 	 */
 	public static function bwfan_store_automation_active_ids() {
-		$max_count = get_option( 'bwfan_max_active_automation', 0 );
-		$processed = get_option( 'bwfan_active_automation_processed', 0 );
+		$max_count = absint( get_option( 'bwfan_max_active_automation', 0 ) );
+		$processed = absint( get_option( 'bwfan_active_automation_processed', 0 ) );
 
 		global $wpdb;
 		$query       = "SELECT `cid`, GROUP_CONCAT(`aid`) AS `aid` FROM `{$wpdb->prefix}bwfan_automation_contact` WHERE `ID` <= {$max_count} GROUP BY `cid` ORDER BY `cid` ASC LIMIT {$processed},20";
@@ -10811,7 +10985,7 @@ class BWFAN_Common {
 		if ( 'formatted-currency' === strval( $formatting ) ) {
 			$currency        = ! empty( $order ) && ! is_null( $order->get_currency() ) ? $order->get_currency() : get_option( 'woocommerce_currency' );
 			$currency_symbol = get_woocommerce_currency_symbol( $currency );
-			$currency_format = html_entity_decode( $currency_symbol );
+			$currency_format = html_entity_decode( $currency_symbol, ENT_QUOTES | ENT_HTML401 );
 		}
 
 		return array( 'raw' => $raw, 'currency' => $currency_format );
@@ -11430,7 +11604,7 @@ class BWFAN_Common {
 			return [];
 		}
 
-		$orders_ids = implode( ',', $orders_ids );
+		$orders_ids = implode( ',', array_map( 'absint', $orders_ids ) );
 
 		if ( BWF_WC_Compatibility::is_hpos_enabled() ) {
 			$query  = $wpdb->prepare( "SELECT `id` AS refund_id, `parent_order_id` AS order_id FROM {$wpdb->prefix}wc_orders  WHERE type = %s AND status = %s AND `parent_order_id` IN ($orders_ids) ORDER BY id DESC LIMIT 1", 'shop_order_refund', 'wc-completed' );// phpcs:ignore WordPress.DB.PreparedSQL,  WordPress.DB.PreparedSQLPlaceholders
@@ -11577,7 +11751,13 @@ class BWFAN_Common {
 	 * @return array|mixed|string|string[]
 	 */
 	public static function get_formatted_value_for_dbquery( $value ) {
-		return ( false !== strpos( $value, "'" ) ) ? str_replace( "'", "\'", $value ) : $value;
+		/**
+		 * Retained for backward compatibility — older Pro/add-on builds may still call this.
+		 * Hardened to use esc_sql() instead of a naive single-quote str_replace(), which was
+		 * backslash-escape bypassable. Returns a value safe to embed inside a quoted SQL
+		 * string literal (handles both strings and arrays).
+		 */
+		return esc_sql( $value );
 	}
 
 	/**
@@ -11915,16 +12095,18 @@ class BWFAN_Common {
 
 	/**
 	 * Get FK Automation links
+	 * 
+	 * @param string $type Specific link type to retrieve. If empty, returns all links. Supported types: 'upgrade', 'offer', 'autonami', 'support', 'docs', 'nxtgenbuilder', 'migratefromv1', 'whatsnew', 'publicapi', 'sublium'.
 	 *
-	 * @return array
+	 * @return array|string 
 	 */
-	public static function get_fk_site_links() {
+	public static function get_fk_site_links( $type = '' ) {
 		$default_args = [
 			'utm_source'   => 'WordPress',
 			'utm_campaign' => 'FKA+Lite+Plugin'
 		];
 
-		return [
+		$links = [
 			'upgrade'       => apply_filters( 'bwfan_upgrade_link_append_utm_args', add_query_arg( $default_args, 'https://funnelkit.com/exclusive-offer/' ) ),
 			'offer'         => apply_filters( 'bwfan_offer_link_append_utm_args', add_query_arg( $default_args, 'https://funnelkit.com/exclusive-offer/' ) ),
 			'autonami'      => apply_filters( 'bwfan_fka_sales_link_append_utm_args', add_query_arg( $default_args, 'https://funnelkit.com/wordpress-marketing-automation-autonami/' ) ),
@@ -11935,7 +12117,14 @@ class BWFAN_Common {
 			'whatsnew'      => apply_filters( 'bwfan_fka_whatsnew_link_append_utm_args', add_query_arg( $default_args, 'https://funnelkit.com/whats-new/' ) ),
 			'publicapi'     => apply_filters( 'bwfan_fka_public_api_link_append_utm_args', add_query_arg( $default_args, 'https://developers.funnelkit.com/#introduction' ) ),
 			'sublium'       => apply_filters( 'bwfan_fka_sublium_link_append_utm_args', add_query_arg( $default_args, 'https://sublium.com/' ) ),
+			'account'       => apply_filters( 'bwfan_fka_account_link_append_utm_args', add_query_arg( $default_args, 'https://myaccount.funnelkit.com/?utm_source=WordPress&utm_campaign=FKA+Lite+Plugin&utm_medium=Settings+License+Login' ) ),
 		];
+
+		if ( ! empty( $type ) ) {
+			return ! empty( $links[ $type ] ) ? $links[ $type ] : '';
+		}
+
+		return $links;
 	}
 
 	/**
@@ -13070,10 +13259,18 @@ class BWFAN_Common {
 	 * Check if async http call timeout is high and status of the call is not 200
 	 *
 	 * @param $force
+	 * @param $last_run
 	 *
 	 * @return array|int[]|mixed
 	 */
-	public static function validate_core_worker( $force = false ) {
+	public static function validate_core_worker( $force = false, $last_run = 0 ) {
+
+		/** Check if the worker has run recently */
+		$last_run = empty( $last_run ) ? bwf_options_get( 'fk_core_worker_let' ) : $last_run;
+		if ( $last_run > 0 ) {
+			return ['response_code' => '' ];
+		}
+
 		$transient_val = get_transient( 'bwfan_core_worker_async' );
 		if ( false === $force && false !== $transient_val ) {
 			return $transient_val;
@@ -13545,6 +13742,19 @@ class BWFAN_Common {
 	 * @return void
 	 */
 	public static function run_v2_worker_tasks( $request = '' ) {
+		self::nocache_headers();
+
+		/** Rate-limit the worker endpoint. v2 GET has no unique-key gate, so this is the only re-entry guard. Shares the v2 cooldown with v2 POST. */
+		if ( self::is_worker_rate_limited( 2 ) ) {
+			wp_send_json( array(
+				'msg'  => 'rate_limited',
+				'time' => date_i18n( 'Y-m-d H:i:s' ),
+			), 429 );
+		}
+
+		/** Stamp run start so subsequent calls within the cooldown window get 429. */
+		bwf_options_update( 'bwfan_worker_let_v2', time() );
+
 		self::event_advanced_logs( "V2 worker callback received" );
 
 		/** Logs */
@@ -13561,7 +13771,7 @@ class BWFAN_Common {
 			'time'      => date_i18n( 'Y-m-d H:i:s' ),
 			'datastore' => get_class( ActionScheduler_Store::instance() ),
 		];
-		self::send_response_and_close_connection( $resp );
+		$connection_closed = self::send_response_and_close_connection( $resp );
 
 		// Now run worker tasks in background (client already received response)
 		self::worker_as_run();
@@ -13572,6 +13782,17 @@ class BWFAN_Common {
 			if ( isset( $logger_obj ) ) {
 				$logger_obj->log( date_i18n( 'Y-m-d H:i:s' ) . ' - after worker run', 'fka-cron-check-v2', 'autonami' );
 			}
+		}
+
+		/**
+		 * When the connection was actually detached, terminate now so neither WP_REST_Server
+		 * nor any host cache layer emits headers against the already-committed output.
+		 * Gated on REST_REQUEST because this function's signature ($request = '') permits
+		 * non-REST callers (cron/CLI/do_action); exiting unconditionally there would kill
+		 * the parent process mid-flow and leave Action Scheduler claims unreleased.
+		 */
+		if ( true === $connection_closed && defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			exit;
 		}
 	}
 

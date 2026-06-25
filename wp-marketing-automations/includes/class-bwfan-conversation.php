@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class BWFAN_Conversation
  */
+#[\AllowDynamicProperties]
 class BWFAN_Conversation {
 	private static $ins = null;
 
@@ -30,6 +31,8 @@ class BWFAN_Conversation {
 	public $template = null;
 	public $template_id = 0;
 	public $engagement_type = null;
+
+	public $disable_tracking = false;
 
 	/**
 	 * @param $content
@@ -192,7 +195,7 @@ class BWFAN_Conversation {
 	public function append_to_email_body( $body, $pre_header, $pixel_id ) {
 		$pre_header = ! empty( $pre_header ) ? str_replace( "$", "\\$", $pre_header ) : '';
 		$pre_header = ! empty( $pre_header ) ? '<span style="display:none;font-size:1px;color:#ffffff;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">' . $pre_header . '</span>' : '';
-		$pixel      = ! empty( $pixel_id ) ? $this->get_email_pixel_html( $pixel_id ) : '';
+		$pixel      = false === $this->disable_tracking && ! empty( $pixel_id ) ? $this->get_email_pixel_html( $pixel_id ) : '';
 
 		/** it will add the space after the pre-header to not show the email body content */
 		if ( ! empty( $pre_header ) ) {
@@ -233,7 +236,8 @@ class BWFAN_Conversation {
 	 * @since 1.0.0
 	 */
 	public function append_to_email_body_links( $body, $utm_data, $track_id, $uid, $mode = 'email' ) {
-		$url_args = self::transform_utm_data( $utm_data );
+		$url_args               = self::transform_utm_data( $utm_data );
+		$this->disable_tracking = false;
 
 		/** SMS & WhatsApp */
 		if ( 'email' !== $mode ) {
@@ -255,6 +259,9 @@ class BWFAN_Conversation {
 			}, $body );
 
 		}
+
+		/** Allow skipping FKA open/click tracking (open pixel + tracked links) while keeping UTM, pre-header and unsubscribe links intact. Assigned every call to reset the flag on the shared instance. */
+		$this->disable_tracking = (bool) apply_filters( 'bwfan_skip_fka_email_tracking', false, $this );
 
 		/** Email */
 		$href_regex = BWFAN_Common::get_regex_pattern();
@@ -317,7 +324,7 @@ class BWFAN_Conversation {
 		 */
 		if ( ! empty( $track_id ) ) {
 			/** Exclude click tracking for unsubscribe link */
-			if ( false === strpos( $string, 'bwfan-action=unsubscribe' ) && false === strpos( $string, 'bwfan-action=view_in_browser' ) ) {
+			if ( false === $this->disable_tracking && false === strpos( $string, 'bwfan-action=unsubscribe' ) && false === strpos( $string, 'bwfan-action=view_in_browser' ) ) {
 				$l_hash = $this->get_link_hash( $string );
 				$string = $this->convert_link_to_track_link( $string, $track_id, $uid, $l_hash );
 			}
@@ -401,7 +408,7 @@ class BWFAN_Conversation {
 			if ( ! empty( $l_hash ) ) {
 				$args['l_hash'] = $l_hash;
 			}
-			$args['bwfan-link'] = rawurlencode( html_entity_decode( $url ) );
+			$args['bwfan-link'] = rawurlencode( html_entity_decode( $url, ENT_QUOTES | ENT_HTML401 ) );
 			$url                = home_url();
 		} else if ( bwfan_is_autonami_pro_active() && ! is_null( $this->contact ) ) {
 			/** Add the Auth Hash */
@@ -575,7 +582,7 @@ class BWFAN_Conversation {
 				'contact_id'   => $contact_id,
 				'contact_mode' => 1
 			) );
-			$template = BWFAN_Common::decode_merge_tags( html_entity_decode( $template ) );
+			$template = BWFAN_Common::decode_merge_tags( html_entity_decode( $template, ENT_QUOTES | ENT_HTML401 ) );
 
 			$contact = new BWFCRM_Contact( $contact_id );
 			if ( $contact->is_contact_exists() ) {
@@ -586,6 +593,11 @@ class BWFAN_Conversation {
 		$this->broadcast_id = $broadcast_id;
 		$template           = BWFAN_Common::bwfan_correct_protocol_url( $template );
 		$pre_header         = BWFAN_Common::decode_merge_tags( $pre_header );
+
+		if ( empty( $this->engagement_type ) && ! empty( $broadcast_id ) ) {
+			$this->engagement_type = BWFAN_Email_Conversations::$TYPE_CAMPAIGN;
+		}
+
 		$template           = $this->apply_template_by_type( $template, $template_type, $pre_header );
 		$template           = $this->append_to_email_body_links( $template, $utm_data, $hash_code, $uid );
 
@@ -1242,7 +1254,7 @@ class BWFAN_Conversation {
 	 * @return string
 	 */
 	public function maybe_insert_link( $link, $data ) {
-		if ( false === wp_http_validate_url( $link ) ) {
+		if ( false === BWFAN_Common::bwfan_is_valid_link( $link ) ) {
 			return '';
 		}
 		$type = $data['type'] ?? 0;

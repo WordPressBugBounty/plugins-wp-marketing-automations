@@ -1352,83 +1352,152 @@ if ( ! class_exists( 'WooFunnels_DB_Updater' ) ) {
 		 * @return mixed false || 0 : not completed || 1 : completed
 		 */
 		public function bwf_reindex_contact_orders( $cid ) {
-			$bwf_contact = new WooFunnels_Contact( '', '', '', $cid );
-			if ( 0 === $bwf_contact->get_id() ) {
-				$this->un_schedule_wc_recurring_actions( $cid );
-
-				return false;
-			}
-
-			$paid_statuses = implode( ',', array_map( function ( $status ) {
-				return "'wc-$status'";
-			}, wc_get_is_paid_statuses() ) );
-
-			$key = "bwf_contact_orders_{$cid}";
-
-			$indexed_order_id = get_option( $key, 0 );
-			if ( 0 > $indexed_order_id ) {
-				return 1;
-			}
 			global $wpdb;
 
-			/** Delete custom table row when starting from 0 i.e. initial starting for a contact */
-			if ( 0 === intval( $indexed_order_id ) ) {
-				$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}bwf_wc_customers WHERE cid = %d", $cid ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
+			/**
+			 * Acquire a short-lived per-contact lock so concurrent Action Scheduler runners cannot race
+			 * the cursor / processed_order_ids writes. If another runner already holds the lock, bail
+			 * without marking the action complete so it is retried on the next tick.
+			 */
+			$lock_name = "bwf_reindex_{$cid}";
+			$got_lock  = $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 0)', $lock_name ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
+			if ( '1' !== (string) $got_lock ) {
+				return 0;
 			}
 
-			$limit = 10;
 			try {
-				if ( ! BWF_WC_Compatibility::is_hpos_enabled() ) {
-					$sql        = "SELECT p.ID FROM {$wpdb->prefix}posts AS p INNER JOIN {$wpdb->prefix}postmeta AS pm ON ( p.ID = pm.post_id ) WHERE 1=1 AND ( ( ( pm.meta_key = %s AND pm.meta_value = %s ) ) ) AND p.post_type = %s AND (p.post_status IN ($paid_statuses)) AND p.ID > %d GROUP BY p.ID ORDER BY p.ID ASC LIMIT 0, " . $limit;
-					$orders_ids = $wpdb->get_col( $wpdb->prepare( $sql, array( '_woofunnel_cid', $cid, 'shop_order', $indexed_order_id ) ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				} else {
-					$order_table      = $wpdb->prefix . 'wc_orders';
-					$order_meta_table = $wpdb->prefix . 'wc_orders_meta';
-					$sql              = ( "SELECT o.id FROM {$order_table} AS o INNER JOIN {$order_meta_table} AS om ON o.id = om.order_id AND om.meta_key = %s AND om.meta_value = %d WHERE o.status IN ({$paid_statuses}) AND o.type = %s AND o.id > %d ORDER BY o.id ASC LIMIT 0, " . $limit );
-					$orders_ids       = $wpdb->get_col( $wpdb->prepare( $sql, array( '_woofunnel_cid', $cid, 'shop_order', $indexed_order_id ) ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				}
-			} catch ( Error|Exception $e ) {
-				$this->un_schedule_wc_recurring_actions( $cid );
+				$bwf_contact = new WooFunnels_Contact( '', '', '', $cid );
+				if ( 0 === $bwf_contact->get_id() ) {
+					$this->un_schedule_wc_recurring_actions( $cid );
 
-				return 1;
-			}
-
-			if ( empty( $orders_ids ) ) {
-				$this->un_schedule_wc_recurring_actions( $cid );
-
-				return 1;
-			}
-
-			$old_processed_oids = $bwf_contact->get_meta( 'processed_order_ids' );
-			$old_processed_oids = is_array( $old_processed_oids ) ? array_map( 'intval', $old_processed_oids ) : [];
-			$processed_oids     = [];
-			foreach ( $orders_ids as $id ) {
-				if ( in_array( intval( $id ), $old_processed_oids, true ) ) {
-					continue;
+					return false;
 				}
 
-				$order = wc_get_order( $id );
-				if ( ! $order instanceof WC_Order ) {
+				$paid_statuses = implode( ',', array_map( function ( $status ) {
+					return "'wc-$status'";
+				}, wc_get_is_paid_statuses() ) );
+
+				$key      = "bwf_contact_orders_{$cid}";
+				$runs_key = "bwf_contact_orders_runs_{$cid}";
+
+				$indexed_order_id = get_option( $key, 0 );
+				if ( 0 > $indexed_order_id ) {
+					return 1;
+				}
+
+				/**
+				 * Bounded-execution failsafe: if the cursor has failed to advance across too many consecutive
+				 * runs the action is stuck. Force-unschedule it instead of re-running the expensive scan forever.
+				 */
+				$no_progress_runs     = absint( get_option( $runs_key, 0 ) );
+				$max_no_progress_runs = absint( apply_filters( 'bwf_reindex_max_no_progress_runs', 50, $cid ) );
+				if ( $no_progress_runs >= $max_no_progress_runs ) {
+					delete_option( $runs_key );
+					$this->un_schedule_wc_recurring_actions( $cid );
+
+					return 1;
+				}
+
+				/** Delete custom table row when starting from 0 i.e. initial starting for a contact */
+				if ( 0 === intval( $indexed_order_id ) ) {
+					$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}bwf_wc_customers WHERE cid = %d", $cid ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
+				}
+
+				$limit = 10;
+				try {
+					if ( ! BWF_WC_Compatibility::is_hpos_enabled() ) {
+						$sql        = "SELECT p.ID FROM {$wpdb->prefix}posts AS p INNER JOIN {$wpdb->prefix}postmeta AS pm ON ( p.ID = pm.post_id ) WHERE 1=1 AND ( ( ( pm.meta_key = %s AND pm.meta_value = %s ) ) ) AND p.post_type = %s AND (p.post_status IN ($paid_statuses)) AND p.ID > %d GROUP BY p.ID ORDER BY p.ID ASC LIMIT 0, " . $limit;
+						$orders_ids = $wpdb->get_col( $wpdb->prepare( $sql, array( '_woofunnel_cid', $cid, 'shop_order', $indexed_order_id ) ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+					} else {
+						$order_table      = $wpdb->prefix . 'wc_orders';
+						$order_meta_table = $wpdb->prefix . 'wc_orders_meta';
+						$sql              = ( "SELECT o.id FROM {$order_table} AS o INNER JOIN {$order_meta_table} AS om ON o.id = om.order_id AND om.meta_key = %s AND om.meta_value = %d WHERE o.status IN ({$paid_statuses}) AND o.type = %s AND o.id > %d ORDER BY o.id ASC LIMIT 0, " . $limit );
+						$orders_ids       = $wpdb->get_col( $wpdb->prepare( $sql, array( '_woofunnel_cid', $cid, 'shop_order', $indexed_order_id ) ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+					}
+				} catch ( Error|Exception $e ) {
+					delete_option( $runs_key );
+					$this->un_schedule_wc_recurring_actions( $cid );
+
+					return 1;
+				}
+
+				if ( empty( $orders_ids ) ) {
+					delete_option( $runs_key );
+					$this->un_schedule_wc_recurring_actions( $cid );
+
+					return 1;
+				}
+
+				$old_processed_oids = $bwf_contact->get_meta( 'processed_order_ids' );
+				$old_processed_oids = is_array( $old_processed_oids ) ? array_map( 'intval', $old_processed_oids ) : [];
+				$processed_oids     = [];
+				foreach ( $orders_ids as $id ) {
+					if ( in_array( intval( $id ), $old_processed_oids, true ) ) {
+						/** Advance the cursor on the skip path so already-processed orders leave the result set */
+						update_option( $key, $id, false );
+						continue;
+					}
+
+					$order = wc_get_order( $id );
+					if ( ! $order instanceof WC_Order ) {
+						/** Advance the cursor on the unloadable-order skip path too */
+						update_option( $key, $id, false );
+						$processed_oids[] = $id;
+						continue;
+					}
+
+					try {
+						$order->delete_meta_data( '_woofunnel_cid' );
+						$order->delete_meta_data( '_woofunnel_custid' );
+						$order->save_meta_data();
+
+						bwf_create_update_contact( $id, array(), 0, true );
+					} catch ( Error|Exception $e ) {
+						/**
+						 * A single order that consistently throws (corrupt order data, a third-party hook on
+						 * bwf_normalize_contact_meta_*, or a save failure) must not freeze the cursor and re-run
+						 * the expensive scan every tick. Advance the cursor past it so the result set keeps
+						 * draining and the recurring action still terminates; the order is left un-reindexed.
+						 */
+						BWF_Logger::get_instance()->log( "Reindex skipped order #{$id} for contact #{$cid}: " . $e->getMessage(), 'bwf-contact-orders-reindex' );
+						update_option( $key, $id, false );
+						continue;
+					}
+
+					/** Update order id on a key index */
+					update_option( $key, $id, false );
 					$processed_oids[] = $id;
-					continue;
 				}
 
-				$order->delete_meta_data( '_woofunnel_cid' );
-				$order->delete_meta_data( '_woofunnel_custid' );
-				$order->save_meta_data();
+				$processed_oids = array_unique( array_merge( $old_processed_oids, $processed_oids ) );
+				sort( $processed_oids );
+				$bwf_contact->update_meta( 'processed_order_ids', maybe_serialize( $processed_oids ) );
 
-				bwf_create_update_contact( $id, array(), 0, true );
+				/** Track forward progress for the bounded-execution failsafe */
+				$new_cursor = intval( get_option( $key, 0 ) );
+				if ( $new_cursor > intval( $indexed_order_id ) ) {
+					delete_option( $runs_key );
+				} else {
+					update_option( $runs_key, $no_progress_runs + 1, false );
+				}
 
-				/** Update order id on a key index */
-				update_option( $key, $id, false );
-				$processed_oids[] = $id;
+				if ( count( $orders_ids ) < $limit ) {
+					delete_option( $key );
+					delete_option( $runs_key );
+					$bwf_contact->delete_meta( 'processed_order_ids' );
+
+					$hook = 'bwf_reindex_contact_orders_end';
+					if ( ! as_has_scheduled_action( $hook, [ 'cid' => $cid ], 'funnelkit' ) ) {
+						as_schedule_single_action( time(), $hook, [ 'cid' => $cid ], 'funnelkit' );
+					}
+
+					return 1;
+				}
+
+				return 0;
+			} finally {
+				$wpdb->query( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock_name ) ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
 			}
-
-			$processed_oids = array_unique( array_merge( $old_processed_oids, $processed_oids ) );
-			sort( $processed_oids );
-			$bwf_contact->update_meta( 'processed_order_ids', maybe_serialize( $processed_oids ) );
-
-			return count( $orders_ids ) < $limit ? 1 : 0; // return 1 or 0 if more orders or not
 		}
 
 		/**
@@ -1442,9 +1511,7 @@ if ( ! class_exists( 'WooFunnels_DB_Updater' ) ) {
 			if ( empty( $cid ) ) {
 				return;
 			}
-
 			update_option( "bwf_contact_orders_{$cid}", '-1', false );
-
 			$hook = 'bwf_reindex_contact_orders_end';
 			if ( ! as_has_scheduled_action( $hook, [ 'cid' => $cid ], 'funnelkit' ) ) {
 				as_schedule_single_action( time(), $hook, [ 'cid' => $cid ], 'funnelkit' );
@@ -1466,6 +1533,7 @@ if ( ! class_exists( 'WooFunnels_DB_Updater' ) ) {
 			global $wpdb;
 
 			delete_option( "bwf_contact_orders_{$cid}" );
+			delete_option( "bwf_contact_orders_runs_{$cid}" );
 			$bwf_contact = new WooFunnels_Contact( '', '', '', $cid );
 			$bwf_contact->delete_meta( 'processed_order_ids' );
 

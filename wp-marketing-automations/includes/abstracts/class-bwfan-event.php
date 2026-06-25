@@ -1360,8 +1360,15 @@ abstract class BWFAN_Event {
 			$data['e_time'] = $data['e_time'] + 5;
 		}
 
-		BWFAN_Model_Automation_Contact::insert( $data );
-		$p_key = BWFAN_Model_Automation_Contact::insert_id();
+		$inserted = BWFAN_Model_Automation_Contact::insert( $data );
+		$p_key    = BWFAN_Model_Automation_Contact::insert_id();
+
+		/** Insert failed (e.g. deadlock-retry exhausted under concurrent checkout load) - fail cleanly instead of acting on a non-existent row */
+		if ( false === $inserted || empty( $p_key ) ) {
+			BWFAN_Common::log_test_data( 'BWFAN: Failed to queue automation contact for automation ID ' . $automation_id . ' contact ' . $contact_id . '. Event - ' . $data['event'], 'fka-db-deadlock', true );
+
+			return false;
+		}
 
 		BWFAN_Common::event_advanced_logs( 'Automation started on contact ID: ' . $contact_id );
 

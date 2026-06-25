@@ -4,7 +4,7 @@ Tags: cart abandonment, follow up emails, email marketing, newsletter, marketing
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 7.0
-Stable tag: 3.8.1.1
+Stable tag: 3.8.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -416,8 +416,26 @@ FunnelKit Automations is 100% self-hosted and fully GDPR compliant.
 
 == Change log ==
 
+= 3.8.2 (June 25, 2026) =
+* Added: PHP 8.4.x compatibility. (#4739)
+* Added: Added support for filtering contacts by audience using the `audience_id` URL parameter on the contact listing page. (#4702)
+* Added: WooCommerce Blocks Checkout compatibility for abandoned carts — full cart capture, recovery, prefilled fields, and restoration of the previously selected payment method now work on modern block-based checkouts. (#4706)
+* Improved: Skip the customer total-spent lookup on the admin orders page when the column is hidden, reducing unnecessary database queries. (#4695)
+* Improved handling of contact queueing deadlocks in V2 automations. (#4734)
+* Fixed: Enhanced WooCommerce Blocks Checkout compatibility for abandoned carts, including cart capture, recovery, and field prefill support. (#4708)
+* Fixed: Abandoned cart language is now captured correctly for multilingual stores during add-to-cart events. (#4698)
+* Fixed: Improved WPML compatibility to ensure the correct language-specific thank-you page is displayed after checkout, a case with Funnel Builder & WPML. (#4700)
+* Fixed: Automation processing now uses the latest order data from the database for improved accuracy. (#4709)
+* Fixed: Safari rendering and layout issues in the automation builder canvas, including split-path preview and customer journey nodes. (#4692)
+* Fixed: Abandoned carts not captured for wholesale and dynamic-priced products when added to cart. (#4729)
+* Fixed: Stale WooCommerce data returned by the contact-order update endpoint; fresh data is now pulled from the database. (#4697)
+* Fixed: Blank admin screens caused by REST responses polluted with stray PHP notices/deprecation warnings — a client-side issue, handling done. (#4715)
+* Fixed: A rare scenario on client site where contacts intermittently not enrolling in V2 automations under concurrent checkout load due to InnoDB deadlocks on the database. (#4734)
+* Fixed: Delay-until-custom-field-date step with day/month recurrence and "jump to step if time has passed" enabled scheduled contacts about a year ahead instead of jumping when the date had already passed. (#4742)
+* Devs: Added the `bwfan_skip_fka_email_tracking` filter to allow developers to disable open-pixel tracking and click-tracking link rewriting for FunnelKit Automations emails. (#4722)
+
 = 3.8.1.1 (May 22, 2026) =
-* Fixed: Compatibility issue with the DateTime component in WordPress 7.0 in admin app. (#4689)
+Fixed: Compatibility issue with the DateTime component in WordPress 7.0 in admin app. (#4689)
 
 = 3.8.1 (May 20, 2026) =
 * Added: Optional Capture IP Address and Capture Device settings under Cart Abandonment to help admins identify bot and fraudulent checkouts.

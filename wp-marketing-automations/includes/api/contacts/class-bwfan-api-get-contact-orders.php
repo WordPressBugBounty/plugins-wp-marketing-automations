@@ -1,5 +1,6 @@
 <?php
 
+#[\AllowDynamicProperties]
 class BWFAN_API_Get_Contact_Orders extends BWFAN_API_Base {
 	public static $ins;
 
@@ -47,8 +48,8 @@ class BWFAN_API_Get_Contact_Orders extends BWFAN_API_Base {
 			return $this->error_response( sprintf( __( 'No contact found with given id #%1$d', 'wp-marketing-automations' ), $contact_id ) );
 		}
 
-		$limit     = $this->get_sanitized_arg( 'limit', 'text_field' );
-		$offset    = $this->get_sanitized_arg( 'offset', 'text_field' );
+		$limit     = $this->get_sanitized_arg( 'limit', 'absint' );
+		$offset    = $this->get_sanitized_arg( 'offset', 'absint' );
 		$limit     = ! empty( $limit ) ? $limit : 10;
 		$offset    = ! empty( $offset ) ? $offset : 0;
 		$order_ids = $contact->get_orders( $offset, $limit );
@@ -178,11 +179,11 @@ class BWFAN_API_Get_Contact_Orders extends BWFAN_API_Base {
 		return [
 			'code'              => $currency,
 			'precision'         => wc_get_price_decimals(),
-			'symbol'            => html_entity_decode( $currency_symbol ),
+			'symbol'            => html_entity_decode( $currency_symbol, ENT_QUOTES | ENT_HTML401 ),
 			'symbolPosition'    => get_option( 'woocommerce_currency_pos' ),
 			'decimalSeparator'  => wc_get_price_decimal_separator(),
 			'thousandSeparator' => wc_get_price_thousand_separator(),
-			'priceFormat'       => html_entity_decode( get_woocommerce_price_format() ),
+			'priceFormat'       => html_entity_decode( get_woocommerce_price_format(), ENT_QUOTES | ENT_HTML401 ),
 		];
 	}
 

@@ -1,5 +1,6 @@
 <?php
 
+#[\AllowDynamicProperties]
 class BWFAN_Manage_Profile {
     private static $ins = null;
     protected $settings = null;
@@ -146,8 +147,8 @@ class BWFAN_Manage_Profile {
      * @return void
      */
     public function create_profile_sample_page() {
-        $global_settings = $this->get_global_settings();
-
+        /** Fetch fresh data from DB */
+        $global_settings = BWFAN_Common::get_global_settings();
         if ( isset( $global_settings['bwfan_profile_page'] ) && intval( $global_settings['bwfan_profile_page'] ) > 0 ) {
             return;
         }
@@ -271,6 +272,13 @@ class BWFAN_Manage_Profile {
         if ( ! is_array( $lists_to_add ) ) {
             return;
         }
+        /**
+         * Restrict additions to the lists configured as publicly manageable.
+         * A holder of a valid profile link must not be able to submit list IDs
+         * that were never rendered in the self-service form (scope bypass).
+         * Mirrors the visible-scope check already applied on the removal path below.
+         */
+        $lists_to_add = array_values( array_intersect( $lists_to_add, $this->get_visible_lists() ) );
         sort( $lists_to_add );
         $assigned_list = array_map( function ( $list ) {
             return [
@@ -307,6 +315,13 @@ class BWFAN_Manage_Profile {
         if ( ! is_array( $tags_to_add ) ) {
             return;
         }
+        /**
+         * Restrict additions to the tags configured as publicly manageable.
+         * A holder of a valid profile link must not be able to submit tag IDs
+         * that were never rendered in the self-service form (scope bypass).
+         * Mirrors the visible-scope check already applied on the removal path below.
+         */
+        $tags_to_add = array_values( array_intersect( $tags_to_add, $this->get_visible_tags() ) );
         sort( $tags_to_add );
         $assigned_tag = array_map( function ( $tag ) {
             return [
@@ -340,6 +355,20 @@ class BWFAN_Manage_Profile {
     public function handle_profile_fields() {
         $fields_to_update = $this->profile_fields;
         if ( ! is_array( $fields_to_update ) || 0 === count( $fields_to_update ) ) {
+            return;
+        }
+
+        /**
+         * Restrict updates to the fields configured as publicly manageable.
+         * A profile-link holder must not be able to write field slugs that were
+         * never exposed in the self-service form (scope bypass). DOB part inputs
+         * share the 'dob' slug, so they survive when 'dob' is an allowed field.
+         */
+        $allowed_field_slugs = array_map( 'strval', $this->get_visible_fields() );
+        $fields_to_update    = array_values( array_filter( $fields_to_update, function ( $field ) use ( $allowed_field_slugs ) {
+            return isset( $field['slug'] ) && in_array( (string) $field['slug'], $allowed_field_slugs, true );
+        } ) );
+        if ( 0 === count( $fields_to_update ) ) {
             return;
         }
 
@@ -724,6 +753,17 @@ class BWFAN_Manage_Profile {
         $settings = $this->get_global_settings();
 
         return ! empty( $settings['bwfan_profile_lists'] ) ? $settings['bwfan_profile_lists'] : [];
+    }
+
+    /**
+     * Get the fields configured as publicly manageable on the profile form.
+     *
+     * @return array|mixed Flat list of allowed field slugs.
+     */
+    protected function get_visible_fields() {
+        $settings = $this->get_global_settings();
+
+        return ! empty( $settings['bwfan_profile_manage_fields'] ) ? $settings['bwfan_profile_manage_fields'] : [];
     }
 
     /**

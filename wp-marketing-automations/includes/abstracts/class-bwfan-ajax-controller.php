@@ -4,6 +4,7 @@
  * Class BWFAN_AJAX_Controller
  * Handles All the request came from front end or the backend
  */
+#[\AllowDynamicProperties]
 abstract class BWFAN_AJAX_Controller {
 
 	public static function init() {

@@ -1,5 +1,6 @@
 <?php
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Total extends BWFAN_Rule_Base {
 
 	public function __construct() {
@@ -107,6 +108,7 @@ class BWFAN_Rule_Order_Total extends BWFAN_Rule_Base {
 
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Product_Stock extends BWFAN_Rule_Base {
 
 	public function __construct() {
@@ -227,6 +229,7 @@ class BWFAN_Rule_Product_Stock extends BWFAN_Rule_Base {
 	}
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Product_Item extends BWFAN_Rule_Products {
 
 	public function __construct() {
@@ -320,6 +323,7 @@ class BWFAN_Rule_Product_Item extends BWFAN_Rule_Products {
 
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Taxonomy extends BWFAN_Rule_Term_Taxonomy {
 
 	public $taxonomy_name = '';
@@ -387,6 +391,7 @@ class BWFAN_Rule_Order_Taxonomy extends BWFAN_Rule_Term_Taxonomy {
 
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Product_Category extends BWFAN_Rule_Term_Taxonomy {
 
 	public $taxonomy_name = 'product_cat';
@@ -453,6 +458,7 @@ class BWFAN_Rule_Product_Category extends BWFAN_Rule_Term_Taxonomy {
 
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Product_Tags extends BWFAN_Rule_Term_Taxonomy {
 
 	public $taxonomy_name = 'product_tag';
@@ -517,6 +523,7 @@ class BWFAN_Rule_Product_Tags extends BWFAN_Rule_Term_Taxonomy {
 	}
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Product_Item_Type extends BWFAN_Rule_Base {
 
 	public function __construct() {
@@ -705,6 +712,7 @@ class BWFAN_Rule_Product_Item_Type extends BWFAN_Rule_Base {
 
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Product_Item_Count extends BWFAN_Rule_Base {
 
 	public function __construct() {
@@ -815,6 +823,7 @@ class BWFAN_Rule_Product_Item_Count extends BWFAN_Rule_Base {
 
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Product_Item_Price extends BWFAN_Rule_Base {
 
 	public function __construct() {
@@ -914,6 +923,7 @@ class BWFAN_Rule_Product_Item_Price extends BWFAN_Rule_Base {
 	}
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Item extends BWFAN_Rule_Products {
 	public function __construct() {
 		$this->v2 = true;
@@ -990,6 +1000,7 @@ class BWFAN_Rule_Order_Item extends BWFAN_Rule_Products {
 
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Category extends BWFAN_Rule_Term_Taxonomy {
 
 	public $taxonomy_name = 'product_cat';
@@ -1064,6 +1075,7 @@ class BWFAN_Rule_Order_Category extends BWFAN_Rule_Term_Taxonomy {
 
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Tags extends BWFAN_Rule_Term_Taxonomy {
 
 	public $taxonomy_name = 'product_tag';
@@ -1135,6 +1147,7 @@ class BWFAN_Rule_Order_Tags extends BWFAN_Rule_Term_Taxonomy {
 
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Item_Type extends BWFAN_Rule_Base {
 
 	public function __construct() {
@@ -1318,6 +1331,7 @@ class BWFAN_Rule_Order_Item_Type extends BWFAN_Rule_Base {
 
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Item_Count extends BWFAN_Rule_Base {
 
 	public function __construct() {
@@ -1429,6 +1443,7 @@ class BWFAN_Rule_Order_Item_Count extends BWFAN_Rule_Base {
 	}
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Product_Item_Custom_Field extends BWFAN_Rule_Custom_Field {
 
 	public function __construct() {
@@ -1481,6 +1496,7 @@ class BWFAN_Rule_Product_Item_Custom_Field extends BWFAN_Rule_Custom_Field {
 	}
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Product_Item_SKU extends BWFAN_Rule_Base {
 
 	public function __construct() {
@@ -1553,6 +1569,7 @@ class BWFAN_Rule_Product_Item_SKU extends BWFAN_Rule_Base {
 	}
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Coupons extends BWFAN_Dynamic_Option_Base {
 
 	public function __construct() {
@@ -1750,6 +1767,7 @@ class BWFAN_Rule_Order_Coupons extends BWFAN_Dynamic_Option_Base {
 
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Payment_Gateway extends BWFAN_Rule_Base {
 	public $supports = array( 'order' );
 
@@ -1879,6 +1897,7 @@ class BWFAN_Rule_Order_Payment_Gateway extends BWFAN_Rule_Base {
 
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Shipping_Country extends BWFAN_Rule_Country {
 
 
@@ -1915,6 +1934,7 @@ class BWFAN_Rule_Order_Shipping_Country extends BWFAN_Rule_Country {
 	}
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Shipping_Method extends BWFAN_Rule_Base {
 
 	public function __construct() {
@@ -2069,6 +2089,7 @@ class BWFAN_Rule_Order_Shipping_Method extends BWFAN_Rule_Base {
 }
 
 /** Order Shipping Method Zone Class  */
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Shipping_Method_Zone extends BWFAN_Rule_Base {
 	public function __construct() {
 		$this->v1 = false;
@@ -2223,6 +2244,7 @@ class BWFAN_Rule_Order_Shipping_Method_Zone extends BWFAN_Rule_Base {
 	}
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Billing_Country extends BWFAN_Rule_Country {
 
 	public function __construct() {
@@ -2263,6 +2285,7 @@ class BWFAN_Rule_Order_Billing_Country extends BWFAN_Rule_Country {
 	}
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Custom_Field extends BWFAN_Rule_Custom_Field {
 
 	public function __construct() {
@@ -2305,6 +2328,7 @@ class BWFAN_Rule_Order_Custom_Field extends BWFAN_Rule_Custom_Field {
 	}
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Items_Data extends BWFAN_Rule_Base {
 	public function __construct() {
 		$this->v2 = true;
@@ -2406,6 +2430,7 @@ class BWFAN_Rule_Order_Items_Data extends BWFAN_Rule_Base {
 }
 
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Coupon_Text_Match extends BWFAN_Rule_Base {
 
 	public function __construct() {
@@ -2475,6 +2500,7 @@ class BWFAN_Rule_Order_Coupon_Text_Match extends BWFAN_Rule_Base {
 	}
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Note_Text_Match extends BWFAN_Rule_Base {
 
 	public function __construct() {
@@ -2539,6 +2565,7 @@ class BWFAN_Rule_Order_Note_Text_Match extends BWFAN_Rule_Base {
 	}
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Status_Change extends BWFAN_Rule_Base {
 	public $supports = array( 'order' );
 
@@ -2657,6 +2684,7 @@ class BWFAN_Rule_Order_Status_Change extends BWFAN_Rule_Base {
 
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Status extends BWFAN_Rule_Base {
 	public $supports = array( 'order' );
 
@@ -2741,6 +2769,7 @@ class BWFAN_Rule_Order_Status extends BWFAN_Rule_Base {
 	}
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Has_Coupon extends BWFAN_Rule_Base {
 	public function __construct() {
 		$this->v1 = false;
@@ -2786,6 +2815,7 @@ class BWFAN_Rule_Order_Has_Coupon extends BWFAN_Rule_Base {
 	}
 }
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Order_Sub_Total extends BWFAN_Rule_Base {
 	public function __construct() {
 		$this->v2 = true;
@@ -2852,6 +2882,7 @@ class BWFAN_Rule_Order_Sub_Total extends BWFAN_Rule_Base {
 }
 
 
+#[\AllowDynamicProperties]
 class BWFAN_Rule_Custom_Taxonomy extends BWFAN_Rule_Term_Taxonomy {
 
 	public $taxonomy_name = '';

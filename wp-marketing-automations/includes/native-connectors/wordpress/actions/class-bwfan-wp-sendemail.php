@@ -1,5 +1,6 @@
 <?php
 
+#[\AllowDynamicProperties]
 final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 
 	public static $TEMPLATE_RICH_TEXT = 1;
@@ -597,7 +598,7 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 				/** Modify email body for engagement tracking */
 				$data_for_engagement            = $this->data;
 				$data_for_engagement['subject'] = isset( $this->data['subject_raw'] ) && ! empty( $this->data['subject_raw'] ) ? $this->data['subject_raw'] : $this->data['subject'];
-				$this->data['body']             = html_entity_decode( $this->data['body'] );
+				$this->data['body']             = html_entity_decode( $this->data['body'], ENT_QUOTES | ENT_HTML401 );
 				$this->data['body']             = BWFAN_Core()->conversations->bwfan_modify_email_body_data( $this->data['body'], $data_for_engagement );
 
 				$this->data['body'] = apply_filters( 'bwfan_before_send_email_body', $this->data['body'], $this->data );
@@ -634,7 +635,7 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 				$data_for_engagement            = $this->data;
 				$data_for_engagement['subject'] = isset( $this->data['subject_raw'] ) && ! empty( $this->data['subject_raw'] ) ? $this->data['subject_raw'] : $this->data['subject'];
 
-				$this->data['body'] = html_entity_decode( $this->data['body'] );
+				$this->data['body'] = html_entity_decode( $this->data['body'], ENT_QUOTES | ENT_HTML401 );
 				$this->data['body'] = BWFAN_Core()->conversations->bwfan_modify_email_body_data( $this->data['body'], $data_for_engagement );
 
 				$this->data['body']     = apply_filters( 'bwfan_before_send_email_body', $this->data['body'], $this->data );

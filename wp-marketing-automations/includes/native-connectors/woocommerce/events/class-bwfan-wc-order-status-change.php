@@ -1,5 +1,6 @@
 <?php
 
+#[\AllowDynamicProperties]
 final class BWFAN_WC_Order_Status_Change extends BWFAN_Event {
 	private static $instance = null;
 	public $order_id = null;

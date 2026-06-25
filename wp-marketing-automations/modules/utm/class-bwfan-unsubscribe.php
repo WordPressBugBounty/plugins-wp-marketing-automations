@@ -1,5 +1,6 @@
 <?php
 
+#[\AllowDynamicProperties]
 class BWFAN_unsubscribe {
 
 	private static $ins = null;

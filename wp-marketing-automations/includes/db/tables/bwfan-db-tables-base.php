@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 
+#[\AllowDynamicProperties]
 abstract class BWFAN_DB_Tables_Base {
 	public $table_name = '';
 	public $db_errors = '';
