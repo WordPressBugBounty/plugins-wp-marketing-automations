@@ -2081,7 +2081,7 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			$headers[] = 'Content-type:text/html;charset=UTF-8';
 
 			if ( ! empty( $reply_to_email ) ) {
-				$headers[] = 'Reply-To:  ' . $reply_to_email;
+				$headers[] = BWFAN_Common::build_reply_to_header( $reply_to_email, '', $from_name );
 			}
 
 			/** Set unsubscribe link in header */

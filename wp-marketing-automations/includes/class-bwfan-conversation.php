@@ -899,7 +899,7 @@ class BWFAN_Conversation {
 			$header[] = 'From: ' . $from_name . ' <' . $from_email . '>';
 		}
 		if ( ! empty( $reply_to_email ) ) {
-			$header[] = 'Reply-To:  ' . $reply_to_email;
+			$header[] = BWFAN_Common::build_reply_to_header( $reply_to_email, '', $from_name );
 		}
 
 		/** Set unsubscribe link in header */

@@ -493,32 +493,80 @@ if ( ! class_exists( 'BWF_AS_Action_Store' ) ) {
 			global $wpdb;
 
 			/**
-			 * Atomic claim: stamp the claim id in a single guarded UPDATE so two concurrent runners can't
-			 * SELECT and stamp the same rows. The `claim_id = 0` guard in the WHERE clause is essential.
+			 * Atomic, deadlock-safe claim.
+			 *
+			 * On MySQL 8.0+ / MariaDB 10.6+ the claimable rows are picked with FOR UPDATE SKIP LOCKED inside a
+			 * derived table and stamped in the SAME statement, so two concurrent runners never wait on each
+			 * other (no 1213 deadlock against the finished-action DELETE) and never double-claim a row. Older
+			 * servers fall back to the single guarded UPDATE. A transient deadlock / lock-wait timeout is
+			 * retried with a short backoff instead of throwing, matching core Action Scheduler behaviour.
+			 *
 			 * The claimed rows are read back afterwards via find_actions_by_claim_id().
 			 */
-			$update = "UPDATE {$this->action_table} SET `claim_id` = %d";
-			$params = array( $claim_id );
-
-			$where    = 'WHERE `claim_id` = 0 AND `e_time` <= %s AND `status` = 0';
-			$params[] = time();
+			$where    = 'WHERE `claim_id` = 0 AND `e_time` <= %d AND `status` = 0';
+			$params   = array( time() );
 
 			if ( ! empty( $group ) ) {
-				$where    .= ' AND `group` = %s';
+				$where    .= ' AND `group_slug` = %s';
 				$params[] = $group;
 			}
 
-			$order    = 'ORDER BY `e_time` ASC LIMIT %d';
+			$where   .= ' ORDER BY `e_time` ASC LIMIT %d';
 			$params[] = $limit;
 
-			$sql = $wpdb->prepare( "{$update} {$where} {$order}", $params ); //phpcs:ignore WordPress.DB.PreparedSQL
+			$attempts = 0;
+			do {
+				$attempts ++;
 
-			$rows_affected = $wpdb->query( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
-			if ( $rows_affected === false ) {
-				throw new RuntimeException( esc_html__( 'Unable to claim actions. Database error.', 'action-scheduler' ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				if ( $this->supports_skip_locked() ) {
+					/** Derived table materialises, so the same table can be read (FOR UPDATE SKIP LOCKED) and updated in one atomic statement. */
+					$sql = "UPDATE {$this->action_table} t1 JOIN ( SELECT `{$this->p_key}` FROM {$this->action_table} {$where} FOR UPDATE SKIP LOCKED ) t2 ON t1.`{$this->p_key}` = t2.`{$this->p_key}` SET t1.`claim_id` = %d";
+					$sql = $wpdb->prepare( $sql, array_merge( $params, array( $claim_id ) ) ); //phpcs:ignore WordPress.DB.PreparedSQL
+				} else {
+					$sql = "UPDATE {$this->action_table} SET `claim_id` = %d {$where}";
+					$sql = $wpdb->prepare( $sql, array_merge( array( $claim_id ), $params ) ); //phpcs:ignore WordPress.DB.PreparedSQL
+				}
+
+				$rows_affected = $wpdb->query( $sql ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL
+				if ( false !== $rows_affected ) {
+					return (int) $rows_affected; // Zero claimable rows is a valid result, not an error.
+				}
+
+				$error = (string) $wpdb->last_error;
+				if ( false === stripos( $error, 'deadlock' ) && false === stripos( $error, 'lock wait timeout' ) ) {
+					break; // Non-transient DB error: stop retrying and surface it.
+				}
+
+				usleep( 50000 * $attempts ); // 50ms, then 100ms backoff before re-claiming.
+			} while ( $attempts < 3 );
+
+			$db_error = empty( $wpdb->last_error ) ? esc_html_x( 'unknown', 'database error', 'action-scheduler' ) : esc_html( $wpdb->last_error ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+			/* translators: %s: database error message. */
+			throw new RuntimeException( sprintf( esc_html__( 'Unable to claim actions. Database error: %s.', 'action-scheduler' ), $db_error ) ); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+		}
+
+		/**
+		 * Whether the DB server supports `SKIP LOCKED` (MySQL 8.0.1+ / MariaDB 10.6+).
+		 *
+		 * @return bool
+		 */
+		private function supports_skip_locked() {
+			global $wpdb;
+			static $supported = null;
+
+			if ( null !== $supported ) {
+				return $supported;
 			}
 
-			return (int) $rows_affected;
+			$info = strtolower( (string) $wpdb->db_server_info() );
+			if ( false !== strpos( $info, 'mariadb' ) ) {
+				$ver       = preg_replace( '/[^0-9.].*$/', '', str_replace( '5.5.5-', '', $info ) );
+				$supported = ( '' !== $ver && version_compare( $ver, '10.6', '>=' ) );
+			} else {
+				$supported = version_compare( $wpdb->db_version(), '8.0.1', '>=' );
+			}
+
+			return $supported;
 		}
 
 		/**

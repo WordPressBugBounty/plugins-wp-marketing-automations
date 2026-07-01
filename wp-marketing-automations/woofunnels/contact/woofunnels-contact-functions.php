@@ -83,7 +83,23 @@ if ( ! function_exists( 'bwf_create_update_contact' ) ) {
 		}
 
 		$cid = $bwf_contact->get_id();
+
+		/**
+		 * Contact failed to persist to a positive id (e.g. a duplicate-email race on a
+		 * REST-pushed guest order). Don't stamp the order so it can be retried later, and
+		 * never index the customer profile against cid 0.
+		 */
+		if ( empty( $cid ) || absint( $cid ) < 1 ) {
+			return 0;
+		}
+
 		$order->update_meta_data( '_woofunnel_cid', $cid );
+		/**
+		 * Stamp the indexed marker here, after the contact has a real id. It was previously
+		 * written inside bwf_create_update_customer() before save(), stamping a premature 0
+		 * for every new contact and marking the order as indexed against a non-existent customer.
+		 */
+		$order->update_meta_data( '_woofunnel_custid', $cid );
 		$order->save_meta_data();
 
 		return $cid;

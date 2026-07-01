@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 
 
-define( 'BWF_VERSION', '1.10.12.80' );
+define( 'BWF_VERSION', '1.10.12.81' );
 define( 'BWF_DB_VERSION', '1.0.6' );
 if ( ! class_exists( 'WooFunnels_Dashboard' ) ) {
 	#[AllowDynamicProperties]

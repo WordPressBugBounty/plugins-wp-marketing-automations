@@ -542,7 +542,8 @@ final class BWFAN_Wp_Sendemail extends BWFAN_Action {
 			$headers[] = 'From: ' . $this->data['from_name'] . ' <' . $this->data['from_email'] . '>';
 		}
 		if ( isset( $this->data['reply_to_email'] ) && ! empty( $this->data['reply_to_email'] ) ) {
-			$headers[] = 'Reply-To: ' . $this->data['reply_to_email'];
+			$fallback_name = isset( $this->data['from_name'] ) ? $this->data['from_name'] : '';
+			$headers[]     = BWFAN_Common::build_reply_to_header( $this->data['reply_to_email'], '', $fallback_name );
 		}
 		$aid = isset( $this->data['automation_id'] ) ? $this->data['automation_id'] : 0;
 		$sid = isset( $this->data['step_id'] ) ? $this->data['step_id'] : 0;

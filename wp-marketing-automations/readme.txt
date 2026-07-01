@@ -4,7 +4,7 @@ Tags: cart abandonment, follow up emails, email marketing, newsletter, marketing
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 7.0
-Stable tag: 3.8.2
+Stable tag: 3.8.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -415,6 +415,11 @@ FunnelKit Automations is 100% self-hosted and fully GDPR compliant.
 
 
 == Change log ==
+
+= 3.8.3 (June 30, 2026) =
+* Fixed: Improved background worker detection to prevent false firewall warnings when loopback requests are temporarily rate-limited (HTTP 429). (#4759)
+* Fixed: Improved Reply-To email header formatting for better compatibility with strict SMTP plugins when sending automation emails. (#4752)
+* Improvement: Persistent pagination across all admin list views. (#4526)
 
 = 3.8.2 (June 25, 2026) =
 * Added: PHP 8.4.x compatibility. (#4739)

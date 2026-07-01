@@ -9455,6 +9455,47 @@ class BWFAN_Common {
 		return bwf_has_action_scheduled( $hook );
 	}
 
+	/**
+	 * Build a Reply-To email header.
+	 *
+	 * Returns the standard RFC 5322 bare `Reply-To: <email>` header, which every
+	 * standards-compliant SMTP provider accepts. Default behaviour is unchanged.
+	 *
+	 * The final header line is passed through the `bwfan_reply_to_header` filter so a
+	 * site can override it for SMTP plugins that need a different format — e.g. Authority
+	 * Mailer rejects a nameless Reply-To with Code 29 ("Reply-To name or email address is
+	 * missing"), and such a site can return `Reply-To: Name <email>` from the filter. The
+	 * filter receives the email, the reply-to name (if any) and a fallback name (typically
+	 * the From name) so the callback can build whatever it needs.
+	 *
+	 * @param string $reply_to_email Reply-To email address.
+	 * @param string $reply_to_name  Reply-To display name (optional).
+	 * @param string $fallback_name  Fallback name, typically the From name.
+	 *
+	 * @return string Reply-To header line, or empty string when no email is provided.
+	 */
+	public static function build_reply_to_header( $reply_to_email, $reply_to_name = '', $fallback_name = '' ) {
+		$reply_to_email = trim( (string) $reply_to_email );
+		if ( empty( $reply_to_email ) ) {
+			return '';
+		}
+
+		/**
+		 * Filter the Reply-To header line before it is added to the email headers.
+		 *
+		 * Default is the standard bare `Reply-To: <email>`. Return a custom value such as
+		 * `Reply-To: Name <email>` for SMTP plugins that require a display name on Reply-To
+		 * (e.g. Authority Mailer, Code 29). When attaching a name that may contain specials
+		 * (comma, <, @, ...), wrap it in double quotes in the callback to keep the header valid.
+		 *
+		 * @param string $header         The Reply-To header line. Default 'Reply-To: <email>'.
+		 * @param string $reply_to_email Reply-To email address.
+		 * @param string $reply_to_name  Reply-To display name, if any (may be empty).
+		 * @param string $fallback_name  Fallback name, typically the From name.
+		 */
+		return apply_filters( 'bwfan_reply_to_header', 'Reply-To: ' . $reply_to_email, $reply_to_email, $reply_to_name, $fallback_name );
+	}
+
 	/** send test email from autonami screen */
 	public static function send_test_email( $args, $is_crm = false ) {
 		if ( empty( $args ) || empty( $args['body'] ) ) {
@@ -9570,7 +9611,7 @@ class BWFAN_Common {
 				$header[] = 'From: ' . $from_name . ' <' . $from_email . '>';
 			}
 			if ( ! empty( $reply_to_email ) ) {
-				$header[] = 'Reply-To: ' . $reply_to_email;
+				$header[] = self::build_reply_to_header( $reply_to_email, '', $from_name );
 			}
 			$header[] = 'Content-type:text/html;charset=UTF-8';
 
@@ -13295,7 +13336,14 @@ class BWFAN_Common {
 
 		/** Check for response code in case of firewall */
 		$status_code = wp_remote_retrieve_response_code( $request );
-		if ( ! empty( $status_code ) && $status_code !== 200 ) {
+
+		/** Check for rate_limited error */
+		if ( 429 === $status_code ) {
+			$body        = json_decode( wp_remote_retrieve_body( $request ), true );
+			$status_code = ( is_array( $body ) && isset( $body['msg'] ) ) ? $body['msg'] : $status_code;
+		}
+
+		if ( ! empty( $status_code ) && $status_code !== 200 && $status_code !== 'rate_limited' ) {
 			$data['response_code'] = $status_code;
 			set_transient( 'bwfan_core_worker_async', $data, 6 * HOUR_IN_SECONDS );
 
