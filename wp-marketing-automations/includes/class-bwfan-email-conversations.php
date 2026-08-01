@@ -875,7 +875,6 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 
 			if ( $last_status === $get_contact::$DISPLAY_STATUS_UNSUBSCRIBED ) {
 				$get_contact->unsubscribe();
-				$contact_obj->delete_meta( 'soft_bounce_count' );
 				return;
 			}
 
@@ -907,7 +906,6 @@ if ( ! class_exists( 'BWFAN_Email_Conversations' ) && BWFAN_Common::is_pro_3_0()
 
 			global $wpdb;
 			$wpdb->update( "{$wpdb->prefix}bwf_contact", [ 'status' => $status ], [ 'id' => $contact->id ] ); //phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$contact_obj->delete_meta( 'soft_bounce_count' );
 		}
 
 		/**

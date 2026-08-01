@@ -2412,8 +2412,6 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 				do_action( 'bwfcrm_after_contact_subscribed', $this->contact );
 			}
 
-			$this->remove_soft_bounce_limit();
-
 			return $return;
 		}
 
@@ -2467,8 +2465,6 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			if ( ! $this->is_contact_exists() ) {
 				return false;
 			}
-
-			$this->remove_soft_bounce_limit();
 
 			if ( ! empty( $this->check_contact_unsubscribed() ) ) {
 				return true;
@@ -2810,8 +2806,6 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			$this->contact->set_last_modified( current_time( 'mysql', 1 ) );
 			$this->save();
 
-			$this->remove_soft_bounce_limit();
-
 			return true;
 		}
 
@@ -2842,8 +2836,6 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			$this->save();
 			$this->contact->save_meta();
 
-			$this->remove_soft_bounce_limit();
-
 			/** Run action if contact earlier has a different status */
 			if ( false === $is_already_bounced && ! $stop_hooks ) {
 				do_action( 'bwfcrm_after_contact_bounced', $this->contact );
@@ -2857,57 +2849,30 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 		 *
 		 * @param $stop_hooks
 		 *
-		 * @return array|bool
+		 * @return bool
 		 */
 		public function mark_as_soft_bounced( $stop_hooks = false ) {
 			if ( ! $this->is_contact_exists() ) {
 				return false;
 			}
 
-			$soft_bounce_limit = apply_filters( 'bwfan_contact_soft_bounce_limit', 3 );
-			$soft_bounce_limit = empty( $soft_bounce_limit ) ? 1 : intval( $soft_bounce_limit );
-
-			$soft_bounce_count = $this->contact->get_meta( 'soft_bounce_count' );
-			$soft_bounce_count = empty( $soft_bounce_count ) ? 0 : intval( $soft_bounce_count );
-
 			/** save last status in contact meta */
 			$this->save_last_status();
 			/** Remove data from unsubscribe table */
 			$this->remove_unsubscribe_data();
 
-			if ( $soft_bounce_count >= $soft_bounce_limit ) {
-				/** Soft bounce limit reached, mark contact bounced */
-
-				$this->contact->set_status( self::$STATUS_BOUNCED );
-				$this->contact->set_last_modified( current_time( 'mysql', 1 ) );
-				$this->save();
-
-				/** Run action if contact has a different status */
-				if ( ! $stop_hooks ) {
-					do_action( 'bwfcrm_after_contact_bounced', $this->contact );
-				}
-				$count = ( $soft_bounce_count > 1 ) ? "($soft_bounce_count times)" : 'once';
-
-				$soft_bounce_count ++;
-				$this->contact->set_meta( 'soft_bounce_count', $soft_bounce_count );
-				$this->contact->save_meta();
-
-				return [
-					'message' => __( "Status change to bounce as contact already soft bounce", "wp-marketing-automations" ) . " $count",
-				];
-			}
-
-			/** Mark contact soft bounced */
-			$soft_bounce_count ++;
-			$this->contact->set_meta( 'soft_bounce_count', $soft_bounce_count );
+			/**
+			 * Mark contact soft bounced.
+			 * A soft bounce no longer counts toward auto-removal. Contacts are only marked bounced on a
+			 * definitive (hard) bounce, handled separately by mark_as_bounced(). Removed the legacy
+			 * 3-attempt soft-bounce counter that converted soft bounces into hard bounces.
+			 */
 			$this->contact->set_status( self::$STATUS_SOFT_BOUNCED );
 			$this->contact->set_last_modified( current_time( 'mysql', 1 ) );
 			$this->save();
-			$this->contact->save_meta();
 
-			/** Check if contact is already bounced */
 			if ( ! $stop_hooks ) {
-				do_action( 'bwfcrm_after_contact_soft_bounced', $this->contact, $soft_bounce_count );
+				do_action( 'bwfcrm_after_contact_soft_bounced', $this->contact );
 			}
 
 			return true;
@@ -2938,26 +2903,12 @@ if ( ! class_exists( 'BWFCRM_Contact' ) && BWFAN_Common::is_pro_3_0() ) {
 			$this->contact->set_last_modified( current_time( 'mysql', 1 ) );
 			$this->save();
 
-			$this->remove_soft_bounce_limit();
-
 			/** Run action if contact earlier has a different status */
 			if ( false === $is_already_complaint && ! $stop_hooks ) {
 				do_action( 'bwfcrm_after_contact_complaint', $this->contact );
 			}
 
 			return true;
-		}
-
-		/**
-		 * Remove soft bounce limit meta
-		 *
-		 * @return void
-		 */
-		public function remove_soft_bounce_limit() {
-			$this->contact->delete_meta( 'soft_bounce_count' );
-
-			/** unset value */
-			$this->contact->unset_meta( 'soft_bounce_count' );
 		}
 
 		/**
