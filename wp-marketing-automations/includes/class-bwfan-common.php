@@ -12215,9 +12215,10 @@ class BWFAN_Common {
 			if ( ! isset( $global_settings['bwfan_unsubscribe_page'] ) || empty( $global_settings['bwfan_unsubscribe_page'] ) ) {
 				self::$unsubscribe_page_link = esc_url_raw( home_url() );
 			} else {
-				$page = absint( $global_settings['bwfan_unsubscribe_page'] );
+				$page      = absint( $global_settings['bwfan_unsubscribe_page'] );
+				$permalink = get_permalink( $page );
 
-				self::$unsubscribe_page_link = get_permalink( $page );
+				self::$unsubscribe_page_link = ! empty( $permalink ) ? $permalink : esc_url_raw( home_url( '/' ) );
 			}
 		}
 

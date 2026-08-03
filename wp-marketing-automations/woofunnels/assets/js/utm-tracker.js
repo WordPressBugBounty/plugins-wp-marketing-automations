@@ -335,13 +335,13 @@ function wffnJourney() {
     let siteIdx = wffnJourneySiteIndex(store, origin);
 
     let pageData = {};
-    pageData['u'] = encodeURIComponent(wffnAddSlashes(fullPath));
-    pageData['t'] = encodeURIComponent(document.title);
-    pageData['i'] = wffnUtm.page_id;
-    pageData['s'] = siteIdx;
+    pageData.u = encodeURIComponent(wffnAddSlashes(fullPath));
+    pageData.t = encodeURIComponent(document.title);
+    pageData.i = wffnUtm.page_id;
+    pageData.s = siteIdx;
 
     // Dedup on the (path, site) pair so the same path on two sites is not collapsed.
-    if (wffnGetLastEntry(store.j, 'u') === pageData['u'] && wffnGetLastEntry(store.j, 's') === pageData['s']) {
+    if (wffnGetLastEntry(store.j, 'u') === pageData.u && wffnGetLastEntry(store.j, 's') === pageData.s) {
         return;
     }
 

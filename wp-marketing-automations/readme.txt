@@ -4,7 +4,7 @@ Tags: cart abandonment, follow up emails, email marketing, newsletter, marketing
 Requires at least: 5.0
 Tested up to: 7.1
 Requires PHP: 7.0
-Stable tag: 3.8.5
+Stable tag: 3.8.5.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -415,6 +415,10 @@ FunnelKit Automations is 100% self-hosted and fully GDPR compliant.
 
 
 == Change log ==
+
+= 3.8.5.1 (Aug 3, 2026) =
+Fixed: Improved search support for automation search, broadcast tag lists, and advanced filters when using terms with special characters. (#4814)
+Fixed: Improved one-click unsubscribe reliability by ensuring the List-Unsubscribe email header always generates a valid URL, even if the unsubscribe page has been deleted. (#4818)
 
 = 3.8.5 (July 30, 2026) =
 * Added: Compatibility with React 19, which is coming in WordPress 7.1. (#4750)
