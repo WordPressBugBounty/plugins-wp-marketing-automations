@@ -90,8 +90,13 @@ if ( ! class_exists( 'BWF_Ecomm_Tracking_Common' ) ) {
 			/**
 			 * Disable client-side journey recording on one-click upsell offer pages.
 			 * The offer view is appended to the journey server-side in update_upsell_journey().
+			 *
+			 * WFOCU_Core() is defined at file level by the Upsells plugin, but its `public`
+			 * property is only populated once load_classes()/register_classes() run, which is
+			 * skipped when WooCommerce is inactive or below the minimum WP/WC version. Guard
+			 * the property before calling into it.
 			 */
-			if ( class_exists( 'WFFN_Common' ) && WFFN_Common::wffn_is_funnel_pro_active() && function_exists( 'WFOCU_Core' ) && WFOCU_Core()->public->if_is_offer() ) {
+			if ( class_exists( 'WFFN_Common' ) && WFFN_Common::wffn_is_funnel_pro_active() && function_exists( 'WFOCU_Core' ) && isset( WFOCU_Core()->public ) && is_callable( array( WFOCU_Core()->public, 'if_is_offer' ) ) && true === WFOCU_Core()->public->if_is_offer() ) {
 				$this->journeyControl = 'disable';
 			}
 
