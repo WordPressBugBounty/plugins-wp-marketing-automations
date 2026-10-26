@@ -4,7 +4,7 @@ Tags: cart abandonment, follow up emails, email marketing, newsletter, marketing
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.8.6
+Stable tag: 3.8.6.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -423,6 +423,11 @@ FunnelKit may connect to the following external services, only when the related 
 * **YouTube** may embed tutorial videos on FunnelKit screens. [Terms](https://www.youtube.com/t/terms) and [Privacy Policy](https://policies.google.com/privacy)
 
 == Change log ==
+
+= 3.8.6.1 (Oct 26, 2026) =
+* Fixed: Restored search results for Lists, Tags, Products, Coupons, Users and category conditions in the Legacy automation builder. (#4932)
+* Fixed: The "Order Item Data" rule now ignores surrounding whitespace in order item meta values and safely handles non-text meta. (#4930)
+* Fixed: Prevented fatal errors in background workers and CSV exports on hosts that disable `ignore_user_abort` or `set_time_limit` in PHP, such as RunCloud defaults.
 
 = 3.8.6 (Oct 22, 2026) =
 * Improved: Hardened REST authentication handling for admin browser sessions, reported via Patchstack.(#4911)

@@ -1215,7 +1215,9 @@ class BWFAN_Common {
 		// Keep PHP running if the client disconnects (e.g. the loopback pinger's short timeout fires)
 		// before background work finishes. Must run BEFORE the REST fallback below, which returns
 		// without detaching the connection and would otherwise leave the worker unprotected from abort.
-		ignore_user_abort( true );
+		if ( function_exists( 'ignore_user_abort' ) ) {
+			ignore_user_abort( true ); // disabled via disable_functions on some hosts (RunCloud default)
+		}
 
 		// Close session to release lock (if active)
 		if ( session_status() === PHP_SESSION_ACTIVE ) {
