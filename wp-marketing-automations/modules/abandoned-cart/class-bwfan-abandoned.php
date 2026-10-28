@@ -1595,6 +1595,21 @@ class BWFAN_Abandoned_Cart {
 	}
 
 	/**
+	 * Sanitize a single checkout field value, rejecting PHP-serialized strings so a
+	 * serialized object payload can never be stored and later unserialized (object injection).
+	 *
+	 * @param mixed $value
+	 *
+	 * @return mixed
+	 */
+	public static function sanitize_checkout_field( $value ) {
+		/** Sanitize first: tag/octet stripping could otherwise rebuild a serialized string (O<x>:8:... becomes O:8:...). */
+		$value = sanitize_text_field( $value );
+
+		return is_serialized( $value ) ? '' : $value;
+	}
+
+	/**
 	 * Insert Abandoned Cart
 	 *
 	 * @since 1.0.0
@@ -1640,7 +1655,7 @@ class BWFAN_Abandoned_Cart {
 
 		$exclude_checkout_fields = apply_filters( 'bwfan_ab_exclude_checkout_fields', array() );
 		$data                    = [
-			'fields'               => isset( $_POST['checkout_fields_data'] ) && is_array( $_POST['checkout_fields_data'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['checkout_fields_data'] ) ) : [],
+			'fields'               => isset( $_POST['checkout_fields_data'] ) && is_array( $_POST['checkout_fields_data'] ) ? array_map( array( __CLASS__, 'sanitize_checkout_field' ), wp_unslash( $_POST['checkout_fields_data'] ) ) : [], // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- each value sanitised by sanitize_checkout_field()
 			//phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput
 			'current_page_id'      => isset( $_POST['current_page_id'] ) ? sanitize_text_field( $_POST['current_page_id'] ) : '',
 			//phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput

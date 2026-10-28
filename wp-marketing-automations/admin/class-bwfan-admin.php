@@ -999,7 +999,7 @@ class BWFAN_Admin {
 	 */
 	public function get_automation_section() {
 		if ( isset( $_GET['section'] ) && ! empty( sanitize_text_field( wp_unslash( $_GET['section'] ) ) ) && isset( $_GET['page'] ) && 'autonami-automations' === sanitize_text_field( wp_unslash( $_GET['page'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only admin page routing or list filter from the URL; no state change
-			return sanitize_text_field( wp_unslash( $_GET['section'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only admin page routing or list filter from the URL; no state change
+			return sanitize_key( wp_unslash( $_GET['section'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only admin page routing or list filter from the URL; no state change. sanitize_key() strips path characters so the section cannot traverse the include at automation-builder-view.php
 		}
 
 		return 'automation';
@@ -1012,7 +1012,7 @@ class BWFAN_Admin {
 	 */
 	public function maybe_set_automation_id() {
 		if ( $this->is_autonami_page() && isset( $_GET['edit'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only admin page routing or list filter from the URL; no state change
-			BWFAN_Core()->automations->set_automation_id( sanitize_text_field( wp_unslash( $_GET['edit'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only admin page routing or list filter from the URL; no state change
+			BWFAN_Core()->automations->set_automation_id( absint( wp_unslash( $_GET['edit'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only admin page routing or list filter from the URL; no state change
 			BWFAN_Core()->automations->set_automation_details();
 
 			do_action( 'bwfan_automation_data_set_automation' ); // WordPress.CSRF.NonceVerification.NoNonceVerification
@@ -1252,7 +1252,7 @@ class BWFAN_Admin {
 	 */
 	public function get_automation_id() {
 		if ( isset( $_GET['edit'] ) && ! empty( sanitize_text_field( wp_unslash( $_GET['edit'] ) ) ) && isset( $_GET['page'] ) && 'autonami-automations' === sanitize_text_field( wp_unslash( $_GET['page'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only admin page routing or list filter from the URL; no state change
-			return sanitize_text_field( wp_unslash( $_GET['edit'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only admin page routing or list filter from the URL; no state change
+			return absint( wp_unslash( $_GET['edit'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only admin page routing or list filter from the URL; no state change
 		}
 
 		return false;

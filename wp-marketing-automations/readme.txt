@@ -4,7 +4,7 @@ Tags: cart abandonment, follow up emails, email marketing, newsletter, marketing
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 3.8.6.1
+Stable tag: 3.8.6.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -423,6 +423,12 @@ FunnelKit may connect to the following external services, only when the related 
 * **YouTube** may embed tutorial videos on FunnelKit screens. [Terms](https://www.youtube.com/t/terms) and [Privacy Policy](https://policies.google.com/privacy)
 
 == Change log ==
+
+= 3.8.6.2 (Oct 28, 2026) =
+* Improved: [Update Recommended] Hardened data validation across abandoned cart capture and contact fields. (#4936)
+* Improved: Refined legacy automation screen functionality and admin preference handling for better reliability. (#4937)
+* Improved: Improved importers for ActiveCampaign, Mailchimp, and Kit. (#4939)
+* Improved: Optimized custom field management for greater stability and reliability. (#4940)
 
 = 3.8.6.1 (Oct 26, 2026) =
 * Fixed: Restored search results for Lists, Tags, Products, Coupons, Users and category conditions in the Legacy automation builder. (#4932)

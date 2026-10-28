@@ -718,7 +718,7 @@ final class BWFAN_Header {
 					$dropdown_data = '<span class="bwf-hover-suheader-menu">';
 					foreach ( $item['items'] as $ikey => $data ) {
 						$class         = $active_slug === $ikey ? 'bwfan_navigation_active' : '';
-						$dropdown_data .= '<a href="' . esc_url( $data['link'] ) . '" class="' . $class . '" data-link-type="bwf-crm">' . $data['name'] . '</a>';
+						$dropdown_data .= '<a href="' . esc_url( $data['link'] ) . '" class="' . esc_attr( $class ) . '" data-link-type="bwf-crm">' . esc_html( $data['name'] ) . '</a>';
 
 						if ( $active_slug === $ikey ) {
 							$active = true;
@@ -738,12 +738,12 @@ final class BWFAN_Header {
 
 				$icon = ( isset( $item['icon'] ) && ! empty( $item['icon'] ) ) ? wp_remote_retrieve_body( wp_remote_get( esc_url( plugin_dir_url( BWFAN_PLUGIN_FILE ) . 'admin/assets/img/menu/' . $item['icon'] . '.svg' ) ) ) : ''; //phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.wp_remote_get_wp_remote_get
 
-				$target = ( isset( $item['target'] ) && ! empty( $item['target'] ) ) ? ' target="' . $item['target'] . '"' : '';
+				$target = ( isset( $item['target'] ) && ! empty( $item['target'] ) ) ? ' target="' . esc_attr( $item['target'] ) . '"' : '';
 
 				$item_link = $item['link'] ?? '#';
 				$item_name = $item['name'] ?? '';
 
-				echo '<span><a href="' . $item_link . '" class="' . $active . '"' . $target . '>' . $icon . $item_name . '</a></span>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo '<span><a href="' . esc_url( $item_link ) . '" class="' . esc_attr( $active ) . '"' . $target . '>' . $icon . esc_html( $item_name ) . '</a></span>'; //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $icon is trusted inline SVG read from the plugin's own assets; link, class and target escaped above
 			}
 		}
 	}
