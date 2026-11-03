@@ -74,6 +74,7 @@ class BWFAN_Abandoned_Cart {
 		add_action( 'wp', [ $this, 'handle_restore_cart' ], 5 );
 
 		add_action( 'woocommerce_after_calculate_totals', [ $this, 'trigger_update_on_cart_and_checkout_pages' ] );
+		add_filter( 'woocommerce_update_order_review_fragments', [ $this, 'add_cart_hash_fragment' ] );
 		// prefill the checkout fields after the cart is restored
 		add_filter( 'woocommerce_billing_fields', [ $this, 'prefill_billing_fields' ], 20 );
 		add_filter( 'woocommerce_shipping_fields', [ $this, 'prefill_shipping_fields' ], 20 );
@@ -713,6 +714,22 @@ class BWFAN_Abandoned_Cart {
 		) {
 			$this->cart_updated();
 		}
+	}
+
+	/**
+	 * Pass the cart hash with every checkout refresh, so the tracking script can tell a refresh that
+	 * changed the cart or its totals from one that changed nothing and skip the save for the latter.
+	 *
+	 * @param array $fragments update_order_review fragments.
+	 *
+	 * @return array
+	 */
+	public function add_cart_hash_fragment( $fragments ) {
+		if ( is_array( $fragments ) && function_exists( 'WC' ) && ! is_null( WC()->cart ) ) {
+			$fragments['bwfan_cart_hash'] = WC()->cart->get_cart_hash();
+		}
+
+		return $fragments;
 	}
 
 	/**

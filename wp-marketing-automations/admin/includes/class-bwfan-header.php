@@ -189,10 +189,22 @@ final class BWFAN_Header {
 			unset( $left_nav_data['carts'] );
 		}
 
+		// FunnelKit AI: administrators only, as its REST routes are, on a site that runs the module.
+		if ( self::shows_funnelkit_ai() ) {
+			$tools = isset( $left_nav_data['tools'] ) ? array( 'tools' => $left_nav_data['tools'] ) : array();
+			unset( $left_nav_data['tools'] );
+			$left_nav_data['funnelkit-ai'] = array(
+				'name'  => __( 'AI & MCP', 'wp-marketing-automations' ),
+				'link'  => admin_url( 'admin.php?page=autonami&path=/ai-mcp' ),
+				'badge' => __( 'New', 'wp-marketing-automations' ),
+			);
+			$left_nav_data += $tools;
+		}
+
 		/** Remove the keys which are not present in menu data */
 		if ( ! empty( $menu_data ) && is_array( $menu_data ) ) {
 			$left_nav_data = array_filter( $left_nav_data, function ( $key ) use ( $menu_data ) {
-				return $key === 'tools' || in_array( $key, $menu_data, true );
+				return $key === 'tools' || $key === 'funnelkit-ai' || in_array( $key, $menu_data, true );
 			}, ARRAY_FILTER_USE_KEY );
 			if ( isset( $left_nav_data['tools'] ) && empty( $left_nav_data['tools']['items'] ) ) {
 				unset( $left_nav_data['tools'] );
@@ -200,6 +212,16 @@ final class BWFAN_Header {
 		}
 
 		return $left_nav_data;
+	}
+
+	/**
+	 * Whether the FunnelKit AI page is offered: the module runs on this site and the
+	 * user is an administrator, the same gate as BWFAN_MCP_Settings_API::permission_check().
+	 *
+	 * @return bool
+	 */
+	public static function shows_funnelkit_ai() {
+		return function_exists( 'fkmcp_boot_module' ) && current_user_can( 'manage_options' );
 	}
 
 	/**

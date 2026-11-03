@@ -352,6 +352,11 @@ class BWFAN_Admin {
 			}, 15 );
 		}
 
+		if ( BWFAN_Header::shows_funnelkit_ai() ) {
+			add_submenu_page( 'autonami', __( 'AI & MCP', 'wp-marketing-automations' ), __( 'AI & MCP', 'wp-marketing-automations' ) . '<span style="padding-left: 2px;color: #f18200; vertical-align: super; font-size: 9px;"> ' . esc_html_x( 'NEW!', 'admin menu badge', 'wp-marketing-automations' ) . '</span>', 'manage_options', 'autonami&path=/ai-mcp', function () {
+			}, 16 );
+		}
+
 
 		if ( true === bwfan_is_autonami_pro_active() ) {
 
